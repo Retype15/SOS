@@ -1,39 +1,39 @@
-# S.O.S. CUSTOM PERMISSIVE LICENSE (SCPL)
-**Copyright (c) 2026-2028 @Retype15. All rights reserved.**
+S.O.S. CUSTOM PERMISSIVE LICENSE (SCPL)
+Copyright (c) 2026-2028 @Retype15. All rights reserved.
 
-### 1. DEFINITIONS
-*   **"Software"** refers to the source code, scripts, configuration files (.xml), visual assets, models, sound files, and technical documentation comprising this mod.
-*   **"Author"** refers to the legitimate holder of the intellectual property rights, identified as @Retype15.
-*   **"Derivative Work"** refers to any software or content that is based upon, derived from, or incorporates any portion of the original Software.
-*   **"Authorized Distribution"** refers to the publication of the Software on collaborative development platforms (e.g., GitHub, GitLab) or third-party mod hosting sites, specifically excluding the platform defined in Section 4.
+1. DEFINITIONS
+    "Software" refers to the source code, scripts, configuration files (.xml), visual assets, models, sound files, and technical documentation comprising this mod.
+    "Author" refers to the legitimate holder of the intellectual property rights, identified as @Retype15.
+    "Derivative Work" refers to any software or content that is based upon, derived from, or incorporates any portion of the original Software.
+    "Authorized Distribution" refers to the publication of the Software on collaborative development platforms (e.g., GitHub, GitLab) or third-party mod hosting sites, specifically excluding the platform defined in Section 4.
 
-### 2. LICENSE GRANT
+2. LICENSE GRANT
 Subject to the terms and conditions of this License, the Author hereby grants to any person ("the Licensee") a worldwide, non-exclusive, no-charge, royalty-free, and perpetual license to:
-*   Use, copy, and study the Software for personal and private purposes.
-*   Modify and create Derivative Works for personal use.
-*   Distribute copies of the Software or its Derivative Works via **Authorized Distributions**, provided that the conditions in Section 3 are met.
+    Use, copy, and study the Software for personal and private purposes.
+    Modify and create Derivative Works for personal use.
+    Distribute copies of the Software or its Derivative Works via Authorized Distributions, provided that the conditions in Section 3 are met.
 
-### 3. ATTRIBUTION AND REDISTRIBUTION REQUIREMENTS
+3. ATTRIBUTION AND REDISTRIBUTION REQUIREMENTS
 Any permitted redistribution of the Software, whether in its original form or as a Derivative Work, must strictly comply with the following requirements:
-1.  **Copyright Notice:** The original copyright notice of the Author must remain intact in all files and metadata.
-2.  **License Inclusion:** A complete copy of this license (SCPL) must be included within the distribution package.
-3.  **Reference Link:** A functional and visible link to the official repository or the Author’s designated original source must be provided.
-4.  **Statement of Changes:** In the event of modifications, it must be clearly stated that the work is a Derivative Work and not the original product.
+1.  Copyright Notice: The original copyright notice of the Author must remain intact in all files and metadata.
+2.  License Inclusion: A complete copy of this license (SCPL) must be included within the distribution package.
+3.  Reference Link: A functional and visible link to the official repository or the Author’s designated original source must be provided.
+4.  Statement of Changes: In the event of modifications, it must be clearly stated that the work is a Derivative Work and not the original product.
 
-### 4. EXCLUSIVE DISTRIBUTION RESTRICTION (STEAM WORKSHOP)
-Notwithstanding the provisions of Section 2, the Author reserves the **sole and exclusive right** to publish, distribute, update, and manage the Software and its Derivative Works on the **Steam Workshop** platform (owned by Valve Corporation).
-*   It is **strictly prohibited** for any individual or legal entity other than the Author to upload, re-upload, host, or facilitate the download of the Software or any Derivative Work thereof on Steam Workshop.
-*   This restriction applies regardless of whether the distribution is free of charge, intended for preservation purposes, or included as part of a "Modpack" or collection.
+4. EXCLUSIVE DISTRIBUTION RESTRICTION (STEAM WORKSHOP)
+Notwithstanding the provisions of Section 2, the Author reserves the sole and exclusive right to publish, distribute, update, and manage the Software and its Derivative Works on the Steam Workshop platform (owned by Valve Corporation).
+    It is strictly prohibited for any individual or legal entity other than the Author to upload, re-upload, host, or facilitate the download of the Software or any Derivative Work thereof on Steam Workshop.
+    This restriction applies regardless of whether the distribution is free of charge, intended for preservation purposes, or included as part of a "Modpack" or collection.
 
-### 5. BREACH, TERMINATION, AND PENALTIES
+5. BREACH, TERMINATION, AND PENALTIES
 Failure to comply with any term of this License, particularly Section 4, shall result in the following immediate legal consequences:
-1.  **Automatic Termination:** The license granted in Section 2 shall terminate automatically and by operation of law. The Licensee shall immediately forfeit all rights to use, study, or distribute the Software.
-2.  **Cease and Desist Action:** The Author will initiate a notice of copyright infringement (**DMCA Notice**) with Valve Corporation to ensure the immediate removal of the unauthorized content.
-3.  **Legal Liability:** The Author reserves the right to seek further legal remedies for damages arising from intellectual property infringement and breach of contract.
-4.  **Conduct Reporting:** Unauthorized use of the Software on Steam Workshop will be reported to platform authorities as a violation of the Steam Subscriber Agreement regarding third-party intellectual property.
+1.  Automatic Termination: The license granted in Section 2 shall terminate automatically and by operation of law. The Licensee shall immediately forfeit all rights to use, study, or distribute the Software.
+2.  Cease and Desist Action: The Author will initiate a notice of copyright infringement (DMCA Notice) with Valve Corporation to ensure the immediate removal of the unauthorized content.
+3.  Legal Liability: The Author reserves the right to seek further legal remedies for damages arising from intellectual property infringement and breach of contract.
+4.  Conduct Reporting: Unauthorized use of the Software on Steam Workshop will be reported to platform authorities as a violation of the Steam Subscriber Agreement regarding third-party intellectual property.
 
-### 6. COMMERCIAL RESTRICTION
+6. COMMERCIAL RESTRICTION
 Under no circumstances may the Software or Derivative Works be sold, rented, or included in any paid services (Paywalls, exclusive Patreon content, or other monetization platforms) without a separate, written commercial agreement signed by the Author.
 
-### 7. DISCLAIMER OF WARRANTY AND LIMITATION OF LIABILITY
+7. DISCLAIMER OF WARRANTY AND LIMITATION OF LIABILITY
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
