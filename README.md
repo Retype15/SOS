@@ -6,13 +6,17 @@
 
 [![GitHub – Download](https://img.shields.io/badge/GitHub-Download-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Retype15/SOS/releases/latest/download/SOS.zip)
 [![Itch.io – Visit Site](https://img.shields.io/badge/Itch.io-Visit%20Site-FA5C5C?style=for-the-badge&logo=itch.io&logoColor=white)](https://retype15.itch.io/sos)
-![Steam Workshop – Not Available](https://img.shields.io/badge/Workshop-Not_Available-1B2838?style=for-the-badge&logo=steam&logoColor=white)
+[![Steam Workshop](https://img.shields.io/badge/Steam_Workshop-Add_here-1B2838?style=for-the-badge&logo=steam&logoColor=white)](https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282)
 
 ---
 
 **S.O.S.** is a high-performance recipe browser and material tracking utility for **Barotrauma**. Designed to be the ultimate companion for both vanilla and heavily modded campaigns (like Neurotrauma or BaroCraftables), it provides a seamless, integrated interface to explore the complex economy of Europa.
 
-[![Download Latest Version Here](https://img.shields.io/badge/Download_Latest_Version_Here-2b2f33?style=for-the-badge)](https://github.com/Retype15/SOS/releases/latest/download/SOS.zip)
+[![Add from Workshop](https://img.shields.io/badge/Add_From-Steam_Workshop-2b2f33?style=for-the-badge)](https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282)
+
+**Or**
+
+[![Manually Download Latest Version](https://img.shields.io/badge/Download_Latest_Version_Here-2b2f33?style=for-the-badge)](https://github.com/Retype15/SOS/releases/latest/download/SOS.zip)
 
 ## Key Features
 
@@ -70,14 +74,15 @@ In future updates, access to the S.O.S. interface will be gated behind a **Chip 
 
 ## License & Copyright
 
-This project is licensed under the [S.O.S. Custom Permissive License (SCPL)](https://github.com/Retype15/SOS?tab=License-1-ov-file).
+This project is licensed under the **GNU General Public License v3.0 (GPLv3)**.  
+See the [LICENSE](LICENCE) file in the project root for the full text of the license.
 
 ### Key Terms
 
-- **Personal Use:** You are free to use, modify, and study the code for personal purposes.
-- **Attribution:** Redistribution on third-party sites or GitHub is allowed provided that full credit is given to the author (@Retype15) and a link to the original repository is included.
-- **Exclusive Distribution:** The Author reserves the **sole and exclusive right** to publish and manage this Software on the **Steam Workshop**. Re-uploading this mod to the Workshop by anyone other than @Retype15 is strictly prohibited and will result in a DMCA notice.
-- **Non-Commercial:** This mod cannot be sold or included in any paid services/paywalls.
+- **Freedom to Use and Modify** — You may use, study, modify, and run this software for any purpose, both privately and publicly.
+- **Attribution Required** — Any redistribution or publication of this project or its derivatives must retain the original copyright notice and clearly credit the author (**[@Retype15](https://github.com/Retype15)**).
+- **Copyleft Protection** — Any modified version that is distributed must also be licensed under **GPLv3**, ensuring that all derivatives remain free and open.
+- **Source Availability** — If you distribute a modified version, you must also provide access to the corresponding source code under the same license terms.
 
 ---
 *Developed by [@Retype15](https://github.com/Retype15)*

@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2026 @Retype15. Licensed under SOS Custom Permissive License (SCPL).
-// See LICENSE file in the project root for full license information.
+﻿// Copyright (c) 2026 Reynier
+// This file is licensed under the GNU GPLv3.
+// See the LICENSE file in the project root for details.
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
