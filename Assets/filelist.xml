@@ -2,4 +2,7 @@
 <contentpackage name="S.O.S - Standard Operations Schematics" description="The ultimate recipe browser and ingredient tracker." modversion="0.3.2b" gameversion="1.11.5.0" corepackage="false" steamworkshopid="3682891282" >
 	<Text file="%ModDir%/Localizations/English.xml" />
 	<Text file="%ModDir%/Localizations/Spanish.xml" />
+	<Text file="%ModDir%/Localizations/Russian.xml" />
+	<Text file="%ModDir%/Localizations/ChineseSimplified.xml" />
+	<Text file="%ModDir%/Localizations/French.xml" />
 </contentpackage>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<infotexts language="Russian" nowhitespace="false" translatedname="Русский">
+	<Override>
+		<sos.command.name>sos</sos.command.name>
+		<sos.command.help>Открыть/Закрыть SOS.</sos.command.help>
+		<sos.client.init>[SOS] Клиент: Инициализирован. Нажмите 'J', чтобы открыть.</sos.client.init>
+		<sos.config.saved>[SOS] Настройки сохранены (v[version]).</sos.config.saved>
+		<sos.config.save_error>[SOS] Не удалось сохранить настройки: [error]</sos.config.save_error>
+		<sos.config.loaded>[SOS] Настройки v[version] успешно загружены.</sos.config.loaded>
+		<sos.config.load_error>[SOS] Ошибка чтения файла настроек: [error]</sos.config.load_error>
+		<sos.context.track>Отслеживать в HUD</sos.context.track>
+		<sos.context.view_recipes>Посмотреть рецепты</sos.context.view_recipes>
+		<sos.context.remove_favorite>Удалить из избранного</sos.context.remove_favorite>
+		<sos.context.add_favorite>Добавить в избранное</sos.context.add_favorite>
+		<sos.context.untrack>Убрать из HUD</sos.context.untrack>
+		<sos.context.track_recipe>Добавить в HUD</sos.context.track_recipe>
+		<sos.context.recipe_options>Параметры рецепта</sos.context.recipe_options>
+		<sos.window.title>SOS - Просмотр рецептов</sos.window.title>
+		<sos.window.clear_hud>Очистить HUD</sos.window.clear_hud>
+		<sos.window.search_placeholder>Поиск предмета...</sos.window.search_placeholder>
+		<sos.window.obtain>ПОЛУЧЕНИЕ</sos.window.obtain>
+		<sos.window.usage>ИСПОЛЬЗОВАНИЕ</sos.window.usage>
+		<sos.window.additional_info>ДОП. ИНФОРМАЦИЯ</sos.window.additional_info>
+		<sos.hud.tracking>ОТСЛЕЖИВАНИЕ:</sos.hud.tracking>
+		<sos.item.header_info>ID: [id] | Цена: [price] мк</sos.item.header_info>
+		<sos.item.id>ID:</sos.item.id>
+		<sos.item.price>Цена:</sos.item.price>
+		<sos.item.max_stack>Макс. стек:</sos.item.max_stack>
+		<sos.item.description>ОПИСАНИЕ:</sos.item.description>
+		<sos.item.tags>ТЕГИ:</sos.item.tags>
+		<sos.recipe.hand>Вручную</sos.recipe.hand>
+		<sos.recipe.deconstructor>ДЕКОНСТРУКТОР</sos.recipe.deconstructor>
+		<sos.recipe.random_outputs>Дает [amount] случайно:</sos.recipe.random_outputs>
+		<sos.recipe.deconstructing>РАЗБОР:</sos.recipe.deconstructing>
+		<sos.shared.loaded>[SOS] Успешно загружено.</sos.shared.loaded>
+		<sos.shared.unloaded>[SOS] Мод выгружен.</sos.shared.unloaded>
+		<sos.recipe.unlocked>Рецепт разблокирован</sos.recipe.unlocked>
+		<sos.recipe.locked>Требуется рецепт для разблокировки</sos.recipe.locked>
+		<sos.window.section_general>ОБЩЕЕ</sos.window.section_general>
+		<sos.window.section_economy>ЭКОНОМИКА</sos.window.section_economy>
+		<sos.window.section_spawning>ГДЕ НАЙТИ</sos.window.section_spawning>
+		<sos.window.section_weapon>ОРУЖИЕ</sos.window.section_weapon>
+		<sos.window.section_equipment>СНАРЯЖЕНИЕ</sos.window.section_equipment>
+		<sos.window.section_utility>УТИЛИТЫ</sos.window.section_utility>
+		<sos.window.section_container>КОНТЕЙНЕР</sos.window.section_container>
+		<sos.gen.yes>Да</sos.gen.yes>
+		<sos.gen.no>Нет</sos.gen.no>
+		<sos.gen.unknown>???</sos.gen.unknown>
+		<sos.item.aliases>Алиасы:</sos.item.aliases>
+		<sos.item.category>Категория:</sos.item.category>
+		<sos.item.cargo_box>Грузовой ящик:</sos.item.cargo_box>
+		<sos.item.hazards>Опасности:</sos.item.hazards>
+		<sos.item.causes_fire>Вызывает пожар</sos.item.causes_fire>
+		<sos.item.drains_oxygen>Потребляет кислород</sos.item.drains_oxygen>
+		<sos.item.base_price>Базовая цена:</sos.item.base_price>
+		<sos.item.can_buy>Можно купить:</sos.item.can_buy>
+		<sos.item.can_sell>Можно продать:</sos.item.can_sell>
+		<sos.item.min_difficulty>Мин. сложность:</sos.item.min_difficulty>
+		<sos.item.required_faction>Требуемая фракция:</sos.item.required_faction>
+		<sos.item.locations>Места:</sos.item.locations>
+		<sos.weapon.fire_rate>Скорострельность:</sos.weapon.fire_rate>
+		<sos.weapon.reload>Перезарядка:</sos.weapon.reload>
+		<sos.weapon.base_spread>Базовый разброс:</sos.weapon.base_spread>
+		<sos.weapon.dmg_multiplier>Множ. урона:</sos.weapon.dmg_multiplier>
+		<sos.weapon.armor_penetration>Пробитие брони:</sos.weapon.armor_penetration>
+		<sos.weapon.range>Дистанция:</sos.weapon.range>
+		<sos.weapon.power_use>Потребление энергии:</sos.weapon.power_use>
+		<sos.weapon.type>Тип:</sos.weapon.type>
+		<sos.weapon.throwable>Метательное</sos.weapon.throwable>
+		<sos.weapon.area_radius>Радиус области:</sos.weapon.area_radius>
+		<sos.weapon.hull_damage>Урон корпусу:</sos.weapon.hull_damage>
+		<sos.weapon.dismember_chance>Шанс расчленения:</sos.weapon.dismember_chance>
+		<sos.equip.max_durability>Макс. прочность:</sos.equip.max_durability>
+		<sos.equip.equips_in>Экипируется в:</sos.equip.equips_in>
+		<sos.equip.pressure_protection>Защита от давления:</sos.equip.pressure_protection>
+		<sos.equip.armor_special>Особенности брони:</sos.equip.armor_special>
+		<sos.equip.deflect_projectiles>Отражает снаряды</sos.equip.deflect_projectiles>
+		<sos.util.radio_range>Дальность радиосвязи</sos.util.radio_range>
+		<sos.util.light_range>Дальность света</sos.util.light_range>
+		<sos.util.pump_flow>Макс. поток насоса</sos.util.pump_flow>
+		<sos.util.sonar_range>Дальность сонара</sos.util.sonar_range>
+		<sos.container.capacity>Вместимость:</sos.container.capacity>
+		<sos.container.slots>Слотов: [amount]</sos.container.slots>
+		<sos.container.accepts>Принимает:</sos.container.accepts>
+	</Override>
+</infotexts>

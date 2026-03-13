@@ -4,7 +4,6 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework.Input;
-using System.Xml.Linq;
 
 
 namespace SOS
@@ -26,8 +25,6 @@ namespace SOS
         public Stack<ItemPrefab> HistoryForward { get; } = new Stack<ItemPrefab>();
 
         private bool isDirty = false;
-        private const int CurrentSaveVersion = 1;
-        private readonly string configPath = "SOS_Settings.xml";
 
         public SOSController()
         {

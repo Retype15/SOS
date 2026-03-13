@@ -36,5 +36,51 @@
 		<sos.shared.unloaded>[SOS] Mod descargado.</sos.shared.unloaded>
 		<sos.recipe.unlocked>Receta Desbloqueada</sos.recipe.unlocked>
 		<sos.recipe.locked>Requiere Receta para Desbloquear</sos.recipe.locked>
+		<sos.window.section_general>GENERAL</sos.window.section_general>
+		<sos.window.section_economy>ECONOMÍA</sos.window.section_economy>
+		<sos.window.section_spawning>SE ENCUENTRA EN</sos.window.section_spawning>
+		<sos.window.section_weapon>ARMA</sos.window.section_weapon>
+		<sos.window.section_equipment>EQUIPO</sos.window.section_equipment>
+		<sos.window.section_utility>UTILIDAD</sos.window.section_utility>
+		<sos.window.section_container>CONTENEDOR</sos.window.section_container>
+		<sos.gen.yes>Sí</sos.gen.yes>
+		<sos.gen.no>No</sos.gen.no>
+		<sos.gen.unknown>???</sos.gen.unknown>
+		<sos.item.aliases>Alias:</sos.item.aliases>
+		<sos.item.category>Categoría:</sos.item.category>
+		<sos.item.cargo_box>Caja de Carga:</sos.item.cargo_box>
+		<sos.item.hazards>Peligros:</sos.item.hazards>
+		<sos.item.causes_fire>Causa Incendio</sos.item.causes_fire>
+		<sos.item.drains_oxygen>Drena Oxígeno</sos.item.drains_oxygen>
+		<sos.item.base_price>Precio Base:</sos.item.base_price>
+		<sos.item.can_buy>Se puede comprar:</sos.item.can_buy>
+		<sos.item.can_sell>Se puede vender:</sos.item.can_sell>
+		<sos.item.min_difficulty>Min. Dificultad:</sos.item.min_difficulty>
+		<sos.item.required_faction>Facción Requerida:</sos.item.required_faction>
+		<sos.item.locations>Ubicaciones:</sos.item.locations>
+		<sos.weapon.fire_rate>Cadencia de tiro:</sos.weapon.fire_rate>
+		<sos.weapon.reload>Recarga:</sos.weapon.reload>
+		<sos.weapon.base_spread>Dispersión Base:</sos.weapon.base_spread>
+		<sos.weapon.dmg_multiplier>Mult. de Daño:</sos.weapon.dmg_multiplier>
+		<sos.weapon.armor_penetration>Penetración de Armadura:</sos.weapon.armor_penetration>
+		<sos.weapon.range>Rango:</sos.weapon.range>
+		<sos.weapon.power_use>Uso de Energía:</sos.weapon.power_use>
+		<sos.weapon.type>Tipo:</sos.weapon.type>
+		<sos.weapon.throwable>Arrojadiza</sos.weapon.throwable>
+		<sos.weapon.area_radius>Radio de Área:</sos.weapon.area_radius>
+		<sos.weapon.hull_damage>Daño al Casco:</sos.weapon.hull_damage>
+		<sos.weapon.dismember_chance>Prob. de Desmembramiento:</sos.weapon.dismember_chance>
+		<sos.equip.max_durability>Durabilidad Máx:</sos.equip.max_durability>
+		<sos.equip.equips_in>Equipa en:</sos.equip.equips_in>
+		<sos.equip.pressure_protection>Protección de Presión:</sos.equip.pressure_protection>
+		<sos.equip.armor_special>Especial de Armadura:</sos.equip.armor_special>
+		<sos.equip.deflect_projectiles>Desvía Proyectiles</sos.equip.deflect_projectiles>
+		<sos.util.radio_range>Rango de Radio</sos.util.radio_range>
+		<sos.util.light_range>Rango de Luz</sos.util.light_range>
+		<sos.util.pump_flow>Flujo Máx de Bomba</sos.util.pump_flow>
+		<sos.util.sonar_range>Rango de Sonar</sos.util.sonar_range>
+		<sos.container.capacity>Capacidad:</sos.container.capacity>
+		<sos.container.slots>[amount] Espacios</sos.container.slots>
+		<sos.container.accepts>Acepta:</sos.container.accepts>
 	</Override>
 </infotexts>

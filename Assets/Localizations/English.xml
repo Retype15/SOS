@@ -36,5 +36,51 @@
 		<sos.shared.unloaded>[SOS] Mod Unloaded.</sos.shared.unloaded>
 		<sos.recipe.unlocked>Recipe Unlocked</sos.recipe.unlocked>
 		<sos.recipe.locked>Requires Recipe to Unlock</sos.recipe.locked>
+		<sos.window.section_general>GENERAL</sos.window.section_general>
+		<sos.window.section_economy>ECONOMY</sos.window.section_economy>
+		<sos.window.section_spawning>FOUND IN</sos.window.section_spawning>
+		<sos.window.section_weapon>AS WEAPON</sos.window.section_weapon>
+		<sos.window.section_equipment>AS EQUIPMENT</sos.window.section_equipment>
+		<sos.window.section_utility>UTILITY</sos.window.section_utility>
+		<sos.window.section_container>AS CONTAINER</sos.window.section_container>
+		<sos.gen.yes>Yes</sos.gen.yes>
+		<sos.gen.no>No</sos.gen.no>
+		<sos.gen.unknown>???</sos.gen.unknown>
+		<sos.item.aliases>Aliases:</sos.item.aliases>
+		<sos.item.category>Category:</sos.item.category>
+		<sos.item.cargo_box>Cargo Box:</sos.item.cargo_box>
+		<sos.item.hazards>Hazards:</sos.item.hazards>
+		<sos.item.causes_fire>Causes Fire</sos.item.causes_fire>
+		<sos.item.drains_oxygen>Drains Oxygen</sos.item.drains_oxygen>
+		<sos.item.base_price>Base Price:</sos.item.base_price>
+		<sos.item.can_buy>Can be Bought:</sos.item.can_buy>
+		<sos.item.can_sell>Can be Sold:</sos.item.can_sell>
+		<sos.item.min_difficulty>Min. Difficulty:</sos.item.min_difficulty>
+		<sos.item.required_faction>Required Faction:</sos.item.required_faction>
+		<sos.item.locations>Locations:</sos.item.locations>
+		<sos.weapon.fire_rate>Fire Rate:</sos.weapon.fire_rate>
+		<sos.weapon.reload>Reload:</sos.weapon.reload>
+		<sos.weapon.base_spread>Base Spread:</sos.weapon.base_spread>
+		<sos.weapon.dmg_multiplier>Dmg. Multiplier:</sos.weapon.dmg_multiplier>
+		<sos.weapon.armor_penetration>Armor Penetration:</sos.weapon.armor_penetration>
+		<sos.weapon.range>Range:</sos.weapon.range>
+		<sos.weapon.power_use>Power Use:</sos.weapon.power_use>
+		<sos.weapon.type>Type:</sos.weapon.type>
+		<sos.weapon.throwable>Throwable</sos.weapon.throwable>
+		<sos.weapon.area_radius>Area Radius:</sos.weapon.area_radius>
+		<sos.weapon.hull_damage>Hull Damage:</sos.weapon.hull_damage>
+		<sos.weapon.dismember_chance>Dismember Chance:</sos.weapon.dismember_chance>
+		<sos.equip.max_durability>Max Durability:</sos.equip.max_durability>
+		<sos.equip.equips_in>Equips In:</sos.equip.equips_in>
+		<sos.equip.pressure_protection>Pressure Protection:</sos.equip.pressure_protection>
+		<sos.equip.armor_special>Armor Special:</sos.equip.armor_special>
+		<sos.equip.deflect_projectiles>Deflects Projectiles</sos.equip.deflect_projectiles>
+		<sos.util.radio_range>Radio Range</sos.util.radio_range>
+		<sos.util.light_range>Light Range</sos.util.light_range>
+		<sos.util.pump_flow>Pump Max Flow</sos.util.pump_flow>
+		<sos.util.sonar_range>Sonar Range</sos.util.sonar_range>
+		<sos.container.capacity>Capacity:</sos.container.capacity>
+		<sos.container.slots>[amount] Slots</sos.container.slots>
+		<sos.container.accepts>Accepts:</sos.container.accepts>
 	</Override>
 </infotexts>

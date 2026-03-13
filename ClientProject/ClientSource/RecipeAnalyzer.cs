@@ -3,19 +3,65 @@
 // See the LICENSE file in the project root for details.
 
 using Barotrauma;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOS
 {
+    // MARK: RecipeAnalyzer
     public static class RecipeAnalyzer
     {
         private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>> usesCache = new Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>>();
         private static readonly Dictionary<Identifier, List<ItemPrefab>> sourcesCache = new Dictionary<Identifier, List<ItemPrefab>>();
 
+        private const int MaxAnalysisCacheSize = 30;
+        private static readonly Dictionary<Identifier, ItemAnalysis> analysisCache = new Dictionary<Identifier, ItemAnalysis>();
+        private static readonly Queue<Identifier> analysisCacheOrder = new Queue<Identifier>();
+
+        public static ItemAnalysis GetAnalysis(ItemPrefab item)
+        {
+            if (item == null) return null;
+
+            if (analysisCache.TryGetValue(item.Identifier, out var cachedAnalysis))
+            {
+                UpdateCachePriority(item.Identifier);
+                return cachedAnalysis;
+            }
+
+            var analysis = new ItemAnalysis(item);
+
+            if (analysisCache.Count >= MaxAnalysisCacheSize)
+            {
+                Identifier oldest = analysisCacheOrder.Dequeue();
+                analysisCache.Remove(oldest);
+            }
+
+            analysisCache[item.Identifier] = analysis;
+            analysisCacheOrder.Enqueue(item.Identifier);
+            return analysis;
+        }
+
+        private static void UpdateCachePriority(Identifier id)
+        {
+            var list = analysisCacheOrder.ToList();
+            if (list.Remove(id))
+            {
+                analysisCacheOrder.Clear();
+                foreach (var item in list) analysisCacheOrder.Enqueue(item);
+                analysisCacheOrder.Enqueue(id);
+            }
+        }
+
         public static void ClearSessionCache()
         {
+            analysisCache.Clear();
+            analysisCacheOrder.Clear();
             usesCache.Clear();
             sourcesCache.Clear();
         }
+
+        // MARK: - consults
 
         public static List<FabricationRecipe> GetCraftingRecipes(ItemPrefab item)
             => item.FabricationRecipes?.Values.ToList() ?? new List<FabricationRecipe>();
@@ -27,10 +73,7 @@ namespace SOS
         {
             if (targetItem == null) return new List<Tuple<ItemPrefab, FabricationRecipe>>();
 
-            if (usesCache.TryGetValue(targetItem.Identifier, out var cachedResult))
-            {
-                return cachedResult;
-            }
+            if (usesCache.TryGetValue(targetItem.Identifier, out var cachedResult)) return cachedResult;
 
             var results = new List<Tuple<ItemPrefab, FabricationRecipe>>();
             foreach (var prefab in ItemPrefab.Prefabs)
@@ -53,10 +96,7 @@ namespace SOS
         {
             if (targetItem == null) return new List<ItemPrefab>();
 
-            if (sourcesCache.TryGetValue(targetItem.Identifier, out var cachedResult))
-            {
-                return cachedResult;
-            }
+            if (sourcesCache.TryGetValue(targetItem.Identifier, out var cachedResult)) return cachedResult;
 
             var results = new List<ItemPrefab>();
             foreach (var prefab in ItemPrefab.Prefabs)

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<infotexts language="Simplified Chinese" nowhitespace="true" translatedname="中文">
+	<Override>
+		<sos.command.name>sos</sos.command.name>
+		<sos.command.help>打开/关闭 SOS。</sos.command.help>
+		<sos.client.init>[SOS] 客户端：已初始化。按 'J' 键打开。</sos.client.init>
+		<sos.config.saved>[SOS] 设置已保存 (v[version])。</sos.config.saved>
+		<sos.config.save_error>[SOS] 无法保存设置：[error]</sos.config.save_error>
+		<sos.config.loaded>[SOS] 设置 v[version] 已成功加载。</sos.config.loaded>
+		<sos.config.load_error>[SOS] 读取设置文件时出错：[error]</sos.config.load_error>
+		<sos.context.track>追踪到 HUD</sos.context.track>
+		<sos.context.view_recipes>查看配方</sos.context.view_recipes>
+		<sos.context.remove_favorite>从收藏中移除</sos.context.remove_favorite>
+		<sos.context.add_favorite>添加到收藏</sos.context.add_favorite>
+		<sos.context.untrack>从 HUD 移除</sos.context.untrack>
+		<sos.context.track_recipe>添加到 HUD</sos.context.track_recipe>
+		<sos.context.recipe_options>配方选项</sos.context.recipe_options>
+		<sos.window.title>SOS - 配方浏览器</sos.window.title>
+		<sos.window.clear_hud>清除 HUD</sos.window.clear_hud>
+		<sos.window.search_placeholder>搜索物品...</sos.window.search_placeholder>
+		<sos.window.obtain>获取途径</sos.window.obtain>
+		<sos.window.usage>用途</sos.window.usage>
+		<sos.window.additional_info>额外信息</sos.window.additional_info>
+		<sos.hud.tracking>追踪中：</sos.hud.tracking>
+		<sos.item.header_info>ID: [id] | 价格: [price] mk</sos.item.header_info>
+		<sos.item.id>ID:</sos.item.id>
+		<sos.item.price>价格:</sos.item.price>
+		<sos.item.max_stack>最大堆叠:</sos.item.max_stack>
+		<sos.item.description>描述：</sos.item.description>
+		<sos.item.tags>标签：</sos.item.tags>
+		<sos.recipe.hand>手持</sos.recipe.hand>
+		<sos.recipe.deconstructor>分解仪</sos.recipe.deconstructor>
+		<sos.recipe.random_outputs>随机给予 [amount] 个：</sos.recipe.random_outputs>
+		<sos.recipe.deconstructing>分解：</sos.recipe.deconstructing>
+		<sos.shared.loaded>[SOS] 已成功加载。</sos.shared.loaded>
+		<sos.shared.unloaded>[SOS] 模组已卸载。</sos.shared.unloaded>
+		<sos.recipe.unlocked>配方已解锁</sos.recipe.unlocked>
+		<sos.recipe.locked>需要配方来解锁</sos.recipe.locked>
+		<sos.window.section_general>常规</sos.window.section_general>
+		<sos.window.section_economy>经济</sos.window.section_economy>
+		<sos.window.section_spawning>获取位置</sos.window.section_spawning>
+		<sos.window.section_weapon>作为武器</sos.window.section_weapon>
+		<sos.window.section_equipment>作为装备</sos.window.section_equipment>
+		<sos.window.section_utility>功能</sos.window.section_utility>
+		<sos.window.section_container>作为容器</sos.window.section_container>
+		<sos.gen.yes>是</sos.gen.yes>
+		<sos.gen.no>否</sos.gen.no>
+		<sos.gen.unknown>???</sos.gen.unknown>
+		<sos.item.aliases>别名：</sos.item.aliases>
+		<sos.item.category>类别：</sos.item.category>
+		<sos.item.cargo_box>货物箱：</sos.item.cargo_box>
+		<sos.item.hazards>危险性：</sos.item.hazards>
+		<sos.item.causes_fire>导致火灾</sos.item.causes_fire>
+		<sos.item.drains_oxygen>消耗氧气</sos.item.drains_oxygen>
+		<sos.item.base_price>基础价格：</sos.item.base_price>
+		<sos.item.can_buy>可购买：</sos.item.can_buy>
+		<sos.item.can_sell>可出售：</sos.item.can_sell>
+		<sos.item.min_difficulty>最低难度：</sos.item.min_difficulty>
+		<sos.item.required_faction>所需派系：</sos.item.required_faction>
+		<sos.item.locations>位置：</sos.item.locations>
+		<sos.weapon.fire_rate>射速：</sos.weapon.fire_rate>
+		<sos.weapon.reload>装填时间：</sos.weapon.reload>
+		<sos.weapon.base_spread>基础散布：</sos.weapon.base_spread>
+		<sos.weapon.dmg_multiplier>伤害倍率：</sos.weapon.dmg_multiplier>
+		<sos.weapon.armor_penetration>穿甲力：</sos.weapon.armor_penetration>
+		<sos.weapon.range>范围：</sos.weapon.range>
+		<sos.weapon.power_use>能量消耗：</sos.weapon.power_use>
+		<sos.weapon.type>类型：</sos.weapon.type>
+		<sos.weapon.throwable>可投掷</sos.weapon.throwable>
+		<sos.weapon.area_radius>爆炸半径：</sos.weapon.area_radius>
+		<sos.weapon.hull_damage>船体伤害：</sos.weapon.hull_damage>
+		<sos.weapon.dismember_chance>肢解率：</sos.weapon.dismember_chance>
+		<sos.equip.max_durability>最大耐久：</sos.equip.max_durability>
+		<sos.equip.equips_in>装备槽位：</sos.equip.equips_in>
+		<sos.equip.pressure_protection>水压保护：</sos.equip.pressure_protection>
+		<sos.equip.armor_special>装备特性：</sos.equip.armor_special>
+		<sos.equip.deflect_projectiles>弹开弹丸</sos.equip.deflect_projectiles>
+		<sos.util.radio_range>无线电范围</sos.util.radio_range>
+		<sos.util.light_range>光照范围</sos.util.light_range>
+		<sos.util.pump_flow>泵最大流量</sos.util.pump_flow>
+		<sos.util.sonar_range>声呐范围</sos.util.sonar_range>
+		<sos.container.capacity>容量：</sos.container.capacity>
+		<sos.container.slots>[amount] 个插槽</sos.container.slots>
+		<sos.container.accepts>可容纳：</sos.container.accepts>
+	</Override>
+</infotexts>

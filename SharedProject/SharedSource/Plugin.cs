@@ -50,7 +50,11 @@ namespace SOS
 
             if (!string.IsNullOrEmpty(fallback))
             {
-                return text.Fallback("[NT]" + fallback); // NT=NOT-TRANSLATED, to identify missing translations
+#if DEBUG
+                return text.Fallback("[NT]" + fallback); // NT=NOT-TRANSLATED
+#else
+                return text.Fallback(fallback);
+#endif
             }
             return text;
         }

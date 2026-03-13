@@ -25,6 +25,8 @@ namespace SOS
         private const int ChunkSize = 50;
         private bool isUpdating = false;
 
+        private List<GUIDesplegableBox> activeDropdowns = new List<GUIDesplegableBox>();
+
         public SOSWindow(SOSController controller)
         {
             this.controller = controller;
@@ -69,8 +71,8 @@ namespace SOS
             metaPanel = new GUIListBox(new RectTransform(new Vector2(1f, 1f), rightPanel.RectTransform), style: "CircuitBoxFrame")
             {
                 Spacing = 10,
-                Padding = new Vector4(12),
-                CanBeFocused = false,
+                Padding = new Vector4(18, 15, 18, 15),
+                CanBeFocused = true,
                 Color = Color.Black * 0.4f
             };
 
@@ -88,6 +90,8 @@ namespace SOS
 
         public void Destroy()
         {
+            activeDropdowns.Clear();
+
             if (mainFrame?.RectTransform != null)
             {
                 mainFrame.RectTransform.Parent = null;
@@ -175,13 +179,13 @@ namespace SOS
         }
 
         public void UpdateDetailsPanel(ItemPrefab targetItem, List<FabricationRecipe> craft, List<DeconstructItem> decon, List<Tuple<ItemPrefab, FabricationRecipe>> uses, List<ItemPrefab> sources)
-        {
+        {   
+            activeDropdowns.Clear();
             if (detailsHeader == null || colObtain == null || colUsage == null || metaPanel == null) return;
+            metaPanel.Content.ClearChildren();
 
             detailsHeader.ClearChildren();
-
             var headerLayout = new GUILayoutGroup(new RectTransform(new Vector2(0.85f, 1f), detailsHeader.RectTransform, Anchor.CenterRight), isHorizontal: true) { AbsoluteSpacing = 15 };
-
             Sprite? icon = targetItem.InventoryIcon ?? targetItem.Sprite;
             if (icon != null)
             {
@@ -190,87 +194,115 @@ namespace SOS
             }
             _ = new GUITextBlock(new RectTransform(new Vector2(0.8f, 1f), headerLayout.RectTransform), targetItem.Name.Value, font: GUIStyle.LargeFont, textColor: Color.White, textAlignment: Alignment.CenterLeft);
 
-            Action<ItemPrefab> onPrimary = (clickedItem) => controller.OnItemSelected(clickedItem);
-            Action<ItemPrefab> onSecondary = (clickedItem) => controller.OpenContextMenu(clickedItem);
-
+            Action<ItemPrefab> onPrimary = (p) => controller.OnItemSelected(p);
+            Action<ItemPrefab> onSecondary = (p) => controller.OpenContextMenu(p);
+            
             colObtain.Content.ClearChildren();
-            foreach (var recipe in craft) CardBuilder.DrawCraftCard(colObtain, recipe, targetItem, controller, onPrimary, onSecondary); ;
-            foreach (var source in sources) CardBuilder.DrawSourceCard(colObtain, source, onPrimary, onSecondary);
-
+            foreach (var r in craft) CardBuilder.DrawCraftCard(colObtain, r, targetItem, controller, onPrimary, onSecondary);
+            foreach (var s in sources) CardBuilder.DrawSourceCard(colObtain, s, onPrimary, onSecondary);
+            
             colUsage.Content.ClearChildren();
             if (decon.Count > 0) CardBuilder.DrawDeconCard(colUsage, targetItem, decon, onPrimary, onSecondary);
-            foreach (var use in uses) CardBuilder.DrawUseCard(colUsage, use, onPrimary, onSecondary);
+            foreach (var u in uses) CardBuilder.DrawUseCard(colUsage, u, onPrimary, onSecondary);
 
-            metaPanel.Content.ClearChildren();
 
-            _ = new GUITextBlock(new RectTransform(new Point(metaPanel.Content.Rect.Width, 25), metaPanel.Content.RectTransform), TextSOS.Get("sos.window.additional_info", "ADDITIONAL INFO"), font: GUIStyle.SubHeadingFont, textColor: Color.Gold, textAlignment: Alignment.Center);
+            var onBadgeClick = (string tag) => { if (searchBox != null) searchBox.Text = tag; UpdateSearch(tag); };
 
-            void AddStat(string label, string? value, Color valColor)
+            var builder = new SectionBuilder
+            (
+                metaPanel, 
+                onBadgeClick, 
+                controller, 
+                onPrimary, 
+                onSecondary
+            ); 
+
+            var analysis = RecipeAnalyzer.GetAnalysis(targetItem);
+
+
+            foreach (var section in analysis.Sections)
             {
-                if (string.IsNullOrEmpty(value)) return;
-
-                var row = new GUILayoutGroup(new RectTransform(new Point(metaPanel.Content.Rect.Width, 25), metaPanel.Content.RectTransform), isHorizontal: true);
-                _ = new GUITextBlock(new RectTransform(new Vector2(0.4f, 1f), row.RectTransform), label, font: GUIStyle.SmallFont, textColor: Color.Gray);
-                _ = new GUITextBlock(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform), value, font: GUIStyle.SmallFont, textColor: valColor);
+                section.Draw(builder);
             }
 
-            string safeId = targetItem.Identifier.IsEmpty ? "unknown" : targetItem.Identifier.Value;
-            AddStat(TextSOS.Get("sos.item.id", "ID:").Value, safeId, Color.White);
+            //metaPanel.RecalculateChildren();
+            //metaPanel.UpdateScrollBarSize();
+            //metaPanel.ScrollBar.BarScroll = 0;
+        }
+    }
 
-            int basePrice = targetItem.DefaultPrice?.Price ?? 0;
-            AddStat(TextSOS.Get("sos.item.price", "Price:").Value, $"{basePrice} mk", Color.Yellow);
+    public class GUIDesplegableBox
+    {
+        public GUIDesplegableBox(GUIComponent parent, Action<string> onbBadgeClick, string labelText, IEnumerable<string> tags, List<ItemPrefab> items, SOSController controller, Action<ItemPrefab> onPrimary, Action<ItemPrefab> onSecondary)
+        {
+            //var leftSpacing = 5;
 
-            AddStat(TextSOS.Get("sos.item.max_stack", "Max Stack:").Value, targetItem.MaxStackSize.ToString(), Color.White);
-
-            if (!targetItem.Description.IsNullOrEmpty())
+            var row = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), parent.RectTransform) { MinSize = new Point(0, 24) }, isHorizontal: true)
             {
-                _ = new GUITextBlock(new RectTransform(new Point(metaPanel.Content.Rect.Width, 20), metaPanel.Content.RectTransform), TextSOS.Get("sos.item.description", "DESCRIPTION:"), font: GUIStyle.SmallFont, textColor: Color.Gold);
+                CanBeFocused = false,
+                AbsoluteSpacing = 5,
+            };
 
-                var descBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), metaPanel.Content.RectTransform), targetItem.Description.Value, font: GUIStyle.SmallFont, textColor: Color.LightGray)
+            var label = new GUITextBlock(new RectTransform(new Vector2(0.3f, 1f), row.RectTransform), labelText, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+
+            var badgeFrame = new GUIFrame(new RectTransform(new Vector2(0.55f, 1f), row.RectTransform), style: null) { CanBeFocused = false };
+            GUIBadgeList.Create(badgeFrame.RectTransform, tags, onbBadgeClick);
+
+            var dropDown = new GUIDropDown2(new RectTransform(new Point(36, 24), row.RectTransform), elementCount: Math.Min(items.Count, 8), listBoxWidth: (int)(row.Rect.Width * 0.95f), style: "GUIDropDown", expandToRight: false);
+
+            foreach (var item in items)
+            {
+                bool isFav = controller.FavoritedItems.Contains(item.Identifier.Value);
+                string prefix = isFav ? "* " : "";
+
+                CardBuilder.DrawCompactItemRow(dropDown.ListBox.Content, item, 1, true, prefix, isFav ? Color.Gold : Color.White,
+                    onPrimaryClick: (p) => { onPrimary?.Invoke(p); dropDown.Dropped = false; },
+                    onSecondaryClick: onSecondary);
+            }
+        }
+    }
+
+    public static class GUIBadgeList
+    {
+        public static void Create(RectTransform targetRect, IEnumerable<string> items, Action<string> onClick)
+        {
+            var list = new GUIListBox(targetRect, isHorizontal: true, style: "GUIBackgroundBlocker")
+            {
+                Spacing = 4,
+                //ScrollBarEnabled = true,
+                //ScrollBarVisible = false,
+                //CanBeFocused = false
+            };
+
+
+            /*if (list.ScrollBar != null)
+            {
+                list.ScrollBar.Color = Color.White;
+                //list.ScrollBar.CanBeFocused = false;
+                //list.ScrollBar.RectTransform.MaxSize = new Point(0, 0);
+            }*/
+
+            foreach (var item in items)
+            {
+                if (string.IsNullOrWhiteSpace(item)) continue;
+
+                var tagBadge = new GUIButton(new RectTransform(new Vector2(0.1f, 0.9f), list.Content.RectTransform), style: "OuterGlow")
                 {
-                    Wrap = true,
-                    CanBeFocused = false
+                    Color = Color.LightSkyBlue * 0.15f,
+                    OnClicked = (_, _) => { onClick?.Invoke(item); return true; }
                 };
 
-                int h = Math.Max((int)descBlock.TextSize.Y + 10, 30);
-                descBlock.RectTransform.NonScaledSize = new Point(descBlock.Rect.Width, h);
-            }
-
-            if (targetItem.Tags != null && targetItem.Tags.Count() > 0)
-            {
-                _ = new GUITextBlock(new RectTransform(new Point(metaPanel.Content.Rect.Width, 20), metaPanel.Content.RectTransform), TextSOS.Get("sos.item.tags", "TAGS:"), font: GUIStyle.SmallFont, textColor: Color.Gold);
-
-                var tagsContainer = new GUIListBox(new RectTransform(new Point(metaPanel.Content.Rect.Width, 45), metaPanel.Content.RectTransform), isHorizontal: true, style: null)
+                var tagText = new GUITextBlock(new RectTransform(Vector2.One, tagBadge.RectTransform), item.ToLower(), font: GUIStyle.SmallFont, textAlignment: Alignment.Center)
                 {
-                    Spacing = 1,
-                    ScrollBarVisible = false,
+                    Padding = new Vector4(8, 0, 8, 0),
+                    TextColor = Color.LightSkyBlue,
                     CanBeFocused = false,
-                    ScrollBar = { BarSize = 10, Color = Color.LightSkyBlue * 0.5f }
+                    Wrap = false
                 };
 
-                foreach (var tag in targetItem.Tags)
-                {
-                    if (tag.IsEmpty) continue;
-
-                    var tagBadge = new GUIButton(new RectTransform(new Point(10, 24), tagsContainer.Content.RectTransform), style: "OuterGlow")
-                    {
-                        Color = Color.LightSkyBlue * 0.2f,
-                        OnClicked = (_, _) =>
-                        {
-                            if (searchBox != null) searchBox.Text = tag.Value;
-                            UpdateSearch(tag.Value);
-                            return true;
-                        }
-                    };
-
-                    var tagText = new GUITextBlock(new RectTransform(Vector2.One, tagBadge.RectTransform), tag.Value.ToLower(), font: GUIStyle.SmallFont, textAlignment: Alignment.Center)
-                    {
-                        Padding = new Vector4(12, 0, 12, 0),
-                        TextColor = Color.LightSkyBlue,
-                        CanBeFocused = false
-                    };
-                    tagBadge.RectTransform.NonScaledSize = new Point((int)tagText.TextSize.X + 24, 24);
-                }
+                int calculatedWidth = (int)tagText.TextSize.X + 16;
+                tagBadge.RectTransform.MinSize = new Point(calculatedWidth, 0);
+                tagBadge.RectTransform.MaxSize = new Point(calculatedWidth, int.MaxValue);
             }
         }
     }

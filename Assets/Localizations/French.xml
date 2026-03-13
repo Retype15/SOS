@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<infotexts language="French" nowhitespace="false" translatedname="Français">
+	<Override>
+		<sos.command.name>sos</sos.command.name>
+		<sos.command.help>Ouvrir/Fermer SOS.</sos.command.help>
+		<sos.client.init>[SOS] Client : Initialisé. Appuyez sur 'J' pour ouvrir.</sos.client.init>
+		<sos.config.saved>[SOS] Paramètres sauvegardés (v[version]).</sos.config.saved>
+		<sos.config.save_error>[SOS] Échec de la sauvegarde des paramètres : [error]</sos.config.save_error>
+		<sos.config.loaded>[SOS] Paramètres v[version] chargés avec succès.</sos.config.loaded>
+		<sos.config.load_error>[SOS] Erreur lors de la lecture du fichier de paramètres : [error]</sos.config.load_error>
+		<sos.context.track>Suivre sur le HUD</sos.context.track>
+		<sos.context.view_recipes>Voir les recettes</sos.context.view_recipes>
+		<sos.context.remove_favorite>Retirer des favoris</sos.context.remove_favorite>
+		<sos.context.add_favorite>Ajouter aux favoris</sos.context.add_favorite>
+		<sos.context.untrack>Retirer du HUD</sos.context.untrack>
+		<sos.context.track_recipe>Ajouter au HUD</sos.context.track_recipe>
+		<sos.context.recipe_options>Options de recette</sos.context.recipe_options>
+		<sos.window.title>SOS - Navigateur de Recettes</sos.window.title>
+		<sos.window.clear_hud>Effacer le HUD</sos.window.clear_hud>
+		<sos.window.search_placeholder>Chercher un objet...</sos.window.search_placeholder>
+		<sos.window.obtain>OBTENTION</sos.window.obtain>
+		<sos.window.usage>UTILISATION</sos.window.usage>
+		<sos.window.additional_info>INFO SUPPLÉMENTAIRE</sos.window.additional_info>
+		<sos.hud.tracking>SUIVI :</sos.hud.tracking>
+		<sos.item.header_info>ID : [id] | Prix : [price] mk</sos.item.header_info>
+		<sos.item.id>ID :</sos.item.id>
+		<sos.item.price>Prix :</sos.item.price>
+		<sos.item.max_stack>Pile Max :</sos.item.max_stack>
+		<sos.item.description>DESCRIPTION :</sos.item.description>
+		<sos.item.tags>TAGS :</sos.item.tags>
+		<sos.recipe.hand>Main</sos.recipe.hand>
+		<sos.recipe.deconstructor>DÉCONSTRUCTEUR</sos.recipe.deconstructor>
+		<sos.recipe.random_outputs>Donne [amount] au hasard :</sos.recipe.random_outputs>
+		<sos.recipe.deconstructing>DÉCONSTRUCTION :</sos.recipe.deconstructing>
+		<sos.shared.loaded>[SOS] Chargé avec succès.</sos.shared.loaded>
+		<sos.shared.unloaded>[SOS] Mod déchargé.</sos.shared.unloaded>
+		<sos.recipe.unlocked>Recette Débloquée</sos.recipe.unlocked>
+		<sos.recipe.locked>Recette requise pour débloquer</sos.recipe.locked>
+		<sos.window.section_general>GÉNÉRAL</sos.window.section_general>
+		<sos.window.section_economy>ÉCONOMIE</sos.window.section_economy>
+		<sos.window.section_spawning>TROUVÉ DANS</sos.window.section_spawning>
+		<sos.window.section_weapon>COMME ARME</sos.window.section_weapon>
+		<sos.window.section_equipment>COMME ÉQUIPEMENT</sos.window.section_equipment>
+		<sos.window.section_utility>UTILITÉ</sos.window.section_utility>
+		<sos.window.section_container>COMME CONTENEUR</sos.window.section_container>
+		<sos.gen.yes>Oui</sos.gen.yes>
+		<sos.gen.no>Non</sos.gen.no>
+		<sos.gen.unknown>???</sos.gen.unknown>
+		<sos.item.aliases>Alias :</sos.item.aliases>
+		<sos.item.category>Catégorie :</sos.item.category>
+		<sos.item.cargo_box>Caisse de Cargaison :</sos.item.cargo_box>
+		<sos.item.hazards>Dangers :</sos.item.hazards>
+		<sos.item.causes_fire>Cause des incendies</sos.item.causes_fire>
+		<sos.item.drains_oxygen>Consomme l'oxygène</sos.item.drains_oxygen>
+		<sos.item.base_price>Prix de base :</sos.item.base_price>
+		<sos.item.can_buy>Peut être acheté :</sos.item.can_buy>
+		<sos.item.can_sell>Peut être vendu :</sos.item.can_sell>
+		<sos.item.min_difficulty>Difficulté Min :</sos.item.min_difficulty>
+		<sos.item.required_faction>Faction Requise :</sos.item.required_faction>
+		<sos.item.locations>Emplacements :</sos.item.locations>
+		<sos.weapon.fire_rate>Cadence de tir :</sos.weapon.fire_rate>
+		<sos.weapon.reload>Recharge :</sos.weapon.reload>
+		<sos.weapon.base_spread>Dispersion de base :</sos.weapon.base_spread>
+		<sos.weapon.dmg_multiplier>Mult. de dégâts :</sos.weapon.dmg_multiplier>
+		<sos.weapon.armor_penetration>Pénétration d'armure :</sos.weapon.armor_penetration>
+		<sos.weapon.range>Portée :</sos.weapon.range>
+		<sos.weapon.power_use>Consommation d'énergie :</sos.weapon.power_use>
+		<sos.weapon.type>Type :</sos.weapon.type>
+		<sos.weapon.throwable>Lançable</sos.weapon.throwable>
+		<sos.weapon.area_radius>Rayon de zone :</sos.weapon.area_radius>
+		<sos.weapon.hull_damage>Dégâts de coque :</sos.weapon.hull_damage>
+		<sos.weapon.dismember_chance>Prob. de démembrement :</sos.weapon.dismember_chance>
+		<sos.equip.max_durability>Durabilité Max :</sos.equip.max_durability>
+		<sos.equip.equips_in>S'équipe dans :</sos.equip.equips_in>
+		<sos.equip.pressure_protection>Protection de pression :</sos.equip.pressure_protection>
+		<sos.equip.armor_special>Spécial d'armure :</sos.equip.armor_special>
+		<sos.equip.deflect_projectiles>Dévie les projectiles</sos.equip.deflect_projectiles>
+		<sos.util.radio_range>Portée radio</sos.util.radio_range>
+		<sos.util.light_range>Portée de la lumière</sos.util.light_range>
+		<sos.util.pump_flow>Débit max de la pompe</sos.util.pump_flow>
+		<sos.util.sonar_range>Portée du sonar</sos.util.sonar_range>
+		<sos.container.capacity>Capacité :</sos.container.capacity>
+		<sos.container.slots>[amount] Emplacements</sos.container.slots>
+		<sos.container.accepts>Accepte :</sos.container.accepts>
+	</Override>
+</infotexts>

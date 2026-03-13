@@ -233,7 +233,7 @@ namespace SOS
                 _ = new GUIImage(new RectTransform(Vector2.One, imgFrame.RectTransform), icon, scaleToFit: true) { Color = prefab?.InventoryIconColor ?? Color.White, CanBeFocused = false };
             }
 
-            string name = prefab?.Name.Value ?? "???";
+            string name = prefab?.Name.Value ?? TextSOS.Get("sos.gen.unknown", "???").Value;
             //string amtStr = amount > 1 || isCardInside ? $" x{amount}" : "";
             string amtStr = (amount > 1) ? $" x{amount}" : "";
             _ = new GUITextBlock(new RectTransform(new Vector2(0.8f, 1f), contentLayout.RectTransform), $"{name}{amtStr}{extraText}", font: GUIStyle.SmallFont, textColor: color ?? Color.White, textAlignment: Alignment.CenterLeft) { CanBeFocused = false };

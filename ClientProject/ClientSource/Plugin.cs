@@ -24,7 +24,7 @@ namespace SOS
                 isCheat: false
             )
             {
-                RelayToServer = false, // Client only
+                RelayToServer = false,
                 OnClientExecute = _ => CrossThread.RequestExecutionOnMainThread(() => controller?.ToggleUI())
             });
 

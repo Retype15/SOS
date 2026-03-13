@@ -11,6 +11,7 @@ using System.Xml.Linq;
 
 namespace SOS
 {
+    // MARK: - Settings Data
     public class SettingsData
     {
         public HashSet<string> Favorites { get; set; } = new HashSet<string>();
@@ -20,6 +21,7 @@ namespace SOS
         public uint TrackedRecipeHash { get; set; } = 0;
     }
 
+    // MARK: - Settings Manager
     public static class SettingsManager
     {
         private const int CurrentSaveVersion = 1;
@@ -51,12 +53,12 @@ namespace SOS
 
                 doc.Save(ConfigPath);
 #if DEBUG
-                LuaCsLogger.LogMessage(TextSOS.Get("sos.config.saved", $"[SOS] Settings saved (v{CurrentSaveVersion}).").Value);
+                LuaCsLogger.LogMessage(TextSOS.Get("sos.config.saved", "[SOS] Settings saved (v[version]).").Replace("[version]", CurrentSaveVersion.ToString()).Value);
 #endif
             }
             catch (Exception e)
             {
-                LuaCsLogger.LogError(TextSOS.Get("sos.config.save_error", $"[SOS] Failed to save settings: {e.Message}").Value);
+                LuaCsLogger.LogError(TextSOS.Get("sos.config.save_error", "[SOS] Failed to save settings: [error]").Replace("[error]", e.Message).Value);
             }
         }
 
@@ -97,18 +99,19 @@ namespace SOS
                     }
                 }
 #if DEBUG
-                LuaCsLogger.LogMessage(TextSOS.Get("sos.config.loaded", $"[SOS] Settings v{fileVersion} loaded successfully.").Value);
+                LuaCsLogger.LogMessage(TextSOS.Get("sos.config.loaded", "[SOS] Settings v[version] loaded successfully.").Replace("[version]", fileVersion.ToString()).Value);
 #endif
             }
             catch (Exception e)
             {
-                LuaCsLogger.LogError(TextSOS.Get("sos.config.load_error", $"[SOS] Error reading settings file: {e.Message}").Value);
+                LuaCsLogger.LogError(TextSOS.Get("sos.config.load_error", "[SOS] Error reading settings file: [error]").Replace("[error]", e.Message).Value);
             }
 
             return data;
         }
     }
 
+    // MARK: - Settings Menu
     public class SettingsMenu
     {
         private GUIFrame? settingsFrame;
