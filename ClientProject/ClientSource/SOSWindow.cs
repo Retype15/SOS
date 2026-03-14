@@ -37,7 +37,12 @@ namespace SOS
             var parentComponent = Screen.Selected?.Frame;
             if (parentComponent == null) return;
 
-            mainFrame = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.9f), parentComponent.RectTransform, Anchor.Center), "InnerFrame") { CanBeFocused = true };
+            mainFrame = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.9f), parentComponent.RectTransform, Anchor.Center), "InnerFrame")
+            { 
+                CanBeFocused = true,
+                Selected = true,
+                Color = Color.Black * 0.7f
+            };
 
             var topBar = new GUIFrame(new RectTransform(new Vector2(1.0f, 0.05f), mainFrame.RectTransform, Anchor.TopCenter), "GUIFrameBottom");
             _ = new GUITextBlock(new RectTransform(Vector2.One, topBar.RectTransform), TextSOS.Get("sos.window.title", "SOS - Recipe Browser"), textAlignment: Alignment.Center, font: GUIStyle.LargeFont);
@@ -74,31 +79,57 @@ namespace SOS
             searchBox = GUI.CreateTextBoxWithPlaceholder(searchContainer.RectTransform, controller.LastSearchQuery, TextSOS.Get("sos.window.search_placeholder", "Search item..."));
             searchBox.ToolTip = TextSOS.Get("sos.window.search_tooltip", "Search by name, ID or tags");
             searchBox.OnTextChanged += (_, text) => { controller.LastSearchQuery = text; UpdateSearch(text); return true; };
-            itemList = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftPanel.RectTransform), style: "PowerButtonFrame") { Padding = new Vector4(8, 5, 5, 5) };
+            itemList = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftPanel.RectTransform), style: "PowerButtonFrame") 
+            { 
+                Padding = new Vector4(8, 5, 5, 5),
+                Color = Color.Black * 0.2f
+            };
 
-            var centerPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.53f, 1f), contentArea.RectTransform)) { Stretch = true, RelativeSpacing = 0.005f };
-            detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.1f), centerPanel.RectTransform), style: "CircuitBoxFrame") { Color = Color.Black * 0.4f };
+            var centerPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.53f, 1f), contentArea.RectTransform)) 
+            { 
+                Stretch = true, 
+                RelativeSpacing = 0.005f
+            };
+            detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.1f), centerPanel.RectTransform), style: "CircuitBoxFrame") 
+            { 
+                Color = Color.Black * 0.4f 
+            };
             var recipeSplit = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0.89f), centerPanel.RectTransform), isHorizontal: true) { Stretch = true, RelativeSpacing = 0.01f };
 
             var leftRecipeCol = new GUILayoutGroup(new RectTransform(new Vector2(0.5f, 1f), recipeSplit.RectTransform)) { Stretch = true };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), leftRecipeCol.RectTransform), TextSOS.Get("sos.window.obtain", "OBTAIN"), font: GUIStyle.SubHeadingFont, textColor: Color.LightGreen, textAlignment: Alignment.Center);
-            colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftRecipeCol.RectTransform), style: "GUIBackgroundBlocker") { Spacing = 5 }; //PowerButtonFrame
+            colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftRecipeCol.RectTransform), style: "GUIBackgroundBlocker") 
+            { 
+                Spacing = 5,
+                Color = Color.Black * 0.3f
+            };
 
             var rightRecipeCol = new GUILayoutGroup(new RectTransform(new Vector2(0.5f, 1f), recipeSplit.RectTransform)) { Stretch = true };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), rightRecipeCol.RectTransform), TextSOS.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
             colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), rightRecipeCol.RectTransform), style: "GUIBackgroundBlocker") { Spacing = 5 };
 
             var rightPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.25f, 1f), contentArea.RectTransform)) { Stretch = true };
-            metaPanel = new GUIListBox(new RectTransform(new Vector2(1f, 1f), rightPanel.RectTransform), style: "CircuitBoxFrame")
+            metaPanel = new GUIListBox(new RectTransform(new Vector2(1f, 1f), rightPanel.RectTransform), style: "InnerFrame")
             {
                 Spacing = 10,
                 Padding = new Vector4(18, 15, 18, 15),
                 CanBeFocused = true,
-                Color = Color.Black * 0.4f
+                Color = Color.Black * 0.4f,
             };
+
+            if (metaPanel.ContentBackground != null)
+            {
+                metaPanel.ContentBackground.Color = Color.Black * 0.4f;
+            }
 
             UpdateSearch(controller.LastSearchQuery);
             UpdateNavigationButtons();
+        }
+
+        public void SetSelected()
+        {
+            if (mainFrame == null) return;
+            mainFrame.Selected = true;
         }
 
         public void UpdateNavigationButtons()
