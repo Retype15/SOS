@@ -2,10 +2,14 @@
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
-using Barotrauma;
-using Microsoft.Xna.Framework;
+#pragma warning disable IDE0130
+#pragma warning disable IDE0079
+#pragma warning disable IDE0290
+
 using System.Collections.Generic;
 using System.Linq;
+using Barotrauma;
+using Microsoft.Xna.Framework;
 
 namespace SOS
 {
@@ -16,7 +20,7 @@ namespace SOS
 
         private GUIFrame? hudFrame;
         private GUILayoutGroup? contentLayout;
-        private readonly List<GUITextBlock> ingredientTexts = new List<GUITextBlock>();
+        private readonly List<GUITextBlock> ingredientTexts = [];
 
         public void SetTrackedItem(ItemPrefab? item, FabricationRecipe? recipe = null)
         {
@@ -64,6 +68,8 @@ namespace SOS
 
         private void CreateHUD()
         {
+            if (TrackedRecipe == null || GUI.Canvas == null) return;
+
             hudFrame = new GUIFrame(new RectTransform(new Point(280, 180), GUI.Canvas, Anchor.TopRight) { AbsoluteOffset = new Point(20, 150) }, style: "InnerFrame")
             {
                 CanBeFocused = false,
@@ -77,15 +83,18 @@ namespace SOS
             };
 
             // enc
-            new GUITextBlock(new RectTransform(new Vector2(1f, 0.2f), contentLayout.RectTransform),
+            contentLayout.RectTransform.SizeChanged += () => { };
+
+            var titleBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0.2f), contentLayout.RectTransform),
                 TextSOS.Get("sos.hud.tracking", "TRACKING:").Value, font: GUIStyle.SubHeadingFont, textColor: Color.Gold)
             { CanBeFocused = false };
 
-            new GUITextBlock(new RectTransform(new Vector2(1f, 0.15f), contentLayout.RectTransform),
+            var itemBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0.15f), contentLayout.RectTransform),
                 TrackedItem?.Name.Value ?? "", font: GUIStyle.SmallFont, textColor: Color.Cyan)
             { CanBeFocused = false };
 
             ingredientTexts.Clear();
+
             foreach (var req in TrackedRecipe.RequiredItems)
             {
                 var text = new GUITextBlock(new RectTransform(new Vector2(1f, 0.12f), contentLayout.RectTransform),
@@ -98,7 +107,7 @@ namespace SOS
             hudFrame.RectTransform.NonScaledSize = new Point(hudFrame.Rect.Width, finalHeight);
         }
 
-        private int GetPlayerCount(FabricationRecipe.RequiredItem req)
+        private static int GetPlayerCount(FabricationRecipe.RequiredItem req)
         {
             if (Character.Controlled?.Inventory == null) return 0;
 

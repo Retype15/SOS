@@ -14,7 +14,7 @@ namespace SOS
     // MARK: - Settings Data
     public class SettingsData
     {
-        public HashSet<string> Favorites { get; set; } = new HashSet<string>();
+        public HashSet<string> Favorites { get; set; } = new();
         public string LastSearchQuery { get; set; } = "";
         public string LastItemId { get; set; } = "";
         public string TrackedItemId { get; set; } = "";

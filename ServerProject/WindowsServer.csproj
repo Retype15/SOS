@@ -8,6 +8,9 @@
     <Authors />
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
+    <BaseIntermediateOutputPath>obj\Windows\</BaseIntermediateOutputPath>
+    <OutputPath>bin\Windows\</OutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
   </PropertyGroup>
 
   <Import Project="..\SharedProject\SharedProject.projitems" Label="Shared" />

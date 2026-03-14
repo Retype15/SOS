@@ -82,5 +82,6 @@
 		<sos.container.capacity>Capacidad:</sos.container.capacity>
 		<sos.container.slots>[amount] Espacios</sos.container.slots>
 		<sos.container.accepts>Acepta:</sos.container.accepts>
+		<sos.container.contained>Contenido por:</sos.container.contained>
 	</Override>
 </infotexts>
