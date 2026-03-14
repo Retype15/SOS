@@ -7,6 +7,7 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
+using Barotrauma.Items.Components;
 using Microsoft.Xna.Framework.Input;
 
 namespace SOS
@@ -232,7 +233,7 @@ namespace SOS
 
         public void Update()
         {
-            if (GUI.KeyboardDispatcher.Subscriber != null) return;
+            if (GUI.KeyboardDispatcher.Subscriber != null && GUI.KeyboardDispatcher.Subscriber is not GUIDropDown2) return;
 
             var kb = Keyboard.GetState();
             bool isKeyDownNow = kb.IsKeyDown(toggleKey);
@@ -245,16 +246,20 @@ namespace SOS
 
             if (mainWindow != null)
             {
-                if (kb.IsKeyDown(Keys.Escape))
+                if (PlayerInput.KeyHit(Keys.Escape))
                 {
+                    mainWindow.SetSelected();
+                    PlayerInput.KeyDown(Keys.Escape);
                     CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
+                    return;
                 }
 
                 if (PlayerInput.KeyHit(Keys.Back) || PlayerInput.Mouse4ButtonClicked())
                 {
                     CrossThread.RequestExecutionOnMainThread(() => NavigateBack());
                 }
-                mainWindow.Update();
+
+                mainWindow?.Update();
             }
 
             Tracker.UpdateHUD();
