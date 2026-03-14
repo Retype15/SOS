@@ -7,7 +7,6 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
-using Barotrauma.Items.Components;
 using Microsoft.Xna.Framework.Input;
 
 namespace SOS
