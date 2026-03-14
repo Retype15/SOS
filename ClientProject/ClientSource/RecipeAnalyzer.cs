@@ -12,14 +12,14 @@ namespace SOS
     // MARK: RecipeAnalyzer
     public static class RecipeAnalyzer
     {
-        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>> usesCache = new Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>>();
-        private static readonly Dictionary<Identifier, List<ItemPrefab>> sourcesCache = new Dictionary<Identifier, List<ItemPrefab>>();
+        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>> usesCache = new();
+        private static readonly Dictionary<Identifier, List<ItemPrefab>> sourcesCache = new();
 
         private const int MaxAnalysisCacheSize = 30;
-        private static readonly Dictionary<Identifier, ItemAnalysis> analysisCache = new Dictionary<Identifier, ItemAnalysis>();
-        private static readonly Queue<Identifier> analysisCacheOrder = new Queue<Identifier>();
+        private static readonly Dictionary<Identifier, ItemAnalysis> analysisCache = new();
+        private static readonly Queue<Identifier> analysisCacheOrder = new();
 
-        public static ItemAnalysis GetAnalysis(ItemPrefab item)
+        public static ItemAnalysis? GetAnalysis(ItemPrefab? item)
         {
             if (item == null) return null;
 

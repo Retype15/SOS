@@ -2,11 +2,14 @@
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
-using Barotrauma;
-using Microsoft.Xna.Framework;
+#pragma warning disable IDE0130
+#pragma warning disable IDE0290
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Barotrauma;
+using Microsoft.Xna.Framework;
 using static Barotrauma.PetBehavior.ItemProduction;
 
 namespace SOS
@@ -46,7 +49,7 @@ namespace SOS
         public void AddRow(string label, string value, Color valColor)
         {
             if (string.IsNullOrEmpty(value) || currentLayout == null) return;
-            
+
             var row = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), isHorizontal: true) { CanBeFocused = false };
             row.RectTransform.MinSize = new Point(0, 18);
             row.RectTransform.MaxSize = new Point(int.MaxValue, 18);
@@ -66,16 +69,16 @@ namespace SOS
 
             _ = new GUITextBlock(new RectTransform(new Vector2(0.40f, 1f), row.RectTransform), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
             var badgeContainer = new GUIFrame(new RectTransform(new Vector2(0.60f, 1f), row.RectTransform), style: null) { CanBeFocused = false };
-            
+
             GUIBadgeList.Create(badgeContainer.RectTransform, tags, onBadgeClick);
             rowsCreated++;
         }
 
         public void AddDropdown(string label, IEnumerable<string> tags, List<ItemPrefab> items)
         {
-            if (currentLayout == null || items == null || !items.Any()) return;
+            if (currentLayout == null || items == null || items.Count == 0) return;
 
-            new GUIDesplegableBox(currentLayout, onBadgeClick, label, tags, items, controller, onPrimaryClick, onSecondaryClick);
+            _ = new GUIDesplegableBox(currentLayout, onBadgeClick, label, tags, items, controller, onPrimaryClick, onSecondaryClick);
 
             rowsCreated++;
         }
@@ -84,11 +87,11 @@ namespace SOS
         {
             if (currentLayout == null || string.IsNullOrEmpty(text)) return;
             var block = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), text, font: GUIStyle.SmallFont, textColor: color, wrap: true) { CanBeFocused = false };
-            
+
             int textHeight = (int)block.TextSize.Y + 10;
             block.RectTransform.MinSize = new Point(0, textHeight);
             block.RectTransform.MaxSize = new Point(int.MaxValue, textHeight);
-            rowsCreated++; 
+            rowsCreated++;
         }
 
         public void EndSection()
@@ -114,13 +117,12 @@ namespace SOS
 
     public class ItemAnalysis
     {
-        public List<BaseStatSection> Sections { get; } = new List<BaseStatSection>();
+        public List<BaseStatSection> Sections { get; } = [];
 
         public ItemAnalysis(ItemPrefab item)
         {
             AddSection(new GeneralSection(), item);
             AddSection(new EconomySection(), item);
-            AddSection(new SpawningSection(), item);
             AddSection(new WeaponSection(), item);
             AddSection(new EquipmentSection(), item);
             AddSection(new UtilitySection(), item);
@@ -149,7 +151,7 @@ namespace SOS
     {
         private ItemPrefab? item;
         private string cargoBox = "";
-        private List<string> hazards = new List<string>();
+        private readonly List<string> hazards = [];
 
         public override bool HasData => item != null;
 
@@ -173,11 +175,11 @@ namespace SOS
             if (item == null) return;
             builder.StartSection(TextSOS.Get("sos.window.section_general", "GENERAL").Value, Color.Gold);
             builder.AddRow(TextSOS.Get("sos.item.id", "ID:").Value, item.Identifier.Value, Color.LightGray);
-            if (item.Aliases.Any()) builder.AddRow(TextSOS.Get("sos.item.aliases", "Aliases:").Value, string.Join(", ", item.Aliases), Color.DarkGray);
+            if (!item.Aliases.IsEmpty) builder.AddRow(TextSOS.Get("sos.item.aliases", "Aliases:").Value, string.Join(", ", item.Aliases), Color.DarkGray);
             builder.AddRow(TextSOS.Get("sos.item.category", "Category:").Value, item.Category.ToString(), Color.White);
             if (!string.IsNullOrEmpty(cargoBox)) builder.AddRow(TextSOS.Get("sos.item.cargo_box", "Cargo Box:").Value, TextManager.Get("EntityName." + cargoBox).Fallback(cargoBox).Value, Color.BurlyWood);
             builder.AddRow(TextSOS.Get("sos.item.max_stack", "Max Stack:").Value, item.MaxStackSize.ToString(), Color.White);
-            if (hazards.Any()) builder.AddRow(TextSOS.Get("sos.item.hazards", "Hazards:").Value, string.Join(", ", hazards), Color.Salmon);
+            if (hazards.Count > 0) builder.AddRow(TextSOS.Get("sos.item.hazards", "Hazards:").Value, string.Join(", ", hazards), Color.Salmon);
             builder.AddBadgeRow(TextSOS.Get("sos.item.tags", "TAGS:").Value, item.Tags.Select(t => t.Value));
             builder.EndSection();
         }
@@ -231,34 +233,6 @@ namespace SOS
         }
     }
 
-    // MARK: spawning
-    public class SpawningSection : BaseStatSection
-    {
-        private List<string> locations = new List<string>();
-        public override bool HasData => locations.Any();
-
-        public override void Analyze(ItemPrefab item)
-        {
-            if (item.PreferredContainers == null) return;
-
-            foreach (var container in item.PreferredContainers)
-            {
-                foreach (var primary in container.Primary)
-                {
-                    string locName = TextManager.Get("EntityName." + primary).Fallback(primary.Value).Value;
-                    if (!locations.Contains(locName)) locations.Add(locName);
-                }
-            }
-        }
-
-        public override void Draw(SectionBuilder builder)
-        {
-            builder.StartSection(TextSOS.Get("sos.window.section_spawning", "FOUND IN").Value, Color.Gold);
-            builder.AddRow(TextSOS.Get("sos.item.locations", "Locations:").Value, string.Join(", ", locations.Take(5)), Color.White);
-            builder.EndSection();
-        }
-    }
-
     // MARK: weapons
     public class WeaponSection : BaseStatSection
     {
@@ -275,10 +249,10 @@ namespace SOS
         private float severProb = 0f;
         private bool isThrowable = false;
 
-        private Dictionary<string, List<string>> aggregatedDamages = new Dictionary<string, List<string>>();
+        private readonly Dictionary<string, List<string>> aggregatedDamages = [];
 
         public override bool HasData => !string.IsNullOrEmpty(reload) || !string.IsNullOrEmpty(range) ||
-                                       !string.IsNullOrEmpty(explosionRadius) || isThrowable || aggregatedDamages.Any();
+                                       !string.IsNullOrEmpty(explosionRadius) || isThrowable || aggregatedDamages.Count > 0;
 
         public override void Analyze(ItemPrefab item)
         {
@@ -324,7 +298,7 @@ namespace SOS
                     if (strength > 0 && !string.IsNullOrEmpty(id))
                     {
                         string name = TextManager.Get("AfflictionName." + id).Fallback(id).Value;
-                        if (!aggregatedDamages.ContainsKey(name)) aggregatedDamages[name] = new List<string>();
+                        if (!aggregatedDamages.ContainsKey(name)) aggregatedDamages[name] = [];
                         aggregatedDamages[name].Add(strength.ToString("0.#"));
                     }
                 }
@@ -361,16 +335,16 @@ namespace SOS
     // MARK: equipements
     public class EquipmentSection : BaseStatSection
     {
-        private List<string> equipSlots = new List<string>();
-        private List<string> statModifiers = new List<string>();
-        private Dictionary<string, List<string>> aggregatedResistances = new Dictionary<string, List<string>>();
+        private readonly List<string> equipSlots = [];
+        private readonly List<string> statModifiers = [];
+        private readonly Dictionary<string, List<string>> aggregatedResistances = [];
 
         private float maxPressure = 0f;
         private bool deflectsProjectiles = false;
         private int durability = 0;
 
-        public override bool HasData => equipSlots.Any() || statModifiers.Any() ||
-                                       aggregatedResistances.Any() || maxPressure > 0 || durability > 0;
+        public override bool HasData => equipSlots.Count > 0 || statModifiers.Count > 0 ||
+                                       aggregatedResistances.Count > 0 || maxPressure > 0 || durability > 0;
 
         public override void Analyze(ItemPrefab item)
         {
@@ -419,7 +393,7 @@ namespace SOS
                             if (string.IsNullOrEmpty(trimmed)) continue;
 
                             string name = TextManager.Get("AfflictionName." + trimmed).Fallback(trimmed).Value;
-                            if (!aggregatedResistances.ContainsKey(name)) aggregatedResistances[name] = new List<string>();
+                            if (!aggregatedResistances.ContainsKey(name)) aggregatedResistances[name] = [];
 
                             aggregatedResistances[name].Add($"{(int)Math.Round((1f - mult) * 100)}%");
                         }
@@ -435,7 +409,7 @@ namespace SOS
             if (durability > 0)
                 builder.AddRow(TextSOS.Get("sos.equip.max_durability", "Max Durability:").Value, durability.ToString(), Color.White);
 
-            if (equipSlots.Any())
+            if (equipSlots.Count > 0)
                 builder.AddRow(TextSOS.Get("sos.equip.equips_in", "Equips In:").Value, string.Join(" / ", equipSlots.Distinct()), Color.White);
 
             if (maxPressure > 0)
@@ -447,7 +421,7 @@ namespace SOS
             foreach (var mod in statModifiers.Distinct())
             {
                 var parts = mod.Split(':');
-                Color color = parts[1].Trim().StartsWith("-") ? Color.Salmon : Color.LightGreen;
+                Color color = parts[1].Trim().StartsWith('-') ? Color.Salmon : Color.LightGreen;
                 builder.AddRow(parts[0] + ":", parts[1], color);
             }
 
@@ -463,9 +437,9 @@ namespace SOS
     // MARK: utility
     public class UtilitySection : BaseStatSection
     {
-        private Dictionary<string, string> deviceProperties = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> deviceProperties = [];
 
-        public override bool HasData => deviceProperties.Any();
+        public override bool HasData => deviceProperties.Count > 0;
 
         public override void Analyze(ItemPrefab item)
         {
@@ -506,63 +480,83 @@ namespace SOS
     public class ContainerSection : BaseStatSection
     {
         private string capacity = "";
-        private HashSet<string> acceptedTags = new HashSet<string>();
-        private List<ItemPrefab> compatibleItems = new List<ItemPrefab>();
+        private readonly HashSet<string> acceptedTags = [];
+        private readonly List<string> spawnLocations = [];
+        private List<ItemPrefab> compatibleItems = [];
 
-        public override bool HasData => !string.IsNullOrEmpty(capacity) || compatibleItems.Any();
+        public override bool HasData => !string.IsNullOrEmpty(capacity) || compatibleItems.Count > 0 || spawnLocations.Count > 0;
 
         public override void Analyze(ItemPrefab item)
         {
-            if (item.ConfigElement == null) return;
-
-            foreach (var child in item.ConfigElement.Descendants())
+            if (item.ConfigElement != null)
             {
-                string n = child.Name.ToString().ToLowerInvariant();
-
-                if (n == "itemcontainer" || n == "magazine")
+                foreach (var child in item.ConfigElement.Descendants())
                 {
-                    string cap = child.GetAttributeString("capacity", "");
-                    if (!string.IsNullOrEmpty(cap)) capacity = cap;
-                }
+                    string n = child.Name.ToString().ToLowerInvariant();
 
-                if (n == "containable")
-                {
-                    string itemsAttr = child.GetAttributeString("items", "");
-                    if (!string.IsNullOrEmpty(itemsAttr))
+                    if (n == "itemcontainer" || n == "magazine")
                     {
-                        foreach (var tag in itemsAttr.Split(','))
+                        string cap = child.GetAttributeString("capacity", "");
+                        if (!string.IsNullOrEmpty(cap)) capacity = cap;
+                    }
+
+                    if (n == "containable")
+                    {
+                        string itemsAttr = child.GetAttributeString("items", "");
+                        if (!string.IsNullOrEmpty(itemsAttr))
                         {
-                            string trimmed = tag.Trim();
-                            if (!string.IsNullOrEmpty(trimmed)) acceptedTags.Add(trimmed);
+                            foreach (var tag in itemsAttr.Split(','))
+                            {
+                                string trimmed = tag.Trim();
+                                if (!string.IsNullOrEmpty(trimmed)) acceptedTags.Add(trimmed);
+                            }
                         }
                     }
                 }
             }
 
-            if (acceptedTags.Any())
+            if (item.PreferredContainers != null && !item.PreferredContainers.IsDefaultOrEmpty)
             {
-                compatibleItems = ItemPrefab.Prefabs.Where(p =>
+                foreach (var container in item.PreferredContainers)
+                {
+                    foreach (var primary in container.Primary)
+                    {
+                        string locName = TextManager.Get("EntityName." + primary).Fallback(primary.Value).Value;
+                        if (!spawnLocations.Contains(locName)) spawnLocations.Add(locName);
+                    }
+                }
+            }
+
+            if (acceptedTags.Count > 0)
+            {
+                compatibleItems = [.. ItemPrefab.Prefabs.Where(p =>
                     acceptedTags.Contains(p.Identifier.Value) ||
                     p.Tags.Any(t => acceptedTags.Contains(t.Value))
-                )
-                .OrderBy(p => p.Name.Value)
-                .ToList();
+                ).OrderBy(p => p.Name.Value)];
             }
         }
 
         public override void Draw(SectionBuilder builder)
         {
-            builder.StartSection(TextSOS.Get("sos.window.section_container", "AS CONTAINER").Value, Color.Gold);
+            builder.StartSection(TextSOS.Get("sos.window.section_container", "CONTAINERS").Value, Color.Gold);
 
             if (!string.IsNullOrEmpty(capacity))
-                builder.AddRow(TextSOS.Get("sos.container.capacity", "Capacity:").Value, TextSOS.Get("sos.container.slots", "[amount] Slots").Replace("[amount]", capacity).Value, Color.White);
+            {
+                builder.AddRow(TextSOS.Get("sos.container.capacity", "Capacity:").Value,
+                    TextSOS.Get("sos.container.slots", "[amount] Slots").Replace("[amount]", capacity).Value, Color.White);
+            }
 
-            if (compatibleItems.Any())
+            if (compatibleItems.Count > 0)
             {
                 builder.AddDropdown(
                     TextSOS.Get("sos.container.accepts", "Accepts:").Value,
                     acceptedTags,
                     compatibleItems);
+            }
+
+            if (spawnLocations.Count > 0)
+            {
+                builder.AddBadgeRow(TextSOS.Get("sos.container.contained", "Contained_by:").Value, spawnLocations);
             }
 
             builder.EndSection();
@@ -574,13 +568,13 @@ namespace SOS
     {
         private string text = "";
         public override bool HasData => !string.IsNullOrEmpty(text);
-        public override void Analyze(ItemPrefab item) => text = item.Description.Value;
+        public override void Analyze(ItemPrefab item) => text = item.Description?.Value ?? "";
         public override void Draw(SectionBuilder builder)
         {
             builder.StartSection(TextSOS.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
-            
+
             builder.AddFullWidthText(text, Color.LightGray);
-            
+
             builder.EndSection();
         }
     }
