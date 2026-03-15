@@ -2,6 +2,10 @@
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
+#pragma warning disable IDE0130
+#pragma warning disable IDE0079
+#pragma warning disable IDE0290
+
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
@@ -14,8 +18,11 @@ namespace SOS
         private const int HeaderHeight = 20;
         private const int CardPadding = 10;
 
+<<<<<<< HEAD
         private static readonly Dictionary<Identifier, string> machineNameCache = new();
 
+=======
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
         public static RichString GetDetailedTooltip(ItemPrefab prefab)
         {
             LocalizedString name = prefab.Name;
@@ -54,8 +61,11 @@ namespace SOS
             Sprite? icon = item.InventoryIcon ?? item.Sprite;
             if (icon != null)
             {
-                var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.1f, 0.9f), layout.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, style: "InnerFrame");
-                _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = item.InventoryIconColor };
+                var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.1f, 0.9f), layout.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, style: "InnerFrame")
+                {
+                    ToolTip = GetDetailedTooltip(item)
+                };
+                _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = item.InventoryIconColor, CanBeFocused = false };
             }
             var textLayout = new GUILayoutGroup(new RectTransform(new Vector2(0.8f, 1f), layout.RectTransform)) { RelativeSpacing = 0.02f };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.6f), textLayout.RectTransform), item.Name.Value, font: GUIStyle.LargeFont, textColor: Color.Cyan);
@@ -106,7 +116,11 @@ namespace SOS
             string headerText = $"{machine}:".ToUpper();
 
             var header = new GUILayoutGroup(new RectTransform(new Point(layout.Rect.Width, HeaderHeight), layout.RectTransform), isHorizontal: true) { CanBeFocused = false };
+<<<<<<< HEAD
             _ = new GUITextBlock(new RectTransform(new Vector2(0.7f, 1f), header.RectTransform), headerText, font: GUIStyle.SmallFont, textColor: isTracked ? Color.Gold : Color.Yellow) { CanBeFocused = false };
+=======
+            _ = new GUITextBlock(new RectTransform(new Vector2(0.7f, 1f), header.RectTransform), machine.ToUpper(), font: GUIStyle.SmallFont, textColor: isTracked ? Color.Gold : Color.Yellow) { CanBeFocused = false };
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
             _ = new GUITextBlock(new RectTransform(new Vector2(0.3f, 1f), header.RectTransform), $"{recipe.RequiredTime}s", font: GUIStyle.SmallFont, textAlignment: Alignment.Right) { CanBeFocused = false };
 
             if (recipe.RequiresRecipe)
@@ -116,7 +130,7 @@ namespace SOS
                 Color recipeColor = hasUnlocked ? Color.LightGreen : Color.Salmon;
                 string recipeText = hasUnlocked ? TextSOS.Get("sos.recipe.unlocked", "Recipe Unlocked").Value : TextSOS.Get("sos.recipe.locked", "Requires Recipe to Unlock").Value;
 
-                new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, RowHeight), layout.RectTransform), recipeText, font: GUIStyle.SmallFont, textColor: recipeColor) { CanBeFocused = false };
+                _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, RowHeight), layout.RectTransform), recipeText, font: GUIStyle.SmallFont, textColor: recipeColor) { CanBeFocused = false };
             }
 
             foreach (var skill in recipe.RequiredSkills)
@@ -144,7 +158,7 @@ namespace SOS
 
                 string localizedSkillName = TextManager.Get("SkillName." + skill.Identifier).Fallback(skill.Identifier.Value).Value;
 
-                new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, RowHeight), layout.RectTransform),
+                _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, RowHeight), layout.RectTransform),
                     $"{localizedSkillName}: {playerLevel}/{skill.Level}",
                     font: GUIStyle.SmallFont, textColor: skillColor)
                 { CanBeFocused = false };
@@ -158,8 +172,20 @@ namespace SOS
 
         public static void DrawDeconCard(GUIListBox col, ItemPrefab item, List<DeconstructItem> deconList, Action<ItemPrefab> onPrimary, Action<ItemPrefab> onSecondary)
         {
+<<<<<<< HEAD
             var groupsByMachine = deconList
                 .GroupBy(di => string.Join(",", di.RequiredDeconstructor.Select(id => id.Value).OrderBy(s => s)))
+=======
+            var groupedOutputs = deconList
+                .GroupBy(di => new { di.ItemIdentifier, di.Commonness, di.MinCondition })
+                .Select(g => new
+                {
+                    g.Key.ItemIdentifier,
+                    g.Key.Commonness,
+                    g.Key.MinCondition,
+                    TotalAmount = g.Sum(di => di.Amount)
+                })
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
                 .ToList();
 
             foreach (var machineGroup in groupsByMachine)
@@ -277,8 +303,12 @@ namespace SOS
                 machine = TextSOS.Get("sos.recipe.hand", "Hand").Value;
             }
 
+<<<<<<< HEAD
             _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, HeaderHeight), layout.RectTransform),
                 $"{machine}:".ToUpper(), font: GUIStyle.SmallFont, textColor: Color.Yellow);
+=======
+            _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, HeaderHeight), layout.RectTransform), machine.ToUpper(), font: GUIStyle.SmallFont, textColor: Color.Yellow);
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
 
             string requirementInfo = usage.AmountRequired > 1 ? $" (pide x{usage.AmountRequired})" : "";
 
@@ -295,6 +325,7 @@ namespace SOS
             };
             var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2 };
 
+<<<<<<< HEAD
             string machineName = group.MachineIds.Length == 0
                 ? ResolveMachineName("deconstructor".ToIdentifier())
                 : string.Join(", ", group.MachineIds.Select(id => ResolveMachineName(id)));
@@ -321,6 +352,10 @@ namespace SOS
                 _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, RowHeight / 2), layout.RectTransform),
                     TextSOS.Get("sos.recipe.chance", "Chance based output").Value, font: GUIStyle.SmallFont, textColor: Color.Gray * 0.8f, textAlignment: Alignment.Right);
             }*/
+=======
+            _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, HeaderHeight), layout.RectTransform), TextSOS.Get("sos.recipe.deconstructing", "DECONSTRUCTING:"), font: GUIStyle.SmallFont, textColor: Color.LightGreen);
+            DrawCompactItemRow(layout, sourceItem, 1, true, "", null, onPrimary, onSecondary);
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
         }
 
         public static void DrawCompactItemRow(GUIComponent parent, ItemPrefab? prefab, float amount, bool isCardInside, string extraText = "", Color? color = null, Action<ItemPrefab>? onPrimaryClick = null, Action<ItemPrefab>? onSecondaryClick = null)
@@ -333,6 +368,7 @@ namespace SOS
             {
                 var btn = new GUIButton(rowRect, style: "ListBoxElement")
                 {
+                    ToolTip = GetDetailedTooltip(prefab),
                     OnClicked = (_, _) =>
                     {
                         onPrimaryClick?.Invoke(prefab);
@@ -348,7 +384,12 @@ namespace SOS
             }
             else
             {
-                container = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 5, CanBeFocused = false };
+                container = new GUILayoutGroup(rowRect, isHorizontal: true)
+                {
+                    AbsoluteSpacing = 5,
+                    CanBeFocused = true,
+                    ToolTip = prefab != null ? GetDetailedTooltip(prefab) : null
+                };
             }
 
             var contentLayout = new GUILayoutGroup(new RectTransform(Vector2.One, container.RectTransform), isHorizontal: true)

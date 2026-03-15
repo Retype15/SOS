@@ -82,5 +82,6 @@
 		<sos.container.capacity>Capacity:</sos.container.capacity>
 		<sos.container.slots>[amount] Slots</sos.container.slots>
 		<sos.container.accepts>Accepts:</sos.container.accepts>
+		<sos.container.contained>Contained_by:</sos.container.contained>
 	</Override>
 </infotexts>

@@ -5,6 +5,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Platforms>AnyCPU;x64</Platforms>
+        <BaseIntermediateOutputPath>obj\OSX\</BaseIntermediateOutputPath>
+        <OutputPath>bin\OSX\</OutputPath>
+        <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
     </PropertyGroup>
 
     <ItemGroup>

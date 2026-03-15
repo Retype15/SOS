@@ -13,13 +13,17 @@ namespace SOS
     public static class RecipeAnalyzer
     {
         private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>> usesCache = new();
+<<<<<<< HEAD
         private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, DeconstructItem>>> sourcesCache = new();
+=======
+        private static readonly Dictionary<Identifier, List<ItemPrefab>> sourcesCache = new();
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
 
         private const int MaxAnalysisCacheSize = 30;
-        private static readonly Dictionary<Identifier, ItemAnalysis> analysisCache = new Dictionary<Identifier, ItemAnalysis>();
-        private static readonly Queue<Identifier> analysisCacheOrder = new Queue<Identifier>();
+        private static readonly Dictionary<Identifier, ItemAnalysis> analysisCache = new();
+        private static readonly Queue<Identifier> analysisCacheOrder = new();
 
-        public static ItemAnalysis GetAnalysis(ItemPrefab item)
+        public static ItemAnalysis? GetAnalysis(ItemPrefab? item)
         {
             if (item == null) return null;
 

@@ -14,8 +14,6 @@
 
 [![Add from Workshop](https://img.shields.io/badge/Add_From-Steam_Workshop-1B2838?style=for-the-badge&logo=steam&logoColor=white)](https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282)
 
-**Or**
-
 [![Manually Download Latest Version](https://img.shields.io/badge/Manually_Download_Latest_Version-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Retype15/SOS/releases/latest/download/SOS.zip)
 
 ## Key Features
@@ -64,12 +62,15 @@ In future updates, access to the S.O.S. interface will be gated behind a **Chip 
 ## Common questions
 
 **Q:** *Can it be used on vanilla servers?*
+
 - **A:** Absolutely. The most it will require from the server is new items, nothing more.
 
 **Q:** *Is this a client-only mod, or does it need to be included on the server?*
+
 - **A:** Currently, it's entirely client-only. We plan for it to always be client-only, so you can use it even on a completely vanilla server without mods. If the server doesn't have it, then the full system unlocked in the beta version will be used.
 
 **Q:** *Is it really compatible with ALL in-game items?*
+
 - **A:** *Yes! Absolutely everything, including submarine parts that are impossible to obtain. I've decided not to exclude these items for now for descriptions and another useful metadata. If they bother you, you can create an issue in the Git project, leave a comment on itch.io, or contact me directly, and I'll prioritize it.*
 
 ## License & Copyright

@@ -2,9 +2,12 @@
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
+#pragma warning disable IDE0130
+#pragma warning disable IDE0079
+#pragma warning disable IDE0290
+
 using Barotrauma;
 using Microsoft.Xna.Framework.Input;
-
 
 namespace SOS
 {
@@ -12,9 +15,9 @@ namespace SOS
     {
         private SOSWindow? mainWindow;
 
-        public HashSet<string> FavoritedItems { get; } = new HashSet<string>();
+        public HashSet<string> FavoritedItems { get; } = [];
 
-        public TrackerManager Tracker { get; } = new TrackerManager();
+        public TrackerManager Tracker { get; } = new();
         private readonly Keys toggleKey = Keys.J;
         private bool wasKeyDown = false;
 
@@ -64,11 +67,8 @@ namespace SOS
 
         public void Destroy()
         {
-            if (mainWindow != null)
-            {
-                mainWindow.Destroy();
-                mainWindow = null;
-            }
+            mainWindow?.Destroy();
+            mainWindow = null;
         }
 
         public void OnItemSelected(ItemPrefab item, bool isHistoryNavigation = false)
@@ -141,9 +141,9 @@ namespace SOS
             var usesAsIngredient = RecipeAnalyzer.GetUsesAsIngredient(item);
             var obtainedFrom = RecipeAnalyzer.GetSourcesFromDeconstruction(item);
 
-            mainWindow.UpdateDetailsPanel(item, craftRecipes, deconOutputs, usesAsIngredient, obtainedFrom);
+            mainWindow?.UpdateDetailsPanel(item, craftRecipes, deconOutputs, usesAsIngredient, obtainedFrom);
 
-            mainWindow.UpdateNavigationButtons();
+            mainWindow?.UpdateNavigationButtons();
         }
 
         public void NavigateBack()
@@ -169,17 +169,17 @@ namespace SOS
         public void OpenContextMenu(ItemPrefab item)
         {
             if (item == null) return;
-            var options = new List<ContextMenuOption>();
-
-            options.Add(new ContextMenuOption(TextSOS.Get("sos.context.track", "Track to HUD"), isEnabled: true, onSelected: () =>
-            {
-                Tracker.SetTrackedItem(item);
-            }));
-
-            options.Add(new ContextMenuOption(TextSOS.Get("sos.context.view_recipes", "View Recipes"), isEnabled: true, onSelected: () =>
-            {
-                OnItemSelected(item);
-            }));
+            List<ContextMenuOption> options =
+            [
+                new ContextMenuOption(TextSOS.Get("sos.context.track", "Track to HUD"), isEnabled: true, onSelected: () =>
+                {
+                    Tracker.SetTrackedItem(item);
+                }),
+                new ContextMenuOption(TextSOS.Get("sos.context.view_recipes", "View Recipes"), isEnabled: true, onSelected: () =>
+                {
+                    OnItemSelected(item);
+                }),
+            ];
 
             string targetId = item.Identifier.Value;
             bool isFav = FavoritedItems.Contains(targetId);
@@ -193,7 +193,7 @@ namespace SOS
                 mainWindow?.RefreshSearch();
             }));
 
-            GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, item.Name, null, options.ToArray());
+            _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, item.Name, null, [.. options]);
         }
 
         public void OpenRecipeContextMenu(ItemPrefab item, FabricationRecipe recipe)
@@ -221,7 +221,7 @@ namespace SOS
 
             //options.Add(new ContextMenuOption("Ver más info (WIP)", isEnabled: false));
 
-            GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, TextSOS.Get("sos.context.recipe_options", "Recipe Options"), null, options.ToArray());
+            _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, TextSOS.Get("sos.context.recipe_options", "Recipe Options"), null, [.. options]);
         }
 
         public void OnRecipeSelected(ItemPrefab item, FabricationRecipe recipe)
@@ -232,7 +232,7 @@ namespace SOS
 
         public void Update()
         {
-            if (GUI.KeyboardDispatcher.Subscriber != null) return;
+            if (GUI.KeyboardDispatcher.Subscriber != null && GUI.KeyboardDispatcher.Subscriber is not GUIDropDown2) return;
 
             var kb = Keyboard.GetState();
             bool isKeyDownNow = kb.IsKeyDown(toggleKey);
@@ -245,16 +245,20 @@ namespace SOS
 
             if (mainWindow != null)
             {
-                if (kb.IsKeyDown(Keys.Escape))
+                if (PlayerInput.KeyHit(Keys.Escape))
                 {
+                    mainWindow.SetSelected();
+                    PlayerInput.KeyDown(Keys.Escape);
                     CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
+                    return;
                 }
 
                 if (PlayerInput.KeyHit(Keys.Back) || PlayerInput.Mouse4ButtonClicked())
                 {
                     CrossThread.RequestExecutionOnMainThread(() => NavigateBack());
                 }
-                mainWindow.Update();
+
+                mainWindow?.Update();
             }
 
             Tracker.UpdateHUD();

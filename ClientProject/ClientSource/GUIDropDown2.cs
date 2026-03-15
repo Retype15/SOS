@@ -2,6 +2,10 @@
 // Original code extracted from (here:)[https://github.com/FakeFishGames/Barotrauma/blob/c8657caefa5c6928013a5152ac0ad301d99b405c/Barotrauma/BarotraumaClient/ClientSource/GUI/GUIDropDown.cs)
 // All rigths from @FakeFishGames.
 
+#pragma warning disable IDE0130
+#pragma warning disable IDE0079
+#pragma warning disable IDE0290
+
 using Barotrauma;
 using EventInput;
 using Microsoft.Xna.Framework;
@@ -12,19 +16,19 @@ namespace SOS
 {
     public class GUIDropDown2 : GUIComponent, IKeyboardSubscriber
     {
-        public delegate bool OnSelectedHandler(GUIComponent selected, object obj);
+        public delegate bool OnSelectedHandler(GUIComponent? selected, object? obj);
 
-        public OnSelectedHandler OnSelected;
-        public OnSelectedHandler AfterSelected;
-        public OnDroppedHandler OnDropped;
-        public delegate bool OnDroppedHandler(GUIDropDown2 dropDown, object obj);
+        public OnSelectedHandler? OnSelected;
+        public OnSelectedHandler? AfterSelected;
+        public OnDroppedHandler? OnDropped;
+        public delegate bool OnDroppedHandler(GUIDropDown2 dropDown, object? obj);
 
         private readonly GUIButton button;
-        private readonly GUIImage icon;
+        private readonly GUIImage? icon;
         private readonly GUIListBox listBox;
 
-        private RectTransform currentHighestParent;
-        private List<RectTransform> parentHierarchy = new List<RectTransform>();
+        private RectTransform? currentHighestParent;
+        private List<RectTransform> parentHierarchy = [];
 
         private readonly bool selectMultiple;
 
@@ -45,7 +49,7 @@ namespace SOS
             }
         }
 
-        public object SelectedItemData
+        public object? SelectedItemData
         {
             get
             {
@@ -63,14 +67,14 @@ namespace SOS
         public bool ButtonEnabled
         {
             get { return button.Enabled; }
-            set 
-            { 
+            set
+            {
                 button.Enabled = value;
                 if (icon != null) { icon.Enabled = value; }
             }
         }
 
-        public GUIComponent SelectedComponent => listBox.SelectedComponent;
+        public GUIComponent? SelectedComponent => listBox.SelectedComponent;
 
         public override bool Selected
         {
@@ -80,7 +84,7 @@ namespace SOS
 
         public GUIListBox ListBox => listBox;
 
-        public object SelectedData => listBox.SelectedComponent.UserData;
+        public object? SelectedData => listBox.SelectedComponent?.UserData;
 
         public int SelectedIndex
         {
@@ -111,10 +115,10 @@ namespace SOS
             }
         }
 
-        private readonly List<object> selectedDataMultiple = new List<object>();
+        private readonly List<object> selectedDataMultiple = [];
         public IEnumerable<object> SelectedDataMultiple => selectedDataMultiple;
 
-        private readonly List<int> selectedIndexMultiple = new List<int>();
+        private readonly List<int> selectedIndexMultiple = [];
         public IEnumerable<int> SelectedIndexMultiple => selectedIndexMultiple;
 
         public bool MustSelectAtLeastOne;
@@ -130,7 +134,7 @@ namespace SOS
             }
         }
 
-        public GUIImage DropDownIcon => icon;
+        public GUIImage? DropDownIcon => icon;
 
         public GUIDropDown2(RectTransform rectT, int elementCount = 4, string style = "", bool selectMultiple = false, bool dropAbove = false, int? listBoxWidth = null, bool? expandToRight = null) : base(style, rectT)
         {
@@ -206,7 +210,7 @@ namespace SOS
         private RectTransform FindHighestParent()
         {
             parentHierarchy.Clear();
-            parentHierarchy = new List<RectTransform>() { RectTransform.Parent };
+            parentHierarchy = [RectTransform.Parent];
             RectTransform parent = parentHierarchy.Last();
             while (parent?.Parent != null)
             {
@@ -244,7 +248,7 @@ namespace SOS
                 {
                     UserData = userData,
                     ToolTip = toolTip,
-                    OnSelected = (GUITickBox tb) =>
+                    OnSelected = tb =>
                     {
                         if (MustSelectAtLeastOne && selectedDataMultiple.Count <= 1 && !tb.Selected)
                         {
@@ -287,7 +291,7 @@ namespace SOS
 
         public IEnumerable<GUIComponent> GetChildren() => listBox.Content.Children;
 
-        private bool SelectItem(GUIComponent component, object obj)
+        private bool SelectItem(GUIComponent? component, object? obj)
         {
             if (selectMultiple)
             {
@@ -320,7 +324,7 @@ namespace SOS
             if (selectMultiple)
             {
                 var child = listBox.Content.GetChild(index);
-                if (child != null) { SelectItem(null, child.UserData); }
+                if (child != null) { SelectItem(child, child.UserData); }
             }
             else
             {
@@ -363,7 +367,7 @@ namespace SOS
                 currentHighestParent.GUIComponent.OnAddedToGUIUpdateList += AddListBoxToGUIUpdateList;
             }
         }
-        
+
         private void AddListBoxToGUIUpdateList(GUIComponent parent)
         {
             for (int i = 1; i < parentHierarchy.Count; i++)
@@ -395,7 +399,7 @@ namespace SOS
 
         public override void Update(float deltaTime)
         {
-            if (!Visible) return;
+            if (!Visible || listBox == null || button == null) return;
             wasOpened = false;
             base.Update(deltaTime);
             if (Dropped && PlayerInput.PrimaryMouseButtonClicked())

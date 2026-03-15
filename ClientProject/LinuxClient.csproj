@@ -5,6 +5,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Platforms>AnyCPU;x64</Platforms>
+        <BaseIntermediateOutputPath>obj\Linux\</BaseIntermediateOutputPath>
+        <OutputPath>bin\Linux\</OutputPath>
+        <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
     </PropertyGroup>
 
     <ItemGroup>

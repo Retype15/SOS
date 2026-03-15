@@ -2,6 +2,10 @@
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
+#pragma warning disable IDE0130
+#pragma warning disable IDE0079
+#pragma warning disable IDE0290
+
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
@@ -17,15 +21,15 @@ namespace SOS
         private readonly GUIListBox? metaPanel;
         private readonly SOSController controller;
         private readonly GUITextBox? searchBox;
-        private GUIButton? btnBack;
-        private GUIButton? btnForward;
+        private readonly GUIButton? btnBack;
+        private readonly GUIButton? btnForward;
 
-        private List<ItemPrefab> allFilteredItems = new List<ItemPrefab>();
+        private List<ItemPrefab> allFilteredItems = [];
         private int itemsLoaded = 0;
         private const int ChunkSize = 50;
         private bool isUpdating = false;
 
-        private List<GUIDesplegableBox> activeDropdowns = new List<GUIDesplegableBox>();
+        private readonly List<GUIDesplegableBox> activeDropdowns = [];
 
         public SOSWindow(SOSController controller)
         {
@@ -34,7 +38,11 @@ namespace SOS
             if (parentComponent == null) return;
 
             mainFrame = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.9f), parentComponent.RectTransform, Anchor.Center), "InnerFrame")
+<<<<<<< HEAD
             {
+=======
+            { 
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
                 CanBeFocused = true,
                 Selected = true,
                 Color = Color.Black * 0.7f
@@ -44,26 +52,49 @@ namespace SOS
             _ = new GUITextBlock(new RectTransform(Vector2.One, topBar.RectTransform), TextSOS.Get("sos.window.title", "SOS - Recipe Browser"), textAlignment: Alignment.Center, font: GUIStyle.LargeFont);
 
             var historyLayout = new GUILayoutGroup(new RectTransform(new Vector2(0.12f, 0.8f), topBar.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true) { RelativeSpacing = 0.05f };
-            btnBack = new GUIButton(new RectTransform(new Vector2(0.45f, 1f), historyLayout.RectTransform), "", style: "GUIButtonToggleLeft") { OnClicked = (_, _) => { controller.NavigateBack(); return true; } };
+            btnBack = new GUIButton(new RectTransform(new Vector2(0.45f, 1f), historyLayout.RectTransform), "", style: "GUIButtonToggleLeft")
+            {
+                OnClicked = (_, _) => { controller.NavigateBack(); return true; },
+                ToolTip = TextSOS.Get("sos.window.back", "Back [Backspace]")
+            };
             if (btnBack.Children.FirstOrDefault() is GUIImage imgBack) imgBack.SpriteEffects = Microsoft.Xna.Framework.Graphics.SpriteEffects.FlipHorizontally;
-            btnForward = new GUIButton(new RectTransform(new Vector2(0.45f, 1f), historyLayout.RectTransform), "", style: "GUIButtonToggleRight") { OnClicked = (_, _) => { controller.NavigateForward(); return true; } };
+            btnForward = new GUIButton(new RectTransform(new Vector2(0.45f, 1f), historyLayout.RectTransform), "", style: "GUIButtonToggleRight")
+            {
+                OnClicked = (_, _) => { controller.NavigateForward(); return true; },
+                ToolTip = TextSOS.Get("sos.window.forward", "Forward [Ctrl+Backspace]")
+            };
 
             var topButtons = new GUILayoutGroup(new RectTransform(new Vector2(0.2f, 0.8f), topBar.RectTransform, Anchor.CenterRight) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true) { Stretch = false, RelativeSpacing = 0.05f, ChildAnchor = Anchor.CenterRight };
-            _ = new GUIButton(new RectTransform(new Vector2(0.2f, 1f), topButtons.RectTransform), "", style: "GUICancelButton") { OnClicked = (_, _) => { controller.ToggleUI(); return true; } };
-            _ = new GUIButton(new RectTransform(new Vector2(0.65f, 1f), topButtons.RectTransform), TextSOS.Get("sos.window.clear_hud", "Clear HUD"), style: "DeviceButton") { OnClicked = (_, _) => { controller.Tracker.SetTrackedItem(null); return true; } };
+            _ = new GUIButton(new RectTransform(new Vector2(0.2f, 1f), topButtons.RectTransform), "", style: "GUICancelButton")
+            {
+                OnClicked = (_, _) => { controller.ToggleUI(); return true; },
+                ToolTip = TextSOS.Get("sos.gen.close", "Close [Esc]")
+            };
+            _ = new GUIButton(new RectTransform(new Vector2(0.65f, 1f), topButtons.RectTransform), TextSOS.Get("sos.window.clear_hud", "Clear HUD"), style: "DeviceButton")
+            {
+                OnClicked = (_, _) => { controller.Tracker.SetTrackedItem(null); return true; },
+                ToolTip = TextSOS.Get("sos.window.clear_hud_tooltip", "Clears the active HUD tracker")
+            };
 
             var contentArea = new GUILayoutGroup(new RectTransform(new Vector2(0.98f, 0.94f), mainFrame.RectTransform, Anchor.BottomCenter) { AbsoluteOffset = new Point(0, 5) }) { IsHorizontal = true, Stretch = true, RelativeSpacing = 0.01f };
 
             var leftPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.22f, 1f), contentArea.RectTransform)) { Stretch = true, RelativeSpacing = 0.01f };
             var searchContainer = new GUIFrame(new RectTransform(new Vector2(1f, 0.04f), leftPanel.RectTransform), style: "InnerFrame");
             searchBox = GUI.CreateTextBoxWithPlaceholder(searchContainer.RectTransform, controller.LastSearchQuery, TextSOS.Get("sos.window.search_placeholder", "Search item..."));
+            searchBox.ToolTip = TextSOS.Get("sos.window.search_tooltip", "Search by name, ID or tags");
             searchBox.OnTextChanged += (_, text) => { controller.LastSearchQuery = text; UpdateSearch(text); return true; };
+<<<<<<< HEAD
             itemList = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftPanel.RectTransform), style: "PowerButtonFrame")
             {
+=======
+            itemList = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftPanel.RectTransform), style: "PowerButtonFrame") 
+            { 
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
                 Padding = new Vector4(8, 5, 5, 5),
                 Color = Color.Black * 0.2f
             };
 
+<<<<<<< HEAD
             var centerPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.53f, 1f), contentArea.RectTransform))
             {
                 Stretch = true,
@@ -72,13 +103,28 @@ namespace SOS
             detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.1f), centerPanel.RectTransform), style: "CircuitBoxFrame")
             {
                 Color = Color.Black * 0.4f
+=======
+            var centerPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.53f, 1f), contentArea.RectTransform)) 
+            { 
+                Stretch = true, 
+                RelativeSpacing = 0.005f
+            };
+            detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.1f), centerPanel.RectTransform), style: "CircuitBoxFrame") 
+            { 
+                Color = Color.Black * 0.4f 
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
             };
             var recipeSplit = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0.89f), centerPanel.RectTransform), isHorizontal: true) { Stretch = true, RelativeSpacing = 0.01f };
 
             var leftRecipeCol = new GUILayoutGroup(new RectTransform(new Vector2(0.5f, 1f), recipeSplit.RectTransform)) { Stretch = true };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), leftRecipeCol.RectTransform), TextSOS.Get("sos.window.obtain", "OBTAIN"), font: GUIStyle.SubHeadingFont, textColor: Color.LightGreen, textAlignment: Alignment.Center);
+<<<<<<< HEAD
             colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftRecipeCol.RectTransform), style: "GUIBackgroundBlocker")
             {
+=======
+            colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftRecipeCol.RectTransform), style: "GUIBackgroundBlocker") 
+            { 
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
                 Spacing = 5,
                 Color = Color.Black * 0.3f
             };
@@ -88,16 +134,27 @@ namespace SOS
             colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), rightRecipeCol.RectTransform), style: "GUIBackgroundBlocker") { Spacing = 5 };
 
             var rightPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.25f, 1f), contentArea.RectTransform)) { Stretch = true };
-            metaPanel = new GUIListBox(new RectTransform(new Vector2(1f, 1f), rightPanel.RectTransform), style: "CircuitBoxFrame")
+            metaPanel = new GUIListBox(new RectTransform(new Vector2(1f, 1f), rightPanel.RectTransform), style: "InnerFrame")
             {
                 Spacing = 10,
                 Padding = new Vector4(18, 15, 18, 15),
                 CanBeFocused = true,
-                Color = Color.Black * 0.4f
+                Color = Color.Black * 0.4f,
             };
+
+            if (metaPanel.ContentBackground != null)
+            {
+                metaPanel.ContentBackground.Color = Color.Black * 0.4f;
+            }
 
             UpdateSearch(controller.LastSearchQuery);
             UpdateNavigationButtons();
+        }
+
+        public void SetSelected()
+        {
+            if (mainFrame == null) return;
+            mainFrame.Selected = true;
         }
 
         public void UpdateNavigationButtons()
@@ -145,15 +202,14 @@ namespace SOS
         {
             if (itemList == null) return;
 
-            allFilteredItems = ItemPrefab.Prefabs.Where(p =>
+            allFilteredItems = [.. ItemPrefab.Prefabs.Where(p =>
                 string.IsNullOrWhiteSpace(query) ||
                 p.Name.Value.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                 p.Identifier.Value.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                 p.Tags.Any(t => t.Value.Contains(query, StringComparison.OrdinalIgnoreCase))
             )
             .OrderByDescending(p => controller.FavoritedItems.Contains(p.Identifier.Value))
-            .ThenBy(p => p.Name.Value)
-            .ToList();
+            .ThenBy(p => p.Name.Value)];
 
             itemsLoaded = 0;
             itemList.Content.ClearChildren();
@@ -221,7 +277,11 @@ namespace SOS
             }
         }
 
+<<<<<<< HEAD
         public void UpdateDetailsPanel(ItemPrefab targetItem, List<FabricationRecipe> craft, List<DeconstructItem> decon, List<Tuple<ItemPrefab, FabricationRecipe>> uses, List<Tuple<ItemPrefab, DeconstructItem>> sources)
+=======
+        public void UpdateDetailsPanel(ItemPrefab targetItem, List<FabricationRecipe> craft, List<DeconstructItem> decon, List<Tuple<ItemPrefab, FabricationRecipe>> uses, List<ItemPrefab> sources)
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
         {
             activeDropdowns.Clear();
             if (detailsHeader == null || colObtain == null || colUsage == null || metaPanel == null) return;
@@ -239,6 +299,7 @@ namespace SOS
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = targetItem.InventoryIconColor, CanBeFocused = false };
             }
 
+<<<<<<< HEAD
             var (headerName, headerColor) = SafeItemName.Get(targetItem, Color.White);
 
             _ = new GUITextBlock
@@ -291,25 +352,41 @@ namespace SOS
                 })
                 .OrderBy(gu => gu.TargetItem.Name.Value)
                 .ToList();
+=======
+            void onPrimary(ItemPrefab p) => controller.OnItemSelected(p);
+            void onSecondary(ItemPrefab p) => controller.OpenContextMenu(p);
+
+            colObtain.Content.ClearChildren();
+            foreach (var r in craft) CardBuilder.DrawCraftCard(colObtain, r, targetItem, controller, onPrimary, onSecondary);
+            foreach (var s in sources) CardBuilder.DrawSourceCard(colObtain, s, onPrimary, onSecondary);
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
 
             colUsage.Content.ClearChildren();
             if (decon.Count > 0) CardBuilder.DrawDeconCard(colUsage, targetItem, decon, onPrimary, onSecondary);
             foreach (var usage in groupedUses) CardBuilder.DrawUseCard(colUsage, usage, onPrimary, onSecondary);
 
 
-            var onBadgeClick = (string tag) => { if (searchBox != null) searchBox.Text = tag; UpdateSearch(tag); };
+            void onBadgeClick(string tag) { if (searchBox != null) searchBox.Text = tag; UpdateSearch(tag); }
 
             var builder = new SectionBuilder
             (
                 metaPanel,
+<<<<<<< HEAD
                 onBadgeClick,
                 controller,
                 onPrimary,
                 onSecondary
+=======
+onBadgeClick,
+                controller,
+onPrimary,
+onSecondary
+>>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
             );
 
             var analysis = RecipeAnalyzer.GetAnalysis(targetItem);
 
+            if (analysis == null || analysis.Sections == null) return;
 
             foreach (var section in analysis.Sections)
             {
@@ -393,7 +470,8 @@ namespace SOS
                 var tagBadge = new GUIButton(new RectTransform(new Vector2(0.1f, 0.9f), list.Content.RectTransform), style: "OuterGlow")
                 {
                     Color = Color.LightSkyBlue * 0.15f,
-                    OnClicked = (_, _) => { onClick?.Invoke(item); return true; }
+                    OnClicked = (_, _) => { onClick?.Invoke(item); return true; },
+                    //ToolTip = TextSOS.Get("sos.window.tag_tooltip", "Search items with tag: [tag]").Replace("[tag]", item)
                 };
 
                 var tagText = new GUITextBlock(new RectTransform(Vector2.One, tagBadge.RectTransform), item.ToLower(), font: GUIStyle.SmallFont, textAlignment: Alignment.Center)
