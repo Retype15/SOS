@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
 <contentpackage name="S.O.S - Standard Operations Schematics" modversion="0.4.3b" gameversion="1.11.5.0" corepackage="false" steamworkshopid="3682891282" >
-=======
-<contentpackage name="S.O.S - Standard Operations Schematics" modversion="0.4.2b" gameversion="1.11.5.0" corepackage="false" steamworkshopid="3682891282" >
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
 	<Text file="%ModDir%/Localizations/English.xml" />
 	<Text file="%ModDir%/Localizations/Spanish.xml" />
 	<Text file="%ModDir%/Localizations/Russian.xml" />

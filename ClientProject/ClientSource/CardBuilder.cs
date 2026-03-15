@@ -18,11 +18,8 @@ namespace SOS
         private const int HeaderHeight = 20;
         private const int CardPadding = 10;
 
-<<<<<<< HEAD
         private static readonly Dictionary<Identifier, string> machineNameCache = new();
 
-=======
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
         public static RichString GetDetailedTooltip(ItemPrefab prefab)
         {
             LocalizedString name = prefab.Name;
@@ -116,11 +113,7 @@ namespace SOS
             string headerText = $"{machine}:".ToUpper();
 
             var header = new GUILayoutGroup(new RectTransform(new Point(layout.Rect.Width, HeaderHeight), layout.RectTransform), isHorizontal: true) { CanBeFocused = false };
-<<<<<<< HEAD
             _ = new GUITextBlock(new RectTransform(new Vector2(0.7f, 1f), header.RectTransform), headerText, font: GUIStyle.SmallFont, textColor: isTracked ? Color.Gold : Color.Yellow) { CanBeFocused = false };
-=======
-            _ = new GUITextBlock(new RectTransform(new Vector2(0.7f, 1f), header.RectTransform), machine.ToUpper(), font: GUIStyle.SmallFont, textColor: isTracked ? Color.Gold : Color.Yellow) { CanBeFocused = false };
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
             _ = new GUITextBlock(new RectTransform(new Vector2(0.3f, 1f), header.RectTransform), $"{recipe.RequiredTime}s", font: GUIStyle.SmallFont, textAlignment: Alignment.Right) { CanBeFocused = false };
 
             if (recipe.RequiresRecipe)
@@ -172,20 +165,8 @@ namespace SOS
 
         public static void DrawDeconCard(GUIListBox col, ItemPrefab item, List<DeconstructItem> deconList, Action<ItemPrefab> onPrimary, Action<ItemPrefab> onSecondary)
         {
-<<<<<<< HEAD
             var groupsByMachine = deconList
                 .GroupBy(di => string.Join(",", di.RequiredDeconstructor.Select(id => id.Value).OrderBy(s => s)))
-=======
-            var groupedOutputs = deconList
-                .GroupBy(di => new { di.ItemIdentifier, di.Commonness, di.MinCondition })
-                .Select(g => new
-                {
-                    g.Key.ItemIdentifier,
-                    g.Key.Commonness,
-                    g.Key.MinCondition,
-                    TotalAmount = g.Sum(di => di.Amount)
-                })
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
                 .ToList();
 
             foreach (var machineGroup in groupsByMachine)
@@ -193,8 +174,7 @@ namespace SOS
                 float poolTotalWeight = machineGroup.Sum(di => di.Commonness);
 
                 var groupedOutputs = machineGroup
-                    .GroupBy(di => new
-                    {
+                    .GroupBy(di => new {
                         di.ItemIdentifier,
                         OtherKey = string.Join(",", di.RequiredOtherItem.Select(id => id.Value).OrderBy(x => x))
                     })
@@ -303,12 +283,8 @@ namespace SOS
                 machine = TextSOS.Get("sos.recipe.hand", "Hand").Value;
             }
 
-<<<<<<< HEAD
             _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, HeaderHeight), layout.RectTransform),
                 $"{machine}:".ToUpper(), font: GUIStyle.SmallFont, textColor: Color.Yellow);
-=======
-            _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, HeaderHeight), layout.RectTransform), machine.ToUpper(), font: GUIStyle.SmallFont, textColor: Color.Yellow);
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
 
             string requirementInfo = usage.AmountRequired > 1 ? $" (pide x{usage.AmountRequired})" : "";
 
@@ -325,7 +301,6 @@ namespace SOS
             };
             var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2 };
 
-<<<<<<< HEAD
             string machineName = group.MachineIds.Length == 0
                 ? ResolveMachineName("deconstructor".ToIdentifier())
                 : string.Join(", ", group.MachineIds.Select(id => ResolveMachineName(id)));
@@ -352,10 +327,6 @@ namespace SOS
                 _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, RowHeight / 2), layout.RectTransform),
                     TextSOS.Get("sos.recipe.chance", "Chance based output").Value, font: GUIStyle.SmallFont, textColor: Color.Gray * 0.8f, textAlignment: Alignment.Right);
             }*/
-=======
-            _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, HeaderHeight), layout.RectTransform), TextSOS.Get("sos.recipe.deconstructing", "DECONSTRUCTING:"), font: GUIStyle.SmallFont, textColor: Color.LightGreen);
-            DrawCompactItemRow(layout, sourceItem, 1, true, "", null, onPrimary, onSecondary);
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
         }
 
         public static void DrawCompactItemRow(GUIComponent parent, ItemPrefab? prefab, float amount, bool isCardInside, string extraText = "", Color? color = null, Action<ItemPrefab>? onPrimaryClick = null, Action<ItemPrefab>? onSecondaryClick = null)

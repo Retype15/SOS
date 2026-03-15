@@ -6,11 +6,6 @@
 #pragma warning disable IDE0079
 #pragma warning disable IDE0290
 
-<<<<<<< HEAD
-=======
-using System.Collections.Generic;
-using System.Linq;
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
 using Barotrauma;
 using Microsoft.Xna.Framework;
 

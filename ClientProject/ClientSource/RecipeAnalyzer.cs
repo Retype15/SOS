@@ -2,10 +2,10 @@
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
+using Barotrauma;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Barotrauma;
 
 namespace SOS
 {
@@ -13,11 +13,7 @@ namespace SOS
     public static class RecipeAnalyzer
     {
         private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>> usesCache = new();
-<<<<<<< HEAD
         private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, DeconstructItem>>> sourcesCache = new();
-=======
-        private static readonly Dictionary<Identifier, List<ItemPrefab>> sourcesCache = new();
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
 
         private const int MaxAnalysisCacheSize = 30;
         private static readonly Dictionary<Identifier, ItemAnalysis> analysisCache = new();

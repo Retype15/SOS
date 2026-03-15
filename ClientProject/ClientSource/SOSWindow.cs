@@ -38,11 +38,7 @@ namespace SOS
             if (parentComponent == null) return;
 
             mainFrame = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.9f), parentComponent.RectTransform, Anchor.Center), "InnerFrame")
-<<<<<<< HEAD
             {
-=======
-            { 
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
                 CanBeFocused = true,
                 Selected = true,
                 Color = Color.Black * 0.7f
@@ -83,18 +79,12 @@ namespace SOS
             searchBox = GUI.CreateTextBoxWithPlaceholder(searchContainer.RectTransform, controller.LastSearchQuery, TextSOS.Get("sos.window.search_placeholder", "Search item..."));
             searchBox.ToolTip = TextSOS.Get("sos.window.search_tooltip", "Search by name, ID or tags");
             searchBox.OnTextChanged += (_, text) => { controller.LastSearchQuery = text; UpdateSearch(text); return true; };
-<<<<<<< HEAD
             itemList = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftPanel.RectTransform), style: "PowerButtonFrame")
             {
-=======
-            itemList = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftPanel.RectTransform), style: "PowerButtonFrame") 
-            { 
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
                 Padding = new Vector4(8, 5, 5, 5),
                 Color = Color.Black * 0.2f
             };
 
-<<<<<<< HEAD
             var centerPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.53f, 1f), contentArea.RectTransform))
             {
                 Stretch = true,
@@ -103,28 +93,13 @@ namespace SOS
             detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.1f), centerPanel.RectTransform), style: "CircuitBoxFrame")
             {
                 Color = Color.Black * 0.4f
-=======
-            var centerPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.53f, 1f), contentArea.RectTransform)) 
-            { 
-                Stretch = true, 
-                RelativeSpacing = 0.005f
-            };
-            detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.1f), centerPanel.RectTransform), style: "CircuitBoxFrame") 
-            { 
-                Color = Color.Black * 0.4f 
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
             };
             var recipeSplit = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0.89f), centerPanel.RectTransform), isHorizontal: true) { Stretch = true, RelativeSpacing = 0.01f };
 
             var leftRecipeCol = new GUILayoutGroup(new RectTransform(new Vector2(0.5f, 1f), recipeSplit.RectTransform)) { Stretch = true };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), leftRecipeCol.RectTransform), TextSOS.Get("sos.window.obtain", "OBTAIN"), font: GUIStyle.SubHeadingFont, textColor: Color.LightGreen, textAlignment: Alignment.Center);
-<<<<<<< HEAD
             colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftRecipeCol.RectTransform), style: "GUIBackgroundBlocker")
             {
-=======
-            colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftRecipeCol.RectTransform), style: "GUIBackgroundBlocker") 
-            { 
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
                 Spacing = 5,
                 Color = Color.Black * 0.3f
             };
@@ -277,11 +252,7 @@ namespace SOS
             }
         }
 
-<<<<<<< HEAD
         public void UpdateDetailsPanel(ItemPrefab targetItem, List<FabricationRecipe> craft, List<DeconstructItem> decon, List<Tuple<ItemPrefab, FabricationRecipe>> uses, List<Tuple<ItemPrefab, DeconstructItem>> sources)
-=======
-        public void UpdateDetailsPanel(ItemPrefab targetItem, List<FabricationRecipe> craft, List<DeconstructItem> decon, List<Tuple<ItemPrefab, FabricationRecipe>> uses, List<ItemPrefab> sources)
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
         {
             activeDropdowns.Clear();
             if (detailsHeader == null || colObtain == null || colUsage == null || metaPanel == null) return;
@@ -299,7 +270,6 @@ namespace SOS
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = targetItem.InventoryIconColor, CanBeFocused = false };
             }
 
-<<<<<<< HEAD
             var (headerName, headerColor) = SafeItemName.Get(targetItem, Color.White);
 
             _ = new GUITextBlock
@@ -337,8 +307,7 @@ namespace SOS
 
             var currentItemId = targetItem.Identifier;
             var groupedUses = uses
-                .GroupBy(u => new
-                {
+                .GroupBy(u => new {
                     ResultId = u.Item1.Identifier,
                     ReqAmount = u.Item2.RequiredItems.FirstOrDefault(ri =>
                         ri.ItemPrefabs.Any(p => p.Identifier == currentItemId))?.Amount ?? 1
@@ -352,14 +321,6 @@ namespace SOS
                 })
                 .OrderBy(gu => gu.TargetItem.Name.Value)
                 .ToList();
-=======
-            void onPrimary(ItemPrefab p) => controller.OnItemSelected(p);
-            void onSecondary(ItemPrefab p) => controller.OpenContextMenu(p);
-
-            colObtain.Content.ClearChildren();
-            foreach (var r in craft) CardBuilder.DrawCraftCard(colObtain, r, targetItem, controller, onPrimary, onSecondary);
-            foreach (var s in sources) CardBuilder.DrawSourceCard(colObtain, s, onPrimary, onSecondary);
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
 
             colUsage.Content.ClearChildren();
             if (decon.Count > 0) CardBuilder.DrawDeconCard(colUsage, targetItem, decon, onPrimary, onSecondary);
@@ -371,17 +332,10 @@ namespace SOS
             var builder = new SectionBuilder
             (
                 metaPanel,
-<<<<<<< HEAD
-                onBadgeClick,
-                controller,
-                onPrimary,
-                onSecondary
-=======
 onBadgeClick,
                 controller,
 onPrimary,
 onSecondary
->>>>>>> 165a25804716a262a7efe1bfdc65ce622be17bf5
             );
 
             var analysis = RecipeAnalyzer.GetAnalysis(targetItem);
