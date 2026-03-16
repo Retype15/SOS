@@ -10,6 +10,10 @@
 
 ---
 
+ **WARN:** PERSONAL PROBLEMS:
+> Hello, sorry, but I just want to let you know that I am from Cuba and right now we have just entered another "general blackout", which means that I will not have electricity or connection for at least 3 days until I don't know when. Therefore I will not be able to accept your issues or do anything in the project for the next few days, I apologize for that, and as soon as I return I promise to solve your issue. A thousand apologies and thanks.
+
+
 **S.O.S.** is a high-performance recipe browser and material tracking utility for **Barotrauma**. Designed to be the ultimate companion for both vanilla and heavily modded campaigns (like Neurotrauma or BaroCraftables), it provides a seamless, integrated interface to explore the complex economy of Europa.
 
 [![Add from Workshop](https://img.shields.io/badge/Add_From-Steam_Workshop-1B2838?style=for-the-badge&logo=steam&logoColor=white)](https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282)
