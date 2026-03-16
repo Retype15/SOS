@@ -141,9 +141,9 @@ namespace SOS
                 {
                     var prevItem = controller.HistoryBack.Peek();
 
-                    var (navBackName, navBackColor) = SafeItemName.Get(prevItem, Color.White);
-
-                    btnBack.ToolTip = $"{TextSOS.Get("sos.window.back", "Back")}: ‖color:{navBackColor}‖{navBackName}‖color:end‖";
+                    var (navBackName, _) = SafeItemName.Get(prevItem, Color.White);
+                    // TODO: Use colored Text.
+                    btnBack.ToolTip = $"{TextSOS.Get("sos.window.back", "Back")}: {navBackName}";
                 }
             }
 
@@ -154,9 +154,10 @@ namespace SOS
                 {
                     var nextItem = controller.HistoryForward.Peek();
 
-                    var (navForwardName, navForwardColor) = SafeItemName.Get(nextItem, Color.White);
+                    var (navForwardName, _) = SafeItemName.Get(nextItem, Color.White);
 
-                    btnForward.ToolTip = $"{TextSOS.Get("sos.window.forward", "Forward")}: ‖color:{navForwardColor}‖{navForwardName}‖color:end‖";
+                    // TODO: Use colored Text.
+                    btnForward.ToolTip = $"{TextSOS.Get("sos.window.forward", "Forward")}: {navForwardName}";
                 }
             }
         }
@@ -295,7 +296,7 @@ namespace SOS
                 {
                     SourceItem = group.First().Item1,
                     MachineIds = group.First().Item2.RequiredDeconstructor,
-                    RequiredOtherItems = group.First().Item2.RequiredOtherItem.ToList(),
+                    RequiredOtherItems = [.. group.First().Item2.RequiredOtherItem],
                     TotalCommonness = group.Sum(g => g.Item2.Commonness),
                     IsRandom = group.First().Item1.RandomDeconstructionOutput
                 })
@@ -307,7 +308,8 @@ namespace SOS
 
             var currentItemId = targetItem.Identifier;
             var groupedUses = uses
-                .GroupBy(u => new {
+                .GroupBy(u => new
+                {
                     ResultId = u.Item1.Identifier,
                     ReqAmount = u.Item2.RequiredItems.FirstOrDefault(ri =>
                         ri.ItemPrefabs.Any(p => p.Identifier == currentItemId))?.Amount ?? 1
@@ -315,11 +317,11 @@ namespace SOS
                 .Select(group => new GroupedUsage
                 {
                     TargetItem = group.First().Item1,
-                    MachineIds = group.SelectMany(g => g.Item2.SuitableFabricatorIdentifiers).Distinct().ToList(),
+                    MachineIds = [.. group.SelectMany(g => g.Item2.SuitableFabricatorIdentifiers).Distinct()],
                     AmountCreated = group.First().Item2.Amount,
                     AmountRequired = group.Key.ReqAmount
                 })
-                .OrderBy(gu => gu.TargetItem.Name.Value)
+                .OrderBy(gu => gu.TargetItem?.Name.Value)
                 .ToList();
 
             colUsage.Content.ClearChildren();
@@ -351,17 +353,17 @@ onSecondary
 
     public class GroupedSource
     {
-        public ItemPrefab SourceItem;
-        public Identifier[] MachineIds;
-        public List<Identifier> RequiredOtherItems;
+        public ItemPrefab? SourceItem;
+        public Identifier[]? MachineIds;
+        public List<Identifier>? RequiredOtherItems;
         public float TotalCommonness;
         public bool IsRandom;
     }
 
     public class GroupedUsage
     {
-        public ItemPrefab TargetItem;
-        public List<Identifier> MachineIds;
+        public ItemPrefab? TargetItem;
+        public List<Identifier>? MachineIds;
         public float AmountCreated;
         public float AmountRequired;
     }

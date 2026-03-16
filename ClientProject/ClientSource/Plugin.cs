@@ -19,22 +19,48 @@ namespace SOS
             DebugConsole.commands.Add(new DebugConsole.Command(
                 name: "sos",
                 help: TextSOS.Get("sos.command.help", "Open/Close SOS.").Value,
-                onExecute: _ => CrossThread.RequestExecutionOnMainThread(() => controller?.ToggleUI()),
+                onExecute: _ => controller?.ToggleUI(),
                 getValidArgs: null,
                 isCheat: false
             )
             {
                 RelayToServer = false,
-                OnClientExecute = _ => CrossThread.RequestExecutionOnMainThread(() => controller?.ToggleUI())
+                OnClientExecute = _ => controller?.ToggleUI()
             });
+
+#if DEBUG
+            DebugConsole.commands.Add(new DebugConsole.Command(
+                name: "debugsos",
+                help: "Abre la ventana de pruebas de UI Escalable.",
+                onExecute: _ => 
+                {
+                    DebugSOSWindow.Instance?.Destroy();
+                    InitDebugSOSWindow();
+                },
+                getValidArgs: null,
+                isCheat: false
+            )
+            {
+                RelayToServer = false,
+                OnClientExecute = _ => InitDebugSOSWindow()
+            });
+#endif
 
             GameMain.LuaCs.Hook.Add("keyupdate", "SOS_UpdateLoop", _ =>
             {
                 controller?.Update();
+#if DEBUG
+                DebugSOSWindow.Instance?.Update();
+#endif
                 return null;
             });
 
             LuaCsLogger.LogMessage(TextSOS.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
+        }
+
+        public static void InitDebugSOSWindow()
+        {
+            _ = new DebugSOSWindow();
         }
 
         public void DisposeClient()

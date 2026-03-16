@@ -2,6 +2,10 @@
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0130
+#pragma warning disable IDE0290
+
 using Barotrauma;
 using System;
 using System.Collections.Generic;
@@ -12,12 +16,12 @@ namespace SOS
     // MARK: RecipeAnalyzer
     public static class RecipeAnalyzer
     {
-        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>> usesCache = new();
-        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, DeconstructItem>>> sourcesCache = new();
+        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>> usesCache = [];
+        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, DeconstructItem>>> sourcesCache = [];
 
         private const int MaxAnalysisCacheSize = 30;
-        private static readonly Dictionary<Identifier, ItemAnalysis> analysisCache = new();
-        private static readonly Queue<Identifier> analysisCacheOrder = new();
+        private static readonly Dictionary<Identifier, ItemAnalysis> analysisCache = [];
+        private static readonly Queue<Identifier> analysisCacheOrder = [];
 
         public static ItemAnalysis? GetAnalysis(ItemPrefab? item)
         {
@@ -64,14 +68,14 @@ namespace SOS
         // MARK: - consults
 
         public static List<FabricationRecipe> GetCraftingRecipes(ItemPrefab item)
-            => item.FabricationRecipes?.Values.ToList() ?? new List<FabricationRecipe>();
+            => item.FabricationRecipes?.Values.ToList() ?? [];
 
         public static List<DeconstructItem> GetDeconstructionOutputs(ItemPrefab item)
-            => item.DeconstructItems.IsDefaultOrEmpty ? new List<DeconstructItem>() : item.DeconstructItems.ToList();
+            => item.DeconstructItems.IsDefaultOrEmpty ? [] : [.. item.DeconstructItems];
 
         public static List<Tuple<ItemPrefab, FabricationRecipe>> GetUsesAsIngredient(ItemPrefab targetItem)
         {
-            if (targetItem == null) return new List<Tuple<ItemPrefab, FabricationRecipe>>();
+            if (targetItem == null) return [];
 
             if (usesCache.TryGetValue(targetItem.Identifier, out var cachedResult)) return cachedResult;
 
@@ -94,7 +98,7 @@ namespace SOS
 
         public static List<Tuple<ItemPrefab, DeconstructItem>> GetSourcesFromDeconstruction(ItemPrefab targetItem)
         {
-            if (targetItem == null) return new List<Tuple<ItemPrefab, DeconstructItem>>();
+            if (targetItem == null) return [];
 
             if (sourcesCache.TryGetValue(targetItem.Identifier, out var cachedResult)) return cachedResult;
 
