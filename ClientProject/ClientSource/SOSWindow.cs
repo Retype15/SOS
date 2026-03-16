@@ -11,9 +11,16 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
+    public enum DisplayMode
+    {
+        Normal,
+        Compact,
+        Hidden
+    }
+
     public class SOSWindow
     {
-        private readonly GUIFrame? mainFrame;
+        private readonly GUIResizableFrame? mainFrame;
         private readonly GUIListBox? itemList;
         private readonly GUIFrame? detailsHeader;
         private readonly GUIListBox? colObtain;
@@ -24,6 +31,13 @@ namespace SOS
         private readonly GUIButton? btnBack;
         private readonly GUIButton? btnForward;
 
+        private readonly GUIFrame? contentArea;
+        private readonly GUIResizableFrame? leftPanel;
+        private readonly GUIFrame? leftContainer;
+        private readonly GUIFrame? centerPanelContainer;
+        private readonly GUIResizableFrame? rightPanel;
+        private readonly GUIFrame? rightContainer;
+
         private List<ItemPrefab> allFilteredItems = [];
         private int itemsLoaded = 0;
         private const int ChunkSize = 50;
@@ -31,20 +45,47 @@ namespace SOS
 
         private readonly List<GUIDesplegableBox> activeDropdowns = [];
 
+        private DisplayMode leftPanelMode = DisplayMode.Normal;
+        private DisplayMode centerPanelMode = DisplayMode.Normal;
+        private DisplayMode rightPanelMode = DisplayMode.Normal;
+        private int lastLeftWForReflow = 0;
+
+        private const int SidebarHiddenThreshold = 70;
+        private const int SidebarCompactThreshold = 240;
+        private const int CenterCompactThreshold = 250;
+
+        private ItemPrefab? currentItem;
+        private List<FabricationRecipe>? currentCraft;
+        private List<DeconstructItem>? currentDecon;
+        private List<Tuple<ItemPrefab, FabricationRecipe>>? currentUses;
+        private List<Tuple<ItemPrefab, DeconstructItem>>? currentSources;
+
         public SOSWindow(SOSController controller)
         {
             this.controller = controller;
             var parentComponent = Screen.Selected?.Frame;
             if (parentComponent == null) return;
 
-            mainFrame = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.9f), parentComponent.RectTransform, Anchor.Center), "InnerFrame")
+            mainFrame = new GUIResizableFrame(new RectTransform(new Vector2(0.95f, 0.9f), parentComponent.RectTransform, Anchor.Center), style: "CircuitBoxFrame")
             {
                 CanBeFocused = true,
                 Selected = true,
-                Color = Color.Black * 0.7f
+                Color = Color.Black * 0.85f,
+                AllowedDirections = ResizeDirection.All
             };
+            mainFrame.RectTransform.MinSize = new Point(400, 200);
 
-            var topBar = new GUIFrame(new RectTransform(new Vector2(1.0f, 0.05f), mainFrame.RectTransform, Anchor.TopCenter), "GUIFrameBottom");
+            if (controller.WindowSize.HasValue)
+            {
+                mainFrame.RectTransform.NonScaledSize = controller.WindowSize.Value;
+            }
+            if (controller.WindowPosition.HasValue)
+            {
+                mainFrame.RectTransform.AbsoluteOffset = controller.WindowPosition.Value;
+            }
+
+            var topBar = new GUIFrame(new RectTransform(new Vector2(1.0f, 0.06f), mainFrame.RectTransform, Anchor.TopCenter), "GUIFrameBottom");
+            topBar.RectTransform.MinSize = new Point(0, 45);
             _ = new GUITextBlock(new RectTransform(Vector2.One, topBar.RectTransform), TextSOS.Get("sos.window.title", "SOS - Recipe Browser"), textAlignment: Alignment.Center, font: GUIStyle.LargeFont);
 
             var historyLayout = new GUILayoutGroup(new RectTransform(new Vector2(0.12f, 0.8f), topBar.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true) { RelativeSpacing = 0.05f };
@@ -72,44 +113,93 @@ namespace SOS
                 ToolTip = TextSOS.Get("sos.window.clear_hud_tooltip", "Clears the active HUD tracker")
             };
 
-            var contentArea = new GUILayoutGroup(new RectTransform(new Vector2(0.98f, 0.94f), mainFrame.RectTransform, Anchor.BottomCenter) { AbsoluteOffset = new Point(0, 5) }) { IsHorizontal = true, Stretch = true, RelativeSpacing = 0.01f };
+            contentArea = new GUIFrame(new RectTransform(new Vector2(0.98f, 0.92f), mainFrame.RectTransform, Anchor.BottomCenter) { AbsoluteOffset = new Point(0, 5) }, style: null);
 
-            var leftPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.22f, 1f), contentArea.RectTransform)) { Stretch = true, RelativeSpacing = 0.01f };
-            var searchContainer = new GUIFrame(new RectTransform(new Vector2(1f, 0.04f), leftPanel.RectTransform), style: "InnerFrame");
-            searchBox = GUI.CreateTextBoxWithPlaceholder(searchContainer.RectTransform, controller.LastSearchQuery, TextSOS.Get("sos.window.search_placeholder", "Search item..."));
+            leftPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.20f, 1f), contentArea.RectTransform, Anchor.TopLeft), style: "InnerFrame")
+            {
+                AllowedDirections = ResizeDirection.Right,
+                IsFixed = true,
+                Color = Color.Black * 0.4f
+            };
+            leftPanel.RectTransform.MinSize = new Point(20, 50);
+            leftPanel.RectTransform.MaxSize = new Point(500, 2000);
+
+            if (controller.LeftPanelWidth.HasValue)
+            {
+                leftPanel.RectTransform.NonScaledSize = new Point(controller.LeftPanelWidth.Value, 0);
+            }
+
+            leftContainer = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.98f), leftPanel.RectTransform, Anchor.Center), style: null);
+            var leftLayout = new GUILayoutGroup(new RectTransform(Vector2.One, leftContainer.RectTransform)) { Stretch = true, RelativeSpacing = 0.01f };
+
+            var searchContainer = new GUIFrame(new RectTransform(new Vector2(1f, 0.05f), leftLayout.RectTransform), style: "InnerFrame");
+
+            searchContainer.RectTransform.MinSize = new Point(0, 35);
+            searchContainer.RectTransform.MaxSize = new Point(int.MaxValue, 35);
+
+            searchBox = GUI.CreateTextBoxWithPlaceholder(new RectTransform(Vector2.One, searchContainer.RectTransform), controller.LastSearchQuery, TextSOS.Get("sos.window.search_placeholder", "Search item..."));
             searchBox.ToolTip = TextSOS.Get("sos.window.search_tooltip", "Search by name, ID or tags");
             searchBox.OnTextChanged += (_, text) => { controller.LastSearchQuery = text; UpdateSearch(text); return true; };
-            itemList = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftPanel.RectTransform), style: "PowerButtonFrame")
+
+            itemList = new GUIListBox(new RectTransform(new Vector2(1f, 1f), leftLayout.RectTransform), style: "GUIListBox")
             {
                 Padding = new Vector4(8, 5, 5, 5),
                 Color = Color.Black * 0.2f
             };
+            itemList.RectTransform.MinSize = new Point(0, 50);
 
-            var centerPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.53f, 1f), contentArea.RectTransform))
+            centerPanelContainer = new GUIFrame(new RectTransform(new Vector2(0.52f, 1f), contentArea.RectTransform, Anchor.TopLeft), style: null);
+            var centerLayout = new GUILayoutGroup(new RectTransform(Vector2.One, centerPanelContainer.RectTransform))
             {
                 Stretch = true,
-                RelativeSpacing = 0.005f
+                RelativeSpacing = 0.01f
             };
-            detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.1f), centerPanel.RectTransform), style: "CircuitBoxFrame")
+            centerPanelContainer.RectTransform.MinSize = new Point(200, 50);
+
+            detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.15f), centerLayout.RectTransform), style: "CircuitBoxFrame")
             {
                 Color = Color.Black * 0.4f
             };
-            var recipeSplit = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0.89f), centerPanel.RectTransform), isHorizontal: true) { Stretch = true, RelativeSpacing = 0.01f };
+            detailsHeader.RectTransform.MinSize = new Point(0, 95);
+            detailsHeader.RectTransform.MaxSize = new Point(int.MaxValue, 95);
 
-            var leftRecipeCol = new GUILayoutGroup(new RectTransform(new Vector2(0.5f, 1f), recipeSplit.RectTransform)) { Stretch = true };
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), leftRecipeCol.RectTransform), TextSOS.Get("sos.window.obtain", "OBTAIN"), font: GUIStyle.SubHeadingFont, textColor: Color.LightGreen, textAlignment: Alignment.Center);
-            colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), leftRecipeCol.RectTransform), style: "GUIBackgroundBlocker")
+            var recipeAreaFrame = new GUIFrame(new RectTransform(new Vector2(1f, 0.84f), centerLayout.RectTransform), style: null);
+            var recipeSplit = new GUILayoutGroup(new RectTransform(Vector2.One, recipeAreaFrame.RectTransform), isHorizontal: true)
+            {
+                Stretch = true,
+                RelativeSpacing = 0.02f
+            };
+
+            var obtainContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
+            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), obtainContainer.RectTransform), TextSOS.Get("sos.window.obtain", "OBTAIN"), font: GUIStyle.SubHeadingFont, textColor: Color.LightGreen, textAlignment: Alignment.Center);
+            colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), obtainContainer.RectTransform), style: "GUIListBox")
             {
                 Spacing = 5,
                 Color = Color.Black * 0.3f
             };
 
-            var rightRecipeCol = new GUILayoutGroup(new RectTransform(new Vector2(0.5f, 1f), recipeSplit.RectTransform)) { Stretch = true };
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), rightRecipeCol.RectTransform), TextSOS.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
-            colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), rightRecipeCol.RectTransform), style: "GUIBackgroundBlocker") { Spacing = 5 };
+            var usageContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
+            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), usageContainer.RectTransform), TextSOS.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
+            colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: "GUIListBox") { Spacing = 5 };
 
-            var rightPanel = new GUILayoutGroup(new RectTransform(new Vector2(0.25f, 1f), contentArea.RectTransform)) { Stretch = true };
-            metaPanel = new GUIListBox(new RectTransform(new Vector2(1f, 1f), rightPanel.RectTransform), style: "InnerFrame")
+            rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), contentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
+            {
+                AllowedDirections = ResizeDirection.Left,
+                IsFixed = true,
+                Color = Color.Black * 0.4f
+            };
+            rightPanel.RectTransform.MinSize = new Point(20, 50);
+            rightPanel.RectTransform.MaxSize = new Point(600, 2000);
+
+            if (controller.RightPanelWidth.HasValue)
+            {
+                rightPanel.RectTransform.NonScaledSize = new Point(controller.RightPanelWidth.Value, 0);
+            }
+
+            rightContainer = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.98f), rightPanel.RectTransform, Anchor.Center), style: null);
+            var rightLayout = new GUILayoutGroup(new RectTransform(Vector2.One, rightContainer.RectTransform)) { Stretch = true };
+
+            metaPanel = new GUIListBox(new RectTransform(Vector2.One, rightLayout.RectTransform), style: "GUIListBox")
             {
                 Spacing = 10,
                 Padding = new Vector4(18, 15, 18, 15),
@@ -119,11 +209,14 @@ namespace SOS
 
             if (metaPanel.ContentBackground != null)
             {
-                metaPanel.ContentBackground.Color = Color.Black * 0.4f;
+                metaPanel.ContentBackground.Color = Color.Transparent;
             }
 
             UpdateSearch(controller.LastSearchQuery);
             UpdateNavigationButtons();
+
+            UpdateLayout();
+            mainFrame.ForceLayoutRecalculation();
         }
 
         public void SetSelected()
@@ -205,20 +298,55 @@ namespace SOS
             float currentScrollPixels = itemList.ScrollBar.BarScroll * totalScrollableHeightBefore;
 
             int nextBatch = Math.Min(itemsLoaded + ChunkSize, allFilteredItems.Count);
-            for (int i = itemsLoaded; i < nextBatch; i++)
+
+            if (leftPanelMode == DisplayMode.Compact)
             {
-                var prefab = allFilteredItems[i];
-                bool isFav = controller.FavoritedItems.Contains(prefab.Identifier.Value);
+                int slotSize = 34;
+                int itemsInRow = 0;
+                int availableWidth = (int)itemList.Rect.Width - 14;
+                int maxItemsPerRow = Math.Max(1, availableWidth / slotSize);
 
-                var btn = new GUIButton(new RectTransform(new Point(itemList.Content.Rect.Width, 35), itemList.Content.RectTransform), style: "ListBoxElement")
+                var rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
+                var currentRow = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 2 };
+
+                for (int i = itemsLoaded; i < nextBatch; i++)
                 {
-                    OnClicked = (_, _) => { controller.OnItemSelected(prefab); return true; },
-                    OnSecondaryClicked = (_, _) => { controller.OpenContextMenu(prefab); return true; }
-                };
+                    var prefab = allFilteredItems[i];
+                    bool isFav = controller.FavoritedItems.Contains(prefab.Identifier.Value);
 
-                string prefix = isFav ? "* " : "";
-                CardBuilder.DrawCompactItemRow(btn, prefab, 1, false, extraText: prefix, color: isFav ? Color.Gold : Color.White);
+                    if (itemsInRow >= maxItemsPerRow)
+                    {
+                        rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
+                        currentRow = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 2 };
+                        itemsInRow = 0;
+                    }
+
+                    CardBuilder.DrawMinimalItemRow(currentRow, prefab, 1,
+                        onPrimaryClick: p => controller.OnItemSelected(p),
+                        onSecondaryClick: p => controller.OpenContextMenu(p),
+                        badgeColor: isFav ? Color.Gold : (Color?)null);
+
+                    itemsInRow++;
+                }
             }
+            else
+            {
+                for (int i = itemsLoaded; i < nextBatch; i++)
+                {
+                    var prefab = allFilteredItems[i];
+                    bool isFav = controller.FavoritedItems.Contains(prefab.Identifier.Value);
+
+                    var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, 35) }, style: "ListBoxElement")
+                    {
+                        OnClicked = (_, _) => { controller.OnItemSelected(prefab); return true; },
+                        OnSecondaryClicked = (_, _) => { controller.OpenContextMenu(prefab); return true; }
+                    };
+
+                    string prefix = isFav ? "* " : "";
+                    CardBuilder.DrawCompactItemRow(btn, prefab, 1, false, extraText: prefix, color: isFav ? Color.Gold : Color.White);
+                }
+            }
+
             itemsLoaded = nextBatch;
 
             itemList.RecalculateChildren();
@@ -239,6 +367,16 @@ namespace SOS
 
         public void Update()
         {
+            if (mainFrame != null)
+            {
+                if (GUI.MouseOn == mainFrame || mainFrame.IsParentOf(GUI.MouseOn))
+                {
+                    mainFrame.Selected = true;
+                }
+            }
+
+            UpdateLayout();
+
             if (itemList == null || itemsLoaded >= allFilteredItems.Count || isUpdating) return;
 
             int total = allFilteredItems.Count;
@@ -253,8 +391,104 @@ namespace SOS
             }
         }
 
+        private void UpdateLayout()
+        {
+            if (contentArea == null || leftPanel == null || rightPanel == null || centerPanelContainer == null) return;
+
+            Rectangle areaRect = contentArea.Rect;
+            if (areaRect.Width <= 0) return;
+
+            int spacing = (int)(areaRect.Width * 0.015f);
+            int leftW = leftPanel.Rect.Width;
+            int rightW = rightPanel.Rect.Width;
+
+            centerPanelContainer.RectTransform.AbsoluteOffset = new Point(leftW + spacing, 0);
+            int centerWidth = Math.Max(0, areaRect.Width - leftW - rightW - (spacing * 2));
+            centerPanelContainer.RectTransform.NonScaledSize = new Point(centerWidth, areaRect.Height);
+
+            leftPanel.RectTransform.NonScaledSize = new Point(leftW, areaRect.Height);
+            rightPanel.RectTransform.NonScaledSize = new Point(rightW, areaRect.Height);
+
+            var newLeftMode = GetModeForWidth(leftW, SidebarHiddenThreshold, SidebarCompactThreshold);
+            var newRightMode = GetModeForWidth(rightW, SidebarHiddenThreshold, SidebarCompactThreshold);
+            var newCenterMode = GetModeForWidth(centerWidth, -1, CenterCompactThreshold);
+
+            bool needsLeftRefresh = newLeftMode != leftPanelMode;
+
+            if (leftPanelMode == DisplayMode.Compact && Math.Abs(leftW - lastLeftWForReflow) > 34)
+            {
+                needsLeftRefresh = true;
+                lastLeftWForReflow = leftW;
+            }
+
+            bool needsCenterRefresh = newCenterMode != centerPanelMode;
+            bool needsRightRefresh = newRightMode != rightPanelMode;
+
+            if (needsLeftRefresh)
+            {
+                leftPanelMode = newLeftMode;
+                lastLeftWForReflow = leftW;
+                if (leftContainer != null) leftContainer.Visible = leftPanelMode != DisplayMode.Hidden;
+                RefreshSearch();
+            }
+
+            if (needsCenterRefresh)
+            {
+                centerPanelMode = newCenterMode;
+                if (currentItem != null && currentCraft != null && currentDecon != null && currentUses != null && currentSources != null)
+                {
+                    UpdateDetailsPanel(currentItem, currentCraft, currentDecon, currentUses, currentSources);
+                }
+            }
+
+            if (needsRightRefresh)
+            {
+                rightPanelMode = newRightMode;
+                if (rightContainer != null) rightContainer.Visible = rightPanelMode != DisplayMode.Hidden;
+                if (currentItem != null && currentCraft != null && currentDecon != null && currentUses != null && currentSources != null)
+                {
+                    UpdateDetailsPanel(currentItem, currentCraft, currentDecon, currentUses, currentSources);
+                }
+            }
+
+            // aaaa
+            if (mainFrame != null && mainFrame.RectTransform.NonScaledSize != (controller.WindowSize ?? Point.Zero))
+            {
+                controller.WindowSize = mainFrame.RectTransform.NonScaledSize;
+                controller.MarkDirty();
+            }
+            if (mainFrame != null && mainFrame.RectTransform.AbsoluteOffset != (controller.WindowPosition ?? new Point(-999)))
+            {
+                controller.WindowPosition = mainFrame.RectTransform.AbsoluteOffset;
+                controller.MarkDirty();
+            }
+            if (leftPanel != null && leftPanel.Rect.Width != (controller.LeftPanelWidth ?? 0))
+            {
+                controller.LeftPanelWidth = leftPanel.Rect.Width;
+                controller.MarkDirty();
+            }
+            if (rightPanel != null && rightPanel.Rect.Width != (controller.RightPanelWidth ?? 0))
+            {
+                controller.RightPanelWidth = rightPanel.Rect.Width;
+                controller.MarkDirty();
+            }
+        }
+
+        private static DisplayMode GetModeForWidth(int width, int hiddenThreshold, int compactThreshold)
+        {
+            if (width < hiddenThreshold) return DisplayMode.Hidden;
+            if (width < compactThreshold) return DisplayMode.Compact;
+            return DisplayMode.Normal;
+        }
+
         public void UpdateDetailsPanel(ItemPrefab targetItem, List<FabricationRecipe> craft, List<DeconstructItem> decon, List<Tuple<ItemPrefab, FabricationRecipe>> uses, List<Tuple<ItemPrefab, DeconstructItem>> sources)
         {
+            currentItem = targetItem;
+            currentCraft = craft;
+            currentDecon = decon;
+            currentUses = uses;
+            currentSources = sources;
+
             activeDropdowns.Clear();
             if (detailsHeader == null || colObtain == null || colUsage == null || metaPanel == null) return;
             metaPanel.Content.ClearChildren();
@@ -280,7 +514,12 @@ namespace SOS
                 font: GUIStyle.LargeFont,
                 textColor: headerColor,
                 textAlignment: Alignment.CenterLeft
-            );
+            )
+            {
+                Wrap = true,
+                AutoScaleHorizontal = true,
+                CanBeFocused = false
+            };
 
             void onPrimary(ItemPrefab p) => controller.OnItemSelected(p);
             void onSecondary(ItemPrefab p) => controller.OpenContextMenu(p);
@@ -303,8 +542,8 @@ namespace SOS
                 .ToList();
 
             colObtain.Content.ClearChildren();
-            foreach (var r in craft) CardBuilder.DrawCraftCard(colObtain, r, targetItem, controller, onPrimary, onSecondary);
-            foreach (var src in groupedSources) CardBuilder.DrawSourceCard(colObtain, src, onPrimary, onSecondary);
+            foreach (var r in craft) CardBuilder.DrawCraftCard(colObtain, r, targetItem, controller, onPrimary, onSecondary, centerPanelMode);
+            foreach (var src in groupedSources) CardBuilder.DrawSourceCard(colObtain, src, onPrimary, onSecondary, centerPanelMode);
 
             var currentItemId = targetItem.Identifier;
             var groupedUses = uses
@@ -325,8 +564,8 @@ namespace SOS
                 .ToList();
 
             colUsage.Content.ClearChildren();
-            if (decon.Count > 0) CardBuilder.DrawDeconCard(colUsage, targetItem, decon, onPrimary, onSecondary);
-            foreach (var usage in groupedUses) CardBuilder.DrawUseCard(colUsage, usage, onPrimary, onSecondary);
+            if (decon.Count > 0) CardBuilder.DrawDeconCard(colUsage, targetItem, decon, onPrimary, onSecondary, centerPanelMode);
+            foreach (var usage in groupedUses) CardBuilder.DrawUseCard(colUsage, usage, onPrimary, onSecondary, centerPanelMode);
 
 
             void onBadgeClick(string tag) { if (searchBox != null) searchBox.Text = tag; UpdateSearch(tag); }
@@ -390,7 +629,7 @@ onSecondary
             foreach (var item in items)
             {
                 bool isFav = controller.FavoritedItems.Contains(item.Identifier.Value);
-                string prefix = isFav ? "* " : "";
+                string prefix = isFav ? " *" : "";
 
                 CardBuilder.DrawCompactItemRow(dropDown.ListBox.Content, item, 1, true, prefix, isFav ? Color.Gold : Color.White,
                     onPrimaryClick: (p) => { onPrimary?.Invoke(p); dropDown.Dropped = false; },

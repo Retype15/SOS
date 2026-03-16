@@ -117,10 +117,12 @@ namespace SOS
 
     public class ItemAnalysis
     {
+        public Identifier ItemId { get; }
         public List<BaseStatSection> Sections { get; } = [];
 
         public ItemAnalysis(ItemPrefab item)
         {
+            ItemId = item.Identifier;
             AddSection(new GeneralSection(), item);
             AddSection(new EconomySection(), item);
             AddSection(new WeaponSection(), item);
