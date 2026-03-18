@@ -30,6 +30,7 @@ namespace SOS
         public int ResizeMargin { get; set; } = 12;
 
         private bool isDragging;
+        private bool isMoving;
         private ResizeDirection currentDragDir;
         private Vector2 dragStartMouse;
         private Rectangle startRect;
@@ -52,9 +53,11 @@ namespace SOS
             bool isMouseHeld = PlayerInput.PrimaryMouseButtonHeld();
             bool isMouseDownNow = isMouseHeld && !wasMouseDown;
 
-            if (!isDragging)
+            if (!isDragging && !isMoving)
             {
                 currentDragDir = GetHoverDirection(mousePos, Rect) & AllowedDirections;
+
+                bool inTitleArea = !IsFixed && Rect.Contains(mousePos) && mousePos.Y < Rect.Y + 50;
 
                 if (currentDragDir != ResizeDirection.None)
                 {
@@ -73,12 +76,37 @@ namespace SOS
                         GUI.ForceMouseOn(this);
                     }
                 }
+                else if (inTitleArea)
+                {
+                    bool onInteractive = GUI.MouseOn is GUIButton or GUITextBox or GUIDropDown or GUIListBox;
+
+                    if (GUI.MouseOn != null && (GUI.MouseOn == this || IsParentOf(GUI.MouseOn)) && !onInteractive)
+                    {
+                        GUI.MouseCursor = CursorState.Hand;
+                        if (isMouseDownNow)
+                        {
+                            isMoving = true;
+                            dragStartMouse = mousePos;
+                            startOffset = RectTransform.AbsoluteOffset;
+                            GUI.ForceMouseOn(this);
+                        }
+                    }
+                }
             }
-            else
+            else if (isDragging)
             {
                 GUI.MouseCursor = CursorState.Dragging;
                 if (!isMouseHeld) { isDragging = false; return; }
                 ApplyInteraction(mousePos);
+            }
+            else if (isMoving)
+            {
+                GUI.MouseCursor = CursorState.Dragging;
+                if (!isMouseHeld) { isMoving = false; return; }
+
+                float deltaX = mousePos.X - dragStartMouse.X;
+                float deltaY = mousePos.Y - dragStartMouse.Y;
+                RectTransform.AbsoluteOffset = new Point((int)(startOffset.X + deltaX), (int)(startOffset.Y + deltaY));
             }
             wasMouseDown = isMouseHeld;
         }
