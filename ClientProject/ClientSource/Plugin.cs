@@ -15,6 +15,7 @@ namespace SOS
         {
             controller = new SOSController();
 
+            if (!DebugConsole.commands.Exists(c => c.Names.ToString() == "sos")) // \\//
             DebugConsole.commands.Add(new DebugConsole.Command(
                 name: "sos",
                 help: TextSOS.Get("sos.command.help", "Open/Close SOS.").Value,
@@ -28,6 +29,7 @@ namespace SOS
             });
 
 #if DEBUG
+            if (!DebugConsole.commands.Exists(c => c.Names.ToString() == "sos")) // \\//
             DebugConsole.commands.Add(new DebugConsole.Command(
                 name: "debugsos",
                 help: "Abre la ventana de pruebas de UI Escalable.",
@@ -64,7 +66,7 @@ namespace SOS
 
         public void DisposeClient()
         {
-
+            DebugConsole.commands.RemoveAll(c => c.Names.Contains("sos"));
             GameMain.LuaCs.Hook.Remove("keyupdate", "SOS_UpdateLoop");
             controller?.SaveSettings();
             controller?.Destroy();
