@@ -23,28 +23,25 @@ namespace SOS
 
         public static RichString GetDetailedTooltip(ItemPrefab prefab)
         {
-            LocalizedString name = prefab.Name;
-            LocalizedString description = prefab.Description;
-            int price = prefab.DefaultPrice?.Price ?? 0;
+            if (prefab == null) return RichString.Rich("");
 
-            string colorWhite = Color.White.ToStringHex();
-            string colorGold = Color.Gold.ToStringHex();
-            string toolTip = $"‖color:{colorWhite}‖{name}‖color:end‖";
+            string toolTip = $"‖color:White‖{prefab.Name.Value}‖color:end‖";
 
 #if DEBUG
-            toolTip += $" ({prefab.Identifier})";
+            toolTip += $" ‖color:gui.orange‖({prefab.Identifier})‖color:end‖";
 #endif
 
+            int price = prefab.DefaultPrice?.Price ?? 0;
             if (price > 0)
             {
-                toolTip += $"\n‖color:{colorGold}‖{TextSOS.Get("sos.item.price", "Price")}{price}mk‖color:end‖";
-            }
-            if (!description.IsNullOrEmpty())
-            {
-                toolTip += '\n' + description.Value;
+                toolTip += $"\n‖color:{Color.Gold.ToStringHex()}‖{TextSOS.Get("sos.item.price", "Price")}{price}mk‖color:end‖";
             }
 
-            if (prefab.ContentPackage?.Name != GameMain.VanillaContent?.Name && prefab.ContentPackage != null)
+            if (!prefab.Description.IsNullOrEmpty())
+            {
+                toolTip += "\n" + prefab.Description.Value;
+            }
+            if (prefab.ContentPackage != null && prefab.ContentPackage.Name != "Vanilla")
             {
                 string modColor = XMLExtensions.ToStringHex(Color.MediumPurple);
                 toolTip += $"\n‖color:{modColor}‖{prefab.ContentPackage.Name}‖color:end‖";
