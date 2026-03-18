@@ -62,6 +62,8 @@ namespace SOS
         private List<Tuple<ItemPrefab, FabricationRecipe>>? currentUses;
         private List<Tuple<ItemPrefab, DeconstructItem>>? currentSources;
 
+        private static readonly Dictionary<Identifier, string> itemSlotCache = [];
+
         public SOSWindow(SOSController controller)
         {
             this.controller = controller;
@@ -227,6 +229,26 @@ namespace SOS
             mainFrame.Selected = true;
         }
 
+        private static string GetItemSlotsCached(ItemPrefab prefab)
+        {
+            if (itemSlotCache.TryGetValue(prefab.Identifier, out var cached)) return cached;
+
+            if (prefab.ConfigElement == null) return itemSlotCache[prefab.Identifier] = "";
+
+            var slots = new List<string>();
+            foreach (var element in prefab.ConfigElement.Descendants())
+            {
+                string n = element.Name.ToString().ToLowerInvariant();
+                if (n == "wearable" || n == "holdable")
+                {
+                    string s = element.GetAttributeString("slots", "");
+                    if (!string.IsNullOrEmpty(s)) slots.Add(s.Replace("+", " "));
+                }
+            }
+
+            return itemSlotCache[prefab.Identifier] = string.Join(" ", slots).ToLowerInvariant();
+        }
+
         public void UpdateNavigationButtons()
         {
             if (btnBack != null)
@@ -272,12 +294,14 @@ namespace SOS
         private void UpdateSearch(string query)
         {
             if (itemList == null) return;
+            string lowerQuery = query.ToLowerInvariant();
 
             allFilteredItems = [.. ItemPrefab.Prefabs.Where(p =>
                 string.IsNullOrWhiteSpace(query) ||
                 p.Name.Value.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                 p.Identifier.Value.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                p.Tags.Any(t => t.Value.Contains(query, StringComparison.OrdinalIgnoreCase))
+                p.Tags.Any(t => t.Value.Contains(query, StringComparison.OrdinalIgnoreCase)) ||
+                GetItemSlotsCached(p).Contains(lowerQuery)
             )
             .OrderByDescending(p => controller.FavoritedItems.Contains(p.Identifier.Value))
             .ThenBy(p => p.Name.Value)];

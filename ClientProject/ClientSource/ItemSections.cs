@@ -411,9 +411,6 @@ namespace SOS
             if (durability > 0)
                 builder.AddRow(TextSOS.Get("sos.equip.max_durability", "Max Durability:").Value, durability.ToString(), Color.White);
 
-            if (equipSlots.Count > 0)
-                builder.AddRow(TextSOS.Get("sos.equip.equips_in", "Equips In:").Value, string.Join(" / ", equipSlots.Distinct()), Color.White);
-
             if (maxPressure > 0)
                 builder.AddRow(TextSOS.Get("sos.equip.pressure_protection", "Pressure Protection:").Value, $"{maxPressure}m", Color.DeepSkyBlue);
 
@@ -430,6 +427,15 @@ namespace SOS
             foreach (var res in aggregatedResistances)
             {
                 builder.AddRow(res.Key + " Res:", string.Join(" | ", res.Value), Color.LightGreen);
+            }
+
+            if (equipSlots.Count > 0)
+            {
+                var uniqueSlots = equipSlots
+                    .SelectMany(s => s.Split([',', ' '], StringSplitOptions.RemoveEmptyEntries))
+                    .Distinct();
+
+                builder.AddBadgeRow(TextSOS.Get("sos.equip.equips_in", "Equips In:").Value, uniqueSlots);
             }
 
             builder.EndSection();
