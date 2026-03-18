@@ -32,6 +32,7 @@ namespace SOS
 
 #if DEBUG
             toolTip += $" ({prefab.Identifier})";
+            var list = new List<string>();
 #endif
 
             if (price > 0)

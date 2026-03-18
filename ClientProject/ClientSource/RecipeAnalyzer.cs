@@ -7,9 +7,6 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SOS
 {
@@ -27,40 +24,36 @@ namespace SOS
         {
             if (item == null) return null;
 
-            if (analysisCache.TryGetValue(item.Identifier, out var cachedAnalysis))
+            if (analysisCache.TryGetValue(item.Identifier, out var node))
             {
-                UpdateCachePriority(item.Identifier);
-                return cachedAnalysis;
+                lruList.Remove(node);
+                lruList.AddFirst(node);
+                return node.Value;
             }
 
             var analysis = new ItemAnalysis(item);
 
             if (analysisCache.Count >= MaxAnalysisCacheSize)
             {
-                Identifier oldest = analysisCacheOrder.Dequeue();
-                analysisCache.Remove(oldest);
+                var lastNode = lruList.Last;
+                if (lastNode != null)
+                {
+                    analysisCache.Remove(lastNode.Value.ItemId);
+                    lruList.RemoveLast();
+                }
             }
 
-            analysisCache[item.Identifier] = analysis;
-            analysisCacheOrder.Enqueue(item.Identifier);
+            var newNode = new LinkedListNode<ItemAnalysis>(analysis);
+            lruList.AddFirst(newNode);
+            analysisCache[item.Identifier] = newNode;
+
             return analysis;
-        }
-
-        private static void UpdateCachePriority(Identifier id)
-        {
-            var list = analysisCacheOrder.ToList();
-            if (list.Remove(id))
-            {
-                analysisCacheOrder.Clear();
-                foreach (var item in list) analysisCacheOrder.Enqueue(item);
-                analysisCacheOrder.Enqueue(id);
-            }
         }
 
         public static void ClearSessionCache()
         {
             analysisCache.Clear();
-            analysisCacheOrder.Clear();
+            lruList.Clear();
             usesCache.Clear();
             sourcesCache.Clear();
         }

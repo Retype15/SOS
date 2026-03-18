@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for details.
 
 using Barotrauma;
-using Microsoft.Xna.Framework;
 
 namespace SOS
 {
@@ -65,6 +64,8 @@ namespace SOS
 
         public void DisposeClient()
         {
+
+            GameMain.LuaCs.Hook.Remove("keyupdate", "SOS_UpdateLoop");
             controller?.SaveSettings();
             controller?.Destroy();
             controller = null;
