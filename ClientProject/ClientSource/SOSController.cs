@@ -7,6 +7,7 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace SOS
@@ -27,6 +28,11 @@ namespace SOS
         public Stack<ItemPrefab> HistoryBack { get; } = new Stack<ItemPrefab>();
         public Stack<ItemPrefab> HistoryForward { get; } = new Stack<ItemPrefab>();
 
+        public Point? WindowSize { get; set; }
+        public Point? WindowPosition { get; set; }
+        public int? LeftPanelWidth { get; set; }
+        public int? RightPanelWidth { get; set; }
+
         private bool isDirty = false;
 
         public SOSController()
@@ -34,7 +40,7 @@ namespace SOS
             LoadSettings();
         }
 
-        private void MarkDirty() => isDirty = true;
+        public void MarkDirty() => isDirty = true;
 
         public void SetTrackedItem(ItemPrefab? item, FabricationRecipe? recipe = null)
         {
@@ -99,7 +105,11 @@ namespace SOS
                 LastSearchQuery = this.LastSearchQuery,
                 LastItemId = this.CurrentItem?.Identifier.Value ?? "",
                 TrackedItemId = this.Tracker.TrackedItem?.Identifier.Value ?? "",
-                TrackedRecipeHash = this.Tracker.TrackedRecipe?.RecipeHash ?? 0
+                TrackedRecipeHash = this.Tracker.TrackedRecipe?.RecipeHash ?? 0,
+                WindowSize = this.WindowSize,
+                WindowPosition = this.WindowPosition,
+                LeftPanelWidth = this.LeftPanelWidth,
+                RightPanelWidth = this.RightPanelWidth
             };
 
             SettingsManager.Save(data);
@@ -113,6 +123,10 @@ namespace SOS
             foreach (var fav in data.Favorites) FavoritedItems.Add(fav);
 
             LastSearchQuery = data.LastSearchQuery;
+            WindowSize = data.WindowSize;
+            WindowPosition = data.WindowPosition;
+            LeftPanelWidth = data.LeftPanelWidth;
+            RightPanelWidth = data.RightPanelWidth;
 
             if (!string.IsNullOrEmpty(data.LastItemId))
             {
@@ -248,7 +262,7 @@ namespace SOS
                 if (PlayerInput.KeyHit(Keys.Escape))
                 {
                     mainWindow.SetSelected();
-                    PlayerInput.KeyDown(Keys.Escape);
+                    //PlayerInput.KeyDown(Keys.Escape);
                     CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
                     return;
                 }

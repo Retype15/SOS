@@ -24,6 +24,7 @@ namespace SOS
 
         private GUILayoutGroup? currentLayout;
         private int rowsCreated = 0;
+        private int totalSectionHeight = 0;
 
         public SectionBuilder(GUIListBox targetPanel, Action<string> onBadgeClick, SOSController controller, Action<ItemPrefab> onPrimary, Action<ItemPrefab> onSecondary)
         {
@@ -44,6 +45,7 @@ namespace SOS
             titleBlock.RectTransform.MaxSize = new Point(int.MaxValue, 30);
 
             rowsCreated = 0;
+            totalSectionHeight = 30;
         }
 
         public void AddRow(string label, string value, Color valColor)
@@ -57,6 +59,7 @@ namespace SOS
             _ = new GUITextBlock(new RectTransform(new Vector2(0.45f, 1f), row.RectTransform), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
             _ = new GUITextBlock(new RectTransform(new Vector2(0.55f, 1f), row.RectTransform), value, font: GUIStyle.SmallFont, textColor: valColor, textAlignment: Alignment.Right) { CanBeFocused = false };
             rowsCreated++;
+            totalSectionHeight += 18 + 2;
         }
 
         public void AddBadgeRow(string label, IEnumerable<string> tags)
@@ -72,6 +75,7 @@ namespace SOS
 
             GUIBadgeList.Create(badgeContainer.RectTransform, tags, onBadgeClick);
             rowsCreated++;
+            totalSectionHeight += 24 + 2;
         }
 
         public void AddDropdown(string label, IEnumerable<string> tags, List<ItemPrefab> items)
@@ -81,6 +85,7 @@ namespace SOS
             _ = new GUIDesplegableBox(currentLayout, onBadgeClick, label, tags, items, controller, onPrimaryClick, onSecondaryClick);
 
             rowsCreated++;
+            totalSectionHeight += 24 + 2;
         }
 
         public void AddFullWidthText(string text, Color color)
@@ -92,6 +97,7 @@ namespace SOS
             block.RectTransform.MinSize = new Point(0, textHeight);
             block.RectTransform.MaxSize = new Point(int.MaxValue, textHeight);
             rowsCreated++;
+            totalSectionHeight += textHeight + 2;
         }
 
         public void EndSection()
@@ -103,13 +109,8 @@ namespace SOS
             }
             else
             {
-                int totalHeight = 0;
-                foreach (var child in currentLayout.Children)
-                {
-                    totalHeight += child.Rect.Height + currentLayout.AbsoluteSpacing;
-                }
-                currentLayout.RectTransform.MinSize = new Point(0, totalHeight + 10);
-                currentLayout.RectTransform.MaxSize = new Point(int.MaxValue, totalHeight + 10);
+                currentLayout.RectTransform.MinSize = new Point(0, totalSectionHeight + 10);
+                currentLayout.RectTransform.MaxSize = new Point(int.MaxValue, totalSectionHeight + 10);
             }
             currentLayout = null;
         }
@@ -117,10 +118,12 @@ namespace SOS
 
     public class ItemAnalysis
     {
+        public Identifier ItemId { get; }
         public List<BaseStatSection> Sections { get; } = [];
 
         public ItemAnalysis(ItemPrefab item)
         {
+            ItemId = item.Identifier;
             AddSection(new GeneralSection(), item);
             AddSection(new EconomySection(), item);
             AddSection(new WeaponSection(), item);

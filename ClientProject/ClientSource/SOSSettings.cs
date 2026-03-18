@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Barotrauma;
+using Microsoft.Xna.Framework;
 
 namespace SOS
 {
@@ -23,6 +24,12 @@ namespace SOS
         public string LastItemId { get; set; } = "";
         public string TrackedItemId { get; set; } = "";
         public uint TrackedRecipeHash { get; set; } = 0;
+
+        // UI Persistence
+        public Point? WindowSize { get; set; }
+        public Point? WindowPosition { get; set; }
+        public int? LeftPanelWidth { get; set; }
+        public int? RightPanelWidth { get; set; }
     }
 
     // MARK: - Settings Manager
@@ -51,6 +58,15 @@ namespace SOS
                         new XElement("Tracker",
                             new XAttribute("targetId", data.TrackedItemId ?? ""),
                             new XAttribute("recipeHash", data.TrackedRecipeHash.ToString())
+                        ),
+
+                        new XElement("Layout",
+                            new XAttribute("winX", data.WindowPosition?.X ?? -1),
+                            new XAttribute("winY", data.WindowPosition?.Y ?? -1),
+                            new XAttribute("winW", data.WindowSize?.X ?? 0),
+                            new XAttribute("winH", data.WindowSize?.Y ?? 0),
+                            new XAttribute("leftW", data.LeftPanelWidth ?? 0),
+                            new XAttribute("rightW", data.RightPanelWidth ?? 0)
                         )
                     )
                 );
@@ -101,6 +117,24 @@ namespace SOS
                         _ = uint.TryParse(tracker.Attribute("recipeHash")?.Value, out uint hash);
                         data.TrackedRecipeHash = hash;
                     }
+
+                    var layout = root.Element("Layout");
+                    if (layout != null)
+                    {
+                        int winX = ImGoodParser(layout.Attribute("winX")?.Value, -1);
+                        int winY = ImGoodParser(layout.Attribute("winY")?.Value, -1);
+                        if (winX >= 0 && winY >= 0) data.WindowPosition = new Point(winX, winY);
+
+                        int winW = ImGoodParser(layout.Attribute("winW")?.Value, 0);
+                        int winH = ImGoodParser(layout.Attribute("winH")?.Value, 0);
+                        if (winW > 0 && winH > 0) data.WindowSize = new Point(winW, winH);
+
+                        int leftW = ImGoodParser(layout.Attribute("leftW")?.Value, 0);
+                        if (leftW > 0) data.LeftPanelWidth = leftW;
+
+                        int rightW = ImGoodParser(layout.Attribute("rightW")?.Value, 0);
+                        if (rightW > 0) data.RightPanelWidth = rightW;
+                    }
                 }
 #if DEBUG
                 LuaCsLogger.LogMessage(TextSOS.Get("sos.config.loaded", "[SOS] Settings v[version] loaded successfully.").Replace("[version]", fileVersion.ToString()).Value);
@@ -112,6 +146,12 @@ namespace SOS
             }
 
             return data;
+        }
+
+        private static int ImGoodParser(string? value, int fallback)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return fallback;
+            return int.TryParse(value, out int result) ? result : fallback;
         }
     }
 
