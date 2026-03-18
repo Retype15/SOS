@@ -3,60 +3,53 @@
 // See the LICENSE file in the project root for details.
 
 using Barotrauma;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SOS
 {
     // MARK: RecipeAnalyzer
     public static class RecipeAnalyzer
     {
-        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>> usesCache = new();
-        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, DeconstructItem>>> sourcesCache = new();
+        private static readonly Dictionary<Identifier, LinkedListNode<ItemAnalysis>> analysisCache = [];
+        private static readonly LinkedList<ItemAnalysis> lruList = new();
+        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>> usesCache = [];
+        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, DeconstructItem>>> sourcesCache = [];
 
         private const int MaxAnalysisCacheSize = 30;
-        private static readonly Dictionary<Identifier, ItemAnalysis> analysisCache = new();
-        private static readonly Queue<Identifier> analysisCacheOrder = new();
 
         public static ItemAnalysis? GetAnalysis(ItemPrefab? item)
         {
             if (item == null) return null;
 
-            if (analysisCache.TryGetValue(item.Identifier, out var cachedAnalysis))
+            if (analysisCache.TryGetValue(item.Identifier, out var node))
             {
-                UpdateCachePriority(item.Identifier);
-                return cachedAnalysis;
+                lruList.Remove(node);
+                lruList.AddFirst(node);
+                return node.Value;
             }
 
             var analysis = new ItemAnalysis(item);
 
             if (analysisCache.Count >= MaxAnalysisCacheSize)
             {
-                Identifier oldest = analysisCacheOrder.Dequeue();
-                analysisCache.Remove(oldest);
+                var lastNode = lruList.Last;
+                if (lastNode != null)
+                {
+                    analysisCache.Remove(lastNode.Value.ItemId);
+                    lruList.RemoveLast();
+                }
             }
 
-            analysisCache[item.Identifier] = analysis;
-            analysisCacheOrder.Enqueue(item.Identifier);
+            var newNode = new LinkedListNode<ItemAnalysis>(analysis);
+            lruList.AddFirst(newNode);
+            analysisCache[item.Identifier] = newNode;
+
             return analysis;
-        }
-
-        private static void UpdateCachePriority(Identifier id)
-        {
-            var list = analysisCacheOrder.ToList();
-            if (list.Remove(id))
-            {
-                analysisCacheOrder.Clear();
-                foreach (var item in list) analysisCacheOrder.Enqueue(item);
-                analysisCacheOrder.Enqueue(id);
-            }
         }
 
         public static void ClearSessionCache()
         {
             analysisCache.Clear();
-            analysisCacheOrder.Clear();
+            lruList.Clear();
             usesCache.Clear();
             sourcesCache.Clear();
         }
