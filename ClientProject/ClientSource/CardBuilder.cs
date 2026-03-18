@@ -18,7 +18,7 @@ namespace SOS
         private const int HeaderHeight = 20;
         private const int CardPadding = 10;
 
-        private static readonly Dictionary<Identifier, string> machineNameCache = new();
+        private static readonly Dictionary<Identifier, string> machineNameCache = [];
 
         public static RichString GetDetailedTooltip(ItemPrefab prefab)
         {
@@ -32,6 +32,7 @@ namespace SOS
 
 #if DEBUG
             toolTip += $" ({prefab.Identifier})";
+            var list = new List<string>();
 #endif
 
             if (price > 0)
@@ -274,7 +275,7 @@ namespace SOS
             var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2 };
 
             string machine;
-            if (usage.MachineIds.Count > 0)
+            if (usage.MachineIds != null && usage.MachineIds.Count > 0)
             {
                 machine = string.Join(", ", usage.MachineIds.Select(id => ResolveMachineName(id)));
             }
@@ -293,7 +294,7 @@ namespace SOS
 
         public static void DrawSourceCard(GUIListBox col, GroupedSource group, Action<ItemPrefab> onPrimary, Action<ItemPrefab> onSecondary)
         {
-            int extraRows = group.RequiredOtherItems.Count;
+            int extraRows = group.RequiredOtherItems?.Count ?? 0;
             int calculatedHeight = HeaderHeight + RowHeight + (extraRows * RowHeight) + CardPadding;
             var card = new GUIFrame(new RectTransform(new Point(col.Content.Rect.Width, calculatedHeight), col.Content.RectTransform), "InnerFrame")
             {
@@ -301,7 +302,7 @@ namespace SOS
             };
             var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2 };
 
-            string machineName = group.MachineIds.Length == 0
+            string machineName = (group.MachineIds == null || group.MachineIds.Length == 0)
                 ? ResolveMachineName("deconstructor".ToIdentifier())
                 : string.Join(", ", group.MachineIds.Select(id => ResolveMachineName(id)));
 
@@ -312,7 +313,7 @@ namespace SOS
 
             DrawCompactItemRow(layout, group.SourceItem, 1, true, "", null, onPrimary, onSecondary);
 
-            foreach (var otherId in group.RequiredOtherItems)
+            foreach (var otherId in group.RequiredOtherItems ?? [])
             {
                 var otherPrefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == otherId);
                 if (otherPrefab != null)
@@ -321,7 +322,7 @@ namespace SOS
                     DrawCompactItemRow(layout, otherPrefab, 1, true, prefix, Color.Cyan, onPrimary, onSecondary);
                 }
             }
-            // That's no convince me, maybe change disposition?
+            // TODO: That's no convince me, maybe change disposition?
             /*if (group.IsRandom && group.TotalCommonness > 0)
             {
                 _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, RowHeight / 2), layout.RectTransform),

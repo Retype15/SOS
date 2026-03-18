@@ -2,19 +2,23 @@
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
-using Barotrauma;
+#pragma warning disable IDE0130
+#pragma warning disable IDE0079
+#pragma warning disable IDE0290
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Barotrauma;
 
 namespace SOS
 {
     // MARK: - Settings Data
     public class SettingsData
     {
-        public HashSet<string> Favorites { get; set; } = new();
+        public HashSet<string> Favorites { get; set; } = [];
         public string LastSearchQuery { get; set; } = "";
         public string LastItemId { get; set; } = "";
         public string TrackedItemId { get; set; } = "";
@@ -31,7 +35,7 @@ namespace SOS
         {
             try
             {
-                XDocument doc = new XDocument(
+                var doc = new XDocument(
                     new XElement("SOSSettings",
                         new XAttribute("version", CurrentSaveVersion),
 
@@ -94,7 +98,7 @@ namespace SOS
                     if (tracker != null)
                     {
                         data.TrackedItemId = tracker.Attribute("targetId")?.Value ?? "";
-                        uint.TryParse(tracker.Attribute("recipeHash")?.Value, out uint hash);
+                        _ = uint.TryParse(tracker.Attribute("recipeHash")?.Value, out uint hash);
                         data.TrackedRecipeHash = hash;
                     }
                 }
@@ -116,18 +120,16 @@ namespace SOS
     {
         private GUIFrame? settingsFrame;
 
-        public void OpenMenu(GUIComponent parent)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Quitar el parámetro no utilizado", Justification = "<pendiente>")]
+        public static void OpenMenu(GUIComponent parent)
         {
             // TODO
         }
 
         public void CloseMenu()
         {
-            if (settingsFrame != null)
-            {
-                settingsFrame.Parent.RemoveChild(settingsFrame);
-                settingsFrame = null;
-            }
+            settingsFrame?.Parent.RemoveChild(settingsFrame);
+            settingsFrame = null;
         }
     }
 }
