@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
 using static Barotrauma.PetBehavior.ItemProduction;
@@ -238,96 +239,139 @@ namespace SOS
     // MARK: weapons
     public class WeaponSection : BaseStatSection
     {
-        private string reload = "";
-        private string range = "";
-        private string powerUse = "";
+        private float penetration = 0f;
+        private int maxTargets = 1;
+        private int projectileCount = 1;
+        private float structureDamage = 0f;
+        private float itemDamage = 0f;
+        private float reload = 0f;
+        private float range = 0f;
+        private float explosionRange = 0f;
+        private float powerUse = 0f;
         private bool isAutomatic = false;
         private float spread = 0f;
         private float dmgModifier = 1f;
-        private float penetration = 0f;
-
-        private string explosionRadius = "";
-        private string structureDamage = "";
         private float severProb = 0f;
         private bool isThrowable = false;
 
-        private readonly Dictionary<string, List<string>> aggregatedDamages = [];
+        private readonly List<AfflictionData> afflictions = [];
 
-        public override bool HasData => !string.IsNullOrEmpty(reload) || !string.IsNullOrEmpty(range) ||
-                                       !string.IsNullOrEmpty(explosionRadius) || isThrowable || aggregatedDamages.Count > 0;
+        public class AfflictionData
+        {
+            public string Name = "";
+            public float Strength;
+            public float Probability;
+        }
+
+        public override bool HasData => afflictions.Count > 0 || penetration > 0 || structureDamage > 0 || itemDamage > 0 || reload > 0 || isThrowable || explosionRange > 0;
 
         public override void Analyze(ItemPrefab item)
         {
             if (item.ConfigElement == null) return;
 
-            foreach (var child in item.ConfigElement.Descendants())
+            foreach (var element in item.ConfigElement.Descendants())
             {
-                string n = child.Name.ToString().ToLowerInvariant();
+                string n = element.Name.ToString().ToLowerInvariant();
 
-                if (n == "weapon" || n == "meleehandheld" || n == "rangedweapon" || n == "projectile")
+                if (n == "rangedweapon" || n == "meleeweapon" || n == "meleehandheld" || n == "projectile" || n == "weapon")
                 {
-                    if (child.GetAttribute("reload") != null) reload = child.GetAttributeString("reload", "0") + "s";
-                    if (child.GetAttribute("range") != null) range = child.GetAttributeString("range", "0");
-                    if (child.GetAttribute("powerconsumption") != null) powerUse = child.GetAttributeString("powerconsumption", "0") + "kW";
-                    if (child.GetAttributeBool("holdtrigger", false)) isAutomatic = true;
+                    reload = element.GetAttributeFloat("reload", reload);
+                    range = element.GetAttributeFloat("range", range);
+                    powerUse = element.GetAttributeFloat("powerconsumption", powerUse);
+                    spread = Math.Max(spread, element.GetAttributeFloat("spread", 0f));
+                    dmgModifier = element.GetAttributeFloat("weapondamagemodifier", dmgModifier);
+                    penetration = Math.Max(penetration, element.GetAttributeFloat("penetration", 0f));
 
-                    spread = Math.Max(spread, child.GetAttributeFloat("spread", 0f));
-                    float mod = child.GetAttributeFloat("weapondamagemodifier", 1f);
-                    if (mod != 1f) dmgModifier = mod;
-                    penetration = Math.Max(penetration, child.GetAttributeFloat("penetration", 0f));
+                    if (n == "projectile")
+                    {
+                        maxTargets = Math.Max(maxTargets, element.GetAttributeInt("maxtargetstohit", 1));
+                        int pCount = element.GetAttributeInt("projectilecount", 1);
+                        if (pCount == 1) pCount = element.GetAttributeInt("hitscancount", 1);
+                        projectileCount = Math.Max(projectileCount, pCount);
+                    }
+
+                    if (element.GetAttributeBool("holdtrigger", false)) isAutomatic = true;
                 }
-
-                if (n == "throwable") isThrowable = true;
 
                 if (n == "explosion")
                 {
-                    if (child.GetAttribute("range") != null) explosionRadius = child.GetAttributeString("range", "0") + "m";
-                    if (child.GetAttribute("structuredamage") != null) structureDamage = child.GetAttributeString("structuredamage", "0");
-                    severProb = Math.Max(severProb, child.GetAttributeFloat("severlimbsprobability", 0f));
+                    explosionRange = Math.Max(explosionRange, element.GetAttributeFloat("range", 0f));
+                    structureDamage = Math.Max(structureDamage, element.GetAttributeFloat("structuredamage", 0f));
+                    itemDamage = Math.Max(itemDamage, element.GetAttributeFloat("itemdamage", 0f));
+                    severProb = Math.Max(severProb, element.GetAttributeFloat("severlimbsprobability", 0f));
+
+                    foreach (var aff in element.Elements().Where(e => e.Name.ToString().Equals("affliction", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        ParseAffliction(aff, 1.0f);
+                    }
                 }
 
                 if (n == "attack")
                 {
-                    if (child.GetAttribute("structuredamage") != null && string.IsNullOrEmpty(structureDamage))
-                        structureDamage = child.GetAttributeString("structuredamage", "0");
-                    severProb = Math.Max(severProb, child.GetAttributeFloat("severlimbsprobability", 0f));
-                }
+                    structureDamage = Math.Max(structureDamage, element.GetAttributeFloat("structuredamage", 0f));
+                    itemDamage = Math.Max(itemDamage, element.GetAttributeFloat("itemdamage", 0f));
+                    severProb = Math.Max(severProb, element.GetAttributeFloat("severlimbsprobability", 0f));
+                    penetration = Math.Max(penetration, element.GetAttributeFloat("penetration", 0f));
 
-                if (n == "affliction")
-                {
-                    string id = child.GetAttributeString("identifier", "");
-                    float strength = child.GetAttributeFloat("strength", 0f);
-                    if (strength > 0 && !string.IsNullOrEmpty(id))
+                    foreach (var aff in element.Elements().Where(e => e.Name.ToString().Equals("affliction", StringComparison.OrdinalIgnoreCase)))
                     {
-                        string name = TextManager.Get("AfflictionName." + id).Fallback(id).Value;
-                        if (!aggregatedDamages.ContainsKey(name)) aggregatedDamages[name] = [];
-                        aggregatedDamages[name].Add(strength.ToString("0.#"));
+                        ParseAffliction(aff, 1.0f);
                     }
                 }
+
+                if (n == "statuseffect")
+                {
+                    float prob = element.GetAttributeFloat("probability", 1.0f);
+                    foreach (var aff in element.Elements().Where(e => e.Name.ToString().Equals("affliction", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        ParseAffliction(aff, prob);
+                    }
+                }
+
+                if (n == "throwable") isThrowable = true;
             }
+        }
+
+        private void ParseAffliction(XElement element, float prob)
+        {
+            string id = element.GetAttributeString("identifier", "");
+            float strength = element.GetAttributeFloat("strength", 0f);
+            if (strength <= 0 || string.IsNullOrEmpty(id)) return;
+
+            afflictions.Add(new AfflictionData
+            {
+                Name = TextManager.Get("AfflictionName." + id).Fallback(id).Value,
+                Strength = strength,
+                Probability = prob
+            });
         }
 
         public override void Draw(SectionBuilder builder)
         {
-            builder.StartSection(TextSOS.Get("sos.window.section_weapon", "AS WEAPON").Value, Color.Gold);
+            builder.StartSection(TextSOS.Get("sos.window.section_weapon", "COMBAT STATS").Value, Color.Gold);
 
-            if (!string.IsNullOrEmpty(reload))
-                builder.AddRow(isAutomatic ? TextSOS.Get("sos.weapon.fire_rate", "Fire Rate:").Value : TextSOS.Get("sos.weapon.reload", "Reload:").Value, reload, Color.Cyan);
+            //pep
+            if (reload > 0) builder.AddRow(isAutomatic ? "Fire Rate:" : "Reload:", $"{reload}s", Color.Cyan);
+            if (powerUse > 0) builder.AddRow("Power Use:", $"{powerUse}kW", Color.Orange);
+            if (range > 0) builder.AddRow("Range:", range.ToString("0.#"), Color.LightGray);
+            if (explosionRange > 0) builder.AddRow("Explosion Radius:", $"{explosionRange:0.#}m", Color.Orange);
+            if (penetration > 0) builder.AddRow("Armor Penetration:", $"{(int)(penetration * 100)}%", Color.Orange);
+            if (projectileCount > 1) builder.AddRow("Projectiles:", $"x{projectileCount}", Color.LightGray);
+            if (maxTargets > 1) builder.AddRow("Max Targets:", maxTargets.ToString(), Color.LightGray);
+            if (structureDamage > 0) builder.AddRow("Structure Damage:", structureDamage.ToString("0.#"), Color.Salmon);
+            if (itemDamage > 0) builder.AddRow("Item Damage:", itemDamage.ToString("0.#"), Color.Salmon);
+            if (severProb > 0) builder.AddRow("Dismember Chance:", $"{(int)(severProb * 100)}%", Color.Crimson);
+            if (spread > 0) builder.AddRow("Base Spread:", $"{spread:0.#}°", Color.LightGray);
+            if (dmgModifier != 1f) builder.AddRow("Dmg. Multiplier:", $"x{dmgModifier:0.#}", Color.LightGreen);
+            if (isThrowable) builder.AddRow("Type:", "Throwable", Color.White);
 
-            if (spread > 0) builder.AddRow(TextSOS.Get("sos.weapon.base_spread", "Base Spread:").Value, $"{spread}°", Color.LightGray);
-            if (dmgModifier != 1f) builder.AddRow(TextSOS.Get("sos.weapon.dmg_multiplier", "Dmg. Multiplier:").Value, $"x{dmgModifier}", Color.LightGreen);
-            if (penetration > 0) builder.AddRow(TextSOS.Get("sos.weapon.armor_penetration", "Armor Penetration:").Value, $"{(int)(penetration * 100)}%", Color.Orange);
-            if (!string.IsNullOrEmpty(range)) builder.AddRow(TextSOS.Get("sos.weapon.range", "Range:").Value, range, Color.Cyan);
-            if (!string.IsNullOrEmpty(powerUse)) builder.AddRow(TextSOS.Get("sos.weapon.power_use", "Power Use:").Value, powerUse, Color.Orange);
-
-            if (isThrowable) builder.AddRow(TextSOS.Get("sos.weapon.type", "Type:").Value, TextSOS.Get("sos.weapon.throwable", "Throwable").Value, Color.White);
-            if (!string.IsNullOrEmpty(explosionRadius)) builder.AddRow(TextSOS.Get("sos.weapon.area_radius", "Area Radius:").Value, explosionRadius, Color.Orange);
-            if (!string.IsNullOrEmpty(structureDamage) && structureDamage != "0") builder.AddRow(TextSOS.Get("sos.weapon.hull_damage", "Hull Damage:").Value, structureDamage, Color.Salmon);
-            if (severProb > 0) builder.AddRow(TextSOS.Get("sos.weapon.dismember_chance", "Dismember Chance:").Value, $"{(int)(severProb * 100)}%", Color.Crimson);
-
-            foreach (var dmg in aggregatedDamages)
+            var grouped = afflictions.GroupBy(a => a.Name);
+            foreach (var group in grouped)
             {
-                builder.AddRow(dmg.Key + ":", string.Join(" | ", dmg.Value), Color.Salmon);
+                string val = string.Join(" | ", group.Select(a =>
+                    a.Probability < 1.0f ? $"{a.Strength} ({(int)(a.Probability * 100)}%)" : a.Strength.ToString("0.#")));
+
+                builder.AddRow(group.Key + ":", val, Color.Salmon);
             }
 
             builder.EndSection();
