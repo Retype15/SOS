@@ -27,8 +27,8 @@ namespace SOS
         public void OnLoadCompleted()
         {
             TextManager.VerifyLanguageAvailable();
-            LuaCsLogger.LogMessage(TextSOS.Get("sos.shared.loaded", "[SOS] Loaded Successfully.").Value);
 #if DEBUG
+            LuaCsLogger.LogMessage(TextSOS.Get("sos.shared.loaded", "[SOS] Loaded Successfully.").Value);
             LuaCsLogger.LogMessage(TextSOS.Get("sos.shared.debugmode", "[SOS] Debug Mode is enabled.").Value);
 #endif
         }
@@ -41,7 +41,9 @@ namespace SOS
             RecipeAnalyzer.ClearSessionCache();
             DisposeClient();
 #endif
+#if DEBUG
             LuaCsLogger.LogMessage(TextSOS.Get("sos.shared.unloaded", "[SOS] Mod Unloaded.").Value);
+#endif
             GC.SuppressFinalize(this);
         }
     }
