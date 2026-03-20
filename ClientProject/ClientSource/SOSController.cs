@@ -130,6 +130,11 @@ namespace SOS
             WindowPosition = data.WindowPosition;
             LeftPanelWidth = data.LeftPanelWidth;
             RightPanelWidth = data.RightPanelWidth;
+            foreach (var kvp in data.CustomLayouts) CustomLayouts[kvp.Key] = kvp.Value;
+
+            if (!WindowSize.HasValue) WindowSize = new Point(1250, 850);
+            if (!LeftPanelWidth.HasValue) LeftPanelWidth = 250;
+            if (!RightPanelWidth.HasValue) RightPanelWidth = 300;
 
             if (!string.IsNullOrEmpty(data.LastItemId))
             {
@@ -148,7 +153,6 @@ namespace SOS
                 }
             }
 
-            foreach (var kvp in data.CustomLayouts) CustomLayouts[kvp.Key] = kvp.Value;
         }
 
         public void ApplyLayout(Point size, int leftW, int rightW)

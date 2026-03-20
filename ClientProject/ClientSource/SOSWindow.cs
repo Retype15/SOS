@@ -74,7 +74,7 @@ namespace SOS
             var parentComponent = Screen.Selected?.Frame;
             if (parentComponent == null) return;
 
-            mainFrame = new GUIResizableFrame(new RectTransform(new Vector2(0.95f, 0.9f), parentComponent.RectTransform, Anchor.Center), style: "CircuitBoxFrame")
+            mainFrame = new GUIResizableFrame(new RectTransform(new Vector2(0.95f, 0.9f), parentComponent.RectTransform, Anchor.TopLeft), style: "CircuitBoxFrame")
             {
                 CanBeFocused = true,
                 Selected = true,
@@ -83,13 +83,20 @@ namespace SOS
             };
             mainFrame.RectTransform.MinSize = new Point(400, 200);
 
-            if (controller.WindowSize.HasValue)
-            {
-                mainFrame.RectTransform.NonScaledSize = controller.WindowSize.Value;
-            }
+            Point initialSize = controller.WindowSize ?? new Point(1000, 700);
+
+            //mainFrame.RectTransform.NonScaledSize = initialSize;
+
             if (controller.WindowPosition.HasValue)
             {
                 mainFrame.RectTransform.AbsoluteOffset = controller.WindowPosition.Value;
+            }
+            else
+            {
+                int centerX = (GameMain.GraphicsWidth / 2) - (initialSize.X / 2);
+                int centerY = (GameMain.GraphicsHeight / 2) - (initialSize.Y / 2);
+
+                mainFrame.RectTransform.AbsoluteOffset = new Point(centerX, centerY);
             }
 
             var topBar = new GUIFrame(new RectTransform(new Vector2(1.0f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter), "GUIFrameBottom");
@@ -426,7 +433,7 @@ namespace SOS
 
             if (layoutMenuFrame != null && PlayerInput.PrimaryMouseButtonClicked())
             {
-                bool overButton = GUI.MouseOn is GUIButton b;
+                bool overButton = GUI.MouseOn is GUIButton;
 
                 if (!layoutMenuFrame.IsParentOf(GUI.MouseOn) && GUI.MouseOn != layoutMenuFrame && !overButton)
                 {
@@ -673,7 +680,7 @@ onSecondary
 
         private void ToggleLayoutMenu(GUIComponent anchor)
         {
-            //if (mainFrame == null) return;
+            if (mainFrame == null) return;
             if (layoutMenuFrame != null)
             {
                 mainFrame?.RemoveChild(layoutMenuFrame);
@@ -734,14 +741,14 @@ onSecondary
 
         private static void AddGroupHeader(GUIListBox list, string text)
         {
-            var header = new GUIFrame(new RectTransform(new Point(list.Content.Rect.Width, 20), list.Content.RectTransform), style: "GUIFrameBottom") 
-            { 
-                Color = Color.Gray * 0.4f, 
-                CanBeFocused = false 
+            var header = new GUIFrame(new RectTransform(new Point(list.Content.Rect.Width, 20), list.Content.RectTransform), style: "GUIFrameBottom")
+            {
+                Color = Color.Gray * 0.4f,
+                CanBeFocused = false
             };
-            _ = new GUITextBlock(new RectTransform(Vector2.One, header.RectTransform), text, font: GUIStyle.SmallFont, textAlignment: Alignment.Center) 
-            { 
-                CanBeFocused = false 
+            _ = new GUITextBlock(new RectTransform(Vector2.One, header.RectTransform), text, font: GUIStyle.SmallFont, textAlignment: Alignment.Center)
+            {
+                CanBeFocused = false
             };
         }
 
@@ -771,7 +778,7 @@ onSecondary
         }
     }
 
-        public class GroupedSource
+    public class GroupedSource
     {
         public ItemPrefab? SourceItem;
         public Identifier[]? MachineIds;
