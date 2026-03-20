@@ -85,7 +85,7 @@ namespace SOS
 
             Point initialSize = controller.WindowSize ?? new Point(1000, 700);
 
-            //mainFrame.RectTransform.NonScaledSize = initialSize;
+            mainFrame.RectTransform.NonScaledSize = initialSize;
 
             if (controller.WindowPosition.HasValue)
             {
