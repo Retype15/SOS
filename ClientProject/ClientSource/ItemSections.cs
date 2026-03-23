@@ -60,7 +60,7 @@ namespace SOS
             rowsCreated++;
         }
 
-        public void AddBadgeRow(string label, IEnumerable<string> tags)
+        public void AddBadgeRow(string label, IEnumerable<string> tags, char? filterPrefix = null)
         {
             if (tags == null || !tags.Any() || currentLayout == null) return;
 
@@ -71,7 +71,13 @@ namespace SOS
             _ = new GUITextBlock(new RectTransform(new Vector2(0.40f, 1f), row.RectTransform), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
             var badgeContainer = new GUIFrame(new RectTransform(new Vector2(0.60f, 1f), row.RectTransform), style: null) { CanBeFocused = false };
 
-            GUIBadgeList.Create(badgeContainer.RectTransform, tags, onBadgeClick);
+            void clickAction(string val)
+            {
+                string query = filterPrefix.HasValue ? $"{filterPrefix}{val}" : val;
+                onBadgeClick?.Invoke(query);
+            }
+
+            GUIBadgeList.Create(badgeContainer.RectTransform, tags, clickAction);
             rowsCreated++;
         }
 
@@ -177,14 +183,15 @@ namespace SOS
         {
             if (item == null) return;
             builder.StartSection(TextSOS.Get("sos.window.section_general", "GENERAL").Value, Color.Gold);
-            builder.AddRow(TextSOS.Get("sos.item.id", "ID:").Value, item.Identifier.Value, Color.LightGray);
+            builder.AddBadgeRow(TextSOS.Get("sos.item.id", "ID:").Value, [item.Identifier.Value], '!');
             if (!item.Aliases.IsEmpty) builder.AddRow(TextSOS.Get("sos.item.aliases", "Aliases:").Value, string.Join(", ", item.Aliases), Color.DarkGray);
-            builder.AddRow(TextSOS.Get("sos.item.category", "Category:").Value, item.Category.ToString(), Color.White);
-            if (item.ContentPackage != null && item.ContentPackage.Name != "Vanilla") builder.AddBadgeRow("Mod:", [item.ContentPackage.Name]);
+            builder.AddBadgeRow(TextSOS.Get("sos.item.category", "Category:").Value, item.Category.ToString().Split(','), '#');
+            string modName = item.ContentPackage?.Name ?? "Vanilla";
+            builder.AddBadgeRow("Mod:", [modName], '@');
             if (!string.IsNullOrEmpty(cargoBox)) builder.AddRow(TextSOS.Get("sos.item.cargo_box", "Cargo Box:").Value, TextManager.Get("EntityName." + cargoBox).Fallback(cargoBox).Value, Color.BurlyWood);
             builder.AddRow(TextSOS.Get("sos.item.max_stack", "Max Stack:").Value, item.MaxStackSize.ToString(), Color.White);
             if (hazards.Count > 0) builder.AddRow(TextSOS.Get("sos.item.hazards", "Hazards:").Value, string.Join(", ", hazards), Color.Salmon);
-            builder.AddBadgeRow(TextSOS.Get("sos.item.tags", "TAGS:").Value, item.Tags.Select(t => t.Value));
+            builder.AddBadgeRow(TextSOS.Get("sos.item.tags", "TAGS:").Value, item.Tags.Select(t => t.Value), '$');
             builder.EndSection();
         }
     }
@@ -480,7 +487,7 @@ namespace SOS
                     .SelectMany(s => s.Split([',', ' '], StringSplitOptions.RemoveEmptyEntries))
                     .Distinct();
 
-                builder.AddBadgeRow(TextSOS.Get("sos.equip.equips_in", "Equips In:").Value, uniqueSlots);
+                builder.AddBadgeRow(TextSOS.Get("sos.equip.equips_in", "Equips In:").Value, uniqueSlots, '&');
             }
 
             builder.EndSection();
