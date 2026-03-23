@@ -196,14 +196,10 @@ namespace SOS
                 float poolTotalWeight = machineGroup.Sum(di => di.Commonness);
 
                 var groupedOutputs = machineGroup
-                    .GroupBy(di => new
-                    {
-                        di.ItemIdentifier,
-                        OtherKey = string.Join(",", di.RequiredOtherItem.Select(id => id.Value).OrderBy(x => x))
-                    })
+                    .GroupBy(di => di.ItemIdentifier)
                     .Select(g => new
                     {
-                        g.Key.ItemIdentifier,
+                        ItemIdentifier = g.Key,
                         MaxAmount = g.Max(di => di.Amount),
                         Machines = g.First().RequiredDeconstructor,
                         RequiredOtherItems = g.First().RequiredOtherItem,
@@ -212,7 +208,6 @@ namespace SOS
                     .ToList();
 
                 int totalRows = groupedOutputs.Count;
-                totalRows += groupedOutputs.Sum(go => go.RequiredOtherItems.Length);
                 if (item.RandomDeconstructionOutput) totalRows++;
 
                 int spacing = 2;
@@ -308,14 +303,14 @@ namespace SOS
                         var prefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == output.ItemIdentifier);
                         DrawCompactItemRow(layout, prefab, output.MaxAmount, true, extras, itemColor, onPrimary, onSecondary);
 
-                        foreach (var extraId in output.RequiredOtherItems)
+                        /*foreach (var extraId in output.RequiredOtherItems)
                         {
                             var extraPrefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == extraId);
                             if (extraPrefab != null)
                             {
                                 DrawCompactItemRow(layout, extraPrefab, 1, true, " + ", Color.Cyan, onPrimary, onSecondary);
                             }
-                        }
+                        }*/
                     }
                 }
             }

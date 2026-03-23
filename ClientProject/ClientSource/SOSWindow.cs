@@ -664,18 +664,14 @@ namespace SOS
 
             var currentItemId = targetItem.Identifier;
             var groupedUses = uses
-                .GroupBy(u => new
-                {
-                    ResultId = u.Item1.Identifier,
-                    ReqAmount = u.Item2.RequiredItems.FirstOrDefault(ri =>
-                        ri.ItemPrefabs.Any(p => p.Identifier == currentItemId))?.Amount ?? 1
-                })
+                .GroupBy(u => u.Item2)
                 .Select(group => new GroupedUsage
                 {
                     TargetItem = group.First().Item1,
-                    MachineIds = [.. group.SelectMany(g => g.Item2.SuitableFabricatorIdentifiers).Distinct()],
-                    AmountCreated = group.First().Item2.Amount,
-                    AmountRequired = group.Key.ReqAmount
+                    MachineIds = [.. group.Key.SuitableFabricatorIdentifiers.Distinct()],
+                    AmountCreated = group.Key.Amount,
+                    AmountRequired = group.Key.RequiredItems.FirstOrDefault(ri =>
+                        ri.ItemPrefabs.Any(p => p.Identifier == currentItemId))?.Amount ?? 1
                 })
                 .OrderBy(gu => gu.TargetItem?.Name.Value)
                 .ToList();
