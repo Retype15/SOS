@@ -32,8 +32,9 @@ namespace SOS
         public Point? WindowPosition { get; set; }
         public int? LeftPanelWidth { get; set; }
         public int? RightPanelWidth { get; set; }
+        public bool RawXmlMode { get; set; } = false;
 
-        public Dictionary<string, SavedLayout> CustomLayouts { get; } = new();
+        public Dictionary<string, SavedLayout> CustomLayouts { get; } = [];
 
         private bool isDirty = false;
 
@@ -112,7 +113,8 @@ namespace SOS
                 WindowPosition = this.WindowPosition,
                 LeftPanelWidth = this.LeftPanelWidth,
                 RightPanelWidth = this.RightPanelWidth,
-                CustomLayouts = this.CustomLayouts
+                CustomLayouts = this.CustomLayouts,
+                RawXmlMode = this.RawXmlMode
             };
 
             SettingsManager.Save(data);
@@ -130,6 +132,7 @@ namespace SOS
             WindowPosition = data.WindowPosition;
             LeftPanelWidth = data.LeftPanelWidth;
             RightPanelWidth = data.RightPanelWidth;
+            RawXmlMode = data.RawXmlMode;
             foreach (var kvp in data.CustomLayouts) CustomLayouts[kvp.Key] = kvp.Value;
 
             if (!WindowSize.HasValue) WindowSize = new Point(1250, 850);
@@ -167,7 +170,7 @@ namespace SOS
         public void SaveCurrentLayout(string name)
         {
             if (mainWindow == null) return;
-            
+
             CustomLayouts[name] = new SavedLayout
             {
                 WindowSize = mainWindow.GetCurrentSize(),
@@ -282,30 +285,40 @@ namespace SOS
 
         public void Update()
         {
-            if (GUI.KeyboardDispatcher.Subscriber != null && GUI.KeyboardDispatcher.Subscriber is not GUIDropDown2) return;
+            bool canHandleInputs = GUI.KeyboardDispatcher.Subscriber == null || GUI.KeyboardDispatcher.Subscriber is GUIDropDown2;
 
-            var kb = Keyboard.GetState();
-            bool isKeyDownNow = kb.IsKeyDown(toggleKey);
-
-            if (isKeyDownNow && !wasKeyDown)
+            if (canHandleInputs)
             {
-                CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
+                var kb = Keyboard.GetState();
+                bool isKeyDownNow = kb.IsKeyDown(toggleKey);
+
+                if (isKeyDownNow && !wasKeyDown)
+                {
+                    CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
+                }
+                wasKeyDown = isKeyDownNow;
             }
-            wasKeyDown = isKeyDownNow;
+            else
+            {
+                wasKeyDown = Keyboard.GetState().IsKeyDown(toggleKey);
+            }
 
             if (mainWindow != null)
             {
-                if (PlayerInput.KeyHit(Keys.Escape))
+                if (canHandleInputs)
                 {
-                    mainWindow.SetSelected();
-                    //PlayerInput.KeyDown(Keys.Escape);
-                    CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
-                    return;
-                }
+                    if (PlayerInput.KeyHit(Keys.Escape))
+                    {
+                        mainWindow.SetSelected();
+                        //PlayerInput.KeyDown(Keys.Escape);
+                        CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
+                        return;
+                    }
 
-                if (PlayerInput.KeyHit(Keys.Back) || PlayerInput.Mouse4ButtonClicked())
-                {
-                    CrossThread.RequestExecutionOnMainThread(() => NavigateBack());
+                    if (PlayerInput.KeyHit(Keys.Back) || PlayerInput.Mouse4ButtonClicked())
+                    {
+                        CrossThread.RequestExecutionOnMainThread(() => NavigateBack());
+                    }
                 }
 
                 mainWindow?.Update();

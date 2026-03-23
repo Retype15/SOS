@@ -20,6 +20,7 @@ namespace SOS
         public string LastItemId { get; set; } = "";
         public string TrackedItemId { get; set; } = "";
         public uint TrackedRecipeHash { get; set; } = 0;
+        public bool RawXmlMode { get; set; } = false;
 
         // UI Persistence
         public Point? WindowSize { get; set; }
@@ -63,7 +64,8 @@ namespace SOS
 
                         new XElement("State",
                             new XAttribute("lastItem", data.LastItemId ?? ""),
-                            new XAttribute("lastSearch", data.LastSearchQuery ?? "")
+                            new XAttribute("lastSearch", data.LastSearchQuery ?? ""),
+                            new XAttribute("rawXml", data.RawXmlMode)
                         ),
 
                         new XElement("Tracker",
@@ -144,6 +146,7 @@ namespace SOS
                     {
                         data.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
                         data.LastItemId = state.Attribute("lastItem")?.Value ?? "";
+                        data.RawXmlMode = ImGoodBoolParser(state.Attribute("rawXml")?.Value, false);
                     }
 
                     var tracker = root.Element("Tracker");
@@ -203,6 +206,12 @@ namespace SOS
         {
             if (string.IsNullOrWhiteSpace(value)) return fallback;
             return int.TryParse(value, out int result) ? result : fallback;
+        }
+
+        private static bool ImGoodBoolParser(string? value, bool fallback)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return fallback;
+            return bool.TryParse(value, out bool result) ? result : fallback;
         }
     }
 

@@ -24,6 +24,7 @@ namespace SOS
         private readonly GUIResizableFrame? mainFrame;
         private readonly GUIListBox? itemList;
         private readonly GUIFrame? detailsHeader;
+        private readonly GUIFrame? recipeAreaFrame;
         private readonly GUIListBox? colObtain;
         private readonly GUIListBox? colUsage;
         private readonly GUIListBox? metaPanel;
@@ -59,6 +60,9 @@ namespace SOS
         private const int CenterCompactThreshold = 250;
         private const int MinCenterWidth = 200;
         private int lastCenterWForReflow = 0;
+
+        private readonly GUITextViewer? xmlContentText;
+        private readonly GUITickBox? rawXmlTickBox;
 
         private ItemPrefab? currentItem;
         private List<FabricationRecipe>? currentCraft;
@@ -208,7 +212,11 @@ namespace SOS
 
             var usageContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), usageContainer.RectTransform), TextSOS.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
-            colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: "GUIListBox") { Spacing = 5 };
+            colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: "GUIListBox")
+            {
+                Spacing = 5,
+                Color = Color.Black * 0.3f
+            };
 
             rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), contentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
             {
@@ -227,7 +235,16 @@ namespace SOS
             rightContainer = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.98f), rightPanel.RectTransform, Anchor.Center), style: null);
             var rightLayout = new GUILayoutGroup(new RectTransform(Vector2.One, rightContainer.RectTransform)) { Stretch = true };
 
-            metaPanel = new GUIListBox(new RectTransform(Vector2.One, rightLayout.RectTransform), style: "GUIListBox")
+            var rightHeaderArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.045f), rightLayout.RectTransform), style: null);
+            rightHeaderArea.RectTransform.MinSize = new Point(0, 32);
+            rawXmlTickBox = new GUITickBox(new RectTransform(new Vector2(1f, 0.45f), rightHeaderArea.RectTransform, Anchor.CenterLeft), TextSOS.Get("sos.window.raw_xml", "RAW XML"), font: GUIStyle.SmallFont)
+            {
+                Selected = controller.RawXmlMode
+            };
+
+            var rightContentArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.955f), rightLayout.RectTransform), style: null);
+
+            metaPanel = new GUIListBox(new RectTransform(Vector2.One, rightContentArea.RectTransform), style: "GUIListBox")
             {
                 Spacing = 10,
                 Padding = new Vector4(18, 15, 18, 15),
@@ -235,10 +252,25 @@ namespace SOS
                 Color = Color.Black * 0.4f,
             };
 
-            if (metaPanel.ContentBackground != null)
+            xmlContentText = new GUITextViewer(new RectTransform(Vector2.One, rightContentArea.RectTransform), style: "GUITextBlock")
             {
-                metaPanel.ContentBackground.Color = Color.Transparent;
-            }
+                Visible = controller.RawXmlMode
+            };
+            metaPanel.Visible = !controller.RawXmlMode;
+
+            if (metaPanel.ContentBackground != null) metaPanel.ContentBackground.Color = Color.Transparent;
+
+            rawXmlTickBox.OnSelected = (tick) =>
+            {
+                controller.RawXmlMode = tick.Selected;
+                controller.MarkDirty();
+                metaPanel.Visible = !tick.Selected;
+                if (xmlContentText != null)
+                {
+                    xmlContentText.Visible = tick.Selected;
+                }
+                return true;
+            };
 
             UpdateSearch(controller.LastSearchQuery);
             UpdateNavigationButtons();
@@ -545,6 +577,18 @@ namespace SOS
                 controller.RightPanelWidth = rightPanel.Rect.Width;
                 controller.MarkDirty();
             }
+
+            if (centerPanelContainer != null && recipeAreaFrame != null && detailsHeader != null)
+            {
+                int headerHeight = 95;
+
+                detailsHeader.RectTransform.AbsoluteOffset = Point.Zero;
+                detailsHeader.RectTransform.NonScaledSize = new Point(centerWidth, headerHeight);
+
+                int recipeHeight = Math.Max(0, centerPanelContainer.Rect.Height - headerHeight);
+                recipeAreaFrame.RectTransform.AbsoluteOffset = new Point(0, headerHeight);
+                recipeAreaFrame.RectTransform.NonScaledSize = new Point(centerWidth, recipeHeight);
+            }
         }
 
         private static DisplayMode GetModeForWidth(int width, int hiddenThreshold, int compactThreshold)
@@ -659,6 +703,40 @@ onSecondary
             foreach (var section in analysis.Sections)
             {
                 section.Draw(builder);
+            }
+
+            if (xmlContentText != null && targetItem.ConfigElement != null)
+            {
+                try
+                {
+                    string rawXml = targetItem.ConfigElement.ToString() ?? "<!-- Empty XML -->";
+
+                    if (rawXml == "Barotrauma.ContentXElement")
+                    {
+                        var prop = targetItem.ConfigElement.GetType().GetProperty("Element")
+                                ?? targetItem.ConfigElement.GetType().GetProperty("XElement");
+                        var field = targetItem.ConfigElement.GetType().GetField("Element")
+                                ?? targetItem.ConfigElement.GetType().GetField("XElement");
+
+                        object? inner = prop?.GetValue(targetItem.ConfigElement)
+                                        ?? field?.GetValue(targetItem.ConfigElement);
+
+                        if (inner != null)
+                        {
+                            rawXml = inner.ToString() ?? rawXml;
+                        }
+                    }
+
+                    xmlContentText.Text = XMLHighlighter.Format(rawXml);
+                }
+                catch
+                {
+                    xmlContentText.Text = XMLHighlighter.Format("<!-- Error parsing XML data -->");
+                }
+            }
+            else if (xmlContentText != null)
+            {
+                xmlContentText.Text = XMLHighlighter.Format("<!-- No XML data found for this item -->");
             }
         }
 
