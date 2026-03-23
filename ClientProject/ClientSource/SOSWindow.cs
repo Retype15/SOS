@@ -361,7 +361,8 @@ namespace SOS
                 p.Name.Value.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                 p.Identifier.Value.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                 p.Tags.Any(t => t.Value.Contains(query, StringComparison.OrdinalIgnoreCase)) ||
-                GetItemSlotsCached(p).Contains(lowerQuery)
+                GetItemSlotsCached(p).Contains(lowerQuery) ||
+                (p.ContentPackage != null && p.ContentPackage.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
             )
             .OrderByDescending(p => controller.FavoritedItems.Contains(p.Identifier.Value))
             .ThenBy(p => p.Name.Value)];
