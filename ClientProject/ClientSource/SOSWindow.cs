@@ -225,7 +225,7 @@ namespace SOS
                 Color = Color.Black * 0.4f
             };
             rightPanel.RectTransform.MinSize = new Point(20, 50);
-            rightPanel.RectTransform.MaxSize = new Point(600, 2000);
+            rightPanel.RectTransform.MaxSize = new Point(1000, 2000);
 
             if (controller.RightPanelWidth.HasValue)
             {
