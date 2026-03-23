@@ -180,6 +180,7 @@ namespace SOS
             builder.AddRow(TextSOS.Get("sos.item.id", "ID:").Value, item.Identifier.Value, Color.LightGray);
             if (!item.Aliases.IsEmpty) builder.AddRow(TextSOS.Get("sos.item.aliases", "Aliases:").Value, string.Join(", ", item.Aliases), Color.DarkGray);
             builder.AddRow(TextSOS.Get("sos.item.category", "Category:").Value, item.Category.ToString(), Color.White);
+            if (item.ContentPackage != null && item.ContentPackage.Name != "Vanilla") builder.AddBadgeRow("Mod:", [item.ContentPackage.Name]);
             if (!string.IsNullOrEmpty(cargoBox)) builder.AddRow(TextSOS.Get("sos.item.cargo_box", "Cargo Box:").Value, TextManager.Get("EntityName." + cargoBox).Fallback(cargoBox).Value, Color.BurlyWood);
             builder.AddRow(TextSOS.Get("sos.item.max_stack", "Max Stack:").Value, item.MaxStackSize.ToString(), Color.White);
             if (hazards.Count > 0) builder.AddRow(TextSOS.Get("sos.item.hazards", "Hazards:").Value, string.Join(", ", hazards), Color.Salmon);
