@@ -195,7 +195,7 @@ namespace SOS
             detailsHeader.RectTransform.MinSize = new Point(0, 95);
             detailsHeader.RectTransform.MaxSize = new Point(int.MaxValue, 95);
 
-            var recipeAreaFrame = new GUIFrame(new RectTransform(new Vector2(1f, 0.84f), centerLayout.RectTransform), style: null);
+            recipeAreaFrame = new GUIFrame(new RectTransform(new Vector2(1f, 0.84f), centerLayout.RectTransform), style: null);
             var recipeSplit = new GUILayoutGroup(new RectTransform(Vector2.One, recipeAreaFrame.RectTransform), isHorizontal: true)
             {
                 Stretch = true,
@@ -237,7 +237,7 @@ namespace SOS
 
             var rightHeaderArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.045f), rightLayout.RectTransform), style: null);
             rightHeaderArea.RectTransform.MinSize = new Point(0, 32);
-            rawXmlTickBox = new GUITickBox(new RectTransform(new Vector2(1f, 0.45f), rightHeaderArea.RectTransform, Anchor.CenterLeft), TextSOS.Get("sos.window.raw_xml", "RAW XML"), font: GUIStyle.SmallFont)
+            rawXmlTickBox = new GUITickBox(new RectTransform(new Vector2(1f, 0.45f), rightHeaderArea.RectTransform, Anchor.CenterLeft), TextSOS.Get("sos.window.raw_xml", "RAW XML"), font: GUIStyle.SmallFont, style: "SwitchHorizontal")
             {
                 Selected = controller.RawXmlMode
             };

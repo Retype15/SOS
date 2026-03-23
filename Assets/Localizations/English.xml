@@ -16,6 +16,7 @@
 		<sos.context.track_recipe>Add to HUD</sos.context.track_recipe>
 		<sos.context.recipe_options>Recipe Options</sos.context.recipe_options>
 		<sos.window.title>SOS - Recipe Browser</sos.window.title>
+		<sos.window.raw_xml>RAW XML</sos.window.raw_xml>
 		<sos.window.clear_hud>Clear HUD</sos.window.clear_hud>
 		<sos.window.search_placeholder>Search item...</sos.window.search_placeholder>
 		<sos.window.obtain>OBTAIN</sos.window.obtain>

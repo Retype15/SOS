@@ -16,6 +16,7 @@
 		<sos.context.track_recipe>Ajouter au HUD</sos.context.track_recipe>
 		<sos.context.recipe_options>Options de recette</sos.context.recipe_options>
 		<sos.window.title>SOS - Navigateur de Recettes</sos.window.title>
+		<sos.window.raw_xml>XML BRUT</sos.window.raw_xml>
 		<sos.window.clear_hud>Effacer le HUD</sos.window.clear_hud>
 		<sos.window.search_placeholder>Chercher un objet...</sos.window.search_placeholder>
 		<sos.window.obtain>OBTENTION</sos.window.obtain>
@@ -82,5 +83,6 @@
 		<sos.container.capacity>Capacité :</sos.container.capacity>
 		<sos.container.slots>[amount] Emplacements</sos.container.slots>
 		<sos.container.accepts>Accepte :</sos.container.accepts>
+		<sos.container.contained>Contenu Par :</sos.container.contained>
 	</Override>
 </infotexts>

@@ -16,6 +16,7 @@
 		<sos.context.track_recipe>添加到 HUD</sos.context.track_recipe>
 		<sos.context.recipe_options>配方选项</sos.context.recipe_options>
 		<sos.window.title>SOS - 配方浏览器</sos.window.title>
+		<sos.window.raw_xml>原始 XML</sos.window.raw_xml>
 		<sos.window.clear_hud>清除 HUD</sos.window.clear_hud>
 		<sos.window.search_placeholder>搜索物品...</sos.window.search_placeholder>
 		<sos.window.obtain>获取途径</sos.window.obtain>
@@ -82,5 +83,6 @@
 		<sos.container.capacity>容量：</sos.container.capacity>
 		<sos.container.slots>[amount] 个插槽</sos.container.slots>
 		<sos.container.accepts>可容纳：</sos.container.accepts>
+		<sos.container.contained>包含于:</sos.container.contained>
 	</Override>
 </infotexts>

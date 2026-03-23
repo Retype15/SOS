@@ -16,6 +16,7 @@
 		<sos.context.track_recipe>Добавить в HUD</sos.context.track_recipe>
 		<sos.context.recipe_options>Параметры рецепта</sos.context.recipe_options>
 		<sos.window.title>SOS - Просмотр рецептов</sos.window.title>
+		<sos.window.raw_xml>RAW XML</sos.window.raw_xml>
 		<sos.window.clear_hud>Очистить HUD</sos.window.clear_hud>
 		<sos.window.search_placeholder>Поиск предмета...</sos.window.search_placeholder>
 		<sos.window.obtain>ПОЛУЧЕНИЕ</sos.window.obtain>
@@ -82,5 +83,6 @@
 		<sos.container.capacity>Вместимость:</sos.container.capacity>
 		<sos.container.slots>Слотов: [amount]</sos.container.slots>
 		<sos.container.accepts>Принимает:</sos.container.accepts>
+		<sos.container.contained>Содержится в:</sos.container.contained>
 	</Override>
 </infotexts>
