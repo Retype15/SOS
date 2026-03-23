@@ -17,7 +17,7 @@ namespace SOS
     {
         private const int RowHeight = 22;
         private const int HeaderHeight = 20;
-        private const int CardPadding = 10;
+        private const int CardPadding = 2;
 
         private static readonly Dictionary<Identifier, string> machineNameCache = [];
 
@@ -76,338 +76,247 @@ namespace SOS
             foreach (var item in items) drawCard(list, item, mode);
         }
 
-        public static void DrawCraftCard(GUIListBox col, FabricationRecipe recipe, ItemPrefab targetItem, SOSController controller, Action<ItemPrefab> onPrimary, Action<ItemPrefab> onSecondary, DisplayMode mode = DisplayMode.Normal)
+        public class UIMachineGroup
         {
-            int extraRows = recipe.RequiredSkills.Length + (recipe.RequiresRecipe ? 1 : 0);
-            int calculatedHeight = HeaderHeight + ((recipe.RequiredItems.Length + extraRows) * RowHeight) + CardPadding;
+            public string MachineName = "";
+            public List<IRecipeCard> Cards = [];
+            public bool IsVendingMachine = false;
+            public string PriceString = "";
 
-            bool isTracked = controller.Tracker.TrackedRecipe == recipe;
+            public void AddCard(IRecipeCard card) => Cards.Add(card);
 
-            var card = new GUIButton(new RectTransform(new Vector2(1f, 0f), col.Content.RectTransform) { MinSize = new Point(0, calculatedHeight) }, style: "InnerFrame")
+            public void Draw(GUIListBox list)
             {
-                Color = Color.Black * 0.4f,
-                OutlineColor = isTracked ? Color.Gold : Color.Transparent,
-                OnClicked = (_, _) => { controller.OnRecipeSelected(targetItem, recipe); return true; },
-                OnSecondaryClicked = (_, _) => { controller.OpenRecipeContextMenu(targetItem, recipe); return true; }
-            };
-
-            var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center))
-            {
-                AbsoluteSpacing = 2,
-                IsHorizontal = false,
-                CanBeFocused = false
-            };
-
-            string machine;
-            if (recipe.SuitableFabricatorIdentifiers.Length > 0)
-            {
-                machine = string.Join(", ", recipe.SuitableFabricatorIdentifiers.Select(id => ResolveMachineName(id)));
+                new MachineHeaderCard(MachineName, IsVendingMachine, PriceString).Draw(list);
+                foreach (var card in Cards) card.Draw(list);
             }
-            else
+        }
+
+        public interface IRecipeCard
+        {
+            void Draw(GUIListBox list);
+        }
+
+        public class MachineHeaderCard : IRecipeCard
+        {
+            public string Title;
+            public bool IsVendingMachine;
+            public string Price;
+
+            public MachineHeaderCard(string title, bool isVending = false, string price = "")
             {
-                machine = TextSOS.Get("sos.recipe.hand", "Hand").Value;
-            }
-
-            string headerText = $"{machine}:".ToUpper();
-
-            var header = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, HeaderHeight) }, isHorizontal: true) { CanBeFocused = false };
-            _ = new GUITextBlock(new RectTransform(new Vector2(0.7f, 1f), header.RectTransform), headerText, font: GUIStyle.SmallFont, textColor: isTracked ? Color.Gold : Color.Yellow) { CanBeFocused = false };
-            _ = new GUITextBlock(new RectTransform(new Vector2(0.3f, 1f), header.RectTransform), $"{recipe.RequiredTime}s", font: GUIStyle.SmallFont, textAlignment: Alignment.Right) { CanBeFocused = false };
-
-            if (recipe.RequiresRecipe)
-            {
-                bool hasUnlocked = Character.Controlled != null && Character.Controlled.HasRecipeForItem(targetItem.Identifier);
-
-                Color recipeColor = hasUnlocked ? Color.LightGreen : Color.Salmon;
-                string recipeText = hasUnlocked ? TextSOS.Get("sos.recipe.unlocked", "Recipe Unlocked").Value : TextSOS.Get("sos.recipe.locked", "Requires Recipe to Unlock").Value;
-
-                _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, RowHeight) }, recipeText, font: GUIStyle.SmallFont, textColor: recipeColor) { CanBeFocused = false };
+                Title = title; IsVendingMachine = isVending; Price = price;
             }
 
-            foreach (var skill in recipe.RequiredSkills)
+            public void Draw(GUIListBox list)
             {
-                int playerLevel = 0;
-                if (Character.Controlled != null)
-                {
-                    playerLevel = (int)Character.Controlled.GetSkillLevel(skill.Identifier);
-                }
+                var frame = new GUIFrame(new RectTransform(new Vector2(1f, 0f), list.Content.RectTransform) { MinSize = new Point(0, HeaderHeight) }, style: null);
+                string text = IsVendingMachine
+                    ? TextSOS.Get("sos.recipe.buyable", "Buyable at [Title] a [Price] mk").Replace("[Title]", Title).Replace("[Price]", Price).Value
+                    : Title.ToUpper() + ":";
+                _ = new GUITextBlock(new RectTransform(Vector2.One, frame.RectTransform), text, font: GUIStyle.SmallFont, textColor: Color.Yellow, textAlignment: Alignment.CenterLeft);
+            }
+        }
 
-                Color skillColor;
+        public class CraftRecipeCard : IRecipeCard
+        {
+            public FabricationRecipe Recipe;
+            public ItemPrefab TargetItem;
+            public SOSController Controller;
+            public Action<ItemPrefab> OnPrimary;
+            public Action<ItemPrefab> OnSecondary;
 
-                if (playerLevel >= skill.Level)
-                {
-                    skillColor = Color.LightGreen;
-                }
-                else if (playerLevel >= skill.Level - 10)
-                {
-                    skillColor = Color.Yellow;
-                }
-                else
-                {
-                    skillColor = Color.Salmon;
-                }
-
-                string localizedSkillName = TextManager.Get("SkillName." + skill.Identifier).Fallback(skill.Identifier.Value).Value;
-
-                _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, RowHeight) },
-                    $"{localizedSkillName}: {playerLevel}/{skill.Level}",
-                    font: GUIStyle.SmallFont, textColor: skillColor)
-                { CanBeFocused = false };
+            public CraftRecipeCard(FabricationRecipe recipe, ItemPrefab target, SOSController controller, Action<ItemPrefab> onP, Action<ItemPrefab> onS)
+            {
+                Recipe = recipe; TargetItem = target; Controller = controller; OnPrimary = onP; OnSecondary = onS;
             }
 
-            if (mode == DisplayMode.Compact)
+            public void Draw(GUIListBox list)
             {
-                int slotSize = 34;
-                int itemsInRow = 0;
-                int availableWidth = (int)layout.Rect.Width;
-                int maxItemsPerRow = Math.Max(1, availableWidth / slotSize);
+                bool isTracked = Controller.Tracker.TrackedRecipe == Recipe;
+                bool showName = !Recipe.RequiresRecipe && Recipe.RequiredSkills.Length == 0;
+                int rows = (showName ? 1 : 0) + (Recipe.RequiresRecipe ? 1 : 0) + Recipe.RequiredSkills.Length + Recipe.RequiredItems.Length;
+                int height = (rows * RowHeight) + (rows * 2) + CardPadding;
 
-                GUIComponent currentRow = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, slotSize) }, isHorizontal: true) { AbsoluteSpacing = 2 };
-
-                foreach (var req in recipe.RequiredItems)
+                var card = new GUIButton(new RectTransform(new Vector2(1f, 0f), list.Content.RectTransform) { MinSize = new Point(0, height) }, style: "InnerFrame")
                 {
-                    if (itemsInRow >= maxItemsPerRow)
+                    Color = Color.Black * 0.4f,
+                    OutlineColor = isTracked ? Color.Gold : Color.Transparent,
+                    OnClicked = (_, _) => { OnPrimary?.Invoke(TargetItem); return true; },
+                    OnSecondaryClicked = (_, _) => { Controller.OpenRecipeContextMenu(TargetItem, Recipe); return true; }
+                };
+
+                var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2, CanBeFocused = false };
+
+                bool timeDrawn = false;
+                void DrawRowWithTime(string text, Color color)
+                {
+                    var row = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, RowHeight) }, isHorizontal: true) { CanBeFocused = false };
+                    _ = new GUITextBlock(new RectTransform(new Vector2(0.7f, 1f), row.RectTransform), text, font: GUIStyle.SmallFont, textColor: color) { CanBeFocused = false };
+                    if (!timeDrawn)
                     {
-                        currentRow = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, slotSize) }, isHorizontal: true) { AbsoluteSpacing = 2 };
-                        itemsInRow = 0;
+                        _ = new GUITextBlock(new RectTransform(new Vector2(0.3f, 1f), row.RectTransform), $"{Recipe.RequiredTime}s", font: GUIStyle.SmallFont, textAlignment: Alignment.Right, textColor: Color.Gray)
+                        {
+                            CanBeFocused = false,
+                            Padding = new Vector4(0, 0, 25, 0)
+                        };
+                        timeDrawn = true;
                     }
-                    DrawMinimalItemRow(currentRow, req.FirstMatchingPrefab, req.Amount, onPrimary, onSecondary);
-                    itemsInRow++;
                 }
-                return;
-            }
-            else
-            {
-                foreach (var req in recipe.RequiredItems)
+
+                if (Recipe.RequiresRecipe)
                 {
-                    DrawCompactItemRow(layout, req.FirstMatchingPrefab, req.Amount, true, "", null, onPrimary, onSecondary);
+                    bool hasUnlocked = Character.Controlled != null && Character.Controlled.HasRecipeForItem(TargetItem.Identifier);
+                    string txt = hasUnlocked ? TextSOS.Get("sos.recipe.unlocked", "Recipe Unlocked").Value : TextSOS.Get("sos.recipe.locked", "Requires Recipe to Unlock").Value;
+                    DrawRowWithTime(txt, hasUnlocked ? Color.LightGreen : Color.Salmon);
+                }
+
+                foreach (var skill in Recipe.RequiredSkills)
+                {
+                    int lvl = Character.Controlled != null ? (int)Character.Controlled.GetSkillLevel(skill.Identifier) : 0;
+                    Color c = lvl >= skill.Level ? Color.LightGreen : (lvl >= skill.Level - 10 ? Color.Yellow : Color.Salmon);
+                    string txt = $"{TextManager.Get("SkillName." + skill.Identifier).Fallback(skill.Identifier.Value).Value}: {lvl}/{skill.Level}";
+                    DrawRowWithTime(txt, c);
+                }
+
+                if (showName)
+                {
+                    DrawRowWithTime(TargetItem.Name.Value, isTracked ? Color.Gold : Color.LightGray);
+                }
+
+                foreach (var req in Recipe.RequiredItems) DrawCompactItemRow(layout, req.FirstMatchingPrefab, req.Amount, true, "", null, OnPrimary, OnSecondary);
+            }
+        }
+
+        public class SourceRecipeCard : IRecipeCard
+        {
+            public GroupedSource Source;
+            public Action<ItemPrefab> OnPrimary;
+            public Action<ItemPrefab> OnSecondary;
+
+            public SourceRecipeCard(GroupedSource source, Action<ItemPrefab> onP, Action<ItemPrefab> onS) { Source = source; OnPrimary = onP; OnSecondary = onS; }
+
+            public void Draw(GUIListBox list)
+            {
+                int rows = 1 + (Source.RequiredOtherItems?.Count ?? 0);
+                int height = (rows * RowHeight) + (rows * 2) + CardPadding;
+
+                var card = new GUIButton(new RectTransform(new Vector2(1f, 0f), list.Content.RectTransform) { MinSize = new Point(0, height) }, style: "InnerFrame")
+                {
+                    Color = Color.Black * 0.4f,
+                    OnClicked = (_, _) => { if (Source.SourceItem != null) OnPrimary?.Invoke(Source.SourceItem); return true; },
+                    OnSecondaryClicked = (_, _) => { if (Source.SourceItem != null) OnSecondary?.Invoke(Source.SourceItem); return true; }
+                };
+
+                var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2, CanBeFocused = false };
+
+                string timeText = Source.SourceItem != null ? $" ({Source.SourceItem.DeconstructTime}s)" : "";
+                DrawCompactItemRow(layout, Source.SourceItem, Source.Amount, true, timeText, Color.LightGreen, null, null);
+
+                foreach (var otherId in Source.RequiredOtherItems ?? [])
+                {
+                    var other = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == otherId);
+                    if (other != null) DrawCompactItemRow(layout, other, 1, true, " + ", Color.Cyan, null, null);
                 }
             }
         }
 
-        public static void DrawDeconCard(GUIListBox col, ItemPrefab item, List<DeconstructItem> deconList, Action<ItemPrefab> onPrimary, Action<ItemPrefab> onSecondary, DisplayMode mode = DisplayMode.Normal)
+        public class DeconOutputCard : IRecipeCard
         {
-            var groupsByMachine = deconList
-                .GroupBy(di => string.Join(",", di.RequiredDeconstructor.Select(id => id.Value).OrderBy(s => s)))
-                .ToList();
+            public ItemPrefab Item;
+            public List<DeconstructItem> Outputs;
+            public Action<ItemPrefab> OnPrimary;
+            public Action<ItemPrefab> OnSecondary;
 
-            foreach (var machineGroup in groupsByMachine)
+            public DeconOutputCard(ItemPrefab item, List<DeconstructItem> outputs, Action<ItemPrefab> onP, Action<ItemPrefab> onS) { Item = item; Outputs = outputs; OnPrimary = onP; OnSecondary = onS; }
+
+            public void Draw(GUIListBox list)
             {
-                float poolTotalWeight = machineGroup.Sum(di => di.Commonness);
+                var groupedOutputs = Outputs.GroupBy(di => di.ItemIdentifier).Select(g => new { ID = g.Key, Max = g.Max(di => di.Amount), Weight = g.Sum(di => di.Commonness) }).ToList();
+                bool isRandom = Item.RandomDeconstructionOutput;
+                int rows = (isRandom ? 1 : 0) + groupedOutputs.Count;
+                int height = (rows * RowHeight) + (rows * 2) + CardPadding;
 
-                var groupedOutputs = machineGroup
-                    .GroupBy(di => new
-                    {
-                        di.ItemIdentifier,
-                        OtherKey = string.Join(",", di.RequiredOtherItem.Select(id => id.Value).OrderBy(x => x))
-                    })
-                    .Select(g => new
-                    {
-                        g.Key.ItemIdentifier,
-                        MaxAmount = g.Max(di => di.Amount),
-                        Machines = g.First().RequiredDeconstructor,
-                        RequiredOtherItems = g.First().RequiredOtherItem,
-                        ItemTotalWeight = g.Sum(di => di.Commonness)
-                    })
-                    .ToList();
+                var card = new GUIFrame(new RectTransform(new Vector2(1f, 0f), list.Content.RectTransform) { MinSize = new Point(0, height) }, "InnerFrame") { Color = Color.Black * 0.4f };
+                var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2, CanBeFocused = false };
 
-                int totalRows = groupedOutputs.Count;
-                totalRows += groupedOutputs.Sum(go => go.RequiredOtherItems.Length);
-                if (item.RandomDeconstructionOutput) totalRows++;
-
-                int spacing = 2;
-                int calculatedHeight = HeaderHeight + (totalRows * RowHeight) + (totalRows * spacing) + CardPadding + 6;
-
-                var card = new GUIFrame(new RectTransform(new Vector2(1f, 0f), col.Content.RectTransform) { MinSize = new Point(0, calculatedHeight) }, "InnerFrame")
+                if (isRandom)
                 {
-                    Color = Color.Black * 0.4f,
-                };
-
-                var machineIds = groupedOutputs[0].Machines;
-                string machineName = (machineIds == null || machineIds.Length == 0)
-                    ? ResolveMachineName("deconstructor".ToIdentifier())
-                    : string.Join(", ", machineIds.Select(id => ResolveMachineName(id)));
-
-                var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center))
-                {
-                    AbsoluteSpacing = spacing,
-                    CanBeFocused = false
-                };
-
-                var header = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, HeaderHeight) }, isHorizontal: true) { CanBeFocused = false };
-                _ = new GUITextBlock(new RectTransform(new Vector2(0.7f, 1f), header.RectTransform), $"{machineName}:".ToUpper(), font: GUIStyle.SmallFont, textColor: Color.Yellow) { CanBeFocused = false };
-                _ = new GUITextBlock(new RectTransform(new Vector2(0.3f, 1f), header.RectTransform), $"{item.DeconstructTime}s", font: GUIStyle.SmallFont, textAlignment: Alignment.Right) { CanBeFocused = false };
-
-                if (item.RandomDeconstructionOutput)
-                {
-                    string randomText = TextSOS.Get("sos.recipe.random_outputs", "Gives [amount] at random:")
-                                        .Replace("[amount]", item.RandomDeconstructionOutputAmount.ToString()).Value;
                     _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, RowHeight) },
-                        randomText, font: GUIStyle.SmallFont, textColor: Color.Orange)
+                        TextSOS.Get("sos.recipe.random_outputs", "Gives [amount] at random:").Replace("[amount]", Item.RandomDeconstructionOutputAmount.ToString()).Value,
+                        font: GUIStyle.SmallFont, textColor: Color.Orange)
                     { CanBeFocused = false };
                 }
 
-                if (mode == DisplayMode.Compact)
+                float totalWeight = Outputs.Sum(di => di.Commonness);
+                foreach (var outpt in groupedOutputs)
                 {
-                    int slotSize = 34;
-                    int itemsInRow = 0;
-                    int availableWidth = (int)layout.Rect.Width;
-                    int maxItemsPerRow = Math.Max(1, availableWidth / slotSize);
+                    string extras = "";
+                    Color c = Color.White;
+                    if (Item.RandomDeconstructionOutput && totalWeight > 0) { extras = $" ({((outpt.Weight / totalWeight) * 100f):0.#}%)"; c = Color.Orange; }
+                    else if (!Item.RandomDeconstructionOutput && outpt.Weight < 1f) { extras = $" ({outpt.Weight * 100:0.#}%)"; c = Color.Orange; }
 
-                    GUIComponent currentRow = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, slotSize) }, isHorizontal: true) { AbsoluteSpacing = 2 };
-
-                    foreach (var output in groupedOutputs)
-                    {
-                        if (itemsInRow >= maxItemsPerRow)
-                        {
-                            currentRow = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, slotSize) }, isHorizontal: true) { AbsoluteSpacing = 2 };
-                            itemsInRow = 0;
-                        }
-
-                        Color itemColor = Color.White;
-                        if (item.RandomDeconstructionOutput)
-                        {
-                            if (poolTotalWeight > 0) itemColor = Color.Orange;
-                        }
-                        else
-                        {
-                            if (output.ItemTotalWeight < 1f) itemColor = Color.Orange;
-                        }
-
-                        var prefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == output.ItemIdentifier);
-                        DrawMinimalItemRow(currentRow, prefab, output.MaxAmount, onPrimary, onSecondary, itemColor);
-                        itemsInRow++;
-                    }
-                }
-                else
-                {
-                    foreach (var output in groupedOutputs)
-                    {
-                        string extras = "";
-                        Color itemColor = Color.White;
-
-                        if (item.RandomDeconstructionOutput)
-                        {
-                            if (poolTotalWeight > 0)
-                            {
-                                float chance = (output.ItemTotalWeight / poolTotalWeight) * 100f;
-                                extras = $" ({chance:0.#}%)";
-                                itemColor = Color.Orange;
-                            }
-                        }
-                        else
-                        {
-                            float chance = Math.Min(output.ItemTotalWeight, 1f);
-                            if (chance < 1f)
-                            {
-                                extras = $" ({chance * 100:0.#}%)";
-                                itemColor = Color.Orange;
-                            }
-                        }
-
-                        var prefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == output.ItemIdentifier);
-                        DrawCompactItemRow(layout, prefab, output.MaxAmount, true, extras, itemColor, onPrimary, onSecondary);
-
-                        foreach (var extraId in output.RequiredOtherItems)
-                        {
-                            var extraPrefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == extraId);
-                            if (extraPrefab != null)
-                            {
-                                DrawCompactItemRow(layout, extraPrefab, 1, true, " + ", Color.Cyan, onPrimary, onSecondary);
-                            }
-                        }
-                    }
+                    var prefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == outpt.ID);
+                    DrawCompactItemRow(layout, prefab, outpt.Max, true, extras, c, OnPrimary, OnSecondary);
                 }
             }
         }
 
-        public static void DrawUseCard(GUIListBox col, GroupedUsage usage, Action<ItemPrefab> onPrimary, Action<ItemPrefab> onSecondary, DisplayMode mode = DisplayMode.Normal)
+        public class SingleDeconOutputCard : IRecipeCard
         {
-            int calculatedHeight = HeaderHeight + RowHeight + CardPadding;
-            var card = new GUIFrame(new RectTransform(new Vector2(1f, 0f), col.Content.RectTransform) { MinSize = new Point(0, calculatedHeight) }, "InnerFrame")
-            {
-                Color = Color.Black * 0.4f,
-            };
-            var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2 };
+            public ItemPrefab SourceItem;
+            public Identifier OutputID;
+            public int Amount;
+            public float Weight;
+            public Action<ItemPrefab> OnPrimary;
+            public Action<ItemPrefab> OnSecondary;
 
-            string machine;
-            if (usage.MachineIds != null && usage.MachineIds.Count > 0)
+            public SingleDeconOutputCard(ItemPrefab source, Identifier outputID, int amount, float weight, Action<ItemPrefab> onP, Action<ItemPrefab> onS)
             {
-                machine = string.Join(", ", usage.MachineIds.Select(id => ResolveMachineName(id)));
-            }
-            else
-            {
-                machine = TextSOS.Get("sos.recipe.hand", "Hand").Value;
+                SourceItem = source; OutputID = outputID; Amount = amount; Weight = weight; OnPrimary = onP; OnSecondary = onS;
             }
 
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, HeaderHeight) },
-                $"{machine}:".ToUpper(), font: GUIStyle.SmallFont, textColor: Color.Yellow);
-
-            string requirementInfo = usage.AmountRequired > 1 ? $" (pide x{usage.AmountRequired})" : "";
-
-            if (mode == DisplayMode.Compact)
+            public void Draw(GUIListBox list)
             {
-                int slotSize = 34;
-                GUIComponent currentRow = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, slotSize) }, isHorizontal: true) { AbsoluteSpacing = 2 };
-                DrawMinimalItemRow(currentRow, usage.TargetItem, usage.AmountCreated, onPrimary, onSecondary);
-            }
-            else
-            {
-                DrawCompactItemRow(layout, usage.TargetItem, usage.AmountCreated, true, requirementInfo, null, onPrimary, onSecondary);
+                var card = new GUIButton(new RectTransform(new Vector2(1f, 0f), list.Content.RectTransform) { MinSize = new Point(0, RowHeight + CardPadding) }, style: "InnerFrame")
+                {
+                    Color = Color.Black * 0.4f,
+                    OnClicked = (_, _) => { var p = ItemPrefab.Prefabs.FirstOrDefault(pref => pref.Identifier == OutputID); if (p != null) OnPrimary?.Invoke(p); return true; },
+                    OnSecondaryClicked = (_, _) => { var p = ItemPrefab.Prefabs.FirstOrDefault(pref => pref.Identifier == OutputID); if (p != null) OnSecondary?.Invoke(p); return true; }
+                };
+
+                var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2, CanBeFocused = false };
+                string chance = Weight < 1f ? $" ({Weight * 100:0.#}%)" : "";
+                var prefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == OutputID);
+                DrawCompactItemRow(layout, prefab, Amount, true, chance, Weight < 1f ? Color.Orange : Color.White, null, null);
             }
         }
 
-        public static void DrawSourceCard(GUIListBox col, GroupedSource group, Action<ItemPrefab> onPrimary, Action<ItemPrefab> onSecondary, DisplayMode mode = DisplayMode.Normal)
+        public class UsageRecipeCard : IRecipeCard
         {
-            int extraRows = group.RequiredOtherItems?.Count ?? 0;
-            int calculatedHeight = HeaderHeight + RowHeight + (extraRows * RowHeight) + CardPadding;
-            var card = new GUIFrame(new RectTransform(new Vector2(1f, 0f), col.Content.RectTransform) { MinSize = new Point(0, calculatedHeight) }, "InnerFrame")
+            public GroupedUsage Usage;
+            public Action<ItemPrefab> OnPrimary;
+            public Action<ItemPrefab> OnSecondary;
+
+            public UsageRecipeCard(GroupedUsage usage, Action<ItemPrefab> onP, Action<ItemPrefab> onS) { Usage = usage; OnPrimary = onP; OnSecondary = onS; }
+
+            public void Draw(GUIListBox list)
             {
-                Color = Color.Black * 0.4f,
-            };
-            var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2 };
+                int rows = 1;
+                int height = (rows * RowHeight) + (rows * 2) + CardPadding;
 
-            string machineName = (group.MachineIds == null || group.MachineIds.Length == 0)
-                ? ResolveMachineName("deconstructor".ToIdentifier())
-                : string.Join(", ", group.MachineIds.Select(id => ResolveMachineName(id)));
-
-            string headerText = (machineName + ':').ToUpper();
-
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, HeaderHeight) },
-                headerText, font: GUIStyle.SmallFont, textColor: Color.LightGreen);
-
-            if (mode == DisplayMode.Compact)
-            {
-                int slotSize = 34;
-                GUIComponent currentRow = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, slotSize) }, isHorizontal: true) { AbsoluteSpacing = 2 };
-
-                DrawMinimalItemRow(currentRow, group.SourceItem, 1, onPrimary, onSecondary);
-                foreach (var otherId in group.RequiredOtherItems ?? [])
+                var card = new GUIButton(new RectTransform(new Vector2(1f, 0f), list.Content.RectTransform) { MinSize = new Point(0, height) }, style: "InnerFrame")
                 {
-                    var otherPrefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == otherId);
-                    if (otherPrefab != null) DrawMinimalItemRow(currentRow, otherPrefab, 1, onPrimary, onSecondary, Color.Cyan);
-                }
-            }
-            else
-            {
-                DrawCompactItemRow(layout, group.SourceItem, 1, true, "", null, onPrimary, onSecondary);
+                    Color = Color.Black * 0.4f,
+                    OnClicked = (_, _) => { if (Usage.TargetItem != null) OnPrimary?.Invoke(Usage.TargetItem); return true; },
+                    OnSecondaryClicked = (_, _) => { if (Usage.TargetItem != null) OnSecondary?.Invoke(Usage.TargetItem); return true; }
+                };
 
-                foreach (var otherId in group.RequiredOtherItems ?? [])
-                {
-                    var otherPrefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == otherId);
-                    if (otherPrefab != null)
-                    {
-                        string prefix = " + ";
-                        DrawCompactItemRow(layout, otherPrefab, 1, true, prefix, Color.Cyan, onPrimary, onSecondary);
-                    }
-                }
+                var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { CanBeFocused = false };
+
+                string req = Usage.AmountRequired > 1 ? $" ({TextSOS.Get("sos.recipe.requires", "Requires")} x{Usage.AmountRequired})" : "";
+                DrawCompactItemRow(layout, Usage.TargetItem, Usage.AmountCreated, true, req, null, null, null);
             }
-            // TODO: That's no convince me, maybe change disposition?
-            /*if (group.IsRandom && group.TotalCommonness > 0)
-            {
-                _ = new GUITextBlock(new RectTransform(new Point(layout.Rect.Width, RowHeight / 2), layout.RectTransform),
-                    TextSOS.Get("sos.recipe.chance", "Chance based output").Value, font: GUIStyle.SmallFont, textColor: Color.Gray * 0.8f, textAlignment: Alignment.Right);
-            }*/
         }
 
         public static void DrawMinimalItemRow(GUIComponent parent, ItemPrefab? prefab, float amount, Action<ItemPrefab>? onPrimaryClick = null, Action<ItemPrefab>? onSecondaryClick = null, Color? badgeColor = null)
@@ -500,16 +409,13 @@ namespace SOS
 
             var (nameStr, aColor) = SafeItemName.Get(prefab, color ?? Color.White);
 
-            string amtStr = (amount > 1) ? $" x{amount}" : "";
-            _ = new GUITextBlock(
-                new RectTransform(new Vector2(0.8f, 1f), contentLayout.RectTransform),
-                $"{nameStr}{amtStr}{extraText}",
-                font: GUIStyle.SmallFont,
-                textColor: aColor,
-                textAlignment: Alignment.CenterLeft
-            )
+            var nameBlock = new GUITextBlock(new RectTransform(new Vector2(0.6f, 1f), contentLayout.RectTransform), nameStr, font: GUIStyle.SmallFont, textColor: aColor, textAlignment: Alignment.CenterLeft) { CanBeFocused = false };
+
+            string amtStr = (amount > 1 || amount < 1) ? $" x{amount}" : "";
+            var rightBlock = new GUITextBlock(new RectTransform(new Vector2(0.4f, 1f), contentLayout.RectTransform), $"{extraText}{amtStr}", font: GUIStyle.SmallFont, textColor: color ?? Color.Gray, textAlignment: Alignment.CenterRight)
             {
-                CanBeFocused = false
+                CanBeFocused = false,
+                Padding = new Vector4(0, 0, 25, 0)
             };
         }
 

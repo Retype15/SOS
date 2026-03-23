@@ -84,5 +84,16 @@
 		<sos.container.slots>[amount] 个插槽</sos.container.slots>
 		<sos.container.accepts>可容纳：</sos.container.accepts>
 		<sos.container.contained>包含于:</sos.container.contained>
+		<sos.config.migrating>[SOS] 正在从旧路径迁移设置...</sos.config.migrating>
+		<sos.gen.close>关闭 [Esc]</sos.gen.close>
+		<sos.recipe.buyable>可在 [Title] 以 [Price] mk 购买</sos.recipe.buyable>
+		<sos.recipe.requires>需要</sos.recipe.requires>
+		<sos.shared.debugmode>[SOS] 调试模式已启用。</sos.shared.debugmode>
+		<sos.window.back>返回</sos.window.back>
+		<sos.window.clear_hud_tooltip>清除活跃的 HUD 追踪器</sos.window.clear_hud_tooltip>
+		<sos.window.forward>前进</sos.window.forward>
+		<sos.window.search_tooltip>按名称、ID 或标签搜索</sos.window.search_tooltip>
+		<sos.window.tag_tooltip>搜索带有标签的物品：[tag]</sos.window.tag_tooltip>
+		<sos.window.settings>设置 (WIP)</sos.window.settings>
 	</Override>
 </infotexts>

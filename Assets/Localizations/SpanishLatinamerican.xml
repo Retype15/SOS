@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<infotexts language="Castillian" nowhitespace="false" translatedname="Español">
+<infotexts language="Latinamerican Spanish" nowhitespace="false" translatedname="Español Latinoamericano">
 	<Override>
 		<sos.command.name>sos</sos.command.name>
 		<sos.command.help>Abre/Cierra SOS.</sos.command.help>

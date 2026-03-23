@@ -8,7 +8,8 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+
+using static SOS.CardBuilder;
 
 namespace SOS
 {
@@ -145,7 +146,10 @@ namespace SOS
                 ToolTip = TextSOS.Get("sos.window.clear_hud_tooltip", "Clears the active HUD tracker")
             };
 
-            contentArea = new GUIFrame(new RectTransform(new Vector2(0.98f, 0.0f), mainFrame.RectTransform, Anchor.BottomCenter), style: null);
+            contentArea = new GUIFrame(new RectTransform(new Vector2(0.98f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter)
+            {
+                AbsoluteOffset = new Point(0, HeaderHeight)
+            }, style: null);
 
             leftPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.20f, 1f), contentArea.RectTransform, Anchor.TopLeft), style: "InnerFrame")
             {
@@ -237,7 +241,7 @@ namespace SOS
 
             var rightHeaderArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.045f), rightLayout.RectTransform), style: null);
             rightHeaderArea.RectTransform.MinSize = new Point(0, 32);
-            rawXmlTickBox = new GUITickBox(new RectTransform(new Vector2(1f, 0.45f), rightHeaderArea.RectTransform, Anchor.CenterLeft), TextSOS.Get("sos.window.raw_xml", "RAW XML"), font: GUIStyle.SmallFont, style: "SwitchHorizontal")
+            rawXmlTickBox = new GUITickBox(new RectTransform(new Vector2(1f, 0.45f), rightHeaderArea.RectTransform, Anchor.CenterLeft), TextSOS.Get("sos.window.raw_xml", "RAW XML"), font: GUIStyle.SmallFont)
             {
                 Selected = controller.RawXmlMode
             };
@@ -424,8 +428,8 @@ namespace SOS
                         OnSecondaryClicked = (_, _) => { controller.OpenContextMenu(prefab); return true; }
                     };
 
-                    string prefix = isFav ? "* " : "";
-                    CardBuilder.DrawCompactItemRow(btn, prefab, 1, false, extraText: prefix, color: isFav ? Color.Gold : Color.White);
+                    //string prefix = isFav ? "* " : "";
+                    CardBuilder.DrawCompactItemRow(btn, prefab, 1, false, color: isFav ? Color.Gold : Color.White);
                 }
             }
 
@@ -493,15 +497,14 @@ namespace SOS
             if (leftW + rightW > totalAvailableForSides)
             {
                 float totalSides = (float)leftW + rightW + 0.001f;
-                float leftRatio = leftW / totalSides;
-                leftW = (int)(totalAvailableForSides * leftRatio);
+                leftW = (int)(totalAvailableForSides * (leftW / totalSides));
                 rightW = totalAvailableForSides - leftW;
             }
 
-            centerPanelContainer.RectTransform.AbsoluteOffset = new Point(leftW + spacing, 0);
-            int centerWidth = Math.Max(0, areaRect.Width - leftW - rightW - (spacing * 2));
+            int centerWidth = areaRect.Width - leftW - rightW - (spacing * 2);
 
             leftPanel.RectTransform.NonScaledSize = new Point(leftW, areaRect.Height);
+            centerPanelContainer.RectTransform.AbsoluteOffset = new Point(leftW + spacing, 0);
             centerPanelContainer.RectTransform.NonScaledSize = new Point(centerWidth, areaRect.Height);
             rightPanel.RectTransform.NonScaledSize = new Point(rightW, areaRect.Height);
 
@@ -577,18 +580,6 @@ namespace SOS
                 controller.RightPanelWidth = rightPanel.Rect.Width;
                 controller.MarkDirty();
             }
-
-            if (centerPanelContainer != null && recipeAreaFrame != null && detailsHeader != null)
-            {
-                int headerHeight = 95;
-
-                detailsHeader.RectTransform.AbsoluteOffset = Point.Zero;
-                detailsHeader.RectTransform.NonScaledSize = new Point(centerWidth, headerHeight);
-
-                int recipeHeight = Math.Max(0, centerPanelContainer.Rect.Height - headerHeight);
-                recipeAreaFrame.RectTransform.AbsoluteOffset = new Point(0, headerHeight);
-                recipeAreaFrame.RectTransform.NonScaledSize = new Point(centerWidth, recipeHeight);
-            }
         }
 
         private static DisplayMode GetModeForWidth(int width, int hiddenThreshold, int compactThreshold)
@@ -633,13 +624,34 @@ namespace SOS
                 textAlignment: Alignment.CenterLeft
             )
             {
-                Wrap = true,
+                Wrap = false,
                 AutoScaleHorizontal = true,
                 CanBeFocused = false
             };
 
             void onPrimary(ItemPrefab p) => controller.OnItemSelected(p);
             void onSecondary(ItemPrefab p) => controller.OpenContextMenu(p);
+
+            UIMachineGroup GetOrCreateMachineGroup(Dictionary<string, UIMachineGroup> dict, IEnumerable<Identifier> machineIds, string fallbackName)
+            {
+                string key = machineIds.Any()
+                    ? string.Join(", ", machineIds.Select(id => ResolveMachineName(id)).OrderBy(s => s))
+                    : fallbackName;
+
+                if (!dict.TryGetValue(key, out UIMachineGroup? value))
+                {
+                    var mg = new UIMachineGroup { MachineName = key };
+                    if (machineIds.Any(id => id == "vendingmachine"))
+                    {
+                        mg.IsVendingMachine = true;
+                        mg.PriceString = (targetItem.DefaultPrice?.Price ?? 0).ToString();
+                    }
+
+                    value = mg;
+                    dict[key] = value;
+                }
+                return value;
+            }
 
             var groupedSources = sources
                 .GroupBy(s => new
@@ -654,35 +666,79 @@ namespace SOS
                     MachineIds = group.First().Item2.RequiredDeconstructor,
                     RequiredOtherItems = [.. group.First().Item2.RequiredOtherItem],
                     TotalCommonness = group.Sum(g => g.Item2.Commonness),
+                    Amount = group.First().Item2.Amount,
                     IsRandom = group.First().Item1.RandomDeconstructionOutput
                 })
                 .ToList();
 
-            colObtain.Content.ClearChildren();
-            foreach (var r in craft) CardBuilder.DrawCraftCard(colObtain, r, targetItem, controller, onPrimary, onSecondary, centerPanelMode);
-            foreach (var src in groupedSources) CardBuilder.DrawSourceCard(colObtain, src, onPrimary, onSecondary, centerPanelMode);
-
-            var currentItemId = targetItem.Identifier;
             var groupedUses = uses
-                .GroupBy(u => new
-                {
-                    ResultId = u.Item1.Identifier,
-                    ReqAmount = u.Item2.RequiredItems.FirstOrDefault(ri =>
-                        ri.ItemPrefabs.Any(p => p.Identifier == currentItemId))?.Amount ?? 1
-                })
-                .Select(group => new GroupedUsage
-                {
-                    TargetItem = group.First().Item1,
-                    MachineIds = [.. group.SelectMany(g => g.Item2.SuitableFabricatorIdentifiers).Distinct()],
-                    AmountCreated = group.First().Item2.Amount,
-                    AmountRequired = group.Key.ReqAmount
-                })
-                .OrderBy(gu => gu.TargetItem?.Name.Value)
+                .GroupBy(u => string.Join(",", u.Item2.SuitableFabricatorIdentifiers.Select(id => id.Value).OrderBy(s => s)))
+                .SelectMany(mg => mg.GroupBy(u => u.Item1.Identifier)
+                    .Select(ig => new GroupedUsage
+                    {
+                        TargetItem = ig.First().Item1,
+                        MachineIds = [.. ig.First().Item2.SuitableFabricatorIdentifiers],
+                        AmountCreated = ig.First().Item2.Amount,
+                        AmountRequired = ig.First().Item2.RequiredItems.FirstOrDefault(ri =>
+                            ri.ItemPrefabs.Any(p => p.Identifier == targetItem.Identifier))?.Amount ?? 1
+                    }))
                 .ToList();
 
+
+            colObtain.Content.ClearChildren();
+            var obtainGroups = new Dictionary<string, UIMachineGroup>();
+
+            foreach (var r in craft)
+            {
+                var mg = GetOrCreateMachineGroup(obtainGroups, r.SuitableFabricatorIdentifiers, TextSOS.Get("sos.recipe.hand", "Hand").Value);
+                mg.AddCard(new CraftRecipeCard(r, targetItem, controller, onPrimary, onSecondary));
+            }
+
+            foreach (var src in groupedSources)
+            {
+                var mg = GetOrCreateMachineGroup(obtainGroups, src.MachineIds ?? [], ResolveMachineName("deconstructor".ToIdentifier()));
+                mg.AddCard(new SourceRecipeCard(src, onPrimary, onSecondary));
+            }
+
+            foreach (var group in obtainGroups.Values) group.Draw(colObtain);
+
+
             colUsage.Content.ClearChildren();
-            if (decon.Count > 0) CardBuilder.DrawDeconCard(colUsage, targetItem, decon, onPrimary, onSecondary, centerPanelMode);
-            foreach (var usage in groupedUses) CardBuilder.DrawUseCard(colUsage, usage, onPrimary, onSecondary, centerPanelMode);
+            var usageDict = new Dictionary<string, UIMachineGroup>();
+
+            if (decon.Count > 0)
+            {
+                var deconByMachine = decon.GroupBy(di => string.Join(",", di.RequiredDeconstructor.Select(id => id.Value).OrderBy(s => s)));
+                foreach (var machineDecons in deconByMachine)
+                {
+                    var machineIds = machineDecons.First().RequiredDeconstructor;
+                    var mg = GetOrCreateMachineGroup(usageDict, machineIds, ResolveMachineName("deconstructor".ToIdentifier()));
+
+                    var deconList = machineDecons.ToList();
+                    bool isRandom = targetItem.RandomDeconstructionOutput;
+
+                    if (isRandom)
+                    {
+                        mg.AddCard(new DeconOutputCard(targetItem, deconList, onPrimary, onSecondary));
+                    }
+                    else
+                    {
+                        var groupedOutputs = deconList.GroupBy(di => di.ItemIdentifier).Select(g => new { ID = g.Key, Amount = g.Max(di => di.Amount), Weight = g.Sum(di => di.Commonness) });
+                        foreach (var output in groupedOutputs)
+                        {
+                            mg.AddCard(new SingleDeconOutputCard(targetItem, output.ID, output.Amount, output.Weight, onPrimary, onSecondary));
+                        }
+                    }
+                }
+            }
+
+            foreach (var usage in groupedUses)
+            {
+                var mg = GetOrCreateMachineGroup(usageDict, usage.MachineIds ?? [], TextSOS.Get("sos.recipe.hand", "Hand").Value);
+                mg.AddCard(new UsageRecipeCard(usage, onPrimary, onSecondary));
+            }
+
+            foreach (var group in usageDict.Values) group.Draw(colUsage);
 
 
             void onBadgeClick(string tag) { if (searchBox != null) searchBox.Text = tag; UpdateSearch(tag); }
@@ -862,6 +918,7 @@ onSecondary
         public Identifier[]? MachineIds;
         public List<Identifier>? RequiredOtherItems;
         public float TotalCommonness;
+        public int Amount;
         public bool IsRandom;
     }
 
