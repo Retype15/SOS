@@ -84,5 +84,16 @@
 		<sos.container.slots>[amount] Slots</sos.container.slots>
 		<sos.container.accepts>Accepts:</sos.container.accepts>
 		<sos.container.contained>Contained_by:</sos.container.contained>
+		<sos.config.migrating>[SOS] Migrating settings from old path...</sos.config.migrating>
+		<sos.gen.close>Close [Esc]</sos.gen.close>
+		<sos.recipe.buyable>Buyable at [Title] for [Price] mk</sos.recipe.buyable>
+		<sos.recipe.requires>Requires</sos.recipe.requires>
+		<sos.shared.debugmode>[SOS] Debug Mode is enabled.</sos.shared.debugmode>
+		<sos.window.back>Back</sos.window.back>
+		<sos.window.clear_hud_tooltip>Clears the active HUD tracker</sos.window.clear_hud_tooltip>
+		<sos.window.forward>Forward</sos.window.forward>
+		<sos.window.search_tooltip>Search by name, ID or tags</sos.window.search_tooltip>
+		<sos.window.tag_tooltip>Search items with tag: [tag]</sos.window.tag_tooltip>
+		<sos.window.settings>Settings (WIP)</sos.window.settings>
 	</Override>
 </infotexts>

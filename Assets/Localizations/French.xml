@@ -84,5 +84,16 @@
 		<sos.container.slots>[amount] Emplacements</sos.container.slots>
 		<sos.container.accepts>Accepte :</sos.container.accepts>
 		<sos.container.contained>Contenu Par :</sos.container.contained>
+		<sos.config.migrating>[SOS] Migration des paramètres depuis l'ancien chemin...</sos.config.migrating>
+		<sos.gen.close>Fermer [Esc]</sos.gen.close>
+		<sos.recipe.buyable>Achetable à [Title] pour [Price] mk</sos.recipe.buyable>
+		<sos.recipe.requires>Requiert</sos.recipe.requires>
+		<sos.shared.debugmode>[SOS] Le mode débogage est activé.</sos.shared.debugmode>
+		<sos.window.back>Retour</sos.window.back>
+		<sos.window.clear_hud_tooltip>Efface le traqueur HUD actif</sos.window.clear_hud_tooltip>
+		<sos.window.forward>Avancer</sos.window.forward>
+		<sos.window.search_tooltip>Rechercher par nom, ID ou tags</sos.window.search_tooltip>
+		<sos.window.tag_tooltip>Rechercher des objets avec le tag : [tag]</sos.window.tag_tooltip>
+		<sos.window.settings>Paramètres (WIP)</sos.window.settings>
 	</Override>
 </infotexts>

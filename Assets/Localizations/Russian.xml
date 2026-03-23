@@ -84,5 +84,16 @@
 		<sos.container.slots>Слотов: [amount]</sos.container.slots>
 		<sos.container.accepts>Принимает:</sos.container.accepts>
 		<sos.container.contained>Содержится в:</sos.container.contained>
+		<sos.config.migrating>[SOS] Перенос настроек из старого пути...</sos.config.migrating>
+		<sos.gen.close>Закрыть [Esc]</sos.gen.close>
+		<sos.recipe.buyable>Купити в [Title] за [Price] mk</sos.recipe.buyable>
+		<sos.recipe.requires>Требует</sos.recipe.requires>
+		<sos.shared.debugmode>[SOS] Режим отладки включен.</sos.shared.debugmode>
+		<sos.window.back>Назад</sos.window.back>
+		<sos.window.clear_hud_tooltip>Очищает активный HUD-трекер</sos.window.clear_hud_tooltip>
+		<sos.window.forward>Вперед</sos.window.forward>
+		<sos.window.search_tooltip>Поиск по имени, ID или тегам</sos.window.search_tooltip>
+		<sos.window.tag_tooltip>Поиск предметов с тегом: [tag]</sos.window.tag_tooltip>
+		<sos.window.settings>Настройки (WIP)</sos.window.settings>
 	</Override>
 </infotexts>
