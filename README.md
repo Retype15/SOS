@@ -45,6 +45,22 @@
 - **[Ctrl + Drag Borders or Corners]**: Resize the window with a parallel aspect ratio.
 - **[Shift + Drag Borders or Corners]**: Move the window.
 
+### Search Tab
+
+Search by Name, ID, Category, Tags, ModName, ItemType, and other filters.
+
+Advanced Filters:
+
+| Filter      | Description     | Example           |
+|-------------|-----------------|-------------------|
+| `@Mod`      | Mod Name        | `@Vanilla @Neuro` |
+| `#Category` | Category        | `#Medical #Weapon`|
+| `$Tag`      | Tag             | `$smallitem $pill`|
+| `&Slot`     | Slot            | `&Head &Inner`    |
+| `!ID`       | Item ID         | `!weldingtool`    |
+
+**Example:** `Brain @NT #Medical $surgery`
+
 ## Project Status: Beta
 
 **S.O.S.** is currently in its Beta stage. While the core functionality is stable and high-performing, we are working towards deep integration with the game's mechanics and immersion.

@@ -21,6 +21,7 @@ namespace SOS
         public string TrackedItemId { get; set; } = "";
         public uint TrackedRecipeHash { get; set; } = 0;
         public bool RawXmlMode { get; set; } = false;
+        public float XmlFontScale { get; set; } = 0.9f;
 
         // UI Persistence
         public Point? WindowSize { get; set; }
@@ -65,7 +66,8 @@ namespace SOS
                         new XElement("State",
                             new XAttribute("lastItem", data.LastItemId ?? ""),
                             new XAttribute("lastSearch", data.LastSearchQuery ?? ""),
-                            new XAttribute("rawXml", data.RawXmlMode)
+                            new XAttribute("rawXml", data.RawXmlMode),
+                            new XAttribute("xmlScale", data.XmlFontScale)
                         ),
 
                         new XElement("Tracker",
@@ -147,6 +149,7 @@ namespace SOS
                         data.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
                         data.LastItemId = state.Attribute("lastItem")?.Value ?? "";
                         data.RawXmlMode = ImGoodBoolParser(state.Attribute("rawXml")?.Value, false);
+                        data.XmlFontScale = ImGoodFloatParser(state.Attribute("xmlScale")?.Value, 0.9f);
                     }
 
                     var tracker = root.Element("Tracker");
@@ -212,6 +215,12 @@ namespace SOS
         {
             if (string.IsNullOrWhiteSpace(value)) return fallback;
             return bool.TryParse(value, out bool result) ? result : fallback;
+        }
+
+        private static float ImGoodFloatParser(string? value, float fallback)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return fallback;
+            return float.TryParse(value, out float result) ? result : fallback;
         }
     }
 

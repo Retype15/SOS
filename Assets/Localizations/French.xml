@@ -92,8 +92,10 @@
 		<sos.window.back>Retour</sos.window.back>
 		<sos.window.clear_hud_tooltip>Efface le traqueur HUD actif</sos.window.clear_hud_tooltip>
 		<sos.window.forward>Avancer</sos.window.forward>
-		<sos.window.search_tooltip>Rechercher par nom, ID ou tags</sos.window.search_tooltip>
+		<sos.window.search_tooltip>Rechercher par nom, ID, catégorie, tags, mod, type, etc.&#xA;Filtres avancés:&#xA;  @Mod        (ex., @Vanilla @Neuro)&#xA;  #Catégorie  (ex., #Medical #Weapon)&#xA;  $Tag        (ex., $smallitem $pill)&#xA;  &amp;Emplac.    (ex., &amp;Head &amp;Inner)&#xA;  !ID         (ex., !weldingtool)&#xA;Exemple: 'Brain @NT #Medical $surgery'</sos.window.search_tooltip>
 		<sos.window.tag_tooltip>Rechercher des objets avec le tag : [tag]</sos.window.tag_tooltip>
 		<sos.window.settings>Paramètres (WIP)</sos.window.settings>
+		<sos.xml.copy>Copier XML</sos.xml.copy>
+		<sos.xml.reset_zoom>Réinitialiser le zoom</sos.xml.reset_zoom>
 	</Override>
 </infotexts>

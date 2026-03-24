@@ -174,7 +174,16 @@ namespace SOS
             searchContainer.RectTransform.MaxSize = new Point(int.MaxValue, 35);
 
             searchBox = GUI.CreateTextBoxWithPlaceholder(new RectTransform(Vector2.One, searchContainer.RectTransform), controller.LastSearchQuery, TextSOS.Get("sos.window.search_placeholder", "Search item..."));
-            searchBox.ToolTip = TextSOS.Get("sos.window.search_tooltip", "Search by name, ID or tags");
+            searchBox.ToolTip = TextSOS.Get("sos.window.search_tooltip",
+                "Search by Name, ID, Category, Tags, ModName, ItemType, etc.\n" +
+                "Advanced Filters:\n" +
+                "  @Mod        (e.g., @Vanilla @Neuro)\n" +
+                "  #Category   (e.g., #Medical #Weapon)\n" +
+                "  $Tag        (e.g., $smallitem $pill)\n" +
+                "  &Slot       (e.g., &Head &Inner)\n" +
+                "  !ID         (e.g., !weldingtool)\n" +
+                "Example: 'Brain @NT #Medical $surgery'");
+
             searchBox.OnTextChanged += (_, text) => { controller.LastSearchQuery = text; UpdateSearch(text); return true; };
 
             itemList = new GUIListBox(new RectTransform(new Vector2(1f, 1f), leftLayout.RectTransform), style: "GUIListBox")
@@ -258,8 +267,17 @@ namespace SOS
 
             xmlContentText = new GUITextViewer(new RectTransform(Vector2.One, rightContentArea.RectTransform), style: "GUITextBlock")
             {
-                Visible = controller.RawXmlMode
+                Visible = controller.RawXmlMode,
+                Font = GUIStyle.SmallFont,
+                TextScale = controller.XmlFontScale,
+                OnScaleChanged = (scale) =>
+                    {
+                        controller.XmlFontScale = scale;
+                        controller.MarkDirty();
+                    },
+                ContentMenu = XmlContextMenu
             };
+
             metaPanel.Visible = !controller.RawXmlMode;
 
             if (metaPanel.ContentBackground != null) metaPanel.ContentBackground.Color = Color.Transparent;
@@ -289,7 +307,7 @@ namespace SOS
             mainFrame.Selected = true;
         }
 
-        private static string GetItemSlotsCached(ItemPrefab prefab)
+        public static string GetItemSlotsCached(ItemPrefab prefab)
         {
             if (itemSlotCache.TryGetValue(prefab.Identifier, out var cached)) return cached;
 
@@ -354,22 +372,14 @@ namespace SOS
         private void UpdateSearch(string query)
         {
             if (itemList == null) return;
-            string lowerQuery = query.ToLowerInvariant();
+            var filter = new SearchFilter(query);
 
-            allFilteredItems = [.. ItemPrefab.Prefabs.Where(p =>
-                string.IsNullOrWhiteSpace(query) ||
-                p.Name.Value.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                p.Identifier.Value.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                p.Tags.Any(t => t.Value.Contains(query, StringComparison.OrdinalIgnoreCase)) ||
-                GetItemSlotsCached(p).Contains(lowerQuery) ||
-                (p.ContentPackage != null && p.ContentPackage.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
-            )
-            .OrderByDescending(p => controller.FavoritedItems.Contains(p.Identifier.Value))
-            .ThenBy(p => p.Name.Value)];
+            allFilteredItems = [.. ItemPrefab.Prefabs.Where(p => filter.Matches(p))
+        .OrderByDescending(p => controller.FavoritedItems.Contains(p.Identifier.Value))
+        .ThenBy(p => p.Name.Value)];
 
             itemsLoaded = 0;
             itemList.Content.ClearChildren();
-
             itemList.ScrollBar.BarScroll = 0;
 
             LoadNextChunk();
@@ -911,6 +921,26 @@ onSecondary
                 };
             }
         }
+
+        private static void XmlContextMenu(GUITextViewer viewer)
+        {
+            var options = new List<ContextMenuOption>
+            {
+                new(TextSOS.Get("sos.xml.reset_zoom", "Reset Zoom"), isEnabled: true, onSelected: () =>
+                {
+                    viewer.TextScale = 0.8f;
+                    viewer.scrollBarsNeedsRecalculation = true;
+                    viewer.OnScaleChanged?.Invoke(viewer.TextScale);
+                }),
+
+                new(TextSOS.Get("sos.xml.copy", "Copy XML"), isEnabled: true, onSelected: () =>
+                {
+                    Clipboard.SetText(viewer.Text.ToString());
+                })
+            };
+
+            GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, "XML Actions", null, [.. options]);
+        }
     }
 
     public class GroupedSource
@@ -969,18 +999,7 @@ onSecondary
             var list = new GUIListBox(targetRect, isHorizontal: true, style: "GUIBackgroundBlocker")
             {
                 Spacing = 4,
-                //ScrollBarEnabled = true,
-                //ScrollBarVisible = false,
-                //CanBeFocused = false
             };
-
-
-            /*if (list.ScrollBar != null)
-            {
-                list.ScrollBar.Color = Color.White;
-                //list.ScrollBar.CanBeFocused = false;
-                //list.ScrollBar.RectTransform.MaxSize = new Point(0, 0);
-            }*/
 
             foreach (var item in items)
             {
@@ -990,7 +1009,6 @@ onSecondary
                 {
                     Color = Color.LightSkyBlue * 0.15f,
                     OnClicked = (_, _) => { onClick?.Invoke(item); return true; },
-                    //ToolTip = TextSOS.Get("sos.window.tag_tooltip", "Search items with tag: [tag]").Replace("[tag]", item)
                 };
 
                 var tagText = new GUITextBlock(new RectTransform(Vector2.One, tagBadge.RectTransform), item.ToLower(), font: GUIStyle.SmallFont, textAlignment: Alignment.Center)
@@ -1005,6 +1023,76 @@ onSecondary
                 tagBadge.RectTransform.MinSize = new Point(calculatedWidth, 0);
                 tagBadge.RectTransform.MaxSize = new Point(calculatedWidth, int.MaxValue);
             }
+        }
+    }
+
+    public class SearchFilter
+    {
+        public List<string> General = [];
+        public List<string> Mod = [];
+        public List<string> Category = [];
+        public List<string> Tag = [];
+        public List<string> Slot = [];
+        public List<string> ID = [];
+
+        public SearchFilter(string rawQuery)
+        {
+            if (string.IsNullOrWhiteSpace(rawQuery)) return;
+
+            char currentType = ' ';
+            int startIndex = 0;
+            string query = rawQuery + " ";
+
+            for (int i = 0; i < query.Length; i++)
+            {
+                char c = query[i];
+                if (c == '@' || c == '#' || c == '$' || c == '&' || c == '!' || i == query.Length - 1)
+                {
+                    string content = query[startIndex..i].Trim();
+                    if (!string.IsNullOrEmpty(content))
+                    {
+                        switch (currentType)
+                        {
+                            case ' ': General.Add(content); break;
+                            case '@': Mod.Add(content); break;
+                            case '#': Category.Add(content); break;
+                            case '$': Tag.Add(content); break;
+                            case '&': Slot.Add(content); break;
+                            case '!': ID.Add(content); break;
+                        }
+                    }
+                    currentType = c;
+                    startIndex = i + 1;
+                }
+            }
+        }
+
+        public bool Matches(ItemPrefab p)
+        {
+            if (Mod.Count > 0 && !Mod.Any(m => (p.ContentPackage?.Name ?? "Vanilla").Contains(m, StringComparison.OrdinalIgnoreCase))) return false;
+
+            if (Category.Count > 0 && !Category.Any(c => p.Category.ToString().Contains(c, StringComparison.OrdinalIgnoreCase))) return false;
+
+            if (ID.Count > 0 && !ID.Any(id => p.Identifier.Value.Contains(id, StringComparison.OrdinalIgnoreCase))) return false;
+
+            if (Slot.Count > 0 && !Slot.Any(s => SOSWindow.GetItemSlotsCached(p).Contains(s, StringComparison.OrdinalIgnoreCase))) return false;
+
+            foreach (var t in Tag) if (!p.Tags.Any(pt => pt.Value.Contains(t, StringComparison.OrdinalIgnoreCase))) return false;
+
+            foreach (var term in General)
+            {
+                string lowerTerm = term.ToLowerInvariant();
+                bool match = p.Name.Value.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                             p.Identifier.Value.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                             p.Tags.Any(t => t.Value.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+                             p.Category.ToString().Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                             (p.ContentPackage?.Name ?? "Vanilla").Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                             SOSWindow.GetItemSlotsCached(p).Contains(lowerTerm);
+
+                if (!match) return false;
+            }
+
+            return true;
         }
     }
 }

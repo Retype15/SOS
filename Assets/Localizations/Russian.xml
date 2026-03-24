@@ -92,8 +92,10 @@
 		<sos.window.back>Назад</sos.window.back>
 		<sos.window.clear_hud_tooltip>Очищает активный HUD-трекер</sos.window.clear_hud_tooltip>
 		<sos.window.forward>Вперед</sos.window.forward>
-		<sos.window.search_tooltip>Поиск по имени, ID или тегам</sos.window.search_tooltip>
+		<sos.window.search_tooltip>Поиск по имени, ID, категории, тегам, моду, типу и т.д.&#xA;Расширенные фильтры:&#xA;  @Мод        (напр., @Vanilla @Neuro)&#xA;  #Категория  (напр., #Medical #Weapon)&#xA;  $Тег        (напр., $smallitem $pill)&#xA;  &amp;Слот      (напр., &amp;Head &amp;Inner)&#xA;  !ID         (напр., !weldingtool)&#xA;Пример: 'Brain @NT #Medical $surgery'</sos.window.search_tooltip>
 		<sos.window.tag_tooltip>Поиск предметов с тегом: [tag]</sos.window.tag_tooltip>
 		<sos.window.settings>Настройки (WIP)</sos.window.settings>
+		<sos.xml.copy>Копировать XML</sos.xml.copy>
+		<sos.xml.reset_zoom>Сбросить масштаб</sos.xml.reset_zoom>
 	</Override>
 </infotexts>
