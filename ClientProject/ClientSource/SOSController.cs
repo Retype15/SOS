@@ -33,6 +33,7 @@ namespace SOS
         public int? LeftPanelWidth { get; set; }
         public int? RightPanelWidth { get; set; }
         public bool RawXmlMode { get; set; } = false;
+        public float XmlFontScale { get; set; } = 0.9f;
 
         public Dictionary<string, SavedLayout> CustomLayouts { get; } = [];
 
@@ -114,7 +115,8 @@ namespace SOS
                 LeftPanelWidth = this.LeftPanelWidth,
                 RightPanelWidth = this.RightPanelWidth,
                 CustomLayouts = this.CustomLayouts,
-                RawXmlMode = this.RawXmlMode
+                RawXmlMode = this.RawXmlMode,
+                XmlFontScale = this.XmlFontScale
             };
 
             SettingsManager.Save(data);
@@ -133,6 +135,7 @@ namespace SOS
             LeftPanelWidth = data.LeftPanelWidth;
             RightPanelWidth = data.RightPanelWidth;
             RawXmlMode = data.RawXmlMode;
+            XmlFontScale = data.XmlFontScale;
             foreach (var kvp in data.CustomLayouts) CustomLayouts[kvp.Key] = kvp.Value;
 
             if (!WindowSize.HasValue) WindowSize = new Point(1250, 850);

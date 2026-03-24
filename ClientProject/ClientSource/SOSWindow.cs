@@ -267,8 +267,17 @@ namespace SOS
 
             xmlContentText = new GUITextViewer(new RectTransform(Vector2.One, rightContentArea.RectTransform), style: "GUITextBlock")
             {
-                Visible = controller.RawXmlMode
+                Visible = controller.RawXmlMode,
+                Font = GUIStyle.SmallFont,
+                TextScale = controller.XmlFontScale,
+                OnScaleChanged = (scale) =>
+                    {
+                        controller.XmlFontScale = scale;
+                        controller.MarkDirty();
+                    },
+                ContentMenu = XmlContextMenu
             };
+
             metaPanel.Visible = !controller.RawXmlMode;
 
             if (metaPanel.ContentBackground != null) metaPanel.ContentBackground.Color = Color.Transparent;
@@ -911,6 +920,26 @@ onSecondary
                     }
                 };
             }
+        }
+
+        private static void XmlContextMenu(GUITextViewer viewer)
+        {
+            var options = new List<ContextMenuOption>
+            {
+                new(TextSOS.Get("sos.xml.reset_zoom", "Reset Zoom"), isEnabled: true, onSelected: () =>
+                {
+                    viewer.TextScale = 0.8f;
+                    viewer.scrollBarsNeedsRecalculation = true;
+                    viewer.OnScaleChanged?.Invoke(viewer.TextScale);
+                }),
+
+                new(TextSOS.Get("sos.xml.copy", "Copy XML"), isEnabled: true, onSelected: () =>
+                {
+                    Clipboard.SetText(viewer.Text.ToString());
+                })
+            };
+
+            GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, "XML Actions", null, [.. options]);
         }
     }
 

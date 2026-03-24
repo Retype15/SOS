@@ -95,5 +95,7 @@
 		<sos.window.search_tooltip>按名称、ID、类别、标签、模组、类型等搜索&#xA;高级过滤器：&#xA;  @模组        (例：@Vanilla @Neuro)&#xA;  #类别        (例：#Medical #Weapon)&#xA;  $标签        (例：$smallitem $pill)&#xA;  &amp;槽位        (例：&amp;Head &amp;Inner)&#xA;  !ID          (例：!weldingtool)&#xA;示例：'Brain @NT #Medical $surgery'</sos.window.search_tooltip>
 		<sos.window.tag_tooltip>搜索带有标签的物品：[tag]</sos.window.tag_tooltip>
 		<sos.window.settings>设置 (WIP)</sos.window.settings>
+		<sos.xml.copy>复制 XML</sos.xml.copy>
+		<sos.xml.reset_zoom>重置缩放</sos.xml.reset_zoom>
 	</Override>
 </infotexts>

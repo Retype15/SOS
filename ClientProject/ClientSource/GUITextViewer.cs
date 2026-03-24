@@ -13,9 +13,16 @@ namespace SOS
         public GUIScrollBar HorizontalScrollBar { get; private set; }
         public GUIScrollBar VerticalScrollBar { get; private set; }
 
-        private bool scrollBarsNeedsRecalculation = true;
+        public bool scrollBarsNeedsRecalculation = true;
         private Vector4 originalPadding;
         private bool paddingInitialized = false;
+
+        private const float MinScale = 0.4f;
+        private const float MaxScale = 2.0f;
+        private const float ZoomStep = 0.05f;
+
+        public Action<float>? OnScaleChanged;
+        public Action<GUITextViewer>? ContentMenu;
 
         private int ScrollBarThickness
         {
@@ -126,21 +133,51 @@ namespace SOS
 
             if (!Visible) return;
 
-            if (GUI.IsMouseOn(this) && PlayerInput.ScrollWheelSpeed != 0)
+            if (GUI.IsMouseOn(this))
             {
-                if (PlayerInput.IsShiftDown() && HorizontalScrollBar.Enabled)
-                    HorizontalScrollBar.BarScroll -= Math.Sign(PlayerInput.ScrollWheelSpeed) * 0.1f;
-                else if (VerticalScrollBar.Enabled)
-                    VerticalScrollBar.BarScroll -= Math.Sign(PlayerInput.ScrollWheelSpeed) * 0.1f;
+                if (ContentMenu != null && PlayerInput.SecondaryMouseButtonClicked())
+                {
+                    ContentMenu(this);
+                }
+
+                if (PlayerInput.IsCtrlDown() && PlayerInput.MidButtonClicked())
+                {
+                    TextScale = 0.9f;
+                    scrollBarsNeedsRecalculation = true;
+                    OnScaleChanged?.Invoke(TextScale);
+                    return;
+                }
+
+                if (PlayerInput.ScrollWheelSpeed != 0)
+                {
+                    if (PlayerInput.IsCtrlDown())
+                    {
+                        float oldScale = TextScale;
+                        TextScale = MathHelper.Clamp(TextScale + Math.Sign(PlayerInput.ScrollWheelSpeed) * ZoomStep, MinScale, MaxScale);
+
+                        if (Math.Abs(oldScale - TextScale) > 0.001f)
+                        {
+                            scrollBarsNeedsRecalculation = true;
+                            OnScaleChanged?.Invoke(TextScale);
+                        }
+                    }
+                    else if (PlayerInput.IsShiftDown() && HorizontalScrollBar.Enabled)
+                    {
+                        HorizontalScrollBar.BarScroll -= Math.Sign(PlayerInput.ScrollWheelSpeed) * 0.075f;
+                    }
+                    else if (VerticalScrollBar.Enabled)
+                    {
+                        VerticalScrollBar.BarScroll -= Math.Sign(PlayerInput.ScrollWheelSpeed) * 0.1f;
+                    }
+                }
+                float maxScrollX = Math.Max(0, (TextSize.X * TextScale) - (Rect.Width - Padding.X - Padding.Z));
+                float maxScrollY = Math.Max(0, (TextSize.Y * TextScale) - (Rect.Height - Padding.Y - Padding.W));
+
+                TextOffset = new Vector2(
+                    (float)Math.Round(-HorizontalScrollBar.BarScroll * maxScrollX),
+                    (float)Math.Round(-VerticalScrollBar.BarScroll * maxScrollY)
+                );
             }
-
-            float maxScrollX = Math.Max(0, (TextSize.X * TextScale) - (Rect.Width - Padding.X - Padding.Z));
-            float maxScrollY = Math.Max(0, (TextSize.Y * TextScale) - (Rect.Height - Padding.Y - Padding.W));
-
-            TextOffset = new Vector2(
-                (int)(-HorizontalScrollBar.BarScroll * maxScrollX),
-                (int)(-VerticalScrollBar.BarScroll * maxScrollY)
-            );
         }
 
         public override void Draw(SpriteBatch spriteBatch)

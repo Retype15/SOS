@@ -95,5 +95,7 @@
 		<sos.window.search_tooltip>Buscar por nombre, ID, categoría, etiquetas, mod, tipo, etc.&#xA;Filtros avanzados:&#xA;  @Mod        (ej., @Vanilla @Neuro)&#xA;  #Categoría  (ej., #Medical #Weapon)&#xA;  $Etiqueta   (ej., $smallitem $pill)&#xA;  &amp;Ranura     (ej., &amp;Head &amp;Inner)&#xA;  !ID         (ej., !weldingtool)&#xA;Ejemplo: 'Brain @NT #Medical $surgery'</sos.window.search_tooltip>
 		<sos.window.tag_tooltip>Buscar objetos con etiqueta: [tag]</sos.window.tag_tooltip>
 		<sos.window.settings>Configuración (WIP)</sos.window.settings>
+		<sos.xml.copy>Copiar XML</sos.xml.copy>
+		<sos.xml.reset_zoom>Restablecer zoom</sos.xml.reset_zoom>
 	</Override>
 </infotexts>

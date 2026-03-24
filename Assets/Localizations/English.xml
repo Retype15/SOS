@@ -95,5 +95,7 @@
 		<sos.window.search_tooltip>Search by Name, ID, Category, Tags, ModName, ItemType, etc.&#xA;Advanced Filters:&#xA;  @Mod        (e.g., @Vanilla @Neuro)&#xA;  #Category   (e.g., #Medical #Weapon)&#xA;  $Tag        (e.g., $smallitem $pill)&#xA;  &amp;Slot       (e.g., &amp;Head &amp;Inner)&#xA;  !ID         (e.g., !weldingtool)&#xA;Example: 'Brain @NT #Medical $surgery'</sos.window.search_tooltip>
 		<sos.window.tag_tooltip>Search items with tag: [tag]</sos.window.tag_tooltip>
 		<sos.window.settings>Settings (WIP)</sos.window.settings>
+		<sos.xml.copy>Copy XML</sos.xml.copy>
+		<sos.xml.reset_zoom>Reset Zoom</sos.xml.reset_zoom>
 	</Override>
 </infotexts>
