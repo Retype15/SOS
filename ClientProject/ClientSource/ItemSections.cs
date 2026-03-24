@@ -93,7 +93,7 @@ namespace SOS
         public void AddFullWidthText(string text, Color color)
         {
             if (currentLayout == null || string.IsNullOrEmpty(text)) return;
-            var block = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), text, font: GUIStyle.SmallFont, textColor: color, wrap: true) { CanBeFocused = false };
+            var block = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), RichString.Rich(text), textColor: color, font: GUIStyle.SmallFont, wrap: true) { CanBeFocused = false, };
 
             int textHeight = (int)block.TextSize.Y + 10;
             block.RectTransform.MinSize = new Point(0, textHeight);

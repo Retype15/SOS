@@ -21,33 +21,21 @@ namespace SOS
 
         private static readonly Dictionary<Identifier, string> machineNameCache = [];
 
-        public static RichString GetDetailedTooltip(ItemPrefab prefab)
+        public static RichString GetDetailedTooltip(ItemPrefab? prefab)
         {
-            if (prefab == null) return RichString.Rich("");
+            LocalizedString actual = prefab?.GetTooltip(Character.Controlled) ?? "";
+            ReadOnlySpan<char> value = actual.Value.AsSpan();
+            int idx = value.LastIndexOf('\n');
+            ReadOnlySpan<char> modLine = idx == -1 ? value : value[(idx + 1)..];
 
-            string toolTip = $"‖color:White‖{prefab.Name.Value}‖color:end‖";
-
-#if DEBUG
-            toolTip += $" ‖color:gui.orange‖({prefab.Identifier})‖color:end‖";
-#endif
-
-            int price = prefab.DefaultPrice?.Price ?? 0;
-            if (price > 0)
+            if (prefab?.ContentPackage != null)
             {
-                toolTip += $"\n‖color:{Color.Gold.ToStringHex()}‖{TextSOS.Get("sos.item.price", "Price")}{price}mk‖color:end‖";
-            }
+                if (modLine.Equals(prefab.ContentPackage.Name, StringComparison.Ordinal)) return RichString.Rich(actual);
 
-            if (!prefab.Description.IsNullOrEmpty())
-            {
-                toolTip += "\n" + prefab.Description.Value;
-            }
-            if (prefab.ContentPackage != null && prefab.ContentPackage.Name != "Vanilla")
-            {
                 string modColor = XMLExtensions.ToStringHex(Color.MediumPurple);
-                toolTip += $"\n‖color:{modColor}‖{prefab.ContentPackage.Name}‖color:end‖";
+                actual += $"\n‖color:{modColor}‖{prefab.ContentPackage.Name}‖color:end‖";
             }
-
-            return RichString.Rich(toolTip);
+            return RichString.Rich(actual);
         }
 
         public static void DrawHeader(GUIFrame parent, ItemPrefab item)
@@ -325,7 +313,7 @@ namespace SOS
 
             var btn = new GUIButton(btnRect, style: "GUIButton")
             {
-                ToolTip = prefab != null ? GetDetailedTooltip(prefab) : null,
+                ToolTip = GetDetailedTooltip(prefab),
                 Color = Color.Black * 0.4f
             };
 
@@ -390,7 +378,7 @@ namespace SOS
                 {
                     AbsoluteSpacing = 5,
                     CanBeFocused = true,
-                    ToolTip = prefab != null ? GetDetailedTooltip(prefab) : null
+                    ToolTip = GetDetailedTooltip(prefab)
                 };
             }
 
