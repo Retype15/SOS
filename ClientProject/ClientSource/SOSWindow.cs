@@ -301,6 +301,9 @@ namespace SOS
             mainFrame.ForceLayoutRecalculation();
         }
 
+        void OnPrimary(ItemPrefab p) => controller.OnItemSelected(p);
+        void OnSecondary(ItemPrefab p) => controller.OpenContextMenu(p);
+
         public void SetSelected()
         {
             if (mainFrame == null) return;
@@ -419,8 +422,8 @@ namespace SOS
                     }
 
                     CardBuilder.DrawMinimalItemRow(currentRow, prefab, 1,
-                        onPrimaryClick: p => controller.OnItemSelected(p),
-                        onSecondaryClick: p => controller.OpenContextMenu(p),
+                        onPrimaryClick: p => OnPrimary(p),
+                        onSecondaryClick: p => OnSecondary(p),
                         badgeColor: isFav ? Color.Gold : (Color?)null);
 
                     itemsInRow++;
@@ -435,8 +438,8 @@ namespace SOS
 
                     var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, 35) }, style: "ListBoxElement")
                     {
-                        OnClicked = (_, _) => { controller.OnItemSelected(prefab); return true; },
-                        OnSecondaryClicked = (_, _) => { controller.OpenContextMenu(prefab); return true; }
+                        OnClicked = (_, _) => { OnPrimary(prefab); return true; },
+                        OnSecondaryClicked = (_, _) => { OnSecondary(prefab); return true; }
                     };
 
                     //string prefix = isFav ? "* " : "";
@@ -640,9 +643,6 @@ namespace SOS
                 CanBeFocused = false
             };
 
-            void onPrimary(ItemPrefab p) => controller.OnItemSelected(p);
-            void onSecondary(ItemPrefab p) => controller.OpenContextMenu(p);
-
             UIMachineGroup GetOrCreateMachineGroup(Dictionary<string, UIMachineGroup> dict, IEnumerable<Identifier> machineIds, string fallbackName)
             {
                 string key = machineIds.Any()
@@ -702,13 +702,13 @@ namespace SOS
             foreach (var r in craft)
             {
                 var mg = GetOrCreateMachineGroup(obtainGroups, r.SuitableFabricatorIdentifiers, TextSOS.Get("sos.recipe.hand", "Hand").Value);
-                mg.AddCard(new CraftRecipeCard(r, targetItem, controller, onPrimary, onSecondary));
+                mg.AddCard(new CraftRecipeCard(r, targetItem, controller, OnPrimary, OnSecondary));
             }
 
             foreach (var src in groupedSources)
             {
                 var mg = GetOrCreateMachineGroup(obtainGroups, src.MachineIds ?? [], ResolveMachineName("deconstructor".ToIdentifier()));
-                mg.AddCard(new SourceRecipeCard(src, onPrimary, onSecondary));
+                mg.AddCard(new SourceRecipeCard(src, OnPrimary, OnSecondary));
             }
 
             foreach (var group in obtainGroups.Values) group.Draw(colObtain);
@@ -730,14 +730,14 @@ namespace SOS
 
                     if (isRandom)
                     {
-                        mg.AddCard(new DeconOutputCard(targetItem, deconList, onPrimary, onSecondary));
+                        mg.AddCard(new DeconOutputCard(targetItem, deconList, OnPrimary, OnSecondary));
                     }
                     else
                     {
                         var groupedOutputs = deconList.GroupBy(di => di.ItemIdentifier).Select(g => new { ID = g.Key, Amount = g.Max(di => di.Amount), Weight = g.Sum(di => di.Commonness) });
                         foreach (var output in groupedOutputs)
                         {
-                            mg.AddCard(new SingleDeconOutputCard(targetItem, output.ID, output.Amount, output.Weight, onPrimary, onSecondary));
+                            mg.AddCard(new SingleDeconOutputCard(targetItem, output.ID, output.Amount, output.Weight, OnPrimary, OnSecondary));
                         }
                     }
                 }
@@ -746,7 +746,7 @@ namespace SOS
             foreach (var usage in groupedUses)
             {
                 var mg = GetOrCreateMachineGroup(usageDict, usage.MachineIds ?? [], TextSOS.Get("sos.recipe.hand", "Hand").Value);
-                mg.AddCard(new UsageRecipeCard(usage, onPrimary, onSecondary));
+                mg.AddCard(new UsageRecipeCard(usage, OnPrimary, OnSecondary));
             }
 
             foreach (var group in usageDict.Values) group.Draw(colUsage);
@@ -757,10 +757,10 @@ namespace SOS
             var builder = new SectionBuilder
             (
                 metaPanel,
-onBadgeClick,
+                onBadgeClick,
                 controller,
-onPrimary,
-onSecondary
+                OnPrimary,
+                OnSecondary
             );
 
             var analysis = RecipeAnalyzer.GetAnalysis(targetItem);
