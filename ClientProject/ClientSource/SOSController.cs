@@ -297,6 +297,15 @@ namespace SOS
 
                 if (isKeyDownNow && !wasKeyDown)
                 {
+                    if (mainWindow == null)
+                    {
+                        ItemPrefab? detected = GetPrefabUnderMouse();
+                        if (detected != null)
+                        {
+                            OnItemSelected(detected);
+                        }
+                    }
+
                     CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
                 }
                 wasKeyDown = isKeyDownNow;
@@ -324,10 +333,56 @@ namespace SOS
                     }
                 }
 
-                mainWindow?.Update();
+                mainWindow.Update();
             }
 
             Tracker.UpdateHUD();
+        }
+
+        private ItemPrefab? GetPrefabUnderMouse()
+        {
+            if (Inventory.SelectedSlot?.Item != null)
+            {
+                return Inventory.SelectedSlot.Item.Prefab;
+            }
+
+            if (Character.Controlled?.FocusedItem != null)
+            {
+                return Character.Controlled.FocusedItem.Prefab;
+            }
+
+            if (GUI.MouseOn != null)
+            {
+                GUIComponent? curr = GUI.MouseOn;
+                while (curr != null)
+                {
+                    if (curr.UserData is PurchasedItem purchasedItem)
+                    {
+                        return purchasedItem.ItemPrefab;
+                    }
+
+                    if (curr.UserData is ItemPrefab prefab) return prefab;
+                    if (curr.UserData is Item item) return item.Prefab;
+                    if (curr.UserData is FabricationRecipe recipe) return recipe.TargetItem;
+
+                    if (curr.UserData as string == "addbutton" || curr.UserData as string == "removebutton")
+                    {
+                        var parent = curr.Parent;
+                        while (parent != null)
+                        {
+                            if (parent.UserData is PurchasedItem parentPurchasedItem)
+                            {
+                                return parentPurchasedItem.ItemPrefab;
+                            }
+                            parent = parent.Parent;
+                        }
+                    }
+
+                    curr = curr.Parent;
+                }
+            }
+
+            return null;
         }
     }
 }

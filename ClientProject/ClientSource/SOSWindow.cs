@@ -469,9 +469,9 @@ namespace SOS
         {
             if (mainFrame == null) return;
 
-            mainFrame.AddToGUIUpdateList();
+            mainFrame.AddToGUIUpdateList(ignoreChildren: false, order: 10000);
 
-            layoutMenuFrame?.AddToGUIUpdateList();
+            layoutMenuFrame?.AddToGUIUpdateList(ignoreChildren: false, order: 10001);
 
             UpdateLayout();
 
