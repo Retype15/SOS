@@ -45,6 +45,12 @@
 - **[Ctrl + Drag Borders or Corners]**: Resize the window with a parallel aspect ratio.
 - **[Shift + Drag Borders or Corners]**: Move the window.
 
+### In XML View
+
+- **[Mouse Wheel]**: Move Vertically
+- **[Shift + Mouse Wheel]**: Move Horizontally
+- **[Ctrl + Mouse Wheel]**: Apply Zoom
+
 ### Search Tab
 
 Search by Name, ID, Category, Tags, ModName, ItemType, and other filters.
@@ -110,4 +116,6 @@ See the [LICENSE](LICENCE) file in the project root for the full text of the lic
 - **Source Availability** — If you distribute a modified version, you must also provide access to the corresponding source code under the same license terms.
 
 ---
+
+*Github Project: [SOS](https://github.com/Retype15/SOS)*
 *Developed by [@Retype15](https://github.com/Retype15)*
