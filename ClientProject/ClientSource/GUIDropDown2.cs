@@ -356,11 +356,12 @@ namespace SOS
 
         public void RefreshListBoxParent()
         {
+            if (RectTransform.Parent == null) { Dispose(); return; }
             if (currentHighestParent != null && currentHighestParent.GUIComponent != null)
             {
                 currentHighestParent.GUIComponent.OnAddedToGUIUpdateList -= AddListBoxToGUIUpdateList;
             }
-            if (RectTransform.Parent == null) { return; }
+
             currentHighestParent = FindHighestParent();
             if (currentHighestParent?.GUIComponent != null)
             {
@@ -410,6 +411,19 @@ namespace SOS
                     Dropped = false;
                     if (GUI.KeyboardDispatcher.Subscriber == this) { GUI.KeyboardDispatcher.Subscriber = null; }
                 }
+            }
+        }
+
+        public void Dispose()
+        {
+            if (currentHighestParent != null && currentHighestParent.GUIComponent != null)
+            {
+                currentHighestParent.GUIComponent.OnAddedToGUIUpdateList -= AddListBoxToGUIUpdateList;
+                currentHighestParent = null;
+            }
+            if (GUI.KeyboardDispatcher.Subscriber == this)
+            {
+                GUI.KeyboardDispatcher.Subscriber = null;
             }
         }
     }
