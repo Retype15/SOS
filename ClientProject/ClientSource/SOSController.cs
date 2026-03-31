@@ -341,14 +341,14 @@ namespace SOS
 
         private ItemPrefab? GetPrefabUnderMouse()
         {
+            if (PlayerInput.IsShiftDown() && Character.Controlled?.FocusedItem != null)
+            {
+                return Character.Controlled.FocusedItem.Prefab;
+            }
+
             if (Inventory.SelectedSlot?.Item != null)
             {
                 return Inventory.SelectedSlot.Item.Prefab;
-            }
-
-            if (Character.Controlled?.FocusedItem != null)
-            {
-                return Character.Controlled.FocusedItem.Prefab;
             }
 
             if (GUI.MouseOn != null)
@@ -367,14 +367,14 @@ namespace SOS
 
                     if (curr.UserData as string == "addbutton" || curr.UserData as string == "removebutton")
                     {
-                        var parent = curr.Parent;
-                        while (parent != null)
+                        GUIComponent? p = curr.Parent;
+                        while (p != null)
                         {
-                            if (parent.UserData is PurchasedItem parentPurchasedItem)
+                            if (p.UserData is PurchasedItem pi)
                             {
-                                return parentPurchasedItem.ItemPrefab;
+                                return pi.ItemPrefab;
                             }
-                            parent = parent.Parent;
+                            p = p.Parent;
                         }
                     }
 
