@@ -71,6 +71,7 @@ namespace SOS
         private List<Tuple<ItemPrefab, FabricationRecipe>>? currentUses;
         private List<Tuple<ItemPrefab, DeconstructItem>>? currentSources;
 
+        private readonly double searchDelay = 0.2;
         private double searchExecutionTime = 0;
         private string? pendingSearchQuery = null;
 
@@ -190,7 +191,7 @@ namespace SOS
             searchBox.OnTextChanged += (_, text) =>
             {
                 pendingSearchQuery = text;
-                searchExecutionTime = Timing.TotalTime + 0.25;
+                searchExecutionTime = Timing.TotalTime + searchDelay;
                 return true;
             };
 
@@ -483,6 +484,13 @@ namespace SOS
 
             UpdateLayout();
 
+            if (pendingSearchQuery != null && Timing.TotalTime >= searchExecutionTime)
+            {
+                controller.LastSearchQuery = pendingSearchQuery;
+                UpdateSearch(pendingSearchQuery);
+                pendingSearchQuery = null;
+            }
+
             if (itemList == null || itemsLoaded >= allFilteredItems.Count || isUpdating) return;
 
             int total = allFilteredItems.Count;
@@ -498,13 +506,6 @@ namespace SOS
                     mainFrame.RemoveChild(layoutMenuFrame);
                     layoutMenuFrame = null;
                 }
-            }
-
-            if (pendingSearchQuery != null && Timing.TotalTime >= searchExecutionTime)
-            {
-                controller.LastSearchQuery = pendingSearchQuery;
-                UpdateSearch(pendingSearchQuery);
-                pendingSearchQuery = null;
             }
         }
 
@@ -787,38 +788,39 @@ namespace SOS
                 section.Draw(builder);
             }
 
-            if (xmlContentText != null && targetItem.ConfigElement != null)
+            if (xmlContentText != null)
             {
-                try
-                {
-                    string rawXml = targetItem.ConfigElement.ToString() ?? "<!-- Empty XML -->";
-
-                    if (rawXml == "Barotrauma.ContentXElement")
-                    {
-                        var prop = targetItem.ConfigElement.GetType().GetProperty("Element")
-                                ?? targetItem.ConfigElement.GetType().GetProperty("XElement");
-                        var field = targetItem.ConfigElement.GetType().GetField("Element")
-                                ?? targetItem.ConfigElement.GetType().GetField("XElement");
-
-                        object? inner = prop?.GetValue(targetItem.ConfigElement)
-                                        ?? field?.GetValue(targetItem.ConfigElement);
-
-                        if (inner != null)
-                        {
-                            rawXml = inner.ToString() ?? rawXml;
-                        }
-                    }
-
-                    xmlContentText.Text = XMLHighlighter.Format(rawXml);
-                }
-                catch
-                {
-                    xmlContentText.Text = XMLHighlighter.Format("<!-- Error parsing XML data -->");
-                }
+                xmlContentText.Text = XMLHighlighter.Format(GetRawXMLSafe(targetItem));
             }
-            else if (xmlContentText != null)
+        }
+
+        private static string GetRawXMLSafe(ItemPrefab item)
+        {
+            if (item.ConfigElement == null) return "<!-- No XML data found for this item -->";
+
+            try
             {
-                xmlContentText.Text = XMLHighlighter.Format("<!-- No XML data found for this item -->");
+                string rawXml = item.ConfigElement.ToString() ?? "<!-- Empty XML -->";
+
+                if (rawXml == "Barotrauma.ContentXElement")
+                {
+                    var type = item.ConfigElement.GetType();
+                    var prop = type.GetProperty("Element") ?? type.GetProperty("XElement");
+                    var field = type.GetField("Element") ?? type.GetField("XElement");
+
+                    object? inner = prop?.GetValue(item.ConfigElement) ?? field?.GetValue(item.ConfigElement);
+
+                    if (inner != null)
+                    {
+                        rawXml = inner.ToString() ?? rawXml;
+                    }
+                }
+
+                return rawXml;
+            }
+            catch (Exception)
+            {
+                return "<!-- Error parsing XML data -->";
             }
         }
 
