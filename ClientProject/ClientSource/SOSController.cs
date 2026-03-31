@@ -339,7 +339,7 @@ namespace SOS
             Tracker.UpdateHUD();
         }
 
-        private ItemPrefab? GetPrefabUnderMouse()
+        private static ItemPrefab? GetPrefabUnderMouse()
         {
             if (PlayerInput.IsShiftDown() && Character.Controlled?.FocusedItem != null)
             {
