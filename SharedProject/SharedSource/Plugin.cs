@@ -7,7 +7,7 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
-
+using Barotrauma.LuaCs;
 using System.Runtime.CompilerServices;
 [assembly: IgnoresAccessChecksTo("Barotrauma")]
 [assembly: IgnoresAccessChecksTo("DedicatedServer")]
@@ -20,7 +20,7 @@ namespace SOS
         public void Initialize()
         {
 #if CLIENT
-                InitClient();
+            InitClient();
 #endif
         }
 
