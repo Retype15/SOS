@@ -7,6 +7,7 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
+using Barotrauma.LuaCs;
 
 using System.Runtime.CompilerServices;
 [assembly: IgnoresAccessChecksTo("Barotrauma")]

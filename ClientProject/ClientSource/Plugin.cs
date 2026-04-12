@@ -3,6 +3,9 @@
 // See the LICENSE file in the project root for details.
 
 using Barotrauma;
+using Barotrauma.LuaCs;
+using static Barotrauma.LuaCs.ILuaEventService;
+using Barotrauma.LuaCs.Compatibility;
 
 namespace SOS
 {
@@ -47,7 +50,7 @@ namespace SOS
             });
 #endif
 
-            GameMain.LuaCs.Hook.Add("keyupdate", "SOS_UpdateLoop", _ =>
+            LuaCsSetup.Instance.EventService.Add("think", "SOS_UpdateLoop", _ =>
             {
                 controller?.Update();
 #if DEBUG
@@ -67,7 +70,7 @@ namespace SOS
         public void DisposeClient()
         {
             DebugConsole.commands.RemoveAll(c => c.Names.Contains("sos"));
-            GameMain.LuaCs.Hook.Remove("keyupdate", "SOS_UpdateLoop");
+            LuaCsSetup.Instance.EventService.Remove("think", "SOS_UpdateLoop");
             controller?.SaveSettings();
             controller?.Destroy();
             controller = null;
