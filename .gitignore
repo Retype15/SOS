@@ -404,3 +404,4 @@ FodyWeavers.xsd
 
 # Extra unnecesary files
 SOS*.txt
+Build.props
