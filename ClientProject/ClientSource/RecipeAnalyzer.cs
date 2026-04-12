@@ -112,5 +112,46 @@ namespace SOS
             sourcesCache[targetItem.Identifier] = results;
             return results;
         }
+
+        public static void PrecomputeCaches()
+        {
+            usesCache.Clear();
+            sourcesCache.Clear();
+
+            var allPrefabs = ItemPrefab.Prefabs;
+
+            foreach (var prefab in allPrefabs)
+            {
+                if (prefab.FabricationRecipes != null)
+                {
+                    foreach (var recipe in prefab.FabricationRecipes.Values)
+                    {
+                        foreach (var req in recipe.RequiredItems)
+                        {
+                            foreach (var p in req.ItemPrefabs)
+                            {
+                                if (p == null) continue;
+                                if (!usesCache.ContainsKey(p.Identifier)) usesCache[p.Identifier] = [];
+                                usesCache[p.Identifier].Add(new Tuple<ItemPrefab, FabricationRecipe>(prefab, recipe));
+                            }
+                        }
+                    }
+                }
+
+                if (!prefab.DeconstructItems.IsDefaultOrEmpty)
+                {
+                    foreach (var di in prefab.DeconstructItems)
+                    {
+                        if (!sourcesCache.ContainsKey(di.ItemIdentifier)) sourcesCache[di.ItemIdentifier] = [];
+                        sourcesCache[di.ItemIdentifier].Add(new Tuple<ItemPrefab, DeconstructItem>(prefab, di));
+                    }
+                }
+            }
+            // MARK: AAAA
+#if DEBUG
+            System.Threading.Thread.Sleep(3000);
+            LuaCsLogger.LogMessage("[SOS] Dependency graph precomputed (Debug Sleep 3s finished).");
+#endif
+        }
     }
 }

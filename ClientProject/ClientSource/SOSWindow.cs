@@ -22,24 +22,25 @@ namespace SOS
 
     public class SOSWindow
     {
+        private GUIFrame? loadingFrame;
         private readonly GUIResizableFrame? mainFrame;
-        private readonly GUIListBox? itemList;
-        private readonly GUIFrame? detailsHeader;
-        private readonly GUIFrame? recipeAreaFrame;
-        private readonly GUIListBox? colObtain;
-        private readonly GUIListBox? colUsage;
-        private readonly GUIListBox? metaPanel;
+        private GUIListBox? itemList;
+        private GUIFrame? detailsHeader;
+        private GUIFrame? recipeAreaFrame;
+        private GUIListBox? colObtain;
+        private GUIListBox? colUsage;
+        private GUIListBox? metaPanel;
         private readonly SOSController controller;
-        private readonly GUITextBox? searchBox;
-        private readonly GUIButton? btnBack;
-        private readonly GUIButton? btnForward;
+        private GUITextBox? searchBox;
+        private GUIButton? btnBack;
+        private GUIButton? btnForward;
 
-        private readonly GUIFrame? contentArea;
-        private readonly GUIResizableFrame? leftPanel;
-        private readonly GUIFrame? leftContainer;
-        private readonly GUIFrame? centerPanelContainer;
-        private readonly GUIResizableFrame? rightPanel;
-        private readonly GUIFrame? rightContainer;
+        private GUIFrame? contentArea;
+        private GUIResizableFrame? leftPanel;
+        private GUIFrame? leftContainer;
+        private GUIFrame? centerPanelContainer;
+        private GUIResizableFrame? rightPanel;
+        private GUIFrame? rightContainer;
         private GUIFrame? layoutMenuFrame;
 
         private List<ItemPrefab> allFilteredItems = [];
@@ -62,8 +63,8 @@ namespace SOS
         private const int MinCenterWidth = 200;
         private int lastCenterWForReflow = 0;
 
-        private readonly GUITextViewer? xmlContentText;
-        private readonly GUITickBox? rawXmlTickBox;
+        private GUITextViewer? xmlContentText;
+        private GUITickBox? rawXmlTickBox;
 
         private ItemPrefab? currentItem;
         private List<FabricationRecipe>? currentCraft;
@@ -71,9 +72,21 @@ namespace SOS
         private List<Tuple<ItemPrefab, FabricationRecipe>>? currentUses;
         private List<Tuple<ItemPrefab, DeconstructItem>>? currentSources;
 
+        private GUITextBlock? LoadingCompletedText;
+
         private readonly double searchDelay = 0.2;
         private double searchExecutionTime = 0;
         private string? pendingSearchQuery = null;
+
+        private ContentPackage? _ModPackage;
+        public ContentPackage ModPackage => _ModPackage ??= LoadModPackage() ?? throw new Exception("[SOS] ModPackage not found");
+
+        private static ContentPackage? LoadModPackage()
+        {
+            var modPackage = ContentPackageManager.EnabledPackages.All.FirstOrDefault(p => p.Name == "S.O.S - Standard Operations Schematics");
+            if (modPackage != null) RLogger.LogDebug("[SOS] ModPackage Loaded: " + modPackage.Name);
+            return modPackage;
+        }
 
         private static readonly Dictionary<Identifier, string> itemSlotCache = [];
 
@@ -108,6 +121,48 @@ namespace SOS
                 mainFrame.RectTransform.AbsoluteOffset = new Point(centerX, centerY);
             }
 
+            if (!controller.DataInitialized)
+            {
+                mainFrame.ExFadeIn(duration: 1.0f);
+                BuildLoadingUI();
+            }
+            else
+            {
+                BuildMainUI();
+            }
+        }
+
+        protected void BuildLoadingUI()
+        {
+            if (mainFrame == null) return;
+
+            loadingFrame = new GUIFrame(new RectTransform(Vector2.One, mainFrame.RectTransform, Anchor.Center), style: "InnerFrame") { Color = Color.Black * 0.5f };
+            var loadingLayout = new GUILayoutGroup(new RectTransform(Vector2.One, loadingFrame.RectTransform), isHorizontal: false) { ChildAnchor = Anchor.Center };
+
+            var imgPath = $"{ModPackage.Dir}/Content/SOS_LOGO_TEXT.png";
+            if (Path.Exists(imgPath) && LuaCsFile.CanReadFromPath(imgPath))
+            {
+                var sprite = new Sprite(newFile: imgPath, Vector2.One);
+                var img = new GUIImage(new RectTransform(new Point(1943, 343), loadingLayout.RectTransform), sprite: sprite, scaleToFit: true);
+                img.SetAlpha(0.8f);
+                img.ExFadeIn(duration: 1.0f).ExFlash(color: Color.Violet, duration: 1.0f, alsoChildren: true);
+            }
+            else
+            {
+                DebugConsole.ThrowError("Error loading SOS logo: " + imgPath);
+            }
+
+            LoadingCompletedText = new GUITextBlock(new RectTransform(new Vector2(1f, 0.2f), loadingLayout.RectTransform),
+                TextSOS.Get("sos.window.loading", "Loading dependencies..."),
+                font: GUIStyle.LargeFont, textAlignment: Alignment.Center, wrap: true);
+
+            LoadingCompletedText.Wait(0.5f).ExFadeIn(duration: 0.5f).ExFlash(color: Color.Violet, duration: 1.0f, alsoChildren: true);
+        }
+
+        protected void BuildMainUI()
+        {
+            if (mainFrame == null) return;
+
             var topBar = new GUIFrame(new RectTransform(new Vector2(1.0f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter), "GUIFrameBottom");
             topBar.RectTransform.MinSize = new Point(0, HeaderHeight);
             topBar.RectTransform.MaxSize = new Point(int.MaxValue, HeaderHeight);
@@ -116,7 +171,7 @@ namespace SOS
                 TextSOS.Get("sos.window.title", "SOS - Recipe Browser"),
                 textAlignment: Alignment.Center, font: GUIStyle.LargeFont);
 
-            var leftTools = new GUILayoutGroup(new RectTransform(new Vector2(0.35f, 0.8f), topBar.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true)
+            var leftTools = new GUILayoutGroup(new RectTransform(new Vector2(0.32f, 0.8f), topBar.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true)
             {
                 AbsoluteSpacing = 5,
                 Stretch = false
@@ -195,7 +250,7 @@ namespace SOS
                 return true;
             };
 
-            itemList = new GUIListBox(new RectTransform(new Vector2(1f, 1f), leftLayout.RectTransform), style: "GUIListBox")
+            itemList = new GUIListBox(new RectTransform(new Vector2(1f, 1f), leftLayout.RectTransform), style: null)
             {
                 Padding = new Vector4(8, 5, 5, 5),
                 Color = Color.Black * 0.2f
@@ -226,18 +281,18 @@ namespace SOS
 
             var obtainContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), obtainContainer.RectTransform), TextSOS.Get("sos.window.obtain", "OBTAIN"), font: GUIStyle.SubHeadingFont, textColor: Color.LightGreen, textAlignment: Alignment.Center);
-            colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), obtainContainer.RectTransform), style: "GUIListBox")
+            colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), obtainContainer.RectTransform), style: null)
             {
                 Spacing = 5,
-                Color = Color.Black * 0.3f
+                Color = Color.Black * 0.2f,
             };
 
             var usageContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), usageContainer.RectTransform), TextSOS.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
-            colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: "GUIListBox")
+            colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: null)
             {
                 Spacing = 5,
-                Color = Color.Black * 0.3f
+                Color = Color.Black * 0.2f
             };
 
             rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), contentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
@@ -308,6 +363,60 @@ namespace SOS
 
             UpdateLayout();
             mainFrame.ForceLayoutRecalculation();
+            RLogger.LogDebug("Main UI built");
+        }
+
+        public void OnInitializationComplete()
+        {
+            RLogger.LogDebug("[SOS] Initialization complete. Finalizing UI...");
+
+            if (loadingFrame != null && mainFrame != null)
+            {
+
+                loadingFrame.ExFadeOut(duration: 0.5f, targetFactor: 0.6f, alsoChildren: true)
+                    .Wait(5.0f)
+                    .ExFadeOut(duration: 2.0f, alsoChildren: true)
+                    .WaitFinish()
+                    .Execute(() =>
+                        {
+                            loadingFrame = null;
+                            RLogger.LogDebug("[SOS] Loading frame removed");
+                        }
+                    );
+
+                LoadingCompletedText?
+                    .Execute(() => LoadingCompletedText.SetRichText(TextSOS.Get("sos.window.loading.complete", "Loading complete!").SetColor(Color.LightGreen)))
+                    .ExBlink(duration: 1.0f, minAlpha: 0.0f, maxAlpha: 0.6f, interval: 0.5f, alsoChildren: true).WaitFinish()
+                    .Execute(() =>
+                        {
+                            LoadingCompletedText = null;
+                            RLogger.LogDebug("[SOS] Loading completed text removed");
+                        }
+                    );
+
+                BuildMainUI();
+
+                contentArea?.ExFadeIn(duration: 1.0f, alsoChildren: true);
+                if (controller.CurrentItem != null)
+                {
+                    UpdateDetailsFromController();
+                }
+                mainFrame?.ForceLayoutRecalculation();
+            }
+        }
+
+        private void UpdateDetailsFromController()
+        {
+            if (controller.CurrentItem == null) return;
+
+            var item = controller.CurrentItem;
+            var craft = RecipeAnalyzer.GetCraftingRecipes(item);
+            var decon = RecipeAnalyzer.GetDeconstructionOutputs(item);
+            var uses = RecipeAnalyzer.GetUsesAsIngredient(item);
+            var sources = RecipeAnalyzer.GetSourcesFromDeconstruction(item);
+
+            UpdateDetailsPanel(item, craft, decon, uses, sources);
+            UpdateNavigationButtons();
         }
 
         void OnPrimary(ItemPrefab p) => controller.OnItemSelected(p);
@@ -374,6 +483,12 @@ namespace SOS
         public void Destroy()
         {
             activeDropdowns.Clear();
+
+            if (loadingFrame != null)
+            {
+                mainFrame?.RemoveChild(loadingFrame);
+                loadingFrame = null;
+            }
 
             if (mainFrame?.RectTransform != null)
             {
@@ -445,10 +560,12 @@ namespace SOS
                     var prefab = allFilteredItems[i];
                     bool isFav = controller.FavoritedItems.Contains(prefab.Identifier.Value);
 
-                    var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, 35) }, style: "ListBoxElement")
+                    var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, 32) }, style: "ListBoxElement")
                     {
                         OnClicked = (_, _) => { OnPrimary(prefab); return true; },
-                        OnSecondaryClicked = (_, _) => { OnSecondary(prefab); return true; }
+                        OnSecondaryClicked = (_, _) => { OnSecondary(prefab); return true; },
+                        Selected = false,
+                        CanBeFocused = true
                     };
 
                     //string prefix = isFav ? "* " : "";

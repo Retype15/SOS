@@ -16,35 +16,35 @@ namespace SOS
             controller = new SOSController();
 
             if (!DebugConsole.commands.Exists(c => c.Names.ToString() == "sos")) // \\//
-            DebugConsole.commands.Add(new DebugConsole.Command(
-                name: "sos",
-                help: TextSOS.Get("sos.command.help", "Open/Close SOS.").Value,
-                onExecute: _ => controller?.ToggleUI(),
-                getValidArgs: null,
-                isCheat: false
-            )
-            {
-                RelayToServer = false,
-                OnClientExecute = _ => controller?.ToggleUI()
-            });
+                DebugConsole.commands.Add(new DebugConsole.Command(
+                    name: "sos",
+                    help: TextSOS.Get("sos.command.help", "Open/Close SOS.").Value,
+                    onExecute: _ => controller?.ToggleUI(),
+                    getValidArgs: null,
+                    isCheat: false
+                )
+                {
+                    RelayToServer = false,
+                    OnClientExecute = _ => controller?.ToggleUI()
+                });
 
 #if DEBUG
             if (!DebugConsole.commands.Exists(c => c.Names.ToString() == "sos")) // \\//
-            DebugConsole.commands.Add(new DebugConsole.Command(
-                name: "debugsos",
-                help: "Abre la ventana de pruebas de UI Escalable.",
-                onExecute: _ =>
+                DebugConsole.commands.Add(new DebugConsole.Command(
+                    name: "debugsos",
+                    help: "Abre la ventana de pruebas de UI Escalable.",
+                    onExecute: _ =>
+                    {
+                        DebugSOSWindow.Instance?.Destroy();
+                        InitDebugSOSWindow();
+                    },
+                    getValidArgs: null,
+                    isCheat: false
+                )
                 {
-                    DebugSOSWindow.Instance?.Destroy();
-                    InitDebugSOSWindow();
-                },
-                getValidArgs: null,
-                isCheat: false
-            )
-            {
-                RelayToServer = false,
-                OnClientExecute = _ => InitDebugSOSWindow()
-            });
+                    RelayToServer = false,
+                    OnClientExecute = _ => InitDebugSOSWindow()
+                });
 #endif
 
             GameMain.LuaCs.Hook.Add("keyupdate", "SOS_UpdateLoop", _ =>

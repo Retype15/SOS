@@ -15,7 +15,7 @@ namespace SOS
 {
     public static class CardBuilder
     {
-        private const int RowHeight = 22;
+        private const int RowHeight = 32;
         private const int HeaderHeight = 20;
         private const int CardPadding = 2;
 

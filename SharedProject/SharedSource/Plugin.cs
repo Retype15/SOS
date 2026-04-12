@@ -7,7 +7,9 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
-
+using Barotrauma.LuaCs;
+using Microsoft.Xna.Framework;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 [assembly: IgnoresAccessChecksTo("Barotrauma")]
 [assembly: IgnoresAccessChecksTo("DedicatedServer")]
@@ -20,7 +22,7 @@ namespace SOS
         public void Initialize()
         {
 #if CLIENT
-                InitClient();
+            InitClient();
 #endif
         }
 
@@ -64,5 +66,26 @@ namespace SOS
             }
             return text;
         }
+    }
+
+    public static class RLogger
+    {
+        [Conditional("DEBUG")]
+        public static void LogDebug(string message, Color? color = null) => LuaCsLogger.LogMessage(message, color);
+
+        [Conditional("DEBUG")]
+        public static void LogDebugError(string message) => LuaCsLogger.LogError(message);
+
+        [Conditional("RELEASE")]
+        public static void LogRelease(string message, Color? color = null) => LuaCsLogger.LogMessage(message, color);
+
+        [Conditional("RELEASE")]
+        public static void LogReleaseError(string message) => LuaCsLogger.LogError(message);
+
+        public static void Log(string message, Color? color = null) => LuaCsLogger.LogMessage(message, color);
+
+        public static void LogError(string message) => LuaCsLogger.LogError(message);
+
+        public static void LogWarning(string message, Color? color = null) => LuaCsLogger.LogMessage(message, color ?? Color.Yellow);
     }
 }
