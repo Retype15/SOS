@@ -1,13 +1,16 @@
-﻿// Copyright (c) 2026 Reynier
+﻿// Copyright (c) 2026 Retype15
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
 using Barotrauma;
+using Barotrauma.LuaCs;
+using Barotrauma.LuaCs.Events;
+using FluentResults;
 
 namespace SOS
 {
     // Client-specific code
-    public partial class Plugin : IAssemblyPlugin
+    public partial class Plugin : IAssemblyPlugin, IEventKeyUpdate
     {
         private SOSController? controller;
 
@@ -28,49 +31,28 @@ namespace SOS
                     OnClientExecute = _ => controller?.ToggleUI()
                 });
 
-#if DEBUG
-            if (!DebugConsole.commands.Exists(c => c.Names.ToString() == "sos")) // \\//
-                DebugConsole.commands.Add(new DebugConsole.Command(
-                    name: "debugsos",
-                    help: "Abre la ventana de pruebas de UI Escalable.",
-                    onExecute: _ =>
-                    {
-                        DebugSOSWindow.Instance?.Destroy();
-                        InitDebugSOSWindow();
-                    },
-                    getValidArgs: null,
-                    isCheat: false
-                )
-                {
-                    RelayToServer = false,
-                    OnClientExecute = _ => InitDebugSOSWindow()
-                });
-#endif
-
-            GameMain.LuaCs.Hook.Add("keyupdate", "SOS_UpdateLoop", _ =>
-            {
-                controller?.Update();
-#if DEBUG
-                DebugSOSWindow.Instance?.Update();
-#endif
-                return null;
-            });
+            _ = LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
 
             LuaCsLogger.LogMessage(TextSOS.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
         }
 
-        public static void InitDebugSOSWindow()
+        public void OnKeyUpdate(double deltaTime)
         {
-            _ = new DebugSOSWindow();
+            controller?.Update();
         }
 
         public void DisposeClient()
         {
             DebugConsole.commands.RemoveAll(c => c.Names.Contains("sos"));
-            GameMain.LuaCs.Hook.Remove("keyupdate", "SOS_UpdateLoop");
+            LuaCsSetup.Instance.EventService.Unsubscribe<IEventKeyUpdate>(this);
             controller?.SaveSettings();
             controller?.Destroy();
             controller = null;
+        }
+
+        void IEventKeyUpdate.OnKeyUpdate(double deltaTime)
+        {
+            throw new NotImplementedException();
         }
     }
 }
