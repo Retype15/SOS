@@ -36,9 +36,10 @@ namespace SOS
         private GUIButton? btnForward;
 
         private GUIFrame? contentArea;
+        private GUIFrame? topBar;
         private GUIResizableFrame? leftPanel;
         private GUIFrame? leftContainer;
-        private GUIFrame? centerPanelContainer;
+        private GUIFrame? centerPanel;
         private GUIResizableFrame? rightPanel;
         private GUIFrame? rightContainer;
         private GUIFrame? layoutMenuFrame;
@@ -123,7 +124,7 @@ namespace SOS
 
             if (!controller.DataInitialized)
             {
-                mainFrame.ExFadeIn(duration: 1.0f);
+                //mainFrame.ExFadeIn(duration: 1.0f);
                 BuildLoadingUI();
             }
             else
@@ -137,33 +138,32 @@ namespace SOS
             if (mainFrame == null) return;
 
             loadingFrame = new GUIFrame(new RectTransform(Vector2.One, mainFrame.RectTransform, Anchor.Center), style: "InnerFrame") { Color = Color.Black * 0.5f };
-            var loadingLayout = new GUILayoutGroup(new RectTransform(Vector2.One, loadingFrame.RectTransform), isHorizontal: false) { ChildAnchor = Anchor.Center };
 
             var imgPath = $"{ModPackage.Dir}/Content/SOS_LOGO_TEXT.png";
-            if (Path.Exists(imgPath) && LuaCsFile.CanReadFromPath(imgPath))
+            if (File.Exists(imgPath) && LuaCsFile.CanReadFromPath(imgPath))
             {
                 var sprite = new Sprite(newFile: imgPath, Vector2.One);
-                var img = new GUIImage(new RectTransform(new Point(1943, 343), loadingLayout.RectTransform), sprite: sprite, scaleToFit: true);
+                var img = new GUIImage(new RectTransform(new Vector2(0.8f, 0.6f), loadingFrame.RectTransform, Anchor.Center), sprite: sprite, scaleToFit: true);
                 img.SetAlpha(0.8f);
-                img.ExFadeIn(duration: 1.0f).ExFlash(color: Color.Violet, duration: 1.0f, alsoChildren: true);
+                img.ExFadeIn(duration: 0.5f, targetFactor: 0.8f, alsoChildren: true);
             }
-            else
+
+            LoadingCompletedText = new GUITextBlock(new RectTransform(new Vector2(0.9f, 0.2f), loadingFrame.RectTransform, Anchor.BottomCenter)
             {
-                DebugConsole.ThrowError("Error loading SOS logo: " + imgPath);
-            }
+                AbsoluteOffset = new Point(0, -30)
+            },
+            TextSOS.Get("sos.window.loading", "Loading dependencies..."),
+            font: GUIStyle.LargeFont, textAlignment: Alignment.Center, wrap: true);
 
-            LoadingCompletedText = new GUITextBlock(new RectTransform(new Vector2(1f, 0.2f), loadingLayout.RectTransform),
-                TextSOS.Get("sos.window.loading", "Loading dependencies..."),
-                font: GUIStyle.LargeFont, textAlignment: Alignment.Center, wrap: true);
-
-            LoadingCompletedText.Wait(0.5f).ExFadeIn(duration: 0.5f).ExFlash(color: Color.Violet, duration: 1.0f, alsoChildren: true);
+            //LoadingCompletedText.SetAlpha(0f);
+            LoadingCompletedText.Wait(0.5f).ExFadeIn(duration: 0.5f);
         }
 
         protected void BuildMainUI()
         {
             if (mainFrame == null) return;
 
-            var topBar = new GUIFrame(new RectTransform(new Vector2(1.0f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter), "GUIFrameBottom");
+            topBar = new GUIFrame(new RectTransform(new Vector2(1.0f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter), "GUIFrameBottom");
             topBar.RectTransform.MinSize = new Point(0, HeaderHeight);
             topBar.RectTransform.MaxSize = new Point(int.MaxValue, HeaderHeight);
 
@@ -257,13 +257,13 @@ namespace SOS
             };
             itemList.RectTransform.MinSize = new Point(0, 50);
 
-            centerPanelContainer = new GUIFrame(new RectTransform(new Vector2(0.52f, 1f), contentArea.RectTransform, Anchor.TopLeft), style: null);
-            var centerLayout = new GUILayoutGroup(new RectTransform(Vector2.One, centerPanelContainer.RectTransform))
+            centerPanel = new GUIFrame(new RectTransform(new Vector2(0.52f, 1f), contentArea.RectTransform, Anchor.TopLeft), style: null);
+            var centerLayout = new GUILayoutGroup(new RectTransform(Vector2.One, centerPanel.RectTransform))
             {
                 Stretch = true,
                 RelativeSpacing = 0.01f
             };
-            centerPanelContainer.RectTransform.MinSize = new Point(200, 50);
+            centerPanel.RectTransform.MinSize = new Point(200, 50);
 
             detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.15f), centerLayout.RectTransform), style: "CircuitBoxFrame")
             {
@@ -373,9 +373,23 @@ namespace SOS
             if (loadingFrame != null && mainFrame != null)
             {
 
-                loadingFrame.ExFadeOut(duration: 0.5f, targetFactor: 0.6f, alsoChildren: true)
-                    .Wait(5.0f)
-                    .ExFadeOut(duration: 2.0f, alsoChildren: true)
+                LoadingCompletedText?
+                    .Wait(0.5f)
+                    .Execute(() => LoadingCompletedText.SetRichText(TextSOS.Get("sos.window.loading.complete", "Loading complete!").SetColor(Color.LightGreen))).WaitFinish()
+                    .ExBlink(duration: 4.0f, minAlpha: 0.0f, maxAlpha: 0.6f, interval: 1.0f, alsoChildren: true).WaitFinish()
+                    .ExFadeOut(0.5f)
+                    .Execute(() =>
+                        {
+                            LoadingCompletedText = null;
+                            RLogger.LogDebug("[SOS] Loading completed text removed");
+                        }
+                    );
+
+                loadingFrame
+                    .Wait(0.5f)
+                    .ExFadeOut(duration: 0.5f, targetFactor: 0.6f, alsoChildren: true)
+                    .Wait(4.0f)
+                    .ExFadeOut(duration: 1.0f, alsoChildren: true)
                     .WaitFinish()
                     .Execute(() =>
                         {
@@ -384,19 +398,13 @@ namespace SOS
                         }
                     );
 
-                LoadingCompletedText?
-                    .Execute(() => LoadingCompletedText.SetRichText(TextSOS.Get("sos.window.loading.complete", "Loading complete!").SetColor(Color.LightGreen)))
-                    .ExBlink(duration: 1.0f, minAlpha: 0.0f, maxAlpha: 0.6f, interval: 0.5f, alsoChildren: true).WaitFinish()
-                    .Execute(() =>
-                        {
-                            LoadingCompletedText = null;
-                            RLogger.LogDebug("[SOS] Loading completed text removed");
-                        }
-                    );
-
                 BuildMainUI();
-
-                contentArea?.ExFadeIn(duration: 1.0f, alsoChildren: true);
+                topBar?.ExFadeIn(duration: 1.0f, alsoChildren: false);
+                //leftPanel?.SetAlpha(0.0f);
+                //centerPanel?.SetAlpha(0.0f);
+                //rightPanel?.SetAlpha(0.0f);
+                contentArea?.SetAlpha(0.0f);
+                contentArea?.ExFadeIn(duration: 1.0f, targetFactor: 1.0f, alsoChildren: true);
                 if (controller.CurrentItem != null)
                 {
                     UpdateDetailsFromController();
@@ -628,7 +636,7 @@ namespace SOS
 
         private void UpdateLayout()
         {
-            if (mainFrame == null || contentArea == null || leftPanel == null || rightPanel == null || centerPanelContainer == null) return;
+            if (mainFrame == null || contentArea == null || leftPanel == null || rightPanel == null || centerPanel == null) return;
 
             int availableHeight = mainFrame.Rect.Height - HeaderHeight - BottomMargin;
             contentArea.RectTransform.NonScaledSize = new Point(contentArea.Rect.Width, availableHeight);
@@ -651,8 +659,8 @@ namespace SOS
             int centerWidth = areaRect.Width - leftW - rightW - (spacing * 2);
 
             leftPanel.RectTransform.NonScaledSize = new Point(leftW, areaRect.Height);
-            centerPanelContainer.RectTransform.AbsoluteOffset = new Point(leftW + spacing, 0);
-            centerPanelContainer.RectTransform.NonScaledSize = new Point(centerWidth, areaRect.Height);
+            centerPanel.RectTransform.AbsoluteOffset = new Point(leftW + spacing, 0);
+            centerPanel.RectTransform.NonScaledSize = new Point(centerWidth, areaRect.Height);
             rightPanel.RectTransform.NonScaledSize = new Point(rightW, areaRect.Height);
 
             var newLeftMode = GetModeForWidth(leftW, SidebarHiddenThreshold, SidebarCompactThreshold);

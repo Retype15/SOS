@@ -43,16 +43,11 @@ namespace SOS
 
         public void DisposeClient()
         {
-            DebugConsole.commands.RemoveAll(c => c.Names.Contains("sos"));
             LuaCsSetup.Instance.EventService.Unsubscribe<IEventKeyUpdate>(this);
+            DebugConsole.commands.RemoveAll(c => c.Names.Contains("sos"));
             controller?.SaveSettings();
             controller?.Destroy();
             controller = null;
-        }
-
-        void IEventKeyUpdate.OnKeyUpdate(double deltaTime)
-        {
-            throw new NotImplementedException();
         }
     }
 }

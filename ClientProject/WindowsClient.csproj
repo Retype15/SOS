@@ -58,6 +58,9 @@
     <Reference Include="XNATypes">
       <HintPath>..\Refs\XNATypes.dll</HintPath>
     </Reference>
+    <Reference Include="FluentResults">
+      <HintPath>..\Refs\FluentResults.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <PropertyGroup>

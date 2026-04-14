@@ -149,7 +149,7 @@ namespace SOS
             }
             // MARK: AAAA
 #if DEBUG
-            System.Threading.Thread.Sleep(3000);
+            //System.Threading.Thread.Sleep(1000);
             LuaCsLogger.LogMessage("[SOS] Dependency graph precomputed (Debug Sleep 3s finished).");
 #endif
         }

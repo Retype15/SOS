@@ -336,8 +336,7 @@ namespace SOS
                 {
                     if (PlayerInput.KeyHit(Keys.Escape))
                     {
-                        mainWindow.SetSelected();
-                        //PlayerInput.KeyDown(Keys.Escape);
+                        //mainWindow.SetSelected();
                         CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
                         return;
                     }
