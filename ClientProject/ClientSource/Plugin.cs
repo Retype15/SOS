@@ -31,7 +31,7 @@ namespace SOS
                     OnClientExecute = _ => controller?.ToggleUI()
                 });
 
-            _ = LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
+            LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
 
             LuaCsLogger.LogMessage(TextSOS.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
         }
@@ -39,12 +39,18 @@ namespace SOS
         public void OnKeyUpdate(double deltaTime)
         {
             controller?.Update();
+
+#if DEBUG
+            DebugSOSWindow.Instance?.Update();
+#endif
         }
 
         public void DisposeClient()
         {
             LuaCsSetup.Instance.EventService.Unsubscribe<IEventKeyUpdate>(this);
+
             DebugConsole.commands.RemoveAll(c => c.Names.Contains("sos"));
+
             controller?.SaveSettings();
             controller?.Destroy();
             controller = null;

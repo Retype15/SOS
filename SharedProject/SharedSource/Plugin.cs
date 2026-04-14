@@ -8,8 +8,6 @@
 
 using Barotrauma;
 using Barotrauma.LuaCs;
-using Microsoft.Xna.Framework;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 [assembly: IgnoresAccessChecksTo("Barotrauma")]
 [assembly: IgnoresAccessChecksTo("DedicatedServer")]
