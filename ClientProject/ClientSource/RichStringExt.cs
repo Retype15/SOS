@@ -1,17 +1,16 @@
 // Copyright (c) 2026 Retype15
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
+// NOTE: This file contains AI generated code, all content 
+//   marked as AI generated are free to use without licence 
+//   requirements.
 
 #pragma warning disable IDE0130
 #pragma warning disable IDE0079
 #pragma warning disable IDE0290
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Barotrauma;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace SOS
 {
@@ -111,14 +110,14 @@ namespace SOS
     public class GUIAnimSequence
     {
         public GUIComponent Component { get; private set; }
-        private static readonly Dictionary<GUIComponent, Color> designColors = new Dictionary<GUIComponent, Color>();
-        private static readonly Dictionary<GUIComponent, Color> designTextColors = new Dictionary<GUIComponent, Color>();
-        private float originalAlpha;
+        private static readonly Dictionary<GUIComponent, Color> designColors = [];
+        private static readonly Dictionary<GUIComponent, Color> designTextColors = [];
+        private readonly float originalAlpha;
         private Color originalBaseColor;
 
         // La secuencia se divide en "Pasos". Cada paso es una lista de acciones paralelas.
-        private List<List<Func<IEnumerable<CoroutineStatus>>>> steps = new List<List<Func<IEnumerable<CoroutineStatus>>>>();
-        private List<Func<IEnumerable<CoroutineStatus>>> currentStep = new List<Func<IEnumerable<CoroutineStatus>>>();
+        private readonly List<List<Func<IEnumerable<CoroutineStatus>>>> steps = [];
+        private List<Func<IEnumerable<CoroutineStatus>>> currentStep = [];
 
         public GUIAnimSequence(GUIComponent component)
         {
@@ -168,7 +167,7 @@ namespace SOS
             if (currentStep.Count > 0)
             {
                 // Prepara un nuevo bloque paralelo vacío
-                currentStep = new List<Func<IEnumerable<CoroutineStatus>>>();
+                currentStep = [];
             }
             return this;
         }
@@ -179,7 +178,7 @@ namespace SOS
         public GUIAnimSequence Wait(float duration)
         {
             WaitFinish(); // Cerramos cualquier tarea paralela actual
-            AddAction(() => DoWait(duration)); // Agregamos la espera como tarea
+            AddAction(() => GUIAnimSequence.DoWait(duration)); // Agregamos la espera como tarea
             WaitFinish(); // Cerramos la espera para que lo siguiente inicie DESPUÉS de ella
             return this;
         }
@@ -225,7 +224,7 @@ namespace SOS
             // Aplicación inmediata del estado inicial (Alpha factor 0) para evitar parpadeo
             if (steps.Count == 0 || (steps.Count == 1 && currentStep.Count == 0))
             {
-                ApplyAlphaInternal(Component, 0f);
+                GUIAnimSequence.ApplyAlphaInternal(Component, 0f);
                 if (alsoChildren)
                 {
                     foreach (var child in Component.GetAllChildren())
@@ -234,7 +233,7 @@ namespace SOS
                         if (!designColors.ContainsKey(child) || child.Color.A > 0) designColors[child] = child.Color;
                         if (child is GUITextBlock tb && (!designTextColors.ContainsKey(tb) || tb.TextColor.A > 0)) designTextColors[tb] = tb.TextColor;
 
-                        ApplyAlphaInternal(child, 0f);
+                        GUIAnimSequence.ApplyAlphaInternal(child, 0f);
                     }
                 }
             }
@@ -270,10 +269,10 @@ namespace SOS
             while (t < duration)
             {
                 t += CoroutineManager.DeltaTime;
-                ApplyAlphaInternal(Component, MathHelper.Lerp(0f, targetFactor, Math.Min(1.0f, t / duration)));
+                GUIAnimSequence.ApplyAlphaInternal(Component, MathHelper.Lerp(0f, targetFactor, Math.Min(1.0f, t / duration)));
                 yield return CoroutineStatus.Running;
             }
-            ApplyAlphaInternal(Component, targetFactor);
+            GUIAnimSequence.ApplyAlphaInternal(Component, targetFactor);
             yield return CoroutineStatus.Success;
         }
 
@@ -284,14 +283,14 @@ namespace SOS
             while (t < duration)
             {
                 t += CoroutineManager.DeltaTime;
-                ApplyAlphaInternal(Component, MathHelper.Lerp(startFactor, targetFactor, Math.Min(1.0f, t / duration)));
+                GUIAnimSequence.ApplyAlphaInternal(Component, MathHelper.Lerp(startFactor, targetFactor, Math.Min(1.0f, t / duration)));
                 yield return CoroutineStatus.Running;
             }
-            ApplyAlphaInternal(Component, targetFactor);
+            GUIAnimSequence.ApplyAlphaInternal(Component, targetFactor);
             yield return CoroutineStatus.Success;
         }
 
-        private void ApplyAlphaInternal(GUIComponent comp, float factor)
+        private static void ApplyAlphaInternal(GUIComponent comp, float factor)
         {
             if (designColors.TryGetValue(comp, out Color dc))
             {
@@ -327,7 +326,7 @@ namespace SOS
         /// </summary>
         public GUIAnimSequence Execute(Action action)
         {
-            AddAction(() => DoExecute(action));
+            AddAction(() => GUIAnimSequence.DoExecute(action));
             return this;
         }
 
@@ -371,7 +370,7 @@ namespace SOS
         // MARK: - CORRUTINAS INTERNAS (LÓGICA MATEMÁTICA)
         // =========================================================================
 
-        private IEnumerable<CoroutineStatus> DoWait(float duration)
+        private static IEnumerable<CoroutineStatus> DoWait(float duration)
         {
             float t = 0;
             while (t < duration)
@@ -390,10 +389,10 @@ namespace SOS
             {
                 t += CoroutineManager.DeltaTime;
                 float progress = Math.Min(1.0f, t / duration);
-                ApplyColorRGB(Component, Color.Lerp(startColor, targetColor, progress));
+                GUIAnimSequence.ApplyColorRGB(Component, Color.Lerp(startColor, targetColor, progress));
                 yield return CoroutineStatus.Running;
             }
-            ApplyColorRGB(Component, targetColor);
+            GUIAnimSequence.ApplyColorRGB(Component, targetColor);
             yield return CoroutineStatus.Success;
         }
 
@@ -415,7 +414,7 @@ namespace SOS
         private IEnumerable<CoroutineStatus> DoShake(float duration, float intensity)
         {
             float t = 0f;
-            Random rand = new Random();
+            Random rand = new();
             Point originalOffset = Component.RectTransform.ScreenSpaceOffset;
             while (t < duration)
             {
@@ -438,10 +437,10 @@ namespace SOS
             while (t < duration)
             {
                 t += CoroutineManager.DeltaTime;
-                ApplyAlpha(Component, MathHelper.Lerp(startAlpha, targetAlpha, Math.Min(1.0f, t / duration)));
+                GUIAnimSequence.ApplyAlpha(Component, MathHelper.Lerp(startAlpha, targetAlpha, Math.Min(1.0f, t / duration)));
                 yield return CoroutineStatus.Running;
             }
-            ApplyAlpha(Component, targetAlpha);
+            GUIAnimSequence.ApplyAlpha(Component, targetAlpha);
             yield return CoroutineStatus.Success;
         }
 
@@ -453,10 +452,10 @@ namespace SOS
             {
                 t += CoroutineManager.DeltaTime;
                 float currentAlpha = MathHelper.Lerp(startAlpha, targetAlpha, Math.Min(1.0f, t / duration));
-                ApplyAlpha(Component, currentAlpha);
+                GUIAnimSequence.ApplyAlpha(Component, currentAlpha);
                 yield return CoroutineStatus.Running;
             }
-            ApplyAlpha(Component, targetAlpha);
+            GUIAnimSequence.ApplyAlpha(Component, targetAlpha);
             yield return CoroutineStatus.Success;
         }
 
@@ -476,7 +475,7 @@ namespace SOS
         private IEnumerable<CoroutineStatus> DoGlitch(float duration, float intensity)
         {
             float t = 0f;
-            Random rand = new Random();
+            Random rand = new();
             Color origColor = Component.Color;
             Vector2 origUV = Component.UVOffset;
 
@@ -517,10 +516,10 @@ namespace SOS
                 float phase = (t / interval) * MathHelper.TwoPi;
                 float alphaScale = (float)(Math.Sin(phase - MathHelper.PiOver2) + 1.0) / 2.0f;
                 float currentFactor = MathHelper.Lerp(minFactor, maxFactor, alphaScale);
-                ApplyAlphaInternal(Component, currentFactor);
+                GUIAnimSequence.ApplyAlphaInternal(Component, currentFactor);
                 yield return CoroutineStatus.Running;
             }
-            ApplyAlphaInternal(Component, 1.0f);
+            GUIAnimSequence.ApplyAlphaInternal(Component, 1.0f);
             yield return CoroutineStatus.Success;
         }
 
@@ -530,19 +529,19 @@ namespace SOS
             yield return CoroutineStatus.Success;
         }
 
-        private IEnumerable<CoroutineStatus> DoExecute(Action action)
+        private static IEnumerable<CoroutineStatus> DoExecute(Action action)
         {
             try { action?.Invoke(); }
             catch (Exception e) { DebugConsole.ThrowError("Error en ejecución de secuencia GUI", e); }
             yield return CoroutineStatus.Success;
         }
 
-        private void ApplyAlpha(GUIComponent comp, float alpha)
+        private static void ApplyAlpha(GUIComponent comp, float alpha)
         {
-            ApplyAlphaInternal(comp, alpha);
+            GUIAnimSequence.ApplyAlphaInternal(comp, alpha);
         }
 
-        private void ApplyColorRGB(GUIComponent comp, Color rgb)
+        private static void ApplyColorRGB(GUIComponent comp, Color rgb)
         {
             // Mantiene el Alpha que el componente ya tenía
             comp.Color = new Color(rgb.R, rgb.G, rgb.B, comp.Color.A);
