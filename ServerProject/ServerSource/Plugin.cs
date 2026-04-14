@@ -8,7 +8,7 @@ using Barotrauma.LuaCs;
 namespace SOS
 {
     // Server-specific code
-    public partial class Plugin : IAssemblyPlugin
+    public partial class Plugin
     {
     }
 }

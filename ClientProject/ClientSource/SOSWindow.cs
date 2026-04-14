@@ -22,24 +22,26 @@ namespace SOS
 
     public class SOSWindow
     {
+        private GUIFrame? loadingFrame;
         private readonly GUIResizableFrame? mainFrame;
-        private readonly GUIListBox? itemList;
-        private readonly GUIFrame? detailsHeader;
-        private readonly GUIFrame? recipeAreaFrame;
-        private readonly GUIListBox? colObtain;
-        private readonly GUIListBox? colUsage;
-        private readonly GUIListBox? metaPanel;
+        private GUIListBox? itemList;
+        private GUIFrame? detailsHeader;
+        private GUIFrame? recipeAreaFrame;
+        private GUIListBox? colObtain;
+        private GUIListBox? colUsage;
+        private GUIListBox? metaPanel;
         private readonly SOSController controller;
-        private readonly GUITextBox? searchBox;
-        private readonly GUIButton? btnBack;
-        private readonly GUIButton? btnForward;
+        private GUITextBox? searchBox;
+        private GUIButton? btnBack;
+        private GUIButton? btnForward;
 
-        private readonly GUIFrame? contentArea;
-        private readonly GUIResizableFrame? leftPanel;
-        private readonly GUIFrame? leftContainer;
-        private readonly GUIFrame? centerPanelContainer;
-        private readonly GUIResizableFrame? rightPanel;
-        private readonly GUIFrame? rightContainer;
+        private GUIFrame? contentArea;
+        private GUIFrame? topBar;
+        private GUIResizableFrame? leftPanel;
+        private GUIFrame? leftContainer;
+        private GUIFrame? centerPanel;
+        private GUIResizableFrame? rightPanel;
+        private GUIFrame? rightContainer;
         private GUIFrame? layoutMenuFrame;
 
         private List<ItemPrefab> allFilteredItems = [];
@@ -62,8 +64,8 @@ namespace SOS
         private const int MinCenterWidth = 200;
         private int lastCenterWForReflow = 0;
 
-        private readonly GUITextViewer? xmlContentText;
-        private readonly GUITickBox? rawXmlTickBox;
+        private GUITextViewer? xmlContentText;
+        private GUITickBox? rawXmlTickBox;
 
         private ItemPrefab? currentItem;
         private List<FabricationRecipe>? currentCraft;
@@ -71,8 +73,21 @@ namespace SOS
         private List<Tuple<ItemPrefab, FabricationRecipe>>? currentUses;
         private List<Tuple<ItemPrefab, DeconstructItem>>? currentSources;
 
+        private GUITextBlock? LoadingCompletedText;
+
+        private readonly double searchDelay = 0.2;
         private double searchExecutionTime = 0;
         private string? pendingSearchQuery = null;
+
+        private ContentPackage? _ModPackage;
+        public ContentPackage ModPackage => _ModPackage ??= LoadModPackage() ?? throw new Exception("[SOS] ModPackage not found");
+
+        private static ContentPackage? LoadModPackage()
+        {
+            var modPackage = ContentPackageManager.EnabledPackages.All.FirstOrDefault(p => p.Name == "S.O.S - Standard Operations Schematics");
+            if (modPackage != null) RLogger.LogDebug("[SOS] ModPackage Loaded: " + modPackage.Name);
+            return modPackage;
+        }
 
         private static readonly Dictionary<Identifier, string> itemSlotCache = [];
 
@@ -107,7 +122,48 @@ namespace SOS
                 mainFrame.RectTransform.AbsoluteOffset = new Point(centerX, centerY);
             }
 
-            var topBar = new GUIFrame(new RectTransform(new Vector2(1.0f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter), "GUIFrameBottom");
+            if (!controller.DataInitialized)
+            {
+                //mainFrame.ExFadeIn(duration: 1.0f);
+                BuildLoadingUI();
+            }
+            else
+            {
+                BuildMainUI();
+            }
+        }
+
+        protected void BuildLoadingUI()
+        {
+            if (mainFrame == null) return;
+
+            loadingFrame = new GUIFrame(new RectTransform(Vector2.One, mainFrame.RectTransform, Anchor.Center), style: "InnerFrame") { Color = Color.Black * 0.5f };
+
+            var imgPath = $"{ModPackage.Dir}/Content/SOS_LOGO_TEXT.png";
+            if (File.Exists(imgPath) && LuaCsFile.CanReadFromPath(imgPath))
+            {
+                var sprite = new Sprite(newFile: imgPath, Vector2.One);
+                var img = new GUIImage(new RectTransform(new Vector2(0.8f, 0.6f), loadingFrame.RectTransform, Anchor.Center), sprite: sprite, scaleToFit: true);
+                img.SetAlpha(0.8f);
+                img.ExFadeIn(duration: 0.5f, targetFactor: 0.8f, alsoChildren: true);
+            }
+
+            LoadingCompletedText = new GUITextBlock(new RectTransform(new Vector2(0.9f, 0.2f), loadingFrame.RectTransform, Anchor.BottomCenter)
+            {
+                AbsoluteOffset = new Point(0, -30)
+            },
+            TextSOS.Get("sos.window.loading", "Loading dependencies..."),
+            font: GUIStyle.LargeFont, textAlignment: Alignment.Center, wrap: true);
+
+            //LoadingCompletedText.SetAlpha(0f);
+            LoadingCompletedText.Wait(0.5f).ExFadeIn(duration: 0.5f);
+        }
+
+        protected void BuildMainUI()
+        {
+            if (mainFrame == null) return;
+
+            topBar = new GUIFrame(new RectTransform(new Vector2(1.0f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter), "GUIFrameBottom");
             topBar.RectTransform.MinSize = new Point(0, HeaderHeight);
             topBar.RectTransform.MaxSize = new Point(int.MaxValue, HeaderHeight);
 
@@ -115,7 +171,7 @@ namespace SOS
                 TextSOS.Get("sos.window.title", "SOS - Recipe Browser"),
                 textAlignment: Alignment.Center, font: GUIStyle.LargeFont);
 
-            var leftTools = new GUILayoutGroup(new RectTransform(new Vector2(0.35f, 0.8f), topBar.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true)
+            var leftTools = new GUILayoutGroup(new RectTransform(new Vector2(0.32f, 0.8f), topBar.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true)
             {
                 AbsoluteSpacing = 5,
                 Stretch = false
@@ -190,24 +246,24 @@ namespace SOS
             searchBox.OnTextChanged += (_, text) =>
             {
                 pendingSearchQuery = text;
-                searchExecutionTime = Timing.TotalTime + 0.25;
+                searchExecutionTime = Timing.TotalTime + searchDelay;
                 return true;
             };
 
-            itemList = new GUIListBox(new RectTransform(new Vector2(1f, 1f), leftLayout.RectTransform), style: "GUIListBox")
+            itemList = new GUIListBox(new RectTransform(new Vector2(1f, 1f), leftLayout.RectTransform), style: null)
             {
                 Padding = new Vector4(8, 5, 5, 5),
                 Color = Color.Black * 0.2f
             };
             itemList.RectTransform.MinSize = new Point(0, 50);
 
-            centerPanelContainer = new GUIFrame(new RectTransform(new Vector2(0.52f, 1f), contentArea.RectTransform, Anchor.TopLeft), style: null);
-            var centerLayout = new GUILayoutGroup(new RectTransform(Vector2.One, centerPanelContainer.RectTransform))
+            centerPanel = new GUIFrame(new RectTransform(new Vector2(0.52f, 1f), contentArea.RectTransform, Anchor.TopLeft), style: null);
+            var centerLayout = new GUILayoutGroup(new RectTransform(Vector2.One, centerPanel.RectTransform))
             {
                 Stretch = true,
                 RelativeSpacing = 0.01f
             };
-            centerPanelContainer.RectTransform.MinSize = new Point(200, 50);
+            centerPanel.RectTransform.MinSize = new Point(200, 50);
 
             detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.15f), centerLayout.RectTransform), style: "CircuitBoxFrame")
             {
@@ -225,18 +281,18 @@ namespace SOS
 
             var obtainContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), obtainContainer.RectTransform), TextSOS.Get("sos.window.obtain", "OBTAIN"), font: GUIStyle.SubHeadingFont, textColor: Color.LightGreen, textAlignment: Alignment.Center);
-            colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), obtainContainer.RectTransform), style: "GUIListBox")
+            colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), obtainContainer.RectTransform), style: null)
             {
                 Spacing = 5,
-                Color = Color.Black * 0.3f
+                Color = Color.Black * 0.2f,
             };
 
             var usageContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), usageContainer.RectTransform), TextSOS.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
-            colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: "GUIListBox")
+            colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: null)
             {
                 Spacing = 5,
-                Color = Color.Black * 0.3f
+                Color = Color.Black * 0.2f
             };
 
             rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), contentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
@@ -307,6 +363,68 @@ namespace SOS
 
             UpdateLayout();
             mainFrame.ForceLayoutRecalculation();
+            RLogger.LogDebug("Main UI built");
+        }
+
+        public void OnInitializationComplete()
+        {
+            RLogger.LogDebug("[SOS] Initialization complete. Finalizing UI...");
+
+            if (loadingFrame != null && mainFrame != null)
+            {
+
+                LoadingCompletedText?
+                    .Wait(0.5f)
+                    .Execute(() => LoadingCompletedText.SetRichText(TextSOS.Get("sos.window.loading.complete", "Loading complete!").SetColor(Color.LightGreen))).WaitFinish()
+                    .ExBlink(duration: 4.0f, minAlpha: 0.0f, maxAlpha: 0.6f, interval: 1.0f, alsoChildren: true).WaitFinish()
+                    .ExFadeOut(0.5f)
+                    .Execute(() =>
+                        {
+                            LoadingCompletedText = null;
+                            RLogger.LogDebug("[SOS] Loading completed text removed");
+                        }
+                    );
+
+                loadingFrame
+                    .Wait(0.5f)
+                    .ExFadeOut(duration: 0.5f, targetFactor: 0.6f, alsoChildren: true)
+                    .Wait(4.0f)
+                    .ExFadeOut(duration: 1.0f, alsoChildren: true)
+                    .WaitFinish()
+                    .Execute(() =>
+                        {
+                            loadingFrame = null;
+                            RLogger.LogDebug("[SOS] Loading frame removed");
+                        }
+                    );
+
+                BuildMainUI();
+                topBar?.ExFadeIn(duration: 1.0f, alsoChildren: false);
+                //leftPanel?.SetAlpha(0.0f);
+                //centerPanel?.SetAlpha(0.0f);
+                //rightPanel?.SetAlpha(0.0f);
+                contentArea?.SetAlpha(0.0f);
+                contentArea?.ExFadeIn(duration: 1.0f, targetFactor: 1.0f, alsoChildren: true);
+                if (controller.CurrentItem != null)
+                {
+                    UpdateDetailsFromController();
+                }
+                mainFrame?.ForceLayoutRecalculation();
+            }
+        }
+
+        private void UpdateDetailsFromController()
+        {
+            if (controller.CurrentItem == null) return;
+
+            var item = controller.CurrentItem;
+            var craft = RecipeAnalyzer.GetCraftingRecipes(item);
+            var decon = RecipeAnalyzer.GetDeconstructionOutputs(item);
+            var uses = RecipeAnalyzer.GetUsesAsIngredient(item);
+            var sources = RecipeAnalyzer.GetSourcesFromDeconstruction(item);
+
+            UpdateDetailsPanel(item, craft, decon, uses, sources);
+            UpdateNavigationButtons();
         }
 
         void OnPrimary(ItemPrefab p) => controller.OnItemSelected(p);
@@ -373,6 +491,12 @@ namespace SOS
         public void Destroy()
         {
             activeDropdowns.Clear();
+
+            if (loadingFrame != null)
+            {
+                mainFrame?.RemoveChild(loadingFrame);
+                loadingFrame = null;
+            }
 
             if (mainFrame?.RectTransform != null)
             {
@@ -444,10 +568,12 @@ namespace SOS
                     var prefab = allFilteredItems[i];
                     bool isFav = controller.FavoritedItems.Contains(prefab.Identifier.Value);
 
-                    var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, 35) }, style: "ListBoxElement")
+                    var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, 32) }, style: "ListBoxElement")
                     {
                         OnClicked = (_, _) => { OnPrimary(prefab); return true; },
-                        OnSecondaryClicked = (_, _) => { OnSecondary(prefab); return true; }
+                        OnSecondaryClicked = (_, _) => { OnSecondary(prefab); return true; },
+                        Selected = false,
+                        CanBeFocused = true
                     };
 
                     //string prefix = isFav ? "* " : "";
@@ -483,6 +609,13 @@ namespace SOS
 
             UpdateLayout();
 
+            if (pendingSearchQuery != null && Timing.TotalTime >= searchExecutionTime)
+            {
+                controller.LastSearchQuery = pendingSearchQuery;
+                UpdateSearch(pendingSearchQuery);
+                pendingSearchQuery = null;
+            }
+
             if (itemList == null || itemsLoaded >= allFilteredItems.Count || isUpdating) return;
 
             int total = allFilteredItems.Count;
@@ -499,18 +632,11 @@ namespace SOS
                     layoutMenuFrame = null;
                 }
             }
-
-            if (pendingSearchQuery != null && Timing.TotalTime >= searchExecutionTime)
-            {
-                controller.LastSearchQuery = pendingSearchQuery;
-                UpdateSearch(pendingSearchQuery);
-                pendingSearchQuery = null;
-            }
         }
 
         private void UpdateLayout()
         {
-            if (mainFrame == null || contentArea == null || leftPanel == null || rightPanel == null || centerPanelContainer == null) return;
+            if (mainFrame == null || contentArea == null || leftPanel == null || rightPanel == null || centerPanel == null) return;
 
             int availableHeight = mainFrame.Rect.Height - HeaderHeight - BottomMargin;
             contentArea.RectTransform.NonScaledSize = new Point(contentArea.Rect.Width, availableHeight);
@@ -533,8 +659,8 @@ namespace SOS
             int centerWidth = areaRect.Width - leftW - rightW - (spacing * 2);
 
             leftPanel.RectTransform.NonScaledSize = new Point(leftW, areaRect.Height);
-            centerPanelContainer.RectTransform.AbsoluteOffset = new Point(leftW + spacing, 0);
-            centerPanelContainer.RectTransform.NonScaledSize = new Point(centerWidth, areaRect.Height);
+            centerPanel.RectTransform.AbsoluteOffset = new Point(leftW + spacing, 0);
+            centerPanel.RectTransform.NonScaledSize = new Point(centerWidth, areaRect.Height);
             rightPanel.RectTransform.NonScaledSize = new Point(rightW, areaRect.Height);
 
             var newLeftMode = GetModeForWidth(leftW, SidebarHiddenThreshold, SidebarCompactThreshold);
@@ -787,38 +913,39 @@ namespace SOS
                 section.Draw(builder);
             }
 
-            if (xmlContentText != null && targetItem.ConfigElement != null)
+            if (xmlContentText != null)
             {
-                try
-                {
-                    string rawXml = targetItem.ConfigElement.ToString() ?? "<!-- Empty XML -->";
-
-                    if (rawXml == "Barotrauma.ContentXElement")
-                    {
-                        var prop = targetItem.ConfigElement.GetType().GetProperty("Element")
-                                ?? targetItem.ConfigElement.GetType().GetProperty("XElement");
-                        var field = targetItem.ConfigElement.GetType().GetField("Element")
-                                ?? targetItem.ConfigElement.GetType().GetField("XElement");
-
-                        object? inner = prop?.GetValue(targetItem.ConfigElement)
-                                        ?? field?.GetValue(targetItem.ConfigElement);
-
-                        if (inner != null)
-                        {
-                            rawXml = inner.ToString() ?? rawXml;
-                        }
-                    }
-
-                    xmlContentText.Text = XMLHighlighter.Format(rawXml);
-                }
-                catch
-                {
-                    xmlContentText.Text = XMLHighlighter.Format("<!-- Error parsing XML data -->");
-                }
+                xmlContentText.Text = XMLHighlighter.Format(GetRawXMLSafe(targetItem));
             }
-            else if (xmlContentText != null)
+        }
+
+        private static string GetRawXMLSafe(ItemPrefab item)
+        {
+            if (item.ConfigElement == null) return "<!-- No XML data found for this item -->";
+
+            try
             {
-                xmlContentText.Text = XMLHighlighter.Format("<!-- No XML data found for this item -->");
+                string rawXml = item.ConfigElement.ToString() ?? "<!-- Empty XML -->";
+
+                if (rawXml == "Barotrauma.ContentXElement")
+                {
+                    var type = item.ConfigElement.GetType();
+                    var prop = type.GetProperty("Element") ?? type.GetProperty("XElement");
+                    var field = type.GetField("Element") ?? type.GetField("XElement");
+
+                    object? inner = prop?.GetValue(item.ConfigElement) ?? field?.GetValue(item.ConfigElement);
+
+                    if (inner != null)
+                    {
+                        rawXml = inner.ToString() ?? rawXml;
+                    }
+                }
+
+                return rawXml;
+            }
+            catch (Exception)
+            {
+                return "<!-- Error parsing XML data -->";
             }
         }
 

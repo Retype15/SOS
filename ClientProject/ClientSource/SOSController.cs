@@ -16,6 +16,8 @@ namespace SOS
     {
         private SOSWindow? mainWindow;
 
+        public bool DataInitialized { get; private set; } = false;
+
         public HashSet<string> FavoritedItems { get; } = [];
 
         public TrackerManager Tracker { get; } = new();
@@ -68,7 +70,20 @@ namespace SOS
 
                 mainWindow = new SOSWindow(this);
 
-                if (CurrentItem != null)
+                if (!DataInitialized)
+                {
+                    System.Threading.Tasks.Task.Run(() =>
+                    {
+                        RecipeAnalyzer.PrecomputeCaches();
+                        DataInitialized = true;
+
+                        CrossThread.RequestExecutionOnMainThread(() =>
+                        {
+                            mainWindow?.OnInitializationComplete();
+                        });
+                    });
+                }
+                else if (CurrentItem != null)
                 {
                     UpdateWindowDetails(CurrentItem);
                 }
@@ -188,7 +203,7 @@ namespace SOS
             if (CustomLayouts.Remove(name)) MarkDirty();
         }
 
-        private void UpdateWindowDetails(ItemPrefab item)
+        public void UpdateWindowDetails(ItemPrefab item)
         {
             if (mainWindow == null) return;
 
@@ -321,8 +336,7 @@ namespace SOS
                 {
                     if (PlayerInput.KeyHit(Keys.Escape))
                     {
-                        mainWindow.SetSelected();
-                        //PlayerInput.KeyDown(Keys.Escape);
+                        //mainWindow.SetSelected();
                         CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
                         return;
                     }
