@@ -18,8 +18,8 @@
 [list]
 [*] [b][J][/b]: Open / Close the SOS Menu. When used over an item(on inventories, recipe in crafting menu, and any item in shop), it will open the SOS Menu with the item the mouse is hovering over.
 [*] [b][Shift + J][/b]: Open / Close the SOS Menu with the world object (light, deconstructor, walls, items in world, etc) the mouse is hovering over.
-[*] [b][Backspace][/b] or [b][Mouse 4][/b]: Navigate to previous item.
-[*] [b][Ctrl + Backspace][/b] or [b][Mouse 5][/b]: Navigate to next item.
+[*] [b][Alt + Left Arrow][/b], [b][Backspace][/b] or [b][Mouse 4][/b]: Navigate to previous item.
+[*] [b][Alt + Right Arrow][/b], [b][Shift + Backspace][/b] or [b][Mouse 5][/b]: Navigate to next item.
 [*] [b][Left Click][/b]: Select item / Navigate to ingredient.
 [*] [b][Right Click][/b]: Open context menu (Track item, Toggle Favorite, etc.).
 [*] [b][Escape][/b]: Close window.

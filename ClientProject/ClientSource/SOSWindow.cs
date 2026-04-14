@@ -467,7 +467,7 @@ namespace SOS
 
                     var (navBackName, _) = SafeItemName.Get(prevItem, Color.White);
                     // TODO: Use colored Text.
-                    btnBack.ToolTip = $"{TextSOS.Get("sos.window.back", "Back")}: {navBackName}";
+                    btnBack.ToolTip = RichString.Rich($"{TextSOS.Get("sos.window.back", "Back")}: {navBackName.SetColor(Color.BlueViolet)}\n{TextSOS.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}");
                 }
             }
 
@@ -481,7 +481,7 @@ namespace SOS
                     var (navForwardName, _) = SafeItemName.Get(nextItem, Color.White);
 
                     // TODO: Use colored Text.
-                    btnForward.ToolTip = $"{TextSOS.Get("sos.window.forward", "Forward")}: {navForwardName}";
+                    btnForward.ToolTip = RichString.Rich($"{TextSOS.Get("sos.window.forward", "Forward")}: {navForwardName.SetColor(Color.BlueViolet)}\n{TextSOS.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}");
                 }
             }
         }

@@ -312,16 +312,22 @@ namespace SOS
 
                 if (isKeyDownNow && !wasKeyDown)
                 {
-                    if (mainWindow == null)
+                    ItemPrefab? detected = GetPrefabUnderMouse();
+
+                    CrossThread.RequestExecutionOnMainThread(() =>
                     {
-                        ItemPrefab? detected = GetPrefabUnderMouse();
+
                         if (detected != null)
                         {
                             OnItemSelected(detected);
+                            if (mainWindow == null) ToggleUI();
                         }
-                    }
+                        else
+                        {
+                            ToggleUI();
+                        }
+                    });
 
-                    CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
                 }
                 wasKeyDown = isKeyDownNow;
             }
@@ -340,11 +346,20 @@ namespace SOS
                         CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
                         return;
                     }
+                    else if
+                    (
+                        (PlayerInput.KeyHit(Keys.Right) && PlayerInput.IsAltDown()) ||
+                        (PlayerInput.KeyHit(Keys.Back) && PlayerInput.IsShiftDown()) ||
+                        PlayerInput.Mouse5ButtonClicked()
+                    ) CrossThread.RequestExecutionOnMainThread(() => NavigateForward());
+                    else if
+                    (
+                        (PlayerInput.KeyHit(Keys.Left) && PlayerInput.IsAltDown()) ||
+                        PlayerInput.KeyHit(Keys.Back) ||
+                        PlayerInput.Mouse4ButtonClicked()
+                    ) CrossThread.RequestExecutionOnMainThread(() => NavigateBack());
 
-                    if (PlayerInput.KeyHit(Keys.Back) || PlayerInput.Mouse4ButtonClicked())
-                    {
-                        CrossThread.RequestExecutionOnMainThread(() => NavigateBack());
-                    }
+
                 }
 
                 mainWindow.Update();

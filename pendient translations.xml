@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<infotexts language="English" nowhitespace="false" translatedname="English">
+	<Override>
+    <sos.window.back.shortcuts>Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4</sos.window.back.shortcuts>
+    <sos.window.forward.shortcuts>Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5</sos.window.forward.shortcuts>
+    </Override>
+</infotexts>
