@@ -144,7 +144,7 @@ namespace SOS
             {
                 var sprite = new Sprite(newFile: imgPath, Vector2.One);
                 var img = new GUIImage(new RectTransform(new Vector2(0.8f, 0.6f), loadingFrame.RectTransform, Anchor.Center), sprite: sprite, scaleToFit: true);
-                img.SetAlpha(0.8f);
+                //img.SetAlpha(0.8f);
                 img.ExFadeIn(duration: 0.5f, targetFactor: 0.8f, alsoChildren: true);
             }
 
