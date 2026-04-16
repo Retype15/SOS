@@ -466,8 +466,7 @@ namespace SOS
                     var prevItem = controller.HistoryBack.Peek();
 
                     var (navBackName, _) = SafeItemName.Get(prevItem, Color.White);
-                    // TODO: Use colored Text.
-                    btnBack.ToolTip = RichString.Rich($"{TextSOS.Get("sos.window.back", "Back")}: {navBackName.SetColor(Color.BlueViolet)}\n{TextSOS.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}");
+                    btnBack.OnDrawToolTip = component => component.ToolTip = RichString.Rich($"{TextSOS.Get("sos.window.back", "Back")}: {navBackName.SetColor(Color.BlueViolet)}\n{TextSOS.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}");
                 }
             }
 
@@ -480,8 +479,7 @@ namespace SOS
 
                     var (navForwardName, _) = SafeItemName.Get(nextItem, Color.White);
 
-                    // TODO: Use colored Text.
-                    btnForward.ToolTip = RichString.Rich($"{TextSOS.Get("sos.window.forward", "Forward")}: {navForwardName.SetColor(Color.BlueViolet)}\n{TextSOS.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}");
+                    btnForward.OnDrawToolTip = component => component.ToolTip = RichString.Rich($"{TextSOS.Get("sos.window.forward", "Forward")}: {navForwardName.SetColor(Color.BlueViolet)}\n{TextSOS.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}");
                 }
             }
         }
@@ -763,7 +761,7 @@ namespace SOS
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.15f, 0.9f), headerLayout.RectTransform, Anchor.CenterLeft), style: null)
                 {
-                    ToolTip = CardBuilder.GetDetailedTooltip(targetItem)
+                    OnDrawToolTip = component => component.ToolTip = GetDetailedTooltip(targetItem)
                 };
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = targetItem.InventoryIconColor, CanBeFocused = false };
             }

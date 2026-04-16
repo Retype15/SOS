@@ -60,6 +60,11 @@ namespace SOS
 
     }
 
+    public static class FloatExt
+    {
+        public static string ToMeters(this float value) => (value / 10f).ToString("0.#") + 'm';
+    }
+
 
     // AI Generated Code
     public static class GUIComponentExt

@@ -134,6 +134,7 @@ namespace SOS
             AddSection(new EconomySection(), item);
             AddSection(new WeaponSection(), item);
             AddSection(new EquipmentSection(), item);
+            AddSection(new MedicalSection(), item);
             AddSection(new UtilitySection(), item);
             AddSection(new ContainerSection(), item);
             AddSection(new DescriptionSection(), item);
@@ -361,8 +362,8 @@ namespace SOS
             //pep
             if (reload > 0) builder.AddRow(isAutomatic ? "Fire Rate:" : "Reload:", $"{reload}s", Color.Cyan);
             if (powerUse > 0) builder.AddRow("Power Use:", $"{powerUse}kW", Color.Orange);
-            if (range > 0) builder.AddRow("Range:", range.ToString("0.#"), Color.LightGray);
-            if (explosionRange > 0) builder.AddRow("Explosion Radius:", $"{explosionRange:0.#}m", Color.Orange);
+            if (range > 0) builder.AddRow("Range:", range.ToMeters(), Color.LightGray);
+            if (explosionRange > 0) builder.AddRow("Explosion Radius:", explosionRange.ToMeters(), Color.Orange);
             if (penetration > 0) builder.AddRow("Armor Penetration:", $"{(int)(penetration * 100)}%", Color.Orange);
             if (projectileCount > 1) builder.AddRow("Projectiles:", $"x{projectileCount}", Color.LightGray);
             if (maxTargets > 1) builder.AddRow("Max Targets:", maxTargets.ToString(), Color.LightGray);
@@ -464,7 +465,7 @@ namespace SOS
                 builder.AddRow(TextSOS.Get("sos.equip.max_durability", "Max Durability:").Value, durability.ToString(), Color.White);
 
             if (maxPressure > 0)
-                builder.AddRow(TextSOS.Get("sos.equip.pressure_protection", "Pressure Protection:").Value, $"{maxPressure}m", Color.DeepSkyBlue);
+                builder.AddRow(TextSOS.Get("sos.equip.pressure_protection", "Pressure Protection:").Value, maxPressure.ToMeters(), Color.DeepSkyBlue);
 
             if (deflectsProjectiles)
                 builder.AddRow(TextSOS.Get("sos.equip.armor_special", "Armor Special:").Value, TextSOS.Get("sos.equip.deflect_projectiles", "Deflects Projectiles").Value, Color.LightGray);
@@ -494,6 +495,137 @@ namespace SOS
         }
     }
 
+    // MARK: Medical
+    public class MedicalSection : BaseStatSection
+    {
+        private int medicalSkillReq = 0;
+        private readonly List<string> suitableTreatments = [];
+
+        private readonly Dictionary<string, float> alwaysHeals = [];
+        private readonly Dictionary<string, float> alwaysCauses = [];
+        private readonly Dictionary<string, float> successHeals = [];
+        private readonly Dictionary<string, float> successCauses = [];
+        private readonly Dictionary<string, float> failureHeals = [];
+        private readonly Dictionary<string, float> failureCauses = [];
+
+        public override bool HasData => suitableTreatments.Count > 0 || alwaysHeals.Count > 0 || successHeals.Count > 0 || alwaysCauses.Count > 0 || successCauses.Count > 0;
+
+        public override void Analyze(ItemPrefab item)
+        {
+            if (item.ConfigElement == null) return;
+
+            foreach (var element in item.ConfigElement.Descendants())
+            {
+                string n = element.Name.ToString().ToLowerInvariant();
+
+                if (n == "suitabletreatment")
+                {
+                    string idOrType = element.GetAttributeString("identifier", element.GetAttributeString("type", ""));
+                    float suit = element.GetAttributeFloat("suitability", 0f);
+                    if (!string.IsNullOrEmpty(idOrType))
+                    {
+                        string sign = suit > 0 ? "+" : "";
+                        suitableTreatments.Add($"{GetAfflictionName(idOrType)} ({sign}{suit})");
+                    }
+                }
+
+                else if (n == "requiredskill" && element.GetAttributeString("identifier", "") == "medical")
+                {
+                    medicalSkillReq = Math.Max(medicalSkillReq, element.GetAttributeInt("level", 0));
+                }
+
+                else if (n == "statuseffect")
+                {
+                    string type = element.GetAttributeString("type", "").ToLowerInvariant();
+                    string target = element.GetAttributeString("target", "").ToLowerInvariant();
+
+                    if (!target.Contains("usetarget") && !target.Contains("character") && !target.Contains("limb")) continue;
+
+                    bool isFailure = type == "onfailure";
+                    bool isSuccess = type == "onsuccess";
+                    bool isAlways = !isFailure && !isSuccess;
+
+                    float duration = element.GetAttributeFloat("duration", 1f);
+
+                    foreach (var sub in element.Elements())
+                    {
+                        string subName = sub.Name.ToString().ToLowerInvariant();
+                        if (subName == "affliction" || subName == "reduceaffliction")
+                        {
+                            string idOrType = sub.GetAttributeString("identifier", sub.GetAttributeString("type", ""));
+                            if (string.IsNullOrEmpty(idOrType)) continue;
+
+                            float rawAmount = sub.GetAttributeFloat("amount", 0f);
+                            float totalAmount = rawAmount * duration; // Calculamos el impacto real total
+
+                            bool isHeal = subName == "reduceaffliction" || totalAmount < 0;
+                            totalAmount = Math.Abs(totalAmount);
+
+                            string affName = GetAfflictionName(idOrType);
+
+                            if (isHeal)
+                                AddStat(isFailure ? failureHeals : (isSuccess ? successHeals : alwaysHeals), affName, totalAmount);
+                            else
+                                AddStat(isFailure ? failureCauses : (isSuccess ? successCauses : alwaysCauses), affName, totalAmount);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void AddStat(Dictionary<string, float> dict, string name, float amount)
+        {
+            if (dict.ContainsKey(name)) dict[name] += amount;
+            else dict[name] = amount;
+        }
+
+        private static string GetAfflictionName(string idOrType)
+        {
+            var loc = TextManager.Get("AfflictionName." + idOrType);
+            if (loc.Loaded && !loc.Value.Contains("AfflictionName.")) return loc.Value;
+
+            if (idOrType.Length > 0) return char.ToUpper(idOrType[0]) + idOrType[1..];
+            return idOrType;
+        }
+
+        public override void Draw(SectionBuilder builder)
+        {
+            builder.StartSection(TextSOS.Get("sos.window.section_medical", "MEDICAL").Value, Color.Gold);
+
+            if (medicalSkillReq > 0)
+                builder.AddRow(TextSOS.Get("sos.med.skill_req", "Medical Skill Req:").Value, medicalSkillReq.ToString(), Color.Orange);
+
+            if (suitableTreatments.Count > 0)
+            {
+                string label = TextSOS.Get("sos.med.suitable", "Recommended:").Value;
+                string values = string.Join(", ", suitableTreatments);
+                builder.AddFullWidthText($"‖color:180,180,180‖{label}‖color:end‖ {values}", Color.LightSkyBlue);
+            }
+
+            void DrawEffectCascading(string label, Dictionary<string, float> dict, Color valColor)
+            {
+                if (dict.Count == 0) return;
+
+                string items = string.Join(", ", dict.Select(kvp => $"{kvp.Key} ({kvp.Value:0.#})"));
+
+                string combinedText = $"{label.SetColor(new Color(160, 160, 160))} {items}";
+
+                builder.AddFullWidthText(combinedText, valColor);
+            }
+
+            DrawEffectCascading(TextSOS.Get("sos.med.always_heals", "Always Heals:").Value, alwaysHeals, Color.LightGreen);
+            DrawEffectCascading(TextSOS.Get("sos.med.always_causes", "Always Applies:").Value, alwaysCauses, Color.Salmon);
+
+            DrawEffectCascading(TextSOS.Get("sos.med.success_heals", "On Success Heals:").Value, successHeals, Color.LightGreen);
+            DrawEffectCascading(TextSOS.Get("sos.med.success_causes", "On Success Applies:").Value, successCauses, Color.Salmon);
+
+            DrawEffectCascading(TextSOS.Get("sos.med.failure_heals", "On Failure Heals:").Value, failureHeals, Color.DarkSeaGreen);
+            DrawEffectCascading(TextSOS.Get("sos.med.failure_causes", "On Failure Applies:").Value, failureCauses, Color.Crimson);
+
+            builder.EndSection();
+        }
+    }
+
     // MARK: utility
     public class UtilitySection : BaseStatSection
     {
@@ -510,16 +642,16 @@ namespace SOS
                 string n = child.Name.ToString().ToLowerInvariant();
 
                 if (n == "wificomponent" && child.GetAttribute("range") != null)
-                    deviceProperties[TextSOS.Get("sos.util.radio_range", "Radio Range").Value] = child.GetAttributeString("range", "0") + "m";
+                    deviceProperties[TextSOS.Get("sos.util.radio_range", "Radio Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
 
                 if (n == "lightcomponent" && child.GetAttribute("range") != null)
-                    deviceProperties[TextSOS.Get("sos.util.light_range", "Light Range").Value] = child.GetAttributeString("range", "0") + "m";
+                    deviceProperties[TextSOS.Get("sos.util.light_range", "Light Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
 
                 if (n == "pump" && child.GetAttribute("maxflow") != null)
-                    deviceProperties[TextSOS.Get("sos.util.pump_flow", "Pump Max Flow").Value] = child.GetAttributeString("maxflow", "0");
+                    deviceProperties[TextSOS.Get("sos.util.pump_flow", "Pump Max Flow").Value] = child.GetAttributeFloat("maxflow", 0).ToMeters();
 
                 if (n == "sonar" && child.GetAttribute("range") != null)
-                    deviceProperties[TextSOS.Get("sos.util.sonar_range", "Sonar Range").Value] = child.GetAttributeString("range", "0") + "m";
+                    deviceProperties[TextSOS.Get("sos.util.sonar_range", "Sonar Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
             }
         }
 
