@@ -46,7 +46,9 @@ namespace SOS
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.1f, 0.9f), layout.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, style: "InnerFrame")
                 {
-                    ToolTip = GetDetailedTooltip(item)
+                    //ToolTip = GetDetailedTooltip(item),
+                    OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(item)
                 };
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = item.InventoryIconColor, CanBeFocused = false };
             }
@@ -313,7 +315,8 @@ namespace SOS
 
             var btn = new GUIButton(btnRect, style: "GUIButton")
             {
-                ToolTip = GetDetailedTooltip(prefab),
+                OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab),
                 Color = Color.Black * 0.4f
             };
 
@@ -358,7 +361,8 @@ namespace SOS
             {
                 var btn = new GUIButton(rowRect, style: "ListBoxElement")
                 {
-                    ToolTip = GetDetailedTooltip(prefab),
+                    OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab),
                     OnClicked = (_, _) =>
                     {
                         onPrimaryClick?.Invoke(prefab);
@@ -378,7 +382,8 @@ namespace SOS
                 {
                     AbsoluteSpacing = 5,
                     CanBeFocused = true,
-                    ToolTip = GetDetailedTooltip(prefab)
+                    OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab)
                 };
             }
 
