@@ -21,9 +21,14 @@ namespace SOS
 
         private static readonly Dictionary<Identifier, string> machineNameCache = [];
 
-        public static RichString GetDetailedTooltip(ItemPrefab? prefab)
+        public static RichString GetDetailedTooltip(Prefab? prefab)
         {
-            LocalizedString actual = prefab?.GetTooltip(Character.Controlled) ?? "";
+            LocalizedString actual = prefab switch
+            {
+                ItemPrefab item => item?.GetTooltip(Character.Controlled) ?? "",
+                AfflictionPrefab affliction => (LocalizedString)(affliction?.GetDescription(0f, AfflictionPrefab.Description.TargetType.Self) ?? ""),
+                _ => TextSOS.Get("sos.gen.unknown", "???"),
+            };
             ReadOnlySpan<char> value = actual.Value.AsSpan();
             int idx = value.LastIndexOf('\n');
             ReadOnlySpan<char> modLine = idx == -1 ? value : value[(idx + 1)..];
@@ -46,7 +51,9 @@ namespace SOS
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.1f, 0.9f), layout.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, style: "InnerFrame")
                 {
-                    ToolTip = GetDetailedTooltip(item)
+                    //ToolTip = GetDetailedTooltip(item),
+                    OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(item)
                 };
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = item.InventoryIconColor, CanBeFocused = false };
             }
@@ -313,7 +320,8 @@ namespace SOS
 
             var btn = new GUIButton(btnRect, style: "GUIButton")
             {
-                ToolTip = GetDetailedTooltip(prefab),
+                OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab),
                 Color = Color.Black * 0.4f
             };
 
@@ -348,6 +356,48 @@ namespace SOS
             }
         }
 
+        public static void DrawMinimalItemRow(GUIComponent parent, AfflictionPrefab? prefab, float amount, Action<AfflictionPrefab>? onPrimaryClick = null, Action<AfflictionPrefab>? onSecondaryClick = null, Color? badgeColor = null)
+        {
+            var btnRect = new RectTransform(new Point(30, 30), parent.RectTransform);
+
+            var btn = new GUIButton(btnRect, style: "GUIButton")
+            {
+                OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab),
+                Color = Color.Black * 0.4f
+            };
+
+            if (prefab != null && (onPrimaryClick != null || onSecondaryClick != null))
+            {
+                btn.OnClicked = (_, _) => { onPrimaryClick?.Invoke(prefab); return true; };
+                btn.OnSecondaryClicked = (_, _) => { onSecondaryClick?.Invoke(prefab); return true; };
+            }
+
+            Sprite? icon = prefab?.Icon;
+            if (icon != null)
+            {
+                _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), btn.RectTransform, Anchor.Center), icon, scaleToFit: true)
+                {
+                    Color = prefab?.IconColors?.First() ?? Color.White,
+                    CanBeFocused = false
+                };
+            }
+
+            if (amount > 1)
+            {
+                _ = new GUITextBlock(new RectTransform(Vector2.One, btn.RectTransform), $"x{amount}", font: GUIStyle.SmallFont, textColor: Color.LightGreen, textAlignment: Alignment.BottomRight)
+                {
+                    CanBeFocused = false,
+                    Padding = Vector4.Zero
+                };
+            }
+
+            if (badgeColor.HasValue)
+            {
+                btn.OutlineColor = badgeColor.Value;
+            }
+        }
+
         public static void DrawCompactItemRow(GUIComponent parent, ItemPrefab? prefab, float amount, bool isCardInside, string extraText = "", Color? color = null, Action<ItemPrefab>? onPrimaryClick = null, Action<ItemPrefab>? onSecondaryClick = null)
         {
             var rowRect = new RectTransform(new Vector2(1f, 0f), parent.RectTransform) { MinSize = new Point(0, RowHeight) };
@@ -358,7 +408,8 @@ namespace SOS
             {
                 var btn = new GUIButton(rowRect, style: "ListBoxElement")
                 {
-                    ToolTip = GetDetailedTooltip(prefab),
+                    OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab),
                     OnClicked = (_, _) =>
                     {
                         onPrimaryClick?.Invoke(prefab);
@@ -378,7 +429,8 @@ namespace SOS
                 {
                     AbsoluteSpacing = 5,
                     CanBeFocused = true,
-                    ToolTip = GetDetailedTooltip(prefab)
+                    OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab)
                 };
             }
 
@@ -393,6 +445,67 @@ namespace SOS
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Point(20, 20), contentLayout.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(isCardInside ? 0 : 5, 0) }, style: null) { CanBeFocused = false };
                 _ = new GUIImage(new RectTransform(Vector2.One, imgFrame.RectTransform), icon, scaleToFit: true) { Color = prefab?.InventoryIconColor ?? Color.White, CanBeFocused = false };
+            }
+
+            var (nameStr, aColor) = SafeItemName.Get(prefab, color ?? Color.White);
+
+            var nameBlock = new GUITextBlock(new RectTransform(new Vector2(0.6f, 1f), contentLayout.RectTransform), nameStr, font: GUIStyle.SmallFont, textColor: aColor, textAlignment: Alignment.CenterLeft) { CanBeFocused = false };
+
+            string amtStr = (amount > 1 || amount < 1) ? $" x{amount}" : "";
+            var rightBlock = new GUITextBlock(new RectTransform(new Vector2(0.4f, 1f), contentLayout.RectTransform), $"{extraText}{amtStr}", font: GUIStyle.SmallFont, textColor: color ?? Color.Gray, textAlignment: Alignment.CenterRight)
+            {
+                CanBeFocused = false,
+                Padding = new Vector4(0, 0, 25, 0)
+            };
+        }
+
+        public static void DrawCompactItemRow(GUIComponent parent, AfflictionPrefab? prefab, float amount, bool isCardInside, string extraText = "", Color? color = null, Action<AfflictionPrefab>? onPrimaryClick = null, Action<AfflictionPrefab>? onSecondaryClick = null)
+        {
+            var rowRect = new RectTransform(new Vector2(1f, 0f), parent.RectTransform) { MinSize = new Point(0, RowHeight) };
+
+            GUIComponent container;
+
+            if (prefab != null && (onPrimaryClick != null || onSecondaryClick != null))
+            {
+                var btn = new GUIButton(rowRect, style: "ListBoxElement")
+                {
+                    OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab),
+                    OnClicked = (_, _) =>
+                    {
+                        onPrimaryClick?.Invoke(prefab);
+                        return true;
+                    },
+                    OnSecondaryClicked = (_, _) =>
+                    {
+                        onSecondaryClick?.Invoke(prefab);
+                        return true;
+                    }
+                };
+                container = btn;
+            }
+            else
+            {
+                container = new GUILayoutGroup(rowRect, isHorizontal: true)
+                {
+                    AbsoluteSpacing = 5,
+                    CanBeFocused = true,
+                    OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab)
+                };
+            }
+
+            var contentLayout = new GUILayoutGroup(new RectTransform(Vector2.One, container.RectTransform), isHorizontal: true)
+            {
+                AbsoluteSpacing = 5,
+                CanBeFocused = false
+            };
+
+            Sprite? icon = prefab?.Icon;
+            if (icon != null)
+            {
+                var imgFrame = new GUIFrame(new RectTransform(new Point(20, 20), contentLayout.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(isCardInside ? 0 : 5, 0) }, style: null) { CanBeFocused = false };
+                _ = new GUIImage(new RectTransform(Vector2.One, imgFrame.RectTransform), icon, scaleToFit: true) { Color = prefab?.IconColors?.First() ?? Color.White, CanBeFocused = false };
             }
 
             var (nameStr, aColor) = SafeItemName.Get(prefab, color ?? Color.White);
@@ -433,17 +546,19 @@ namespace SOS
 
     public static class SafeItemName
     {
-        public static (string Name, Color TextColor) Get(ItemPrefab? prefab, Color defaultColor)
+
+        public static (string Name, Color TextColor) Get(Prefab? prefab, Color defaultColor)
         {
-            if (prefab == null)
-                return (TextSOS.Get("sos.gen.unknown", "???").Value, defaultColor);
-
-            if (prefab.Name.IsNullOrEmpty())
+            return prefab switch
             {
-                return ($"[{prefab.Identifier}]", Color.Red);
-            }
-
-            return (prefab.Name.Value, defaultColor);
+                ItemPrefab item => item.Name.IsNullOrEmpty()
+                                        ? ($"[{item.Identifier}]", Color.Red)
+                                        : (item.Name.Value, defaultColor),
+                AfflictionPrefab affliction => affliction.Name.IsNullOrEmpty()
+                                        ? ($"[{affliction.Identifier}]", Color.Red)
+                                        : (affliction.Name.Value, defaultColor),
+                _ => (TextSOS.Get("sos.gen.unknown", "???").Value, defaultColor),
+            };
         }
     }
 }
