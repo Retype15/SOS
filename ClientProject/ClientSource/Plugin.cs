@@ -5,7 +5,7 @@
 using Barotrauma;
 using Barotrauma.LuaCs;
 using Barotrauma.LuaCs.Events;
-using FluentResults;
+using Microsoft.Xna.Framework;
 
 namespace SOS
 {
@@ -54,6 +54,56 @@ namespace SOS
             controller?.SaveSettings();
             controller?.Destroy();
             controller = null;
+        }
+    }
+
+    // TODO: Must to Change site...
+    public class PrefabAdapter
+    {
+        public static LocalizedString Name(Prefab prefab)
+        {
+            return prefab switch
+            {
+                ItemPrefab item => item.Name,
+                AfflictionPrefab affliction => affliction.Name,
+                _ => TextSOS.Get("sos.gen.unknown", "???")
+            };
+        }
+        public static Sprite? Icon(Prefab prefab)
+        {
+            return prefab switch
+            {
+                ItemPrefab item => item.InventoryIcon ?? item.Sprite,
+                AfflictionPrefab affliction => affliction.Icon,
+                _ => null
+            };
+        }
+        public static Color IconColor(Prefab prefab)
+        {
+            return prefab switch
+            {
+                ItemPrefab item => item.InventoryIconColor,
+                AfflictionPrefab affliction => affliction.IconColors?.First() ?? Color.White,
+                _ => Color.White
+            };
+        }
+        public static PriceInfo? DefaultPrice(Prefab prefab)
+        {
+            return prefab switch
+            {
+                ItemPrefab item => item.DefaultPrice,
+                _ => null
+            };
+        }
+
+        public static ContentXElement? ConfigElement(Prefab prefab)
+        {
+            return prefab switch
+            {
+                ItemPrefab item => item.ConfigElement,
+                AfflictionPrefab affliction => affliction.configElement,
+                _ => null
+            };
         }
     }
 }

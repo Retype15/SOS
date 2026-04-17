@@ -62,7 +62,8 @@ namespace SOS
 
     public static class FloatExt
     {
-        public static string ToMeters(this float value) => (value / 10f).ToString("0.#") + 'm';
+        public static string ToMeters(this float value) => (value / 10f).ToValue() + 'm';
+        public static string ToValue(this float value) => value.ToString("0.###");
     }
 
 
