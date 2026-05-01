@@ -10,7 +10,7 @@
 
 ---
 
-**S.O.S.** is a high-performance recipe browser and material tracking utility for **Barotrauma**. Designed to be the ultimate companion for both vanilla and heavily modded campaigns (like Neurotrauma or BaroCraftables), it provides a seamless, integrated interface to explore the complex economy of Europa.
+**S.O.S.** is a high-performance recipe browser and object tracking utility for **Barotrauma**. Designed to be the ultimate companion for both vanilla and heavily modded campaigns, it provides a seamless, integrated interface to explore the complex system of Europa.
 
 [![Add from Workshop](https://img.shields.io/badge/Add_From-Steam_Workshop-1B2838?style=for-the-badge&logo=steam&logoColor=white)](https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282)
 
@@ -18,9 +18,10 @@
 
 ## Key Features
 
-- **Comprehensive Browser:** View Fabrication, Deconstruction, and "Used In" recipes for any item in the game.
+- **Comprehensive Browser:** View Fabrication, Deconstruction, and "Used In" recipes for any object in the game.
+- **NEW! Now Includes Afflictions!** View information of ALL afflictions (Status Effects), including those from mods.
 - **HUD Tracker:** Track ingredients in real-time with an on-screen checklist that updates as you gather materials.
-- **Dynamic Meta-Info:** View base prices, item tags, stack sizes, and detailed descriptions in a structured Wiki-style panel.
+- **Dynamic Meta-Info:** View base prices, object tags, stack sizes, and detailed descriptions in a structured Wiki-style panel.
 - **Responsive UI:** High-precision resizable interface that ensures the UI is always displayed in any position, scale or aspect ratio do you want, as a real window.
 - **Adaptive Layout Modes:** Smart "Compact" view that intelligently wraps icon grids and scales content to fit any window dimension.
 - **Detailed Recipe Analytics:** Refined "Obtain" and "Usage" sections with context-aware filtering and smart ingredient wrapping.
@@ -58,33 +59,20 @@ Search by Name, ID, Category, Tags, ModName, ItemType, and other filters.
 
 Advanced Filters:
 
-| Filter      | Description     | Example           |
-|-------------|-----------------|-------------------|
-| `@Mod`      | Mod Name        | `@Vanilla @Neuro` |
-| `#Category` | Category        | `#Medical #Weapon`|
-| `$Tag`      | Tag             | `$smallitem $pill`|
-| `&Slot`     | Slot            | `&Head &Inner`    |
-| `!ID`       | Item ID         | `!weldingtool`    |
+| Filter      | Description     | Example             |
+|-------------|-----------------|---------------------|
+| `@Mod`      | Mod Name        | `@Vanilla @Neuro`   |
+| `#Category` | Category        | `#Medical #Weapon`  |
+| `$Tag`      | Tag             | `$smallitem $pill`  |
+| `&Slot`     | Slot            | `&Head &Inner`      |
+| `!ID`       | Item ID         | `!weldingtool`      |
+| `%Type`     | Class Type Name | `%item %affliction` |
 
 **Example:** `Brain @NT #Medical $surgery`
 
 ## Project Status: Beta
 
 **S.O.S.** is currently in its Beta stage. While the core functionality is stable and high-performing, we are working towards deep integration with the game's mechanics and immersion.
-
-### Late Mod Roadmap: The Neural Link System
-
-In future updates, access to the S.O.S. interface will be gated behind a **Chip Progression System**. Players will need to craft and consume specialized neural chips to unlock different modules of the database.
-
-#### Tiered Modules
-
-- **Fabricator Chip (Lv. 1):** Unlocks the ability to view crafting recipes (Compatible with vanilla and modded stations).
-- **Fabricator Chip (Lv. 2):** Unlocks "Reverse Lookup" (View what items can be crafted using the selected material).
-- **Deconstructor Chip (Lv. 1):** Unlocks deconstruction yield data.
-- **Deconstructor Chip (Lv. 2):** Unlocks "Reverse Deconstruction" (View which items provide this material when recycled).
-- **Medical Chip (Lv. 1 & 2):** Specialized modules for medical recipes and advanced chemistry.
-
-> Note: This proposal is merely an idea at the moment; there is no guarantee that it will be implemented in this specific manner in the future—it could take a different, more convenient form.
 
 *Stay tuned for these updates as we move toward the 1.0 Full Release.*
 
