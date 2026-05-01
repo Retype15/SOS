@@ -38,7 +38,7 @@ namespace SOS
                 var lastNode = lruList.Last;
                 if (lastNode != null)
                 {
-                    analysisCache.Remove(lastNode.Value.ItemId);
+                    analysisCache.Remove(lastNode.Value.PrefabId);
                     lruList.RemoveLast();
                 }
             }
