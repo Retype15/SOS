@@ -248,13 +248,8 @@ namespace SOS
         {
             if (target == null) return;
             List<ContextMenuOption> options = [];
-            if (target is ItemPrefab item)
-            {
-                options.Add(new ContextMenuOption(TextSOS.Get("sos.context.track", "Track to HUD"), isEnabled: true, onSelected: () =>
-           {
-               Tracker.SetTrackedItem(item);
-           }));
-            }
+            if (target is ItemPrefab item) options.Add(new ContextMenuOption(TextSOS.Get("sos.context.track", "Track to HUD"), isEnabled: true, onSelected: () => Tracker.SetTrackedItem(item)));
+
             options.Add(new ContextMenuOption(TextSOS.Get("sos.context.view_recipes", "View Recipes"), isEnabled: true, onSelected: () =>
             {
                 OnTargetSelected(target);
@@ -272,13 +267,7 @@ namespace SOS
                 mainWindow?.RefreshSearch();
             }));
 
-            LocalizedString name = target switch
-            {
-                ItemPrefab itemP => itemP.Name,
-                AfflictionPrefab affliction => affliction.Name,
-                // TODO: Remember correct this...
-                _ => "#ERROR"
-            };
+            RichString name = target.Name();
 
             _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, name, null, [.. options]);
         }
@@ -289,22 +278,17 @@ namespace SOS
 
             var options = new List<ContextMenuOption>();
 
-            bool isCurrentlyTracked = Tracker.TrackedRecipe == recipe;
-
-            if (isCurrentlyTracked && target is ItemPrefab item)
-            {
-                options.Add(new ContextMenuOption(TextSOS.Get("sos.context.untrack", "Remove from HUD"), isEnabled: true, onSelected: () =>
-                {
-                    Tracker.SetTrackedItem(null);
-                }));
-            }
-            else if (target is ItemPrefab item2)
-            {
-                options.Add(new ContextMenuOption(TextSOS.Get("sos.context.track_recipe", "Add to HUD"), isEnabled: true, onSelected: () =>
-                {
-                    Tracker.SetTrackedItem(item2, recipe);
-                }));
-            }
+            if (target is ItemPrefab item)
+                if (Tracker.TrackedRecipe == recipe)
+                    options.Add(new ContextMenuOption(TextSOS.Get("sos.context.untrack", "Remove from HUD"), isEnabled: true, onSelected: () =>
+                    {
+                        Tracker.SetTrackedItem(null);
+                    }));
+                else
+                    options.Add(new ContextMenuOption(TextSOS.Get("sos.context.track_recipe", "Add to HUD"), isEnabled: true, onSelected: () =>
+                    {
+                        Tracker.SetTrackedItem(item, recipe);
+                    }));
 
             //options.Add(new ContextMenuOption("Ver más info (WIP)", isEnabled: false));
 

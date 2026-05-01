@@ -8,7 +8,7 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
-
+using MonoMod.Utils;
 using static SOS.CardBuilder;
 
 namespace SOS
@@ -44,7 +44,7 @@ namespace SOS
         private GUIFrame? rightContainer;
         private GUIFrame? layoutMenuFrame;
 
-        private readonly List<Prefab> allFilteredTargets = [];
+        private List<Prefab> allFilteredTargets = [];
         private int itemsLoaded = 0;
         private const int ChunkSize = 50;
         private bool isUpdating = false;
@@ -78,6 +78,8 @@ namespace SOS
         private readonly double searchDelay = 0.2;
         private double searchExecutionTime = 0;
         private string? pendingSearchQuery = null;
+
+        private Type? lastTypeInList = null;
 
         private ContentPackage? _ModPackage;
         public ContentPackage ModPackage => _ModPackage ??= LoadModPackage() ?? throw new Exception("[SOS] ModPackage not found");
@@ -472,7 +474,7 @@ namespace SOS
                 {
                     var prevItem = controller.HistoryBack.Peek();
 
-                    var (navBackName, _) = SafeItemName.Get(prevItem, Color.White);
+                    var (navBackName, _) = prevItem.SafeName(Color.White);
                     btnBack.OnDrawToolTip = component => component.ToolTip = RichString.Rich($"{TextSOS.Get("sos.window.back", "Back")}: {navBackName.SetColor(Color.BlueViolet)}\n{TextSOS.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}");
                 }
             }
@@ -484,7 +486,7 @@ namespace SOS
                 {
                     var nextItem = controller.HistoryForward.Peek();
 
-                    var (navForwardName, _) = SafeItemName.Get(nextItem, Color.White);
+                    var (navForwardName, _) = nextItem.SafeName(Color.White);
 
                     btnForward.OnDrawToolTip = component => component.ToolTip = RichString.Rich($"{TextSOS.Get("sos.window.forward", "Forward")}: {navForwardName.SetColor(Color.BlueViolet)}\n{TextSOS.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}");
                 }
@@ -515,21 +517,25 @@ namespace SOS
             var filter = new SearchFilter(query);
 
             allFilteredTargets.Clear();
+            lastTypeInList = null;
 
-            if (filter.AllowsItems)
-            {
-                allFilteredTargets.AddRange(ItemPrefab.Prefabs
-                    .Where(filter.Matches)
-                    .OrderByDescending(p => controller.FavoritedItems.Contains(p.Identifier.Value))
-                    .ThenBy(p => p.Name.Value));
-            }
+            var candidates = new List<Prefab>();
+            if (filter.AllowsItems) candidates.AddRange(ItemPrefab.Prefabs.Where(filter.Matches));
+            if (filter.AllowsAfflictions) candidates.AddRange(AfflictionPrefab.List.Where(filter.Matches));
 
-            if (filter.AllowsAfflictions)
-            {
-                allFilteredTargets.AddRange(AfflictionPrefab.List
-                    .Where(filter.Matches)
-                    .OrderBy(a => a.Name.Value));
-            }
+            allFilteredTargets = [.. candidates
+                .OrderByDescending(p => controller.FavoritedItems.Contains(p.Identifier.Value)) // 1. Fav
+                .ThenBy(                                                                        // 2. Type
+                p => p switch
+                    {
+                        ItemPrefab              => 1,
+                        AfflictionPrefabHusk    => 2.5f,
+                        AfflictionPrefab        => 2,
+                        TalentPrefab            => 3,
+                        _                       => 4
+                    }
+                )
+                .ThenBy(p => p.Name())];                                                        // 3. name
 
             itemsLoaded = 0;
             itemList.Content.ClearChildren();
@@ -549,64 +555,77 @@ namespace SOS
 
             int nextBatch = Math.Min(itemsLoaded + ChunkSize, allFilteredTargets.Count);
 
-            if (leftPanelMode == DisplayMode.Compact)
+            //
+            int slotSize = 32;
+            int itemsInRow = 0;
+            int availableWidth = (int)itemList.Rect.Width - 14;
+            int maxItemsPerRow = Math.Max(1, availableWidth / slotSize);
+
+            var rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
+            var currentRow = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 2 };
+
+            //lastTypeInList = allFilteredTargets.First()?.GetType();
+
+            for (int i = itemsLoaded; i < nextBatch; i++)
             {
-                int slotSize = 34;
-                int itemsInRow = 0;
-                int availableWidth = (int)itemList.Rect.Width - 14;
-                int maxItemsPerRow = Math.Max(1, availableWidth / slotSize);
+                var prefab = allFilteredTargets[i];
 
-                var rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
-                var currentRow = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 2 };
+                Type currentType = prefab.GetType();
 
-                for (int i = itemsLoaded; i < nextBatch; i++)
+                if (currentType != lastTypeInList)
                 {
-                    var prefab = allFilteredTargets[i];
-                    bool isFav = controller.FavoritedItems.Contains(prefab.Identifier.Value);
+                    lastTypeInList = currentType;
 
-                    if (itemsInRow >= maxItemsPerRow)
+                    var separatorFrame = new GUIFrame(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) }, style: "GUIFrameBottom")
                     {
-                        rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
-                        currentRow = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 2 };
-                        itemsInRow = 0;
-                    }
-
-                    if (prefab is ItemPrefab item)
-                        CardBuilder.DrawMinimalItemRow(currentRow, item, 1,
-                            onPrimaryClick: p => OnPrimary(p),
-                            onSecondaryClick: p => OnSecondary(p),
-                            badgeColor: isFav ? Color.Gold : (Color?)null);
-                    else if (prefab is AfflictionPrefab affliction)
-                    {
-                        CardBuilder.DrawMinimalItemRow(currentRow, affliction, 1,
-                            onPrimaryClick: p => OnPrimary(p),
-                            onSecondaryClick: p => OnSecondary(p),
-                            badgeColor: isFav ? Color.Gold : (Color?)null);
-                    }
-
-                    itemsInRow++;
-                }
-            }
-            else
-            {
-                for (int i = itemsLoaded; i < nextBatch; i++)
-                {
-                    var prefab = allFilteredTargets[i];
-                    bool isFav = controller.FavoritedItems.Contains(prefab.Identifier.Value);
-
-                    var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, 32) }, style: "ListBoxElement")
-                    {
-                        OnClicked = (_, _) => { OnPrimary(prefab); return true; },
-                        OnSecondaryClicked = (_, _) => { OnSecondary(prefab); return true; },
-                        Selected = false,
-                        CanBeFocused = true
+                        Color = Color.White * 0.1f,
+                        CanBeFocused = false
                     };
 
-                    //string prefix = isFav ? "* " : "";
-                    if (prefab is ItemPrefab item)
-                        CardBuilder.DrawCompactItemRow(btn, item, 1, false, color: isFav ? Color.Gold : Color.White);
-                    else if (prefab is AfflictionPrefab affliction)
-                        CardBuilder.DrawCompactItemRow(btn, affliction, 1, false, color: isFav ? Color.Gold : Color.White);
+                    string label = currentType.Name;
+
+                    _ = new GUITextBlock(new RectTransform(Vector2.One, separatorFrame.RectTransform),
+                        TextSOS.Get($"sos.list.header.{label.ToLower()}", label.SpacedPascalCase()),
+                        font: GUIStyle.SmallFont, textColor: Color.Gold, textAlignment: Alignment.Center);
+
+                    rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
+                    currentRow = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 2 };
+                    itemsInRow = 0;
+                }
+
+                bool isFav = controller.FavoritedItems.Contains(prefab.Identifier.Value);
+
+                switch (leftPanelMode)
+                {
+                    case DisplayMode.Compact:
+                        if (itemsInRow >= maxItemsPerRow)
+                        {
+                            rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
+                            currentRow = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 2 };
+                            itemsInRow = 0;
+                        }
+
+                        CardBuilder.DrawMinimalItemRow(currentRow, prefab, 1,
+                            onPrimaryClick: p => OnPrimary(p),
+                            onSecondaryClick: p => OnSecondary(p),
+                            badgeColor: isFav ? Color.Gold : (Color?)null);
+
+                        itemsInRow++;
+                        break;
+
+                    case DisplayMode.Normal:
+                        var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) }, style: "ListBoxElement")
+                        {
+                            OnClicked = (_, _) => { OnPrimary(prefab); return true; },
+                            OnSecondaryClicked = (_, _) => { OnSecondary(prefab); return true; },
+                            Selected = false,
+                            CanBeFocused = true
+                        };
+
+                        CardBuilder.DrawCompactItemRow(btn, prefab, 1, false, color: isFav ? Color.Gold : Color.White);
+                        break;
+
+                    case DisplayMode.Hidden: break;
                 }
             }
 
@@ -776,15 +795,15 @@ namespace SOS
         public void UpdateDetailsPanel(Prefab targetItem, List<FabricationRecipe> craft, List<DeconstructItem> decon, List<Tuple<ItemPrefab, FabricationRecipe>> uses, List<Tuple<ItemPrefab, DeconstructItem>> sources)
         {
             currentItem = targetItem;
-            currentCraft = craft ?? [];
-            currentDecon = decon ?? [];
-            currentUses = uses ?? [];
-            currentSources = sources ?? [];
+            currentCraft = craft;
+            currentDecon = decon;
+            currentUses = uses;
+            currentSources = sources;
 
-            if (recipeAreaFrame != null)
+            /*if (recipeAreaFrame != null)
             {
                 recipeAreaFrame.Visible = targetItem is ItemPrefab;
-            }
+            }*/
 
             activeDropdowns.Clear();
             if (detailsHeader == null || colObtain == null || colUsage == null || metaPanel == null) return;
@@ -802,7 +821,7 @@ namespace SOS
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = PrefabAdapter.IconColor(targetItem), CanBeFocused = false };
             }
 
-            var (headerName, headerColor) = SafeItemName.Get(targetItem, Color.White);
+            var (headerName, headerColor) = targetItem.SafeName(Color.White);
 
             _ = new GUITextBlock
             (
@@ -817,115 +836,117 @@ namespace SOS
                 AutoScaleHorizontal = true,
                 CanBeFocused = false
             };
-
-            UIMachineGroup GetOrCreateMachineGroup(Dictionary<string, UIMachineGroup> dict, IEnumerable<Identifier> machineIds, string fallbackName)
+            if (targetItem is ItemPrefab item)
             {
-                string key = machineIds.Any()
-                    ? string.Join(", ", machineIds.Select(id => ResolveMachineName(id)).OrderBy(s => s))
-                    : fallbackName;
-
-                if (!dict.TryGetValue(key, out UIMachineGroup? value))
+                UIMachineGroup GetOrCreateMachineGroup(Dictionary<string, UIMachineGroup> dict, IEnumerable<Identifier> machineIds, string fallbackName)
                 {
-                    var mg = new UIMachineGroup { MachineName = key };
-                    if (machineIds.Any(id => id == "vendingmachine"))
+                    string key = machineIds.Any()
+                        ? string.Join(", ", machineIds.Select(id => ResolveMachineName(id)).OrderBy(s => s))
+                        : fallbackName;
+
+                    if (!dict.TryGetValue(key, out UIMachineGroup? value))
                     {
-                        mg.IsVendingMachine = true;
-                        mg.PriceString = (PrefabAdapter.DefaultPrice(targetItem)?.Price ?? 0).ToString();
-                    }
-
-                    value = mg;
-                    dict[key] = value;
-                }
-                return value;
-            }
-
-            var groupedSources = sources?
-                .GroupBy(s => new
-                {
-                    SourceId = s.Item1.Identifier,
-                    MachineKey = string.Join(",", s.Item2.RequiredDeconstructor.Select(id => id.Value).OrderBy(x => x)),
-                    OtherItemsKey = string.Join(",", s.Item2.RequiredOtherItem.Select(id => id.Value).OrderBy(x => x))
-                })
-                .Select(group => new GroupedSource
-                {
-                    SourceItem = group.First().Item1,
-                    MachineIds = group.First().Item2.RequiredDeconstructor,
-                    RequiredOtherItems = [.. group.First().Item2.RequiredOtherItem],
-                    TotalCommonness = group.Sum(g => g.Item2.Commonness),
-                    Amount = group.First().Item2.Amount,
-                    IsRandom = group.First().Item1.RandomDeconstructionOutput
-                })
-                .ToList();
-
-            var groupedUses = uses?
-                .GroupBy(u => string.Join(",", u.Item2.SuitableFabricatorIdentifiers.Select(id => id.Value).OrderBy(s => s)))
-                .SelectMany(mg => mg.GroupBy(u => u.Item1.Identifier)
-                    .Select(ig => new GroupedUsage
-                    {
-                        TargetItem = ig.First().Item1,
-                        MachineIds = [.. ig.First().Item2.SuitableFabricatorIdentifiers],
-                        AmountCreated = ig.First().Item2.Amount,
-                        AmountRequired = ig.First().Item2.RequiredItems.FirstOrDefault(ri =>
-                            ri.ItemPrefabs.Any(p => p.Identifier == targetItem.Identifier))?.Amount ?? 1
-                    }))
-                .ToList();
-
-
-            colObtain.Content.ClearChildren();
-            var obtainGroups = new Dictionary<string, UIMachineGroup>();
-
-            foreach (var r in craft ?? [])
-            {
-                var mg = GetOrCreateMachineGroup(obtainGroups, r.SuitableFabricatorIdentifiers, TextSOS.Get("sos.recipe.hand", "Hand").Value);
-                if (targetItem is ItemPrefab itemc) mg.AddCard(new CraftRecipeCard(r, itemc, controller, OnPrimary, OnSecondary));
-            }
-
-            foreach (var src in groupedSources ?? [])
-            {
-                var mg = GetOrCreateMachineGroup(obtainGroups, src.MachineIds ?? [], ResolveMachineName("deconstructor".ToIdentifier()));
-                mg.AddCard(new SourceRecipeCard(src, OnPrimary, OnSecondary));
-            }
-
-            foreach (var group in obtainGroups.Values) group.Draw(colObtain);
-
-
-            colUsage.Content.ClearChildren();
-            var usageDict = new Dictionary<string, UIMachineGroup>();
-
-            if (decon?.Count > 0 && targetItem is ItemPrefab item)
-            {
-                var deconByMachine = decon.GroupBy(di => string.Join(",", di.RequiredDeconstructor.Select(id => id.Value).OrderBy(s => s)));
-                foreach (var machineDecons in deconByMachine)
-                {
-                    var machineIds = machineDecons.First().RequiredDeconstructor;
-                    var mg = GetOrCreateMachineGroup(usageDict, machineIds, ResolveMachineName("deconstructor".ToIdentifier()));
-
-                    var deconList = machineDecons.ToList();
-                    bool isRandom = item.RandomDeconstructionOutput;
-
-                    if (isRandom)
-                    {
-                        mg.AddCard(new DeconOutputCard(item, deconList, OnPrimary, OnSecondary));
-                    }
-                    else
-                    {
-                        var groupedOutputs = deconList.GroupBy(di => di.ItemIdentifier).Select(g => new { ID = g.Key, Amount = g.Max(di => di.Amount), Weight = g.Sum(di => di.Commonness) });
-                        foreach (var output in groupedOutputs)
+                        var mg = new UIMachineGroup { MachineName = key };
+                        if (machineIds.Any(id => id == "vendingmachine"))
                         {
-                            mg.AddCard(new SingleDeconOutputCard(item, output.ID, output.Amount, output.Weight, OnPrimary, OnSecondary));
+                            mg.IsVendingMachine = true;
+                            mg.PriceString = (PrefabAdapter.DefaultPrice(item)?.Price ?? 0).ToString();
+                        }
+
+                        value = mg;
+                        dict[key] = value;
+                    }
+                    return value;
+                }
+
+                var groupedSources = sources?
+                    .GroupBy(s => new
+                    {
+                        SourceId = s.Item1.Identifier,
+                        MachineKey = string.Join(",", s.Item2.RequiredDeconstructor.Select(id => id.Value).OrderBy(x => x)),
+                        OtherItemsKey = string.Join(",", s.Item2.RequiredOtherItem.Select(id => id.Value).OrderBy(x => x))
+                    })
+                    .Select(group => new GroupedSource
+                    {
+                        SourceItem = group.First().Item1,
+                        MachineIds = group.First().Item2.RequiredDeconstructor,
+                        RequiredOtherItems = [.. group.First().Item2.RequiredOtherItem],
+                        TotalCommonness = group.Sum(g => g.Item2.Commonness),
+                        Amount = group.First().Item2.Amount,
+                        IsRandom = group.First().Item1.RandomDeconstructionOutput
+                    })
+                    .ToList();
+
+                var groupedUses = uses?
+                    .GroupBy(u => string.Join(",", u.Item2.SuitableFabricatorIdentifiers.Select(id => id.Value).OrderBy(s => s)))
+                    .SelectMany(mg => mg.GroupBy(u => u.Item1.Identifier)
+                        .Select(ig => new GroupedUsage
+                        {
+                            TargetItem = ig.First().Item1,
+                            MachineIds = [.. ig.First().Item2.SuitableFabricatorIdentifiers],
+                            AmountCreated = ig.First().Item2.Amount,
+                            AmountRequired = ig.First().Item2.RequiredItems.FirstOrDefault(ri =>
+                                ri.ItemPrefabs.Any(p => p.Identifier == item.Identifier))?.Amount ?? 1
+                        }))
+                    .ToList();
+
+
+                colObtain.Content.ClearChildren();
+                var obtainGroups = new Dictionary<string, UIMachineGroup>();
+
+                foreach (var r in craft ?? [])
+                {
+                    var mg = GetOrCreateMachineGroup(obtainGroups, r.SuitableFabricatorIdentifiers, TextSOS.Get("sos.recipe.hand", "Hand").Value);
+                    mg.AddCard(new CraftRecipeCard(r, item, controller, OnPrimary, OnSecondary));
+                }
+
+                foreach (var src in groupedSources ?? [])
+                {
+                    var mg = GetOrCreateMachineGroup(obtainGroups, src.MachineIds ?? [], ResolveMachineName("deconstructor".ToIdentifier()));
+                    mg.AddCard(new SourceRecipeCard(src, OnPrimary, OnSecondary));
+                }
+
+                foreach (var group in obtainGroups.Values) group.Draw(colObtain);
+
+
+                colUsage.Content.ClearChildren();
+                var usageDict = new Dictionary<string, UIMachineGroup>();
+
+                if (decon?.Count > 0)
+                {
+                    var deconByMachine = decon.GroupBy(di => string.Join(",", di.RequiredDeconstructor.Select(id => id.Value).OrderBy(s => s)));
+                    foreach (var machineDecons in deconByMachine)
+                    {
+                        var machineIds = machineDecons.First().RequiredDeconstructor;
+                        var mg = GetOrCreateMachineGroup(usageDict, machineIds, ResolveMachineName("deconstructor".ToIdentifier()));
+
+                        var deconList = machineDecons.ToList();
+                        bool isRandom = item.RandomDeconstructionOutput;
+
+                        if (isRandom)
+                        {
+                            mg.AddCard(new DeconOutputCard(item, deconList, OnPrimary, OnSecondary));
+                        }
+                        else
+                        {
+                            var groupedOutputs = deconList.GroupBy(di => di.ItemIdentifier).Select(g => new { ID = g.Key, Amount = g.Max(di => di.Amount), Weight = g.Sum(di => di.Commonness) });
+                            foreach (var output in groupedOutputs)
+                            {
+                                mg.AddCard(new SingleDeconOutputCard(item, output.ID, output.Amount, output.Weight, OnPrimary, OnSecondary));
+                            }
                         }
                     }
                 }
+
+                foreach (var usage in groupedUses ?? [])
+                {
+                    var mg = GetOrCreateMachineGroup(usageDict, usage.MachineIds ?? [], TextSOS.Get("sos.recipe.hand", "Hand").Value);
+                    mg.AddCard(new UsageRecipeCard(usage, OnPrimary, OnSecondary));
+                }
+
+                foreach (var group in usageDict.Values) group.Draw(colUsage);
+
             }
-
-            foreach (var usage in groupedUses ?? [])
-            {
-                var mg = GetOrCreateMachineGroup(usageDict, usage.MachineIds ?? [], TextSOS.Get("sos.recipe.hand", "Hand").Value);
-                mg.AddCard(new UsageRecipeCard(usage, OnPrimary, OnSecondary));
-            }
-
-            foreach (var group in usageDict.Values) group.Draw(colUsage);
-
 
             void onBadgeClick(string tag) { if (searchBox != null) searchBox.Text = tag; UpdateSearch(tag); }
 
@@ -1141,78 +1162,189 @@ namespace SOS
 
     public class GUIDesplegableBox
     {
-        public GUIDesplegableBox(GUIComponent parent, Action<string> onbBadgeClick, string labelText, IEnumerable<string> tags, IEnumerable<Prefab> items, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public GUIDesplegableBox(GUIComponent parent, Action<string> onBadgeClick, string labelText, IEnumerable<string> tags, IEnumerable<Prefab> items, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            //var leftSpacing = 5;
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), parent.RectTransform) { MinSize = new Point(0, 24) }, style: null);
 
-            var row = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), parent.RectTransform) { MinSize = new Point(0, 24) }, isHorizontal: true)
-            {
-                CanBeFocused = false,
-                AbsoluteSpacing = 5,
-            };
+            _ = new GUITextBlock(new RectTransform(new Vector2(0.3f, 1f), row.RectTransform, Anchor.CenterLeft), labelText, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
 
-            var label = new GUITextBlock(new RectTransform(new Vector2(0.3f, 1f), row.RectTransform), labelText, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+            var tagsList = tags.ToList();
 
-            var badgeFrame = new GUIFrame(new RectTransform(new Vector2(0.55f, 1f), row.RectTransform), style: null) { CanBeFocused = false };
-            GUIBadgeList.Create(badgeFrame.RectTransform, tags, onbBadgeClick);
+            RichString tagsRich = tagsList.JoinToRichString(", ", t => t, t => Color.LightSkyBlue);
+            var tagsText = new GUITextBlock(new RectTransform(new Vector2(0.55f, 1f), row.RectTransform, Anchor.TopLeft) { RelativeOffset = new Vector2(0.3f, 0f) }, "", wrap: true, font: GUIStyle.SmallFont, textAlignment: Alignment.CenterLeft);
+            tagsText.SetRichText(tagsRich);
 
-            var dropDown = new GUIDropDown2(new RectTransform(new Point(36, 24), row.RectTransform), elementCount: Math.Min((int)items.Count(), 8), listBoxWidth: (int)(row.Rect.Width * 0.95f), style: "GUIDropDown", expandToRight: false);
+            tagsText.BindHyperlinks(tagsList, tag => onBadgeClick?.Invoke(tag));
+
+            var dropDown = new GUIDropDown2(new RectTransform(new Point(36, 24), row.RectTransform, Anchor.TopRight) { IsFixedSize = true }, elementCount: Math.Min((int)items.Count(), 8), listBoxWidth: (int)(parent.Rect.Width * 0.95f), style: "GUIDropDown", expandToRight: false);
 
             foreach (var item in items)
             {
                 bool isFav = controller.FavoritedItems.Contains(item.Identifier.Value);
                 string prefix = isFav ? " *" : "";
 
-                switch (item)
-                {
-                    case ItemPrefab itemP:
-                        CardBuilder.DrawCompactItemRow(dropDown.ListBox.Content, itemP, 1, true, prefix, isFav ? Color.Gold : Color.White,
-                        onPrimaryClick: (p) => { onPrimary?.Invoke(p); dropDown.Dropped = false; },
-                        onSecondaryClick: onSecondary);
-                        break;
-                    case AfflictionPrefab affliction:
-                        RLogger.LogDebug($"Afliccion: {affliction.Name}, ID: {affliction.Identifier}");
-                        CardBuilder.DrawCompactItemRow(dropDown.ListBox.Content, affliction, 1, true, prefix, isFav ? Color.Gold : Color.White,
-                        onPrimaryClick: (p) => { onPrimary?.Invoke(p); dropDown.Dropped = false; },
-                        onSecondaryClick: onSecondary);
-                        break;
-                }
-
+                CardBuilder.DrawCompactItemRow(dropDown.ListBox.Content, item, 1, true, prefix, isFav ? Color.Gold : Color.White,
+                onPrimaryClick: (p) => { onPrimary?.Invoke(p); dropDown.Dropped = false; },
+                onSecondaryClick: onSecondary);
             }
+
+            void UpdateHeight()
+            {
+                int h = Math.Max(24, (int)tagsText.TextSize.Y + 4);
+                row.RectTransform.MinSize = new Point(0, h);
+                row.RectTransform.MaxSize = new Point(int.MaxValue, h);
+            }
+            UpdateHeight();
+            row.RectTransform.SizeChanged += UpdateHeight;
         }
     }
 
     public static class GUIBadgeList
     {
-        public static void Create(RectTransform targetRect, IEnumerable<string> items, Action<string> onClick)
+        public static void AddBadge(GUIListBox list, Prefab item, Action<Prefab> onClick, RichString? displayName = null)
         {
-            var list = new GUIListBox(targetRect, isHorizontal: true, style: "GUIBackgroundBlocker")
+            RichString finalName = displayName ?? item.SafeName(Color.White).Name;
+            Color themeColor = item.IconColor();
+
+            var tagBadge = new GUIButton(new RectTransform(new Vector2(0.1f, 0.9f), list.Content.RectTransform), style: "OuterGlow")
             {
-                Spacing = 4,
+                Color = themeColor * 0.2f,
+                OnClicked = (_, _) => { onClick?.Invoke(item); return true; },
+                OnDrawToolTip = component => component.ToolTip = CardBuilder.GetDetailedTooltip(item)
             };
 
-            foreach (var item in items)
+            var tagText = new GUITextBlock(new RectTransform(Vector2.One, tagBadge.RectTransform), finalName.ToLower(), font: GUIStyle.SmallFont, textAlignment: Alignment.Center)
             {
-                if (string.IsNullOrWhiteSpace(item)) continue;
+                Padding = new Vector4(8, 0, 8, 0),
+                CanBeFocused = false,
+                Wrap = false
+            };
 
-                var tagBadge = new GUIButton(new RectTransform(new Vector2(0.1f, 0.9f), list.Content.RectTransform), style: "OuterGlow")
-                {
-                    Color = Color.LightSkyBlue * 0.15f,
-                    OnClicked = (_, _) => { onClick?.Invoke(item); return true; },
-                };
+            int calculatedWidth = (int)tagText.TextSize.X + 16;
+            tagBadge.RectTransform.MinSize = new Point(calculatedWidth, 0);
+            tagBadge.RectTransform.MaxSize = new Point(calculatedWidth, int.MaxValue);
+        }
 
-                var tagText = new GUITextBlock(new RectTransform(Vector2.One, tagBadge.RectTransform), item.ToLower(), font: GUIStyle.SmallFont, textAlignment: Alignment.Center)
-                {
-                    Padding = new Vector4(8, 0, 8, 0),
-                    TextColor = Color.LightSkyBlue,
-                    CanBeFocused = false,
-                    Wrap = false
-                };
+        // Método auxiliar para añadir un badge de String a una lista existente
+        public static void AddBadge(GUIListBox list, string value, Action<string> onClick, RichString? displayName = null)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return;
+            RichString finalName = displayName ?? value;
 
-                int calculatedWidth = (int)tagText.TextSize.X + 16;
-                tagBadge.RectTransform.MinSize = new Point(calculatedWidth, 0);
-                tagBadge.RectTransform.MaxSize = new Point(calculatedWidth, int.MaxValue);
+            var tagBadge = new GUIButton(new RectTransform(new Vector2(0.1f, 0.9f), list.Content.RectTransform), style: "OuterGlow")
+            {
+                Color = Color.LightSkyBlue * 0.15f,
+                OnClicked = (_, _) => { onClick?.Invoke(value); return true; },
+            };
+
+            var tagText = new GUITextBlock(new RectTransform(Vector2.One, tagBadge.RectTransform), finalName.ToLower(), font: GUIStyle.SmallFont, textAlignment: Alignment.Center)
+            {
+                Padding = new Vector4(8, 0, 8, 0),
+                TextColor = Color.LightSkyBlue,
+                CanBeFocused = false,
+                Wrap = false
+            };
+
+            int calculatedWidth = (int)tagText.TextSize.X + 16;
+            tagBadge.RectTransform.MinSize = new Point(calculatedWidth, 0);
+            tagBadge.RectTransform.MaxSize = new Point(calculatedWidth, int.MaxValue);
+        }
+
+        // Mantener los métodos Create originales por compatibilidad, pero refactorizados
+        public static void Create(RectTransform targetRect, IEnumerable<string> values, Action<string> onClick, IEnumerable<RichString>? displayNames = null)
+        {
+            var list = new GUIListBox(targetRect, isHorizontal: true, style: null) { Spacing = 4 };
+            var valList = values.ToList();
+            var dispList = displayNames?.ToList();
+            for (int i = 0; i < valList.Count; i++)
+            {
+                AddBadge(list, valList[i], onClick, (dispList != null && i < dispList.Count) ? dispList[i] : null);
             }
+        }
+
+        public static void Create(RectTransform targetRect, IEnumerable<Prefab> items, Action<Prefab> onClick, IEnumerable<RichString>? displayNames = null)
+        {
+            var list = new GUIListBox(targetRect, isHorizontal: true, style: null) { Spacing = 4 };
+            var prefabs = items.ToList();
+            var names = displayNames?.ToList();
+            for (int i = 0; i < prefabs.Count; i++)
+            {
+                AddBadge(list, prefabs[i], onClick, (names != null && i < names.Count) ? names[i] : null);
+            }
+        }
+    }
+
+    public static class GUIHyperlinkList
+    {
+        public static GUITextBlock Create(RectTransform targetRect, IEnumerable<string> values, Action<string> onClick, IEnumerable<RichString>? displayNames = null, string separator = " | ", Color? linkColor = null)
+        {
+            var valList = values.ToList();
+            var dispList = displayNames?.ToList();
+            var parts = new List<string>();
+
+            for (int i = 0; i < valList.Count; i++)
+            {
+                string displayName = (dispList != null && i < dispList.Count) ? dispList[i].ToString() : valList[i];
+                parts.Add(displayName.SetHyperlink(linkColor));
+            }
+
+            var textBlock = new GUITextBlock(new RectTransform(Vector2.One, targetRect), RichString.Rich(string.Join(separator, parts)), wrap: true, font: GUIStyle.SmallFont)
+            {
+                CanBeFocused = false
+            };
+
+            if (textBlock.HasColorHighlight && textBlock.RichTextData != null)
+            {
+                int index = 0;
+                foreach (var data in textBlock.RichTextData)
+                {
+                    if (index >= valList.Count) break;
+                    string target = valList[index];
+                    textBlock.ClickableAreas.Add(new GUITextBlock.ClickableArea()
+                    {
+                        Data = data,
+                        OnClick = (tb, area) => { onClick?.Invoke(target); }
+                    });
+                    index++;
+                }
+            }
+            return textBlock;
+        }
+
+        public static GUITextBlock Create(RectTransform targetRect, IEnumerable<Prefab> items, Action<Prefab> onClick, IEnumerable<RichString>? displayNames = null, string separator = " | ", Color? linkColor = null)
+        {
+            var prefabs = items.ToList();
+            var names = displayNames?.ToList();
+            var parts = new List<string>();
+
+            for (int i = 0; i < prefabs.Count; i++)
+            {
+                var (name, _) = prefabs[i].SafeName(Color.White);
+                string displayName = (names != null && i < names.Count) ? names[i].ToString() : name;
+                parts.Add(displayName.SetHyperlink(linkColor ?? prefabs[i].IconColor()));
+            }
+
+            var textBlock = new GUITextBlock(new RectTransform(Vector2.One, targetRect), RichString.Rich(string.Join(separator, parts)), wrap: true, font: GUIStyle.SmallFont)
+            {
+                CanBeFocused = false
+            };
+
+            if (textBlock.HasColorHighlight && textBlock.RichTextData != null)
+            {
+                int index = 0;
+                foreach (var data in textBlock.RichTextData)
+                {
+                    if (index >= prefabs.Count) break;
+                    var target = prefabs[index];
+                    textBlock.ClickableAreas.Add(new GUITextBlock.ClickableArea()
+                    {
+                        Data = data,
+                        OnClick = (tb, area) => { onClick?.Invoke(target); }
+                    });
+                    index++;
+                }
+            }
+            return textBlock;
         }
     }
 
