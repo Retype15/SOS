@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Retype15
+// Copyright (c) 2026 Retype15
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
@@ -561,10 +561,7 @@ namespace SOS
             int availableWidth = (int)itemList.Rect.Width - 14;
             int maxItemsPerRow = Math.Max(1, availableWidth / slotSize);
 
-            var rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
-            var currentRow = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 2 };
-
-            //lastTypeInList = allFilteredTargets.First()?.GetType();
+            GUILayoutGroup? currentRow = null;
 
             for (int i = itemsLoaded; i < nextBatch; i++)
             {
@@ -588,8 +585,7 @@ namespace SOS
                         TextSOS.Get($"sos.list.header.{label.ToLower()}", label.SpacedPascalCase()),
                         font: GUIStyle.SmallFont, textColor: Color.Gold, textAlignment: Alignment.Center);
 
-                    rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
-                    currentRow = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 2 };
+                    currentRow = null;
                     itemsInRow = 0;
                 }
 
@@ -598,9 +594,9 @@ namespace SOS
                 switch (leftPanelMode)
                 {
                     case DisplayMode.Compact:
-                        if (itemsInRow >= maxItemsPerRow)
+                        if (currentRow == null || itemsInRow >= maxItemsPerRow)
                         {
-                            rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
+                            var rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
                             currentRow = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 2 };
                             itemsInRow = 0;
                         }
