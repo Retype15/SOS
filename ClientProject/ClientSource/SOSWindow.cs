@@ -573,17 +573,22 @@ namespace SOS
                 {
                     lastTypeInList = currentType;
 
-                    var separatorFrame = new GUIFrame(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) }, style: "GUIFrameBottom")
+                    var separatorFrame = new GUIButton(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) }, style: "GUIFrameBottom")
                     {
                         Color = Color.White * 0.1f,
-                        CanBeFocused = false
+                        CanBeFocused = true,
+                        OnClicked = (btn, _) =>
+                        {
+                            if (searchBox != null) searchBox.Text = $"%{currentType.Name}";
+                            return true;
+                        }
                     };
 
                     string label = currentType.Name;
 
                     _ = new GUITextBlock(new RectTransform(Vector2.One, separatorFrame.RectTransform),
                         TextSOS.Get($"sos.list.header.{label.ToLower()}", label.SpacedPascalCase()),
-                        font: GUIStyle.SmallFont, textColor: Color.Gold, textAlignment: Alignment.Center);
+                        font: GUIStyle.SmallFont, textColor: Color.MediumPurple, textAlignment: Alignment.Center);
 
                     currentRow = null;
                     itemsInRow = 0;
@@ -1354,8 +1359,11 @@ namespace SOS
         public List<string> ID = [];
         public List<string> PrefabType = [];
 
-        public bool AllowsItems => PrefabType.Count == 0 || PrefabType.Any(t => "items".Contains(t, StringComparison.OrdinalIgnoreCase) || "itemprefab".Contains(t, StringComparison.OrdinalIgnoreCase));
-        public bool AllowsAfflictions => PrefabType.Count == 0 || PrefabType.Any(t => "afflictions".Contains(t, StringComparison.OrdinalIgnoreCase) || "afflictionprefab".Contains(t, StringComparison.OrdinalIgnoreCase));
+        public bool AllowsItems => PrefabType.Count == 0 || PrefabType.Any(t => 
+            !t.Contains("Affliction", StringComparison.OrdinalIgnoreCase));
+
+        public bool AllowsAfflictions => PrefabType.Count == 0 || PrefabType.Any(t => 
+            !t.Contains("Item", StringComparison.OrdinalIgnoreCase));
 
         public SearchFilter(string rawQuery)
         {
@@ -1392,6 +1400,12 @@ namespace SOS
 
         public bool Matches(Prefab p)
         {
+            if (PrefabType.Count > 0)
+            {
+                string typeName = p.GetType().Name;
+                if (!PrefabType.Any(t => typeName.Contains(t, StringComparison.OrdinalIgnoreCase))) return false;
+            }
+
             return p switch
             {
                 ItemPrefab item => MatchesItem(item),
