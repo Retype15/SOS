@@ -159,7 +159,8 @@ namespace SOS
 
             if (!string.IsNullOrEmpty(data.LastItemId))
             {
-                CurrentTarget = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == data.LastItemId);
+                CurrentTarget = (Prefab?)ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == data.LastItemId)
+                             ?? (Prefab?)AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == data.LastItemId);
             }
 
             if (!string.IsNullOrEmpty(data.TrackedItemId))
@@ -312,7 +313,7 @@ namespace SOS
 
                 if (isKeyDownNow && !wasKeyDown)
                 {
-                    ItemPrefab? detected = GetPrefabUnderMouse();
+                    Prefab? detected = GetPrefabUnderMouse();
 
                     CrossThread.RequestExecutionOnMainThread(() =>
                     {
@@ -368,32 +369,38 @@ namespace SOS
             Tracker.UpdateHUD();
         }
 
-        private static ItemPrefab? GetPrefabUnderMouse()
+        private static Prefab? GetPrefabUnderMouse()
         {
+            // 1. World
             if (PlayerInput.IsShiftDown() && Character.Controlled?.FocusedItem != null)
             {
                 return Character.Controlled.FocusedItem.Prefab;
             }
 
+            // 2. Inv
             if (Inventory.SelectedSlot?.Item != null)
             {
                 return Inventory.SelectedSlot.Item.Prefab;
             }
 
+            // 3. other GUIs
             if (GUI.MouseOn != null)
             {
                 GUIComponent? curr = GUI.MouseOn;
                 while (curr != null)
                 {
-                    if (curr.UserData is PurchasedItem purchasedItem)
-                    {
-                        return purchasedItem.ItemPrefab;
-                    }
+                    // Any direct
+                    if (curr.UserData is Prefab prefab) return prefab;
 
-                    if (curr.UserData is ItemPrefab prefab) return prefab;
+                    // Specific
                     if (curr.UserData is Item item) return item.Prefab;
+                    if (curr.UserData is Affliction affliction) return affliction.Prefab;
+
+                    // Shopp
+                    if (curr.UserData is PurchasedItem purchasedItem) return purchasedItem.ItemPrefab;
                     if (curr.UserData is FabricationRecipe recipe) return recipe.TargetItem;
 
+                    // Shop Btns
                     if (curr.UserData as string == "addbutton" || curr.UserData as string == "removebutton")
                     {
                         GUIComponent? p = curr.Parent;
@@ -407,6 +414,7 @@ namespace SOS
                         }
                     }
 
+                    // parent
                     curr = curr.Parent;
                 }
             }

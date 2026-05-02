@@ -310,8 +310,14 @@ namespace SOS
         private readonly List<string> hazards = [];
 
         // Affliction
+        private bool isBuff;
         private float activationThreshold;
         private float treatmentThreshold;
+        private float scannerThreshold;
+        private float iconThreshold;
+        private float baseHealCost;
+        private float healMultiplier;
+        private float medSkillGain;
         private string causeOfDeath = "";
 
         public override void Analyze(Prefab prefab)
@@ -332,6 +338,13 @@ namespace SOS
                     }
                     break;
                 case AfflictionPrefab affliction:
+                    isBuff = affliction.IsBuff;
+                    scannerThreshold = affliction.ShowInHealthScannerThreshold;
+                    iconThreshold = affliction.ShowIconThreshold;
+                    baseHealCost = affliction.BaseHealCost;
+                    healMultiplier = affliction.HealCostMultiplier;
+                    medSkillGain = affliction.MedicalSkillGain;
+
                     if (affliction.configElement != null)
                     {
                         activationThreshold = affliction.configElement.GetAttributeFloat("activationthreshold", 0f);
@@ -368,19 +381,21 @@ namespace SOS
             }
             else if (prefab is AfflictionPrefab aff)
             {
+                builder.AddRow("Classification:", isBuff ? "Buff (Positive)" : "Debuff (Negative)", isBuff ? Color.LightGreen : Color.Salmon);
                 builder.AddBadgeRow("Type:", [aff.AfflictionType.ToString()], filterPrefix: '#');
-
                 builder.AddRow("Max Strength:", aff.MaxStrength.ToValue(), Color.White);
 
-                if (activationThreshold > 0)
-                    builder.AddRow("Activation Threshold:", activationThreshold.ToValue(), Color.Yellow);
-                if (treatmentThreshold > 0)
-                    builder.AddRow("Treatment Threshold:", treatmentThreshold.ToValue(), Color.LightGreen);
+                if (activationThreshold > 0) builder.AddRow("Activation Threshold:", activationThreshold.ToValue(), Color.Yellow);
+                if (iconThreshold > 0 && iconThreshold < 1000) builder.AddRow("Icon Appears At:", iconThreshold.ToValue(), Color.Cyan);
+                if (scannerThreshold > 0 && scannerThreshold < 1000) builder.AddRow("Scanner Detects At:", scannerThreshold.ToValue(), Color.Cyan);
+                if (treatmentThreshold > 0) builder.AddRow("AI Treats At:", treatmentThreshold.ToValue(), Color.LightGreen);
 
-                if (aff.LimbSpecific)
-                    builder.AddRow("Limb Specific:", "Yes", Color.Gray);
+                float totalCost = baseHealCost * healMultiplier;
+                if (totalCost > 0) builder.AddRow("Clinic Heal Cost:", $"~{(int)totalCost} mk", Color.Gold);
+                if (medSkillGain > 0) builder.AddRow("Medical Exp Gain:", $"+{medSkillGain.ToValue()}", Color.MediumPurple);
 
-                if (!string.IsNullOrEmpty(aff.IndicatorLimb.ToString()))
+                if (aff.LimbSpecific) builder.AddRow("Limb Specific:", "Yes", Color.Gray);
+                if (!string.IsNullOrEmpty(aff.IndicatorLimb.ToString()) && aff.IndicatorLimb.ToString() != "None")
                     builder.AddRow("Indicator Limb:", aff.IndicatorLimb.ToString(), Color.Gray);
 
                 if (!string.IsNullOrEmpty(causeOfDeath))
@@ -981,96 +996,212 @@ namespace SOS
     // MARK: Affliction effects
     public class AfflictionEffectsSection : BaseStatSection
     {
-        private class EffectGroup
+        private class PhaseData
         {
             public string Range = "";
+            public float StrengthChange;
             public List<string> Stats = [];
-            public List<(string ID, string Name)> Causes = [];
-            public List<(string ID, string Name)> Heals = [];
+            public List<string> Resistances = [];
+            public List<string> Events = [];
+            public List<(string ID, string Name, Color Theme)> LinkedAfflictions = [];
         }
 
-        private readonly List<EffectGroup> effects = [];
+        private readonly List<PhaseData> phases = [];
+        private readonly List<PhaseData> periodicPhases = [];
 
-        public override bool HasData => effects.Count > 0;
+        public override bool HasData => phases.Count > 0 || periodicPhases.Count > 0;
 
         public override void Analyze(Prefab prefab)
         {
             if (prefab is not AfflictionPrefab aff || aff.configElement == null) return;
-            effects.Clear();
+            phases.Clear();
+            periodicPhases.Clear();
 
             foreach (var element in aff.configElement.GetChildElements("Effect"))
             {
-                var group = new EffectGroup
+                var phase = new PhaseData
                 {
-                    Range = $"{element.GetAttributeFloat("minstrength", 0f).ToValue()} - {element.GetAttributeFloat("maxstrength", 0f).ToValue()}"
+                    Range = $"{element.GetAttributeFloat("minstrength", 0f).ToValue()} - {element.GetAttributeFloat("maxstrength", 0f).ToValue()}",
+                    StrengthChange = element.GetAttributeFloat("strengthchange", 0f)
                 };
 
-                float vit = element.GetAttributeFloat("maxvitalitydecrease", 0f);
-                if (vit > 0) group.Stats.Add($"Vit: {vit.ToValue().SetColor((vit >= 0) ? Color.LimeGreen : Color.OrangeRed)}");
+                // vit
+                float vitMin = element.GetAttributeFloat("minvitalitydecrease", 0f);
+                float vitMax = element.GetAttributeFloat("maxvitalitydecrease", 0f);
+                bool isPercent = element.GetAttributeBool("multiplybymaxvitality", false);
 
-                float regen = element.GetAttributeFloat("strengthchange", 0f);
-                if (regen != 0) group.Stats.Add($"Regen: {$"{regen.ToSignedValue()}/s".SetColor((regen >= 0) ? Color.GreenYellow : Color.OrangeRed)}");
-
-                float speed = element.GetAttributeFloat("minspeedmultiplier", 1f);
-                if (speed != 1f) group.Stats.Add($"Speed: {('x' + speed.ToValue()).SetColor((speed >= 1f) ? Color.LimeGreen : Color.OrangeRed)}");
-
-                foreach (var se in element.GetChildElements("StatusEffect"))
+                if (vitMax > 0)
                 {
-                    foreach (var sub in se.Elements())
-                    {
-                        string n = sub.Name.ToString().ToLowerInvariant();
-                        if (n == "affliction" || n == "reduceaffliction")
-                        {
-                            string id = sub.GetAttributeString("identifier", sub.GetAttributeString("type", "???"));
-                            float amt = sub.GetAttributeFloat("amount", sub.GetAttributeFloat("strength", 0f));
-
-                            // TODO: Remember these...
-                            var targetAff = AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == id);
-                            string displayName = targetAff != null ? targetAff.Name.Value : id;
-                            string finalName = $"{displayName} ({Math.Abs(amt).ToValue()})";
-
-                            if (n == "reduceaffliction" || amt < 0)
-                                group.Heals.Add((id, finalName));
-                            else
-                                group.Causes.Add((id, finalName));
-                        }
-                    }
+                    string vitStr = vitMin == vitMax ? vitMax.ToValue() : $"{vitMin.ToValue()} to {vitMax.ToValue()}";
+                    vitStr += isPercent ? "%" : " pts";
+                    phase.Stats.Add($"Max HP Penalty: -{vitStr.SetColor(Color.OrangeRed)}");
                 }
 
-                if (group.Stats.Count > 0 || group.Causes.Count > 0 || group.Heals.Count > 0)
-                    effects.Add(group);
+                // modf
+                float speedMin = element.GetAttributeFloat("minspeedmultiplier", 1f);
+                float speedMax = element.GetAttributeFloat("maxspeedmultiplier", 1f);
+                if (speedMin != 1f || speedMax != 1f)
+                {
+                    string speedStr = speedMin == speedMax ? speedMax.ToValue() : $"{speedMin.ToValue()} to {speedMax.ToValue()}";
+                    phase.Stats.Add($"Speed: x{speedStr.SetColor((speedMax >= 1f) ? Color.LimeGreen : Color.OrangeRed)}");
+                }
+
+                // effects
+                List<string> effectList = [];
+                if (element.GetAttributeFloat("maxscreendistort", 0f) > 0) effectList.Add("disort");
+                if (element.GetAttributeFloat("maxscreenblur", 0f) > 0) effectList.Add("blur");
+                if (element.GetAttributeFloat("maxradialdistort", 0f) > 0) effectList.Add("radial");
+                if (element.GetAttributeFloat("maxchromaticaberration", 0f) > 0) effectList.Add("chroma");
+                if (effectList.Count > 0)
+                    phase.Stats.Add($"Visual Distortions ({string.Join(", ", effectList)})".SetColor(Color.Orange));
+
+                float convulse = element.GetAttributeFloat("convulseamount", 0f);
+                if (convulse > 0) phase.Stats.Add($"Convulsions/Spasms ({convulse})".SetColor(Color.OrangeRed));
+
+                // res
+                string resList = element.GetAttributeString("resistancefor", "");
+                if (!string.IsNullOrEmpty(resList))
+                {
+                    float resMin = element.GetAttributeFloat("minresistance", 0f);
+                    float resMax = element.GetAttributeFloat("maxresistance", 0f);
+                    string resStr = resMin == resMax ? $"{(resMax * 100):0.#}%" : $"{(resMin * 100):0.#}% to {(resMax * 100):0.#}%";
+
+                    Color resColor = resMax > 0 ? Color.LightGreen : Color.Salmon;
+                    phase.Resistances.Add($"{resList.Replace(",", ", ")} ({resStr.SetColor(resColor)})");
+                }
+
+                ParseStatusEffects(element, phase);
+
+                if (phase.Stats.Count > 0 || phase.Resistances.Count > 0 || phase.LinkedAfflictions.Count > 0 || phase.Events.Count > 0 || phase.StrengthChange != 0)
+                    phases.Add(phase);
             }
+
+            foreach (var element in aff.configElement.GetChildElements("PeriodicEffect"))
+            {
+                var phase = new PhaseData
+                {
+                    Range = $"Interval: {element.GetAttributeFloat("mininterval", 1f).ToValue()}s - {element.GetAttributeFloat("maxinterval", 1f).ToValue()}s"
+                };
+
+                float minStr = element.GetAttributeFloat("minstrength", 0f);
+                float maxStr = element.GetAttributeFloat("maxstrength", 0f);
+                if (minStr > 0 || maxStr > 0)
+                {
+                    phase.Range += $" (Str: {minStr.ToValue()} - {maxStr.ToValue()})";
+                }
+
+                ParseStatusEffects(element, phase);
+
+                if (phase.LinkedAfflictions.Count > 0 || phase.Events.Count > 0)
+                    periodicPhases.Add(phase);
+            }
+        }
+
+        private static void ParseStatusEffects(Barotrauma.ContentXElement parentElement, PhaseData phase)
+        {
+            bool hasSounds = false;
+            bool hasParticles = false;
+            bool hasExplosion = false;
+            bool hasAnimations = false;
+
+            foreach (var se in parentElement.GetChildElements("StatusEffect"))
+            {
+                if (se.GetChildElements("Sound").Any()) hasSounds = true;
+                if (se.GetChildElements("ParticleEmitter").Any()) hasParticles = true;
+                if (se.GetChildElements("Explosion").Any()) hasExplosion = true;
+                if (se.GetChildElements("TriggerAnimation").Any()) hasAnimations = true;
+
+                foreach (var sub in se.Elements())
+                {
+                    string n = sub.Name.ToString().ToLowerInvariant();
+                    if (n == "affliction" || n == "reduceaffliction")
+                    {
+                        string id = sub.GetAttributeString("identifier", sub.GetAttributeString("type", ""));
+                        if (string.IsNullOrEmpty(id)) continue;
+
+                        float amt = sub.GetAttributeFloat("amount", sub.GetAttributeFloat("strength", 0f));
+                        float prob = sub.GetAttributeFloat("probability", 1f);
+
+                        var targetAff = AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == id);
+                        string displayName = targetAff != null ? targetAff.Name.Value : id;
+
+                        bool isHeal = n == "reduceaffliction" || amt < 0;
+                        string sign = isHeal ? "-" : "+";
+                        string probStr = prob < 1f ? $" ({prob * 100:0.#}%)" : "";
+
+                        string finalName = $"{displayName} {sign}{Math.Abs(amt).ToValue()}{probStr}";
+                        Color theme = isHeal ? Color.LightGreen : Color.OrangeRed;
+
+                        phase.LinkedAfflictions.Add((id, finalName, theme));
+                    }
+                }
+            }
+
+            if (hasSounds) phase.Events.Add("Triggers Sounds/Noises");
+            if (hasParticles) phase.Events.Add("Spawns Particles");
+            if (hasExplosion) phase.Events.Add("Causes Explosion");
+            if (hasAnimations) phase.Events.Add("Forces Animations");
         }
 
         public override void Draw(SectionBuilder builder)
         {
-            builder.StartSection("EFFECTS BY SEVERITY", Color.Gold);
-
-            foreach (var group in effects)
+            if (phases.Count > 0)
             {
-                builder.AddFullWidthText($"Str: {group.Range.SetColor(Color.Orange)}");
+                builder.StartSection("EFFECTS BY STRENGTH PHASE", Color.Gold);
 
-                if (group.Stats.Count > 0)
-                    builder.AddFullWidthText($"  -> {string.Join(", ", group.Stats).SetColor(Color.Salmon)}".SetColor(Color.Gray));
-
-                if (group.Causes.Count > 0)
+                foreach (var phase in phases)
                 {
-                    builder.AddSelectorBadgeRow("  -> Causes:",
-                        group.Causes.Select(c => c.ID),
-                        group.Causes.Select(c => c.Name.SetColor(Color.OrangeRed)), '!');
-                }
+                    builder.AddFullWidthText($"Strength Range: {phase.Range.SetColor(Color.Orange)}");
 
-                if (group.Heals.Count > 0)
-                {
-                    builder.AddSelectorBadgeRow("  -> Heals:",
-                        group.Heals.Select(h => h.ID),
-                        group.Heals.Select(h => h.Name.SetColor(Color.LightGreen)), '!');
-                }
+                    if (phase.StrengthChange != 0)
+                    {
+                        string trend = phase.StrengthChange > 0
+                            ? $"Worsens: +{phase.StrengthChange}/s".SetColor(Color.Salmon)
+                            : $"Natural Healing: {phase.StrengthChange}/s".SetColor(Color.LightGreen);
+                        builder.AddFullWidthText($"  -> {trend}");
+                    }
 
-                builder.AddFullWidthText(" ");
+                    if (phase.Stats.Count > 0)
+                        builder.AddFullWidthText($"  -> {string.Join(" | ", phase.Stats)}");
+
+                    if (phase.Resistances.Count > 0)
+                        builder.AddFullWidthText($"  -> Resistances: {string.Join(" | ", phase.Resistances)}");
+
+                    if (phase.Events.Count > 0)
+                        builder.AddFullWidthText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
+
+                    if (phase.LinkedAfflictions.Count > 0)
+                    {
+                        builder.AddSelectorBadgeRow("  -> Triggers:",
+                            phase.LinkedAfflictions.Select(l => l.ID),
+                            phase.LinkedAfflictions.Select(l => l.Name.SetColor(l.Theme)), '!');
+                    }
+
+                    builder.AddFullWidthText(" ");
+                }
+                builder.EndSection();
             }
 
-            builder.EndSection();
+            if (periodicPhases.Count > 0)
+            {
+                builder.StartSection("PERIODIC EVENTS", Color.MediumPurple);
+                foreach (var phase in periodicPhases)
+                {
+                    builder.AddFullWidthText($"Frequency: {phase.Range.SetColor(Color.Cyan)}");
+
+                    if (phase.Events.Count > 0)
+                        builder.AddFullWidthText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
+
+                    if (phase.LinkedAfflictions.Count > 0)
+                    {
+                        builder.AddSelectorBadgeRow("  -> Triggers:",
+                            phase.LinkedAfflictions.Select(l => l.ID),
+                            phase.LinkedAfflictions.Select(l => l.Name.SetColor(l.Theme)), '!');
+                    }
+                    builder.AddFullWidthText(" ");
+                }
+                builder.EndSection();
+            }
         }
     }
 
@@ -1078,59 +1209,95 @@ namespace SOS
     public class AfflictionTreatmentSection : BaseStatSection
     {
         private AfflictionPrefab? aff;
-        private List<Prefab> healers = [];
 
-        public override bool HasData => healers.Count > 0;
+        private readonly List<ItemPrefab> highEff = [];
+        private readonly List<ItemPrefab> medEff = [];
+        private readonly List<ItemPrefab> lowEff = [];
+        private readonly List<ItemPrefab> harmful = [];
+
+        private readonly List<string> blockers = [];
+
+        public override bool HasData => aff != null && (highEff.Count > 0 || medEff.Count > 0 || lowEff.Count > 0 || harmful.Count > 0 || blockers.Count > 0);
 
         public override void Analyze(Prefab prefab)
         {
-            if (prefab is AfflictionPrefab affliction)
-            {
-                aff = affliction;
-                string affId = aff.Identifier.Value.ToLowerInvariant();
-                string affType = aff.AfflictionType.ToString().ToLowerInvariant();
+            if (prefab is not AfflictionPrefab affliction) return;
+            aff = affliction;
 
-                healers = [.. ItemPrefab.Prefabs.Where(p =>
+            if (aff.IgnoreTreatmentIfAfflictedBy != null)
+            {
+                foreach (var blockerId in aff.IgnoreTreatmentIfAfflictedBy)
                 {
-                    if (p.ConfigElement == null) return false;
-                    return p.ConfigElement.Descendants().Any(e =>
-                    {
-                        string n = e.Name.ToString().ToLowerInvariant();
-                        if (n == "suitabletreatment")
-                        {
-                            string idOrType = e.GetAttributeString("identifier", e.GetAttributeString("type", "")).ToLowerInvariant();
-                            float suit = e.GetAttributeFloat("suitability", 0f);
-                            if (suit > 0 && (idOrType == affId || idOrType == affType)) return true;
-                        }
-                        else if (n == "statuseffect")
-                        {
-                            foreach (var sub in e.Elements())
-                            {
-                                string subName = sub.Name.ToString().ToLowerInvariant();
-                                if (subName == "reduceaffliction")
-                                {
-                                    string idOrType = sub.GetAttributeString("identifier", sub.GetAttributeString("type", "")).ToLowerInvariant();
-                                    if (idOrType == affId || idOrType == affType) return true;
-                                }
-                                else if (subName == "affliction")
-                                {
-                                    string idOrType = sub.GetAttributeString("identifier", sub.GetAttributeString("type", "")).ToLowerInvariant();
-                                    float amount = sub.GetAttributeFloat("amount", 0f);
-                                    if (amount < 0 && (idOrType == affId || idOrType == affType)) return true;
-                                }
-                            }
-                        }
-                        return false;
-                    });
-                }).OrderBy(p => p.Name.Value).Cast<Prefab>()];
+                    blockers.Add(blockerId.Value);
+                }
             }
+
+            if (aff.TreatmentSuitabilities != null)
+            {
+                foreach (var kvp in aff.TreatmentSuitabilities)
+                {
+                    var item = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == kvp.Key);
+                    if (item == null) continue;
+
+                    float suit = kvp.Value;
+                    var target = suit switch
+                    {
+                        >= 50f => highEff,
+                        >= 20f => medEff,
+                        > 0f => lowEff,
+                        < 0f => harmful,
+                        _ => null
+                    };
+                    target?.Add(item);
+                }
+            }
+            //ok
+            if (aff.TreatmentSuitabilities != null)
+            {
+                int CompareSuitDesc(ItemPrefab a, ItemPrefab b) => aff.TreatmentSuitabilities[b.Identifier].CompareTo(aff.TreatmentSuitabilities[a.Identifier]);
+                int CompareSuitAsc(ItemPrefab a, ItemPrefab b) => aff.TreatmentSuitabilities[a.Identifier].CompareTo(aff.TreatmentSuitabilities[b.Identifier]);
+                highEff.Sort(CompareSuitDesc);
+                medEff.Sort(CompareSuitDesc);
+                lowEff.Sort(CompareSuitDesc);
+                harmful.Sort(CompareSuitAsc);
+            }
+
         }
 
         public override void Draw(SectionBuilder builder)
         {
-            if (aff == null || healers.Count == 0) return;
-            builder.StartSection(TextSOS.Get("sos.affliction.treatments", "EFFECTIVE TREATMENTS").Value, Color.SpringGreen);
-            builder.AddDropdown(TextSOS.Get("sos.affliction.curedby", "Cured by:").Value, [], healers);
+            if (aff == null) return;
+
+            builder.StartSection(TextSOS.Get("sos.affliction.treatments", "TREATMENTS & MEDICATION").Value, Color.SpringGreen);
+
+            if (blockers.Count > 0)
+            {
+                var displayNames = blockers.Select(b =>
+                    AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == b)?.Name.Value ?? b);
+
+                builder.AddSelectorBadgeRow(TextSOS.Get("sos.affliction.blockedby", "Treatment Blocked By:").Value, blockers, displayNames, '!');
+            }
+
+            void DrawRow(string label, List<ItemPrefab> items)
+            {
+                if (items.Count == 0) return;
+
+                var ids = items.Select(i => i.Identifier.Value);
+                var names = items.Select(i => $"{i.Name.Value} ({aff.TreatmentSuitabilities[i.Identifier]:0})");
+
+                builder.AddSelectorBadgeRow(label, ids, names, '!');
+            }
+
+            DrawRow(TextSOS.Get("sos.affliction.highlyeffective", "Highly Effective:").Value, highEff);
+            DrawRow(TextSOS.Get("sos.affliction.effective", "Effective:").Value, medEff);
+            DrawRow(TextSOS.Get("sos.affliction.alternative", "Alternative / Weak:").Value, lowEff);
+
+            if (harmful.Count > 0)
+            {
+                builder.AddFullWidthText(TextSOS.Get("sos.affliction.contraindicated_warn", "WARNING: The following items worsen the condition!").Value.SetColor(Color.Salmon));
+                DrawRow(TextSOS.Get("sos.affliction.contraindicated", "Contraindicated:").Value, harmful);
+            }
+
             builder.EndSection();
         }
     }
