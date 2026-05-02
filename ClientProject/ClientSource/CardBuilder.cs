@@ -21,9 +21,14 @@ namespace SOS
 
         private static readonly Dictionary<Identifier, string> machineNameCache = [];
 
-        public static RichString GetDetailedTooltip(ItemPrefab? prefab)
+        public static RichString GetDetailedTooltip(Prefab? prefab)
         {
-            LocalizedString actual = prefab?.GetTooltip(Character.Controlled) ?? "";
+            LocalizedString actual = prefab switch
+            {
+                ItemPrefab item => item?.GetTooltip(Character.Controlled) ?? "",
+                AfflictionPrefab affliction => (LocalizedString)(affliction?.GetDescription(0f, AfflictionPrefab.Description.TargetType.Self) ?? ""),
+                _ => TextSOS.Get("sos.gen.unknown", "???"),
+            };
             ReadOnlySpan<char> value = actual.Value.AsSpan();
             int idx = value.LastIndexOf('\n');
             ReadOnlySpan<char> modLine = idx == -1 ? value : value[(idx + 1)..];
@@ -46,7 +51,9 @@ namespace SOS
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.1f, 0.9f), layout.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, style: "InnerFrame")
                 {
-                    ToolTip = GetDetailedTooltip(item)
+                    //ToolTip = GetDetailedTooltip(item),
+                    OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(item)
                 };
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = item.InventoryIconColor, CanBeFocused = false };
             }
@@ -111,10 +118,10 @@ namespace SOS
             public FabricationRecipe Recipe;
             public ItemPrefab TargetItem;
             public SOSController Controller;
-            public Action<ItemPrefab> OnPrimary;
-            public Action<ItemPrefab> OnSecondary;
+            public Action<Prefab> OnPrimary;
+            public Action<Prefab> OnSecondary;
 
-            public CraftRecipeCard(FabricationRecipe recipe, ItemPrefab target, SOSController controller, Action<ItemPrefab> onP, Action<ItemPrefab> onS)
+            public CraftRecipeCard(FabricationRecipe recipe, ItemPrefab target, SOSController controller, Action<Prefab> onP, Action<Prefab> onS)
             {
                 Recipe = recipe; TargetItem = target; Controller = controller; OnPrimary = onP; OnSecondary = onS;
             }
@@ -182,7 +189,8 @@ namespace SOS
             public Action<ItemPrefab> OnPrimary;
             public Action<ItemPrefab> OnSecondary;
 
-            public SourceRecipeCard(GroupedSource source, Action<ItemPrefab> onP, Action<ItemPrefab> onS) { Source = source; OnPrimary = onP; OnSecondary = onS; }
+            public SourceRecipeCard(GroupedSource source, Action<ItemPrefab> onP, Action<ItemPrefab> onS)
+            { Source = source; OnPrimary = onP; OnSecondary = onS; }
 
             public void Draw(GUIListBox list)
             {
@@ -213,10 +221,10 @@ namespace SOS
         {
             public ItemPrefab Item;
             public List<DeconstructItem> Outputs;
-            public Action<ItemPrefab> OnPrimary;
-            public Action<ItemPrefab> OnSecondary;
+            public Action<Prefab> OnPrimary;
+            public Action<Prefab> OnSecondary;
 
-            public DeconOutputCard(ItemPrefab item, List<DeconstructItem> outputs, Action<ItemPrefab> onP, Action<ItemPrefab> onS) { Item = item; Outputs = outputs; OnPrimary = onP; OnSecondary = onS; }
+            public DeconOutputCard(ItemPrefab item, List<DeconstructItem> outputs, Action<Prefab> onP, Action<Prefab> onS) { Item = item; Outputs = outputs; OnPrimary = onP; OnSecondary = onS; }
 
             public void Draw(GUIListBox list)
             {
@@ -307,13 +315,14 @@ namespace SOS
             }
         }
 
-        public static void DrawMinimalItemRow(GUIComponent parent, ItemPrefab? prefab, float amount, Action<ItemPrefab>? onPrimaryClick = null, Action<ItemPrefab>? onSecondaryClick = null, Color? badgeColor = null)
+        public static void DrawMinimalItemRow(GUIComponent parent, Prefab? prefab, float amount, Action<Prefab>? onPrimaryClick = null, Action<Prefab>? onSecondaryClick = null, Color? badgeColor = null)
         {
             var btnRect = new RectTransform(new Point(30, 30), parent.RectTransform);
 
             var btn = new GUIButton(btnRect, style: "GUIButton")
             {
-                ToolTip = GetDetailedTooltip(prefab),
+                OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab),
                 Color = Color.Black * 0.4f
             };
 
@@ -323,12 +332,12 @@ namespace SOS
                 btn.OnSecondaryClicked = (_, _) => { onSecondaryClick?.Invoke(prefab); return true; };
             }
 
-            Sprite? icon = prefab?.InventoryIcon ?? prefab?.Sprite;
+            Sprite? icon = prefab.Icon();
             if (icon != null)
             {
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), btn.RectTransform, Anchor.Center), icon, scaleToFit: true)
                 {
-                    Color = prefab?.InventoryIconColor ?? Color.White,
+                    Color = prefab.IconColor(),
                     CanBeFocused = false
                 };
             }
@@ -348,7 +357,7 @@ namespace SOS
             }
         }
 
-        public static void DrawCompactItemRow(GUIComponent parent, ItemPrefab? prefab, float amount, bool isCardInside, string extraText = "", Color? color = null, Action<ItemPrefab>? onPrimaryClick = null, Action<ItemPrefab>? onSecondaryClick = null)
+        public static void DrawCompactItemRow(GUIComponent parent, Prefab? prefab, float amount, bool isCardInside, string extraText = "", Color? color = null, Action<Prefab>? onPrimaryClick = null, Action<Prefab>? onSecondaryClick = null)
         {
             var rowRect = new RectTransform(new Vector2(1f, 0f), parent.RectTransform) { MinSize = new Point(0, RowHeight) };
 
@@ -358,7 +367,8 @@ namespace SOS
             {
                 var btn = new GUIButton(rowRect, style: "ListBoxElement")
                 {
-                    ToolTip = GetDetailedTooltip(prefab),
+                    OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab),
                     OnClicked = (_, _) =>
                     {
                         onPrimaryClick?.Invoke(prefab);
@@ -378,7 +388,8 @@ namespace SOS
                 {
                     AbsoluteSpacing = 5,
                     CanBeFocused = true,
-                    ToolTip = GetDetailedTooltip(prefab)
+                    OnDrawToolTip = component =>
+                        component.ToolTip = GetDetailedTooltip(prefab)
                 };
             }
 
@@ -388,14 +399,14 @@ namespace SOS
                 CanBeFocused = false
             };
 
-            Sprite? icon = prefab?.InventoryIcon ?? prefab?.Sprite;
+            Sprite? icon = prefab?.Icon();
             if (icon != null)
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Point(20, 20), contentLayout.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(isCardInside ? 0 : 5, 0) }, style: null) { CanBeFocused = false };
-                _ = new GUIImage(new RectTransform(Vector2.One, imgFrame.RectTransform), icon, scaleToFit: true) { Color = prefab?.InventoryIconColor ?? Color.White, CanBeFocused = false };
+                _ = new GUIImage(new RectTransform(Vector2.One, imgFrame.RectTransform), icon, scaleToFit: true) { Color = prefab.IconColor(), CanBeFocused = false };
             }
 
-            var (nameStr, aColor) = SafeItemName.Get(prefab, color ?? Color.White);
+            var (nameStr, aColor) = prefab.SafeName(color ?? Color.White);
 
             var nameBlock = new GUITextBlock(new RectTransform(new Vector2(0.6f, 1f), contentLayout.RectTransform), nameStr, font: GUIStyle.SmallFont, textColor: aColor, textAlignment: Alignment.CenterLeft) { CanBeFocused = false };
 
@@ -428,22 +439,6 @@ namespace SOS
 
             string fallback = id.Value.Replace("_", " ").Replace(".", " ");
             return machineNameCache[id] = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(fallback);
-        }
-    }
-
-    public static class SafeItemName
-    {
-        public static (string Name, Color TextColor) Get(ItemPrefab? prefab, Color defaultColor)
-        {
-            if (prefab == null)
-                return (TextSOS.Get("sos.gen.unknown", "???").Value, defaultColor);
-
-            if (prefab.Name.IsNullOrEmpty())
-            {
-                return ($"[{prefab.Identifier}]", Color.Red);
-            }
-
-            return (prefab.Name.Value, defaultColor);
         }
     }
 }

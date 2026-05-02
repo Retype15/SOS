@@ -25,10 +25,10 @@ namespace SOS
         private bool wasKeyDown = false;
 
         public string LastSearchQuery { get; set; } = "";
-        public ItemPrefab? CurrentItem { get; private set; }
+        public Prefab? CurrentTarget { get; private set; }
 
-        public Stack<ItemPrefab> HistoryBack { get; } = new Stack<ItemPrefab>();
-        public Stack<ItemPrefab> HistoryForward { get; } = new Stack<ItemPrefab>();
+        public Stack<Prefab> HistoryBack { get; } = new Stack<Prefab>();
+        public Stack<Prefab> HistoryForward { get; } = new Stack<Prefab>();
 
         public Point? WindowSize { get; set; }
         public Point? WindowPosition { get; set; }
@@ -83,9 +83,9 @@ namespace SOS
                         });
                     });
                 }
-                else if (CurrentItem != null)
+                else if (CurrentTarget != null)
                 {
-                    UpdateWindowDetails(CurrentItem);
+                    UpdateWindowDetails(CurrentTarget);
                 }
             }
         }
@@ -96,19 +96,19 @@ namespace SOS
             mainWindow = null;
         }
 
-        public void OnItemSelected(ItemPrefab item, bool isHistoryNavigation = false)
+        public void OnTargetSelected(Prefab item, bool isHistoryNavigation = false)
         {
             if (item == null) return;
 
-            if (!isHistoryNavigation && CurrentItem != null && CurrentItem != item)
+            if (!isHistoryNavigation && CurrentTarget != null && CurrentTarget != item)
             {
-                HistoryBack.Push(CurrentItem);
+                HistoryBack.Push(CurrentTarget);
                 HistoryForward.Clear();
             }
 
-            if (CurrentItem != item)
+            if (CurrentTarget != item)
             {
-                CurrentItem = item;
+                CurrentTarget = item;
                 MarkDirty();
             }
             UpdateWindowDetails(item);
@@ -122,7 +122,7 @@ namespace SOS
             {
                 Favorites = this.FavoritedItems,
                 LastSearchQuery = this.LastSearchQuery,
-                LastItemId = this.CurrentItem?.Identifier.Value ?? "",
+                LastItemId = this.CurrentTarget?.Identifier.Value ?? "",
                 TrackedItemId = this.Tracker.TrackedItem?.Identifier.Value ?? "",
                 TrackedRecipeHash = this.Tracker.TrackedRecipe?.RecipeHash ?? 0,
                 WindowSize = this.WindowSize,
@@ -159,7 +159,8 @@ namespace SOS
 
             if (!string.IsNullOrEmpty(data.LastItemId))
             {
-                CurrentItem = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == data.LastItemId);
+                CurrentTarget = (Prefab?)ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == data.LastItemId)
+                             ?? (Prefab?)AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == data.LastItemId);
             }
 
             if (!string.IsNullOrEmpty(data.TrackedItemId))
@@ -203,16 +204,23 @@ namespace SOS
             if (CustomLayouts.Remove(name)) MarkDirty();
         }
 
-        public void UpdateWindowDetails(ItemPrefab item)
+        public void UpdateWindowDetails(Prefab target)
         {
             if (mainWindow == null) return;
 
-            var craftRecipes = RecipeAnalyzer.GetCraftingRecipes(item);
-            var deconOutputs = RecipeAnalyzer.GetDeconstructionOutputs(item);
-            var usesAsIngredient = RecipeAnalyzer.GetUsesAsIngredient(item);
-            var obtainedFrom = RecipeAnalyzer.GetSourcesFromDeconstruction(item);
+            if (target is ItemPrefab item)
+            {
+                var craftRecipes = RecipeAnalyzer.GetCraftingRecipes(item);
+                var deconOutputs = RecipeAnalyzer.GetDeconstructionOutputs(item);
+                var usesAsIngredient = RecipeAnalyzer.GetUsesAsIngredient(item);
+                var obtainedFrom = RecipeAnalyzer.GetSourcesFromDeconstruction(item);
 
-            mainWindow?.UpdateDetailsPanel(item, craftRecipes, deconOutputs, usesAsIngredient, obtainedFrom);
+                mainWindow.UpdateDetailsPanel(item, craftRecipes, deconOutputs, usesAsIngredient, obtainedFrom);
+            }
+            else
+            {
+                mainWindow.UpdateDetailsPanel(target, [], [], [], []);
+            }
 
             mainWindow?.UpdateNavigationButtons();
         }
@@ -221,9 +229,9 @@ namespace SOS
         {
             if (HistoryBack.Count > 0)
             {
-                if (CurrentItem != null) HistoryForward.Push(CurrentItem);
-                CurrentItem = HistoryBack.Pop();
-                UpdateWindowDetails(CurrentItem);
+                if (CurrentTarget != null) HistoryForward.Push(CurrentTarget);
+                CurrentTarget = HistoryBack.Pop();
+                UpdateWindowDetails(CurrentTarget);
             }
         }
 
@@ -231,28 +239,24 @@ namespace SOS
         {
             if (HistoryForward.Count > 0)
             {
-                if (CurrentItem != null) HistoryBack.Push(CurrentItem);
-                CurrentItem = HistoryForward.Pop();
-                UpdateWindowDetails(CurrentItem);
+                if (CurrentTarget != null) HistoryBack.Push(CurrentTarget);
+                CurrentTarget = HistoryForward.Pop();
+                UpdateWindowDetails(CurrentTarget);
             }
         }
 
-        public void OpenContextMenu(ItemPrefab item)
+        public void OpenContextMenu(Prefab target)
         {
-            if (item == null) return;
-            List<ContextMenuOption> options =
-            [
-                new ContextMenuOption(TextSOS.Get("sos.context.track", "Track to HUD"), isEnabled: true, onSelected: () =>
-                {
-                    Tracker.SetTrackedItem(item);
-                }),
-                new ContextMenuOption(TextSOS.Get("sos.context.view_recipes", "View Recipes"), isEnabled: true, onSelected: () =>
-                {
-                    OnItemSelected(item);
-                }),
-            ];
+            if (target == null) return;
+            List<ContextMenuOption> options = [];
+            if (target is ItemPrefab item) options.Add(new ContextMenuOption(TextSOS.Get("sos.context.track", "Track to HUD"), isEnabled: true, onSelected: () => Tracker.SetTrackedItem(item)));
 
-            string targetId = item.Identifier.Value;
+            options.Add(new ContextMenuOption(TextSOS.Get("sos.context.view_recipes", "View Recipes"), isEnabled: true, onSelected: () =>
+            {
+                OnTargetSelected(target);
+            }));
+
+            string targetId = target.Identifier.Value;
             bool isFav = FavoritedItems.Contains(targetId);
             string favText = isFav ? TextSOS.Get("sos.context.remove_favorite", "Remove from Favorites").Value : TextSOS.Get("sos.context.add_favorite", "Add to Favorites").Value;
 
@@ -264,31 +268,28 @@ namespace SOS
                 mainWindow?.RefreshSearch();
             }));
 
-            _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, item.Name, null, [.. options]);
+            RichString name = target.Name();
+
+            _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, name, null, [.. options]);
         }
 
-        public void OpenRecipeContextMenu(ItemPrefab item, FabricationRecipe recipe)
+        public void OpenRecipeContextMenu(Prefab target, FabricationRecipe recipe)
         {
-            if (item == null || recipe == null) return;
+            if (target == null || recipe == null) return;
 
             var options = new List<ContextMenuOption>();
 
-            bool isCurrentlyTracked = Tracker.TrackedRecipe == recipe;
-
-            if (isCurrentlyTracked)
-            {
-                options.Add(new ContextMenuOption(TextSOS.Get("sos.context.untrack", "Remove from HUD"), isEnabled: true, onSelected: () =>
-                {
-                    Tracker.SetTrackedItem(null);
-                }));
-            }
-            else
-            {
-                options.Add(new ContextMenuOption(TextSOS.Get("sos.context.track_recipe", "Add to HUD"), isEnabled: true, onSelected: () =>
-                {
-                    Tracker.SetTrackedItem(item, recipe);
-                }));
-            }
+            if (target is ItemPrefab item)
+                if (Tracker.TrackedRecipe == recipe)
+                    options.Add(new ContextMenuOption(TextSOS.Get("sos.context.untrack", "Remove from HUD"), isEnabled: true, onSelected: () =>
+                    {
+                        Tracker.SetTrackedItem(null);
+                    }));
+                else
+                    options.Add(new ContextMenuOption(TextSOS.Get("sos.context.track_recipe", "Add to HUD"), isEnabled: true, onSelected: () =>
+                    {
+                        Tracker.SetTrackedItem(item, recipe);
+                    }));
 
             //options.Add(new ContextMenuOption("Ver más info (WIP)", isEnabled: false));
 
@@ -298,7 +299,7 @@ namespace SOS
         public void OnRecipeSelected(ItemPrefab item, FabricationRecipe recipe)
         {
             Tracker.SetTrackedItem(item, recipe);
-            OnItemSelected(item);
+            OnTargetSelected(item);
         }
 
         public void Update()
@@ -312,14 +313,14 @@ namespace SOS
 
                 if (isKeyDownNow && !wasKeyDown)
                 {
-                    ItemPrefab? detected = GetPrefabUnderMouse();
+                    Prefab? detected = GetPrefabUnderMouse();
 
                     CrossThread.RequestExecutionOnMainThread(() =>
                     {
 
                         if (detected != null)
                         {
-                            OnItemSelected(detected);
+                            OnTargetSelected(detected);
                             if (mainWindow == null) ToggleUI();
                         }
                         else
@@ -368,32 +369,38 @@ namespace SOS
             Tracker.UpdateHUD();
         }
 
-        private static ItemPrefab? GetPrefabUnderMouse()
+        private static Prefab? GetPrefabUnderMouse()
         {
+            // 1. World
             if (PlayerInput.IsShiftDown() && Character.Controlled?.FocusedItem != null)
             {
                 return Character.Controlled.FocusedItem.Prefab;
             }
 
+            // 2. Inv
             if (Inventory.SelectedSlot?.Item != null)
             {
                 return Inventory.SelectedSlot.Item.Prefab;
             }
 
+            // 3. other GUIs
             if (GUI.MouseOn != null)
             {
                 GUIComponent? curr = GUI.MouseOn;
                 while (curr != null)
                 {
-                    if (curr.UserData is PurchasedItem purchasedItem)
-                    {
-                        return purchasedItem.ItemPrefab;
-                    }
+                    // Any direct
+                    if (curr.UserData is Prefab prefab) return prefab;
 
-                    if (curr.UserData is ItemPrefab prefab) return prefab;
+                    // Specific
                     if (curr.UserData is Item item) return item.Prefab;
+                    if (curr.UserData is Affliction affliction) return affliction.Prefab;
+
+                    // Shopp
+                    if (curr.UserData is PurchasedItem purchasedItem) return purchasedItem.ItemPrefab;
                     if (curr.UserData is FabricationRecipe recipe) return recipe.TargetItem;
 
+                    // Shop Btns
                     if (curr.UserData as string == "addbutton" || curr.UserData as string == "removebutton")
                     {
                         GUIComponent? p = curr.Parent;
@@ -407,6 +414,7 @@ namespace SOS
                         }
                     }
 
+                    // parent
                     curr = curr.Parent;
                 }
             }

@@ -16,6 +16,14 @@ namespace SOS
 {
     public static class RichStringExt
     {
+        public static RichString Rich(this string text) => RichString.Rich(text);
+
+        public static string SetHyperlink(this string text, Color? color = null)
+            => text.SetColor(color ?? Color.LightSkyBlue);
+
+        public static LocalizedString SetHyperlink(this LocalizedString text, Color? color = null)
+            => text.SetColor(color ?? Color.LightSkyBlue);
+
         public static string SetColor(this string text, string colorName)
         => $"‖color:{colorName}‖{text}‖end‖";
 
@@ -58,6 +66,119 @@ namespace SOS
         public static LocalizedString SetStrikethrough(this LocalizedString text)
             => $"‖strikethrough‖{text}‖end‖";
 
+    }
+
+    public static class HyperlinkExtensions
+    {
+        public static RichString JoinToRichString<T>(
+            this IEnumerable<T> items,
+            string separator,
+            Func<T, string> textSelector,
+            Func<T, Color> colorSelector)
+        {
+            var sb = new System.Text.StringBuilder();
+            var list = items.ToList();
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                var item = list[i];
+                Color color = colorSelector(item);
+                string text = textSelector(item).Replace("‖", "");
+
+                // Formateo simple por color.
+                sb.Append(text.SetColor(color));
+
+                if (i < list.Count - 1) sb.Append(separator);
+            }
+
+            return RichString.Rich(sb.ToString());
+        }
+
+        public static void BindHyperlinks<T>(
+            this GUITextBlock textBlock,
+            IEnumerable<T> items,
+            Action<T> onPrimaryClick,
+            Action<T>? onSecondaryClick = null)
+        {
+            var list = items.ToList();
+
+            void ApplyLinks()
+            {
+                if (textBlock.RichTextData == null) return;
+                textBlock.ClickableAreas.Clear();
+
+                int index = 0;
+                foreach (var data in textBlock.RichTextData)
+                {
+                    if (data.StartIndex >= data.EndIndex || data.StartIndex < 0 || data.Color == null) continue;
+                    if (index >= list.Count) break;
+
+                    var target = list[index];
+                    textBlock.ClickableAreas.Add(new GUITextBlock.ClickableArea()
+                    {
+                        Data = data,
+                        OnClick = (tb, area) => { onPrimaryClick?.Invoke(target); },
+                        OnSecondaryClick = onSecondaryClick != null ? ((tb, area) => { onSecondaryClick.Invoke(target); }) : null
+                    });
+                    index++;
+                }
+            }
+
+            ApplyLinks();
+            textBlock.RectTransform.SizeChanged += ApplyLinks;
+        }
+    }
+
+    public static class FloatExt
+    {
+        public static string ToMeters(this float value) => (value / 10f).ToValue() + 'm';
+        public static string ToValue(this float value) => value.ToString("0.###");
+        public static string ToSignedValue(this float value) => (value > 0) ? '+' + value.ToValue() : value.ToValue();
+    }
+
+    public static class PrefabExt
+    {
+
+        public static (string Name, Color TextColor) SafeName(this Prefab? prefab, Color defaultColor)
+        {
+            return prefab switch
+            {
+                ItemPrefab item => item.Name.IsNullOrEmpty()
+                                        ? ($"[{item.Identifier}]", Color.Red)
+                                        : (item.Name.Value, defaultColor),
+                AfflictionPrefab affliction => affliction.Name.IsNullOrEmpty()
+                                        ? ($"[{affliction.Identifier}]", Color.Red)
+                                        : (affliction.Name.Value, defaultColor),
+                _ => (TextSOS.Get("sos.gen.unknown", "???").Value, defaultColor),
+            };
+        }
+        public static string Name(this Prefab prefab)
+        {
+            return prefab switch
+            {
+                ItemPrefab item => item.Name.ToString(),
+                AfflictionPrefab affliction => affliction.Name.ToString(),
+                _ => prefab.Identifier.ToString()
+            };
+        }
+        public static Sprite? Icon(this Prefab? prefab)
+        {
+            return prefab switch
+            {
+                ItemPrefab item => item.InventoryIcon ?? item.sprite,
+                AfflictionPrefab affliction => affliction.Icon,
+                _ => null
+            };
+        }
+        public static Color IconColor(this Prefab? prefab)
+        {
+            return prefab switch
+            {
+                ItemPrefab item => item.InventoryIconColor,
+                AfflictionPrefab affliction => affliction.IconColors?.FirstOrDefault(Color.White),
+                _ => null
+            } ?? Color.White;
+        }
     }
 
 

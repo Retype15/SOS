@@ -20,7 +20,7 @@ namespace SOS
 
         private const int MaxAnalysisCacheSize = 30;
 
-        public static ItemAnalysis? GetAnalysis(ItemPrefab? item)
+        public static ItemAnalysis? GetAnalysis(Prefab? item)
         {
             if (item == null) return null;
 
@@ -38,7 +38,7 @@ namespace SOS
                 var lastNode = lruList.Last;
                 if (lastNode != null)
                 {
-                    analysisCache.Remove(lastNode.Value.ItemId);
+                    analysisCache.Remove(lastNode.Value.PrefabId);
                     lruList.RemoveLast();
                 }
             }
