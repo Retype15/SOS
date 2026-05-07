@@ -26,9 +26,6 @@ namespace SOS
         private readonly GUIResizableFrame? mainFrame;
         private GUIListBox? itemList;
         private GUIFrame? detailsHeader;
-        private GUIFrame? recipeAreaFrame;
-        private GUIListBox? colObtain;
-        private GUIListBox? colUsage;
         private GUIListBox? metaPanel;
         private readonly SOSController controller;
         private GUITextBox? searchBox;
@@ -68,10 +65,11 @@ namespace SOS
         private GUITickBox? rawXmlTickBox;
 
         private Prefab? currentItem;
-        private List<FabricationRecipe>? currentCraft;
-        private List<DeconstructItem>? currentDecon;
-        private List<Tuple<ItemPrefab, FabricationRecipe>>? currentUses;
-        private List<Tuple<ItemPrefab, DeconstructItem>>? currentSources;
+
+        private GUIFrame? dynamicCenterArea;
+        private GUIListBox? tabButtonsArea;
+        private readonly List<ICenterPanelTab> availableTabs = [];
+        private ICenterPanelTab? activeTab;
 
         private GUITextBlock? LoadingCompletedText;
 
@@ -267,35 +265,30 @@ namespace SOS
             };
             centerPanel.RectTransform.MinSize = new Point(200, 50);
 
-            detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.15f), centerLayout.RectTransform), style: "CircuitBoxFrame")
+            detailsHeader = new GUIFrame(new RectTransform(new Vector2(1f, 0.10f), centerLayout.RectTransform), style: "CircuitBoxFrame")
             {
                 Color = Color.Black * 0.4f
             };
-            detailsHeader.RectTransform.MinSize = new Point(0, 95);
-            detailsHeader.RectTransform.MaxSize = new Point(int.MaxValue, 95);
+            detailsHeader.RectTransform.MinSize = new Point(0, 65);
+            detailsHeader.RectTransform.MaxSize = new Point(int.MaxValue, 65);
 
-            recipeAreaFrame = new GUIFrame(new RectTransform(new Vector2(1f, 0.84f), centerLayout.RectTransform), style: null);
-            var recipeSplit = new GUILayoutGroup(new RectTransform(Vector2.One, recipeAreaFrame.RectTransform), isHorizontal: true)
-            {
-                Stretch = true,
-                RelativeSpacing = 0.02f
-            };
-
-            var obtainContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), obtainContainer.RectTransform), TextSOS.Get("sos.window.obtain", "OBTAIN"), font: GUIStyle.SubHeadingFont, textColor: Color.LightGreen, textAlignment: Alignment.Center);
-            colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), obtainContainer.RectTransform), style: null)
+            tabButtonsArea = new GUIListBox(new RectTransform(new Vector2(1f, 0.05f), centerLayout.RectTransform), isHorizontal: true, style: null)
             {
                 Spacing = 5,
-                Color = Color.Black * 0.2f,
+                Padding = new Vector4(5, 0, 5, 0)
             };
+            tabButtonsArea.RectTransform.MinSize = new Point(0, 32);
+            tabButtonsArea.RectTransform.MaxSize = new Point(int.MaxValue, 32);
 
-            var usageContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), usageContainer.RectTransform), TextSOS.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
-            colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: null)
+            dynamicCenterArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.85f), centerLayout.RectTransform), style: null);
+
+            availableTabs.Clear();
+            availableTabs.Add(new ItemCenterPanelTab());
+            availableTabs.Add(new AfflictionCenterPanelTab());
+            foreach (var tab in availableTabs)
             {
-                Spacing = 5,
-                Color = Color.Black * 0.2f
-            };
+                tab.Initialize(dynamicCenterArea);
+            }
 
             rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), contentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
             {
@@ -419,19 +412,7 @@ namespace SOS
         {
             if (controller.CurrentTarget == null) return;
 
-            if (controller.CurrentTarget is ItemPrefab item)
-            {
-                var craft = RecipeAnalyzer.GetCraftingRecipes(item);
-                var decon = RecipeAnalyzer.GetDeconstructionOutputs(item);
-                var uses = RecipeAnalyzer.GetUsesAsIngredient(item);
-                var sources = RecipeAnalyzer.GetSourcesFromDeconstruction(item);
-                UpdateDetailsPanel(item, craft, decon, uses, sources);
-            }
-            else
-            {
-                UpdateDetailsPanel(controller.CurrentTarget, [], [], [], []);
-            }
-
+            UpdateDetailsPanel(controller.CurrentTarget);
 
             UpdateNavigationButtons();
         }
@@ -497,6 +478,8 @@ namespace SOS
 
         public void Destroy()
         {
+            ClinicalSimulatorManager.Destroy();
+
             activeDropdowns.Clear();
 
             if (loadingFrame != null)
@@ -588,7 +571,10 @@ namespace SOS
 
                     _ = new GUITextBlock(new RectTransform(Vector2.One, separatorFrame.RectTransform),
                         TextSOS.Get($"sos.list.header.{label.ToLower()}", label.SpacedPascalCase()),
-                        font: GUIStyle.SmallFont, textColor: Color.MediumPurple, textAlignment: Alignment.Center);
+                        font: GUIStyle.SmallFont, textColor: Color.MediumPurple, textAlignment: Alignment.Center)
+                    {
+                        Wrap = true
+                    };
 
                     currentRow = null;
                     itemsInRow = 0;
@@ -747,9 +733,9 @@ namespace SOS
                 centerPanelMode = newCenterMode;
                 lastCenterWForReflow = centerWidth;
 
-                if (currentItem != null && currentCraft != null && currentDecon != null && currentUses != null && currentSources != null)
+                if (currentItem != null)
                 {
-                    UpdateDetailsPanel(currentItem, currentCraft, currentDecon, currentUses, currentSources);
+                    UpdateDetailsPanel(currentItem);
                 }
             }
 
@@ -757,9 +743,9 @@ namespace SOS
             {
                 rightPanelMode = newRightMode;
                 if (rightContainer != null) rightContainer.Visible = rightPanelMode != DisplayMode.Hidden;
-                if (currentItem != null && currentCraft != null && currentDecon != null && currentUses != null && currentSources != null)
+                if (currentItem != null)
                 {
-                    UpdateDetailsPanel(currentItem, currentCraft, currentDecon, currentUses, currentSources);
+                    UpdateDetailsPanel(currentItem);
                 }
             }
 
@@ -793,21 +779,11 @@ namespace SOS
             return DisplayMode.Normal;
         }
 
-        public void UpdateDetailsPanel(Prefab targetItem, List<FabricationRecipe> craft, List<DeconstructItem> decon, List<Tuple<ItemPrefab, FabricationRecipe>> uses, List<Tuple<ItemPrefab, DeconstructItem>> sources)
+        public void UpdateDetailsPanel(Prefab targetItem)
         {
             currentItem = targetItem;
-            currentCraft = craft;
-            currentDecon = decon;
-            currentUses = uses;
-            currentSources = sources;
-
-            /*if (recipeAreaFrame != null)
-            {
-                recipeAreaFrame.Visible = targetItem is ItemPrefab;
-            }*/
-
             activeDropdowns.Clear();
-            if (detailsHeader == null || colObtain == null || colUsage == null || metaPanel == null) return;
+            if (detailsHeader == null || dynamicCenterArea == null || metaPanel == null) return;
             metaPanel.Content.ClearChildren();
 
             detailsHeader.ClearChildren();
@@ -837,116 +813,46 @@ namespace SOS
                 AutoScaleHorizontal = true,
                 CanBeFocused = false
             };
-            if (targetItem is ItemPrefab item)
+
+            if (tabButtonsArea != null)
             {
-                UIMachineGroup GetOrCreateMachineGroup(Dictionary<string, UIMachineGroup> dict, IEnumerable<Identifier> machineIds, string fallbackName)
+                tabButtonsArea.Content.ClearChildren();
+
+                var validTabs = availableTabs.Where(t => t.CanHandle(targetItem)).ToList();
+
+                if (activeTab == null || !validTabs.Contains(activeTab))
                 {
-                    string key = machineIds.Any()
-                        ? string.Join(", ", machineIds.Select(id => ResolveMachineName(id)).OrderBy(s => s))
-                        : fallbackName;
-
-                    if (!dict.TryGetValue(key, out UIMachineGroup? value))
-                    {
-                        var mg = new UIMachineGroup { MachineName = key };
-                        if (machineIds.Any(id => id == "vendingmachine"))
-                        {
-                            mg.IsVendingMachine = true;
-                            mg.PriceString = (PrefabAdapter.DefaultPrice(item)?.Price ?? 0).ToString();
-                        }
-
-                        value = mg;
-                        dict[key] = value;
-                    }
-                    return value;
+                    activeTab = validTabs.FirstOrDefault();
                 }
 
-                var groupedSources = sources?
-                    .GroupBy(s => new
-                    {
-                        SourceId = s.Item1.Identifier,
-                        MachineKey = string.Join(",", s.Item2.RequiredDeconstructor.Select(id => id.Value).OrderBy(x => x)),
-                        OtherItemsKey = string.Join(",", s.Item2.RequiredOtherItem.Select(id => id.Value).OrderBy(x => x))
-                    })
-                    .Select(group => new GroupedSource
-                    {
-                        SourceItem = group.First().Item1,
-                        MachineIds = group.First().Item2.RequiredDeconstructor,
-                        RequiredOtherItems = [.. group.First().Item2.RequiredOtherItem],
-                        TotalCommonness = group.Sum(g => g.Item2.Commonness),
-                        Amount = group.First().Item2.Amount,
-                        IsRandom = group.First().Item1.RandomDeconstructionOutput
-                    })
-                    .ToList();
-
-                var groupedUses = uses?
-                    .GroupBy(u => string.Join(",", u.Item2.SuitableFabricatorIdentifiers.Select(id => id.Value).OrderBy(s => s)))
-                    .SelectMany(mg => mg.GroupBy(u => u.Item1.Identifier)
-                        .Select(ig => new GroupedUsage
-                        {
-                            TargetItem = ig.First().Item1,
-                            MachineIds = [.. ig.First().Item2.SuitableFabricatorIdentifiers],
-                            AmountCreated = ig.First().Item2.Amount,
-                            AmountRequired = ig.First().Item2.RequiredItems.FirstOrDefault(ri =>
-                                ri.ItemPrefabs.Any(p => p.Identifier == item.Identifier))?.Amount ?? 1
-                        }))
-                    .ToList();
-
-
-                colObtain.Content.ClearChildren();
-                var obtainGroups = new Dictionary<string, UIMachineGroup>();
-
-                foreach (var r in craft ?? [])
+                if (validTabs.Count > 1)
                 {
-                    var mg = GetOrCreateMachineGroup(obtainGroups, r.SuitableFabricatorIdentifiers, TextSOS.Get("sos.recipe.hand", "Hand").Value);
-                    mg.AddCard(new CraftRecipeCard(r, item, controller, OnPrimary, OnSecondary));
-                }
-
-                foreach (var src in groupedSources ?? [])
-                {
-                    var mg = GetOrCreateMachineGroup(obtainGroups, src.MachineIds ?? [], ResolveMachineName("deconstructor".ToIdentifier()));
-                    mg.AddCard(new SourceRecipeCard(src, OnPrimary, OnSecondary));
-                }
-
-                foreach (var group in obtainGroups.Values) group.Draw(colObtain);
-
-
-                colUsage.Content.ClearChildren();
-                var usageDict = new Dictionary<string, UIMachineGroup>();
-
-                if (decon?.Count > 0)
-                {
-                    var deconByMachine = decon.GroupBy(di => string.Join(",", di.RequiredDeconstructor.Select(id => id.Value).OrderBy(s => s)));
-                    foreach (var machineDecons in deconByMachine)
+                    foreach (var tab in validTabs)
                     {
-                        var machineIds = machineDecons.First().RequiredDeconstructor;
-                        var mg = GetOrCreateMachineGroup(usageDict, machineIds, ResolveMachineName("deconstructor".ToIdentifier()));
+                        Vector2 textSize = GUIStyle.SmallFont.MeasureString(tab.TabName);
+                        int width = (int)textSize.X + 24;
 
-                        var deconList = machineDecons.ToList();
-                        bool isRandom = item.RandomDeconstructionOutput;
-
-                        if (isRandom)
+                        var tabBtn = new GUIButton(new RectTransform(new Point(width, 32), tabButtonsArea.Content.RectTransform), tab.TabName, style: "SubtreeHeader")
                         {
-                            mg.AddCard(new DeconOutputCard(item, deconList, OnPrimary, OnSecondary));
-                        }
-                        else
-                        {
-                            var groupedOutputs = deconList.GroupBy(di => di.ItemIdentifier).Select(g => new { ID = g.Key, Amount = g.Max(di => di.Amount), Weight = g.Sum(di => di.Commonness) });
-                            foreach (var output in groupedOutputs)
+                            Selected = tab == activeTab,
+                            OnClicked = (b, _) =>
                             {
-                                mg.AddCard(new SingleDeconOutputCard(item, output.ID, output.Amount, output.Weight, OnPrimary, OnSecondary));
+                                if (activeTab != tab)
+                                {
+                                    activeTab = tab;
+                                    UpdateDetailsFromController(); // Re-trigger update to switch tab
+                                }
+                                return true;
                             }
-                        }
+                        };
                     }
                 }
 
-                foreach (var usage in groupedUses ?? [])
+                foreach (var tab in availableTabs)
                 {
-                    var mg = GetOrCreateMachineGroup(usageDict, usage.MachineIds ?? [], TextSOS.Get("sos.recipe.hand", "Hand").Value);
-                    mg.AddCard(new UsageRecipeCard(usage, OnPrimary, OnSecondary));
+                    if (tab == activeTab) tab.Activate(targetItem, controller, OnPrimary, OnSecondary);
+                    else tab.Deactivate();
                 }
-
-                foreach (var group in usageDict.Values) group.Draw(colUsage);
-
             }
 
             void onBadgeClick(string tag) { if (searchBox != null) searchBox.Text = tag; UpdateSearch(tag); }
@@ -961,13 +867,11 @@ namespace SOS
             );
 
             var analysis = RecipeAnalyzer.GetAnalysis(targetItem);
-
-            if (analysis == null || analysis.Sections == null) return;
-
-            foreach (var section in analysis.Sections)
-            {
-                section.Draw(builder);
-            }
+            if (analysis != null && analysis.Sections != null)
+                foreach (var section in analysis.Sections)
+                {
+                    section.Draw(builder);
+                }
 
             if (xmlContentText != null)
             {
@@ -1359,10 +1263,10 @@ namespace SOS
         public List<string> ID = [];
         public List<string> PrefabType = [];
 
-        public bool AllowsItems => PrefabType.Count == 0 || PrefabType.Any(t => 
+        public bool AllowsItems => PrefabType.Count == 0 || PrefabType.Any(t =>
             !t.Contains("Affliction", StringComparison.OrdinalIgnoreCase));
 
-        public bool AllowsAfflictions => PrefabType.Count == 0 || PrefabType.Any(t => 
+        public bool AllowsAfflictions => PrefabType.Count == 0 || PrefabType.Any(t =>
             !t.Contains("Item", StringComparison.OrdinalIgnoreCase));
 
         public SearchFilter(string rawQuery)

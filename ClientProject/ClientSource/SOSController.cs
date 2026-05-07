@@ -208,19 +208,7 @@ namespace SOS
         {
             if (mainWindow == null) return;
 
-            if (target is ItemPrefab item)
-            {
-                var craftRecipes = RecipeAnalyzer.GetCraftingRecipes(item);
-                var deconOutputs = RecipeAnalyzer.GetDeconstructionOutputs(item);
-                var usesAsIngredient = RecipeAnalyzer.GetUsesAsIngredient(item);
-                var obtainedFrom = RecipeAnalyzer.GetSourcesFromDeconstruction(item);
-
-                mainWindow.UpdateDetailsPanel(item, craftRecipes, deconOutputs, usesAsIngredient, obtainedFrom);
-            }
-            else
-            {
-                mainWindow.UpdateDetailsPanel(target, [], [], [], []);
-            }
+            mainWindow.UpdateDetailsPanel(target);
 
             mainWindow?.UpdateNavigationButtons();
         }
