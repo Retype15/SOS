@@ -11,17 +11,28 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace SOS
 {
-    public interface ICenterPanelTab
+
+    public abstract class CenterPanelTab
     {
-        string TabName { get; }
-        bool CanHandle(Prefab prefab);
-        void Initialize(GUIComponent container);
-        void Activate(Prefab prefab, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
-        void Deactivate();
+
+        public virtual GUIButton CreateTabButton(string text, RectTransform parent, bool isActive, Action onClick)
+        {
+            Vector2 textSize = GUIStyle.SmallFont.MeasureString(text);
+            int width = (int)textSize.X + 24;
+
+            var tabBtn = new GUIButton(new RectTransform(new Point(width, 32), parent), text, style: "MainMenuNotificationButton") //MainMenuNotificationButton,
+            {
+                Selected = isActive,
+                OnClicked = (_, _) => { onClick(); return true; },
+            };
+            //tabBtn.ExBlink(3f, 0.5f, 1f, 0.5f).WaitFinish();
+
+            return tabBtn;
+        }
     }
 
     // MARK: Item Recipes Tab
-    public class ItemCenterPanelTab : ICenterPanelTab
+    public class ItemCenterPanelTab : CenterPanelTab, ITab
     {
         public string TabName => TextSOS.Get("sos.tab.recipes", "RECIPES").Value;
         private GUIFrame? _container;
@@ -82,8 +93,8 @@ namespace SOS
                 GetOrCreateMachineGroup(obtainGroups, r.SuitableFabricatorIdentifiers, TextSOS.Get("sos.recipe.hand", "Hand").Value)
                     .AddCard(new CardBuilder.CraftRecipeCard(r, item, controller, onPrimary, onSecondary));
 
-            var groupedSources = sources?.GroupBy(s => new { SourceId = s.Item1.Identifier, MachineKey = string.Join(",", s.Item2.RequiredDeconstructor.Select(id => id.Value).OrderBy(x => x)), OtherItemsKey = string.Join(",", s.Item2.RequiredOtherItem.Select(id => id.Value).OrderBy(x => x)) })
-                .Select(group => new GroupedSource { SourceItem = group.First().Item1, MachineIds = group.First().Item2.RequiredDeconstructor, RequiredOtherItems = [.. group.First().Item2.RequiredOtherItem], TotalCommonness = group.Sum(g => g.Item2.Commonness), Amount = group.First().Item2.Amount, IsRandom = group.First().Item1.RandomDeconstructionOutput }).ToList();
+            var groupedSources = sources?.GroupBy(s => new { SourceId = s.Item.Identifier, MachineKey = string.Join(",", s.DeconstructItem.RequiredDeconstructor.Select(id => id.Value).OrderBy(x => x)), OtherItemsKey = string.Join(",", s.DeconstructItem.RequiredOtherItem.Select(id => id.Value).OrderBy(x => x)) })
+                .Select(group => new GroupedSource { SourceItem = group.First().Item, MachineIds = group.First().DeconstructItem.RequiredDeconstructor, RequiredOtherItems = [.. group.First().DeconstructItem.RequiredOtherItem], TotalCommonness = group.Sum(g => g.DeconstructItem.Commonness), Amount = group.First().DeconstructItem.Amount, IsRandom = group.First().Item.RandomDeconstructionOutput }).ToList();
 
             foreach (var src in groupedSources ?? [])
                 GetOrCreateMachineGroup(obtainGroups, src.MachineIds ?? [], CardBuilder.ResolveMachineName("deconstructor".ToIdentifier()))
@@ -106,8 +117,8 @@ namespace SOS
                 }
             }
 
-            var groupedUses = uses?.GroupBy(u => string.Join(",", u.Item2.SuitableFabricatorIdentifiers.Select(id => id.Value).OrderBy(s => s)))
-                .SelectMany(mg => mg.GroupBy(u => u.Item1.Identifier).Select(ig => new GroupedUsage { TargetItem = ig.First().Item1, MachineIds = [.. ig.First().Item2.SuitableFabricatorIdentifiers], AmountCreated = ig.First().Item2.Amount, AmountRequired = ig.First().Item2.RequiredItems.FirstOrDefault(ri => ri.ItemPrefabs.Any(p => p.Identifier == item.Identifier))?.Amount ?? 1 })).ToList();
+            var groupedUses = uses?.GroupBy(u => string.Join(",", u.Recipe.SuitableFabricatorIdentifiers.Select(id => id.Value).OrderBy(s => s)))
+                .SelectMany(mg => mg.GroupBy(u => u.Item.Identifier).Select(ig => new GroupedUsage { TargetItem = ig.First().Item, MachineIds = [.. ig.First().Recipe.SuitableFabricatorIdentifiers], AmountCreated = ig.First().Recipe.Amount, AmountRequired = ig.First().Recipe.RequiredItems.FirstOrDefault(ri => ri.ItemPrefabs.Any(p => p.Identifier == item.Identifier))?.Amount ?? 1 })).ToList();
 
             foreach (var usage in groupedUses ?? [])
                 GetOrCreateMachineGroup(usageDict, usage.MachineIds ?? [], TextSOS.Get("sos.recipe.hand", "Hand").Value)
@@ -123,7 +134,7 @@ namespace SOS
     }
 
     // MARK: - Clinic SIM
-    public class AfflictionCenterPanelTab : ICenterPanelTab
+    public class AfflictionCenterPanelTab : CenterPanelTab, ITab
     {
         public string TabName => TextSOS.Get("sos.tab.simulator", "SIMULATOR").Value;
         private GUIFrame? _container;
@@ -138,8 +149,6 @@ namespace SOS
         public void Initialize(GUIComponent parentContainer)
         {
             _container = new GUIFrame(new RectTransform(Vector2.One, parentContainer.RectTransform), style: null) { Visible = false };
-
-            ClinicalSimulatorManager.Initialize();
 
             var simView = new GUIFrame(new RectTransform(new Vector2(1f, 0.88f), _container.RectTransform, Anchor.TopCenter), style: null)
             {
@@ -162,24 +171,31 @@ namespace SOS
                         }
                     }
 
+                    var health = ClinicalSimulatorManager.Patient?.CharacterHealth;
+                    if (health == null) return;
+
+                    if (ClinicalSimulatorManager.HealthWindowField?.GetValue(health) is GUIFrame nativeWindow && nativeWindow.RectTransform.Parent != simView.RectTransform)
+                    {
+                        AttachNativeWindow(nativeWindow, simView);
+                    }
+
                     bool primaryClicked = PlayerInput.PrimaryMouseButtonClicked();
                     bool secondaryClicked = PlayerInput.SecondaryMouseButtonClicked();
 
                     if ((primaryClicked || secondaryClicked) && simView.Rect.Contains(PlayerInput.MousePosition.ToPoint()))
                     {
-                        var health = ClinicalSimulatorManager.Patient?.CharacterHealth;
-                        if (health == null) return;
-
-                        if (ClinicalSimulatorManager.HighlightedAfflictionField?.GetValue(health) is Affliction highlightedAff)
+                        // iconos de afliccion
+                        if (GUI.MouseOn?.UserData is Affliction highlightedAff)
                         {
                             if (primaryClicked) _onPrimary?.Invoke(highlightedAff.Prefab);
                             else if (secondaryClicked) ShowSimulationMenu(highlightedAff.Prefab, null);
                             return;
                         }
 
+                        // Lista de aflicciones
                         if (_affList != null && _affList.Rect.Contains(PlayerInput.MousePosition.ToPoint()))
                         {
-                            var hovered = _affList.Content.Children.FirstOrDefault(c => c.Rect.Contains(PlayerInput.MousePosition.ToPoint()));
+                            var hovered = _affList.Content.Children.FirstOrDefault(child => child.Rect.Contains(PlayerInput.MousePosition.ToPoint()));
                             if (hovered?.UserData is Affliction affFromList)
                             {
                                 if (primaryClicked) _onPrimary?.Invoke(affFromList.Prefab);
@@ -188,6 +204,7 @@ namespace SOS
                             }
                         }
 
+                        // Partes del cuerpo
                         if (secondaryClicked && ClinicalSimulatorManager.HighlightedLimbField?.GetValue(health) is int highlighted && highlighted >= 0)
                         {
                             var limbHealth = health.limbHealths[highlighted];
@@ -197,45 +214,6 @@ namespace SOS
                         }
                     }
                 });
-
-            if (ClinicalSimulatorManager.HealthWindowField?.GetValue(ClinicalSimulatorManager.Patient?.CharacterHealth) is GUIFrame nativeWindow)
-            {
-                nativeWindow.RectTransform.Parent = simView.RectTransform;
-                var scaleBasisField = typeof(RectTransform).GetField("scaleBasis", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                scaleBasisField?.SetValue(nativeWindow.RectTransform, ScaleBasis.Normal);
-
-                nativeWindow.RectTransform.IsFixedSize = false;
-                nativeWindow.RectTransform.RelativeSize = Vector2.One;
-                nativeWindow.RectTransform.AbsoluteOffset = Point.Zero;
-                nativeWindow.RectTransform.Anchor = Anchor.Center;
-                nativeWindow.RectTransform.Pivot = Pivot.Center;
-
-                nativeWindow.IgnoreLayoutGroups = true;
-                nativeWindow.Color = Color.Transparent;
-                nativeWindow.ApplyStyle(null);
-
-                if (nativeWindow.Children.FirstOrDefault() is GUILayoutGroup internalVerticalLayout)
-                {
-                    internalVerticalLayout.RectTransform.RelativeSize = Vector2.One;
-                    internalVerticalLayout.Stretch = true;
-                    var children = internalVerticalLayout.Children.ToList();
-
-                    if (children.Count > 1) children[1].RectTransform.RelativeSize = new Vector2(1f, 0.05f);
-                    if (children.Count > 3 && children[3] is GUILayoutGroup bodyArea)
-                    {
-                        bodyArea.RectTransform.RelativeSize = new Vector2(1f, 0.75f);
-                        bodyArea.Stretch = true;
-                        var parts = bodyArea.Children.ToList();
-                        foreach (var bodyPart in parts)
-                        {
-                            if (bodyPart is GUICustomComponent) bodyPart.RectTransform.RelativeSize = new Vector2(0.5f, 1f);
-                            if (bodyPart is GUIListBox affList) { affList.RectTransform.RelativeSize = new Vector2(0.4f, 1f); _affList = affList; }
-                        }
-                    }
-                    if (children.Count > 5) children[5].RectTransform.RelativeSize = new Vector2(1f, 0.15f);
-                    internalVerticalLayout.RectTransform.RecalculateChildren(true, true);
-                }
-            }
 
             var toolbar = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _container.RectTransform, Anchor.BottomCenter), style: "GUIFrameBottom")
             {
@@ -256,26 +234,43 @@ namespace SOS
 
             var playBtn = new GUIButton(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), "START", style: "DeviceButton")
             {
-                OnClicked = (_, _) => { ClinicalSimulatorManager.IsPlaying = !ClinicalSimulatorManager.IsPlaying; return true; }
+                OnClicked = (_, _) => { ClinicalSimulatorManager.HasPlaying(!ClinicalSimulatorManager.IsPlaying); return true; }
             };
             _ = new GUICustomComponent(new RectTransform(Vector2.Zero, playBtn.RectTransform), onUpdate: (dt, c) =>
             {
                 playBtn.Text = ClinicalSimulatorManager.IsPlaying ? "PAUSE" : "START";
             });
 
-            var speedDropdown = new GUIDropDown(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), text: "Speed", elementCount: 4);
+            var speedDropdown = new GUIDropDown(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), text: "Speed", elementCount: 4)
+            {
+                ToolTip = TextSOS.Get("sos.aff.speedDropdown", "More than x1 are still in progress. \nIt's work fine in Singleplayer, but not at all in Multiplayer."),
+                OnSelected = (comp, obj) =>
+                {
+                    string s = (string)obj;
+                    ClinicalSimulatorManager.SetTimeScale(s switch { "x1" => 1f, "x2" => 2f, "x5" => 5f, "x10" => 10f, _ => 1f });
+                    return true;
+                },
+            };
             foreach (string s in new[] { "x1", "x2", "x5", "x10" }) speedDropdown.AddItem(s, s);
             speedDropdown.SelectItem("x1");
-            speedDropdown.OnSelected = (comp, obj) =>
-            {
-                string s = (string)obj;
-                ClinicalSimulatorManager.TimeScale = s switch { "x1" => 1f, "x2" => 2f, "x5" => 5f, "x10" => 10f, _ => 1f };
-                return true;
-            };
 
             var actionBtn = new GUIButton(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), "DROP", style: "DeviceButton")
             {
-                OnClicked = (_, _) => { if (ClinicalSimulatorManager.HasStarted) ClinicalSimulatorManager.CleanPatient(); else ClinicalSimulatorManager.ResetPatient(); return true; }
+                OnClicked = (_, _) =>
+                {
+                    if (ClinicalSimulatorManager.HasStarted)
+                    {
+                        ClinicalSimulatorManager.DiscardPatient();
+                    }
+                    else
+                    {
+                        if (ClinicalSimulatorManager.Patient != null && ClinicalSimulatorManager.Patient.IsDead)
+                            ClinicalSimulatorManager.DiscardPatient();
+                        else
+                            ClinicalSimulatorManager.ResetPatient();
+                    }
+                    return true;
+                }
             };
             _ = new GUICustomComponent(new RectTransform(Vector2.Zero, actionBtn.RectTransform), onUpdate: (dt, c) =>
             {
@@ -283,11 +278,83 @@ namespace SOS
             });
         }
 
+        private void AttachNativeWindow(GUIFrame nativeWindow, GUIFrame simView)
+        {
+            ClinicalSimulatorManager.RegisterHijackedWindow(nativeWindow);
+
+            nativeWindow.RectTransform.Parent = simView.RectTransform;
+            var scaleBasisField = typeof(RectTransform).GetField("scaleBasis", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            scaleBasisField?.SetValue(nativeWindow.RectTransform, ScaleBasis.Normal);
+
+            nativeWindow.RectTransform.IsFixedSize = false;
+            nativeWindow.RectTransform.RelativeSize = Vector2.One;
+            nativeWindow.RectTransform.AbsoluteOffset = Point.Zero;
+            nativeWindow.RectTransform.Anchor = Anchor.Center;
+            nativeWindow.RectTransform.Pivot = Pivot.Center;
+
+            nativeWindow.IgnoreLayoutGroups = true;
+            nativeWindow.Color = Color.Transparent;
+            nativeWindow.ApplyStyle(null);
+
+            if (nativeWindow.Children.FirstOrDefault() is GUILayoutGroup internalVerticalLayout)
+            {
+                internalVerticalLayout.RectTransform.RelativeSize = Vector2.One;
+                internalVerticalLayout.Stretch = true;
+                var children = internalVerticalLayout.Children.ToList();
+
+                if (children.Count > 0)
+                {
+                    children[0].RectTransform.RelativeSize = new Vector2(1f, 0.10f);
+
+                    var subChildren = children[0].Children.ToList();
+                    if (subChildren.Count > 2)
+                    {
+                        // Person Icon
+                        subChildren[0].RectTransform.RelativeSize = new Vector2(0.22f, 1.0f);
+                        // Name 
+                        subChildren[1].RectTransform.RelativeSize = new Vector2(0.56f, 1.0f);
+                        // Profession Icon
+                        subChildren[2].RectTransform.RelativeSize = new Vector2(0.22f, 1.0f);
+                    }
+                }
+
+                // Health Bar
+                if (children.Count > 1) children[1].RectTransform.RelativeSize = new Vector2(1f, 0.05f);
+
+                // Spacing
+                if (children.Count > 2) children[2].RectTransform.RelativeSize = new Vector2(1f, 0.02f);
+
+                // Body
+                if (children.Count > 3 && children[3] is GUILayoutGroup bodyArea)
+                {
+                    bodyArea.RectTransform.RelativeSize = new Vector2(1f, 0.70f);
+                    bodyArea.Stretch = true;
+                    var parts = bodyArea.Children.ToList();
+                    foreach (var bodyPart in parts)
+                    {
+                        if (bodyPart is GUICustomComponent) bodyPart.RectTransform.RelativeSize = new Vector2(0.5f, 1f);
+                        if (bodyPart is GUIListBox affList) { affList.RectTransform.RelativeSize = new Vector2(0.4f, 1f); _affList = affList; }
+                    }
+                }
+
+                // Treatment List
+                if (children.Count > 5) children[5].RectTransform.RelativeSize = new Vector2(1f, 0.13f);
+
+                internalVerticalLayout.RectTransform.RecalculateChildren(true, true);
+            }
+        }
+
         public void Activate(Prefab prefab, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             if (_container == null) return;
             CurrentPrefab = prefab;
             _onPrimary = onPrimary;
+
+            if (ClinicalSimulatorManager.Patient == null || ClinicalSimulatorManager.Patient.Removed)
+            {
+                ClinicalSimulatorManager.Initialize(controller.DummyDeathCount, controller.DummyCharacterXML);
+            }
+
             _container.Visible = true;
         }
 
@@ -298,11 +365,8 @@ namespace SOS
 
         private static void ShowSimulationMenu(Prefab prefab, Limb? targetLimb)
         {
-            if (activeAfflictionMenu != null)
-            {
-                activeAfflictionMenu.Parent?.RemoveChild(activeAfflictionMenu);
-                activeAfflictionMenu = null;
-            }
+            activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu);
+            activeAfflictionMenu = null;
 
             int menuWidth = 280;
             int menuHeight = 220;

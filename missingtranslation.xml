@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LocalizationReport>
+  <Language name="ChineseSimplified">
+    <Missing>
+      <Key>sos.aff.speedDropdown</Key>
+      <Key>sos.dummyname.rand.1</Key>
+      <Key>sos.dummyname.rand.2</Key>
+      <Key>sos.dummyname.rand.3</Key>
+      <Key>sos.dummyname.tier0</Key>
+      <Key>sos.dummyname.tier1</Key>
+      <Key>sos.dummyname.tier2</Key>
+      <Key>sos.dummyname.tier3</Key>
+      <Key>sos.dummyname.tier4</Key>
+      <Key>sos.tab.recipes</Key>
+      <Key>sos.tab.simulator</Key>
+    </Missing>
+    <Extra />
+  </Language>
+  <Language name="French">
+    <Missing>
+      <Key>sos.aff.speedDropdown</Key>
+      <Key>sos.dummyname.rand.1</Key>
+      <Key>sos.dummyname.rand.2</Key>
+      <Key>sos.dummyname.rand.3</Key>
+      <Key>sos.dummyname.tier0</Key>
+      <Key>sos.dummyname.tier1</Key>
+      <Key>sos.dummyname.tier2</Key>
+      <Key>sos.dummyname.tier3</Key>
+      <Key>sos.dummyname.tier4</Key>
+      <Key>sos.tab.recipes</Key>
+      <Key>sos.tab.simulator</Key>
+    </Missing>
+    <Extra />
+  </Language>
+  <Language name="Russian">
+    <Missing>
+      <Key>sos.aff.speedDropdown</Key>
+      <Key>sos.dummyname.rand.1</Key>
+      <Key>sos.dummyname.rand.2</Key>
+      <Key>sos.dummyname.rand.3</Key>
+      <Key>sos.dummyname.tier0</Key>
+      <Key>sos.dummyname.tier1</Key>
+      <Key>sos.dummyname.tier2</Key>
+      <Key>sos.dummyname.tier3</Key>
+      <Key>sos.dummyname.tier4</Key>
+      <Key>sos.tab.recipes</Key>
+      <Key>sos.tab.simulator</Key>
+    </Missing>
+    <Extra />
+  </Language>
+  <Language name="Spanish">
+    <Missing>
+      <Key>sos.aff.speedDropdown</Key>
+      <Key>sos.dummyname.rand.1</Key>
+      <Key>sos.dummyname.rand.2</Key>
+      <Key>sos.dummyname.rand.3</Key>
+      <Key>sos.dummyname.tier0</Key>
+      <Key>sos.dummyname.tier1</Key>
+      <Key>sos.dummyname.tier2</Key>
+      <Key>sos.dummyname.tier3</Key>
+      <Key>sos.dummyname.tier4</Key>
+      <Key>sos.tab.recipes</Key>
+      <Key>sos.tab.simulator</Key>
+    </Missing>
+    <Extra />
+  </Language>
+  <Language name="SpanishLatinamerican">
+    <Missing>
+      <Key>sos.aff.speedDropdown</Key>
+      <Key>sos.dummyname.rand.1</Key>
+      <Key>sos.dummyname.rand.2</Key>
+      <Key>sos.dummyname.rand.3</Key>
+      <Key>sos.dummyname.tier0</Key>
+      <Key>sos.dummyname.tier1</Key>
+      <Key>sos.dummyname.tier2</Key>
+      <Key>sos.dummyname.tier3</Key>
+      <Key>sos.dummyname.tier4</Key>
+      <Key>sos.tab.recipes</Key>
+      <Key>sos.tab.simulator</Key>
+    </Missing>
+    <Extra />
+  </Language>
+</LocalizationReport>

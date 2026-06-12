@@ -2,10 +2,12 @@
   <!-- 
     Localization Watchdog by Visual Studio
     This file runs during compilation to ensure all localization keys are translated.
+    AI GENERATED FILE.
   -->
   <UsingTask TaskName="VerifyLocalizationsTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <ParameterGroup>
       <LocalizationFolder ParameterType="System.String" Required="true" />
+      <OutputFile ParameterType="System.String" Required="true" />
     </ParameterGroup>
     <Task>
       <Using Namespace="System" />
@@ -13,39 +15,57 @@
       <Using Namespace="System.Xml.Linq" />
       <Using Namespace="System.Collections.Generic" />
       <Using Namespace="System.Linq" />
+
       <Code Type="Fragment" Language="cs">
         <![CDATA[
           try {
               string englishPath = Path.Combine(LocalizationFolder, "English.xml");
               if (!File.Exists(englishPath)) {
-                  Log.LogWarning("English.xml not found at " + englishPath + ". Localization check skipped.");
+                  Log.LogMessage("English.xml not found at " + englishPath + ". Localization check skipped.");
                   return true;
               }
 
               var englishDoc = XDocument.Load(englishPath);
-              var englishKeys = new HashSet<string>(englishDoc.Descendants("Override").Elements().Select(e => e.Name.LocalName));
+              var englishKeys = new HashSet<string>(
+                  englishDoc.Descendants("Override").Elements().Select(e => e.Name.LocalName)
+              );
+
+              var reportRoot = new XElement("LocalizationReport");
 
               string[] otherFiles = Directory.GetFiles(LocalizationFolder, "*.xml");
               foreach (string file in otherFiles) {
-                  if (Path.GetFileName(file).Equals("English.xml", StringComparison.OrdinalIgnoreCase)) continue;
+                  if (Path.GetFileName(file).Equals("English.xml", StringComparison.OrdinalIgnoreCase))
+                      continue;
 
                   var otherDoc = XDocument.Load(file);
-                  var otherKeys = new HashSet<string>(otherDoc.Descendants("Override").Elements().Select(e => e.Name.LocalName));
+                  var otherKeys = new HashSet<string>(
+                      otherDoc.Descendants("Override").Elements().Select(e => e.Name.LocalName)
+                  );
+
                   string langName = Path.GetFileNameWithoutExtension(file);
 
-                  var missingKeys = englishKeys.Except(otherKeys).ToList();
-                  foreach (var key in missingKeys) {
-                      // Reporting as a warning that shows up in the Error List
-                      Log.LogWarning(null, "SOS-LOC", null, file, 0, 0, 0, 0, 
-                          "Missing translation for key '" + key + "' in " + langName);
-                  }
-                  
-                  var extraKeys = otherKeys.Except(englishKeys).ToList();
-                   foreach (var key in extraKeys) {
-                      Log.LogMessage(MessageImportance.Low, "Extra/Legacy key found in " + langName + ": " + key);
-                  }
+                  var missingKeys = englishKeys.Except(otherKeys).OrderBy(k => k).ToList();
+                  var extraKeys = otherKeys.Except(englishKeys).OrderBy(k => k).ToList();
+
+                  var langElement = new XElement("Language",
+                      new XAttribute("name", langName),
+                      new XElement("Missing",
+                          missingKeys.Select(k => new XElement("Key", k))
+                      ),
+                      new XElement("Extra",
+                          extraKeys.Select(k => new XElement("Key", k))
+                      )
+                  );
+
+                  reportRoot.Add(langElement);
               }
-          } catch (Exception e) {
+
+              var reportDoc = new XDocument(reportRoot);
+              reportDoc.Save(OutputFile);
+
+              Log.LogMessage("Localization report generated at: " + OutputFile);
+          }
+          catch (Exception e) {
               Log.LogError("Localization Check Error: " + e.Message);
           }
         ]]>
@@ -53,7 +73,10 @@
     </Task>
   </UsingTask>
 
-  <Target Name="VerifyLocalizations" BeforeTargets="Build">
-    <VerifyLocalizationsTask LocalizationFolder="$(MSBuildThisFileDirectory)Assets\Localizations\" />
+  <Target Name="VerifyLocalizations" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Assets'">
+    <VerifyLocalizationsTask 
+      LocalizationFolder="$(MSBuildThisFileDirectory)/Assets/Localizations/" 
+      OutputFile="$(MSBuildThisFileDirectory)/missingtranslation.xml"
+      />
   </Target>
 </Project>

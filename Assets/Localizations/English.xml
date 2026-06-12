@@ -97,5 +97,18 @@
 		<sos.window.settings>Settings (WIP)</sos.window.settings>
 		<sos.xml.copy>Copy XML</sos.xml.copy>
 		<sos.xml.reset_zoom>Reset Zoom</sos.xml.reset_zoom>
+		<sos.tab.recipes>RECIPES</sos.tab.recipes>
+		<sos.tab.simulator>SIMULATOR</sos.tab.simulator>
+		<sos.aff.speedDropdown>More than x1 are still in progress. \nIt's work fine in Singleplayer, but not at all in Multiplayer.</sos.aff.speedDropdown>
+
+		<sos.dummyname.tier0>Dummy Subject #[id]</sos.dummyname.tier0>
+		<sos.dummyname.tier1>Not A Real Person #[id]</sos.dummyname.tier1>
+		<sos.dummyname.tier2>Probably Sentient #[id]</sos.dummyname.tier2>
+		<sos.dummyname.tier3>Do Not Think About It #[id]</sos.dummyname.tier3>
+		<sos.dummyname.tier4>Don’t Mind The Screaming #[id]</sos.dummyname.tier4>
+		
+		<sos.dummyname.rand.1>Probably Fine #[id]</sos.dummyname.rand.1>
+		<sos.dummyname.rand.2>Has A Family #[id]</sos.dummyname.rand.2>
+		<sos.dummyname.rand.3>Knows What You Did</sos.dummyname.rand.3>
 	</Override>
 </infotexts>

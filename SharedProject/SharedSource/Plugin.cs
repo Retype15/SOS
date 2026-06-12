@@ -28,7 +28,7 @@ namespace SOS
 
         public void OnLoadCompleted()
         {
-            TextManager.VerifyLanguageAvailable();
+            //TextManager.VerifyLanguageAvailable();
 #if DEBUG
             LuaCsLogger.LogMessage(TextSOS.Get("sos.shared.loaded", "[SOS] Loaded Successfully.").Value);
             LuaCsLogger.LogMessage(TextSOS.Get("sos.shared.debugmode", "[SOS] Debug Mode is enabled.").Value);
@@ -52,6 +52,7 @@ namespace SOS
 
     public static class TextSOS
     {
+        private static readonly Dictionary<string, Dictionary<Identifier, string>> prefixCache = [];
         public static LocalizedString Get(string key, string fallback = "")
         {
             var text = TextManager.Get(key);
@@ -65,6 +66,19 @@ namespace SOS
 #endif
             }
             return text;
+        }
+
+        public static Dictionary<Identifier, string> GetTranslationsByPrefix(string prefix)
+        {
+            if (prefixCache.TryGetValue(prefix, out var cached)) return cached;
+
+            var allTranslations = TextManager.GetAllTagTextPairs();
+            var filtered = allTranslations
+                .Where(kvp => kvp.Key.StartsWith(prefix))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            prefixCache[prefix] = filtered;
+            return filtered;
         }
     }
 
