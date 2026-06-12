@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Retype15
+// Copyright (c) 2026 Retype15
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
@@ -37,9 +37,33 @@ namespace SOS
         public bool RawXmlMode { get; set; } = false;
         public float XmlFontScale { get; set; } = 0.9f;
 
+        public int DummyDeathCount { get; set; } = 0;
+        public string? DummyCharacterXML { get; set; } = null;
+        public List<string> TabHistory { get; } = [];
+        public bool DummySimulated { get; set; } = false;
+
+        public void PushTabHistory(string uid)
+        {
+            TabHistory.Remove(uid);
+            TabHistory.Insert(0, uid);
+        }
+
         public Dictionary<string, SavedLayout> CustomLayouts { get; } = [];
 
         private bool isDirty = false;
+
+        private static SOSController? _instance;
+        public static SOSController Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new SOSController();
+                }
+                return _instance;
+            }
+        }
 
         public SOSController()
         {
@@ -118,9 +142,20 @@ namespace SOS
         {
             if (!isDirty) return;
 
+            if (ClinicalSimulatorManager.Patient != null)
+            {
+                this.DummyDeathCount = ClinicalSimulatorManager.DeathCount;
+                this.DummyCharacterXML = ClinicalSimulatorManager.ExportSaveData()?.ToString();
+                this.DummySimulated = !ClinicalSimulatorManager.HasStarted;
+            }
+
             var data = new SettingsData
             {
                 Favorites = this.FavoritedItems,
+                DummyDeathCount = this.DummyDeathCount,
+                DummyCharacterXML = this.DummyCharacterXML,
+                DummySimulated = this.DummySimulated,
+                TabHistory = [.. this.TabHistory],
                 LastSearchQuery = this.LastSearchQuery,
                 LastItemId = this.CurrentTarget?.Identifier.Value ?? "",
                 TrackedItemId = this.Tracker.TrackedItem?.Identifier.Value ?? "",
@@ -143,6 +178,12 @@ namespace SOS
             var data = SettingsManager.Load();
 
             foreach (var fav in data.Favorites) FavoritedItems.Add(fav);
+
+            this.DummyDeathCount = data.DummyDeathCount;
+            this.DummyCharacterXML = data.DummyCharacterXML;
+            this.DummySimulated = data.DummySimulated;
+            this.TabHistory.Clear();
+            this.TabHistory.AddRange(data.TabHistory);
 
             LastSearchQuery = data.LastSearchQuery;
             WindowSize = data.WindowSize;

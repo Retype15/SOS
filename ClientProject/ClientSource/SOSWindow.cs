@@ -55,7 +55,7 @@ namespace SOS
 
         private const int HeaderHeight = 48;
         private const int BottomMargin = 10;
-        private const int SidebarHiddenThreshold = 70;
+        private const int SidebarHiddenThreshold = 100;
         private const int SidebarCompactThreshold = 240;
         private const int CenterCompactThreshold = 250;
         private const int MinCenterWidth = 200;
@@ -66,10 +66,7 @@ namespace SOS
 
         private Prefab? currentItem;
 
-        private GUIFrame? dynamicCenterArea;
-        private GUIListBox? tabButtonsArea;
-        private readonly List<ICenterPanelTab> availableTabs = [];
-        private ICenterPanelTab? activeTab;
+        private GUITabWidget? centerTabWidget;
 
         private GUITextBlock? LoadingCompletedText;
 
@@ -272,23 +269,9 @@ namespace SOS
             detailsHeader.RectTransform.MinSize = new Point(0, 65);
             detailsHeader.RectTransform.MaxSize = new Point(int.MaxValue, 65);
 
-            tabButtonsArea = new GUIListBox(new RectTransform(new Vector2(1f, 0.05f), centerLayout.RectTransform), isHorizontal: true, style: null)
-            {
-                Spacing = 5,
-                Padding = new Vector4(5, 0, 5, 0)
-            };
-            tabButtonsArea.RectTransform.MinSize = new Point(0, 32);
-            tabButtonsArea.RectTransform.MaxSize = new Point(int.MaxValue, 32);
-
-            dynamicCenterArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.85f), centerLayout.RectTransform), style: null);
-
-            availableTabs.Clear();
-            availableTabs.Add(new ItemCenterPanelTab());
-            availableTabs.Add(new AfflictionCenterPanelTab());
-            foreach (var tab in availableTabs)
-            {
-                tab.Initialize(dynamicCenterArea);
-            }
+            centerTabWidget = new GUITabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform));
+            centerTabWidget.RegisterTab(new ItemCenterPanelTab());
+            centerTabWidget.RegisterTab(new AfflictionCenterPanelTab());
 
             rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), contentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
             {
@@ -404,7 +387,6 @@ namespace SOS
                 {
                     UpdateDetailsFromController();
                 }
-                mainFrame?.ForceLayoutRecalculation();
             }
         }
 
@@ -479,6 +461,9 @@ namespace SOS
         public void Destroy()
         {
             ClinicalSimulatorManager.Destroy();
+
+            centerTabWidget?.Clear();
+            centerTabWidget = null;
 
             activeDropdowns.Clear();
 
@@ -783,7 +768,7 @@ namespace SOS
         {
             currentItem = targetItem;
             activeDropdowns.Clear();
-            if (detailsHeader == null || dynamicCenterArea == null || metaPanel == null) return;
+            if (detailsHeader == null || centerTabWidget == null || metaPanel == null) return;
             metaPanel.Content.ClearChildren();
 
             detailsHeader.ClearChildren();
@@ -814,46 +799,7 @@ namespace SOS
                 CanBeFocused = false
             };
 
-            if (tabButtonsArea != null)
-            {
-                tabButtonsArea.Content.ClearChildren();
-
-                var validTabs = availableTabs.Where(t => t.CanHandle(targetItem)).ToList();
-
-                if (activeTab == null || !validTabs.Contains(activeTab))
-                {
-                    activeTab = validTabs.FirstOrDefault();
-                }
-
-                if (validTabs.Count > 1)
-                {
-                    foreach (var tab in validTabs)
-                    {
-                        Vector2 textSize = GUIStyle.SmallFont.MeasureString(tab.TabName);
-                        int width = (int)textSize.X + 24;
-
-                        var tabBtn = new GUIButton(new RectTransform(new Point(width, 32), tabButtonsArea.Content.RectTransform), tab.TabName, style: "SubtreeHeader")
-                        {
-                            Selected = tab == activeTab,
-                            OnClicked = (b, _) =>
-                            {
-                                if (activeTab != tab)
-                                {
-                                    activeTab = tab;
-                                    UpdateDetailsFromController(); // Re-trigger update to switch tab
-                                }
-                                return true;
-                            }
-                        };
-                    }
-                }
-
-                foreach (var tab in availableTabs)
-                {
-                    if (tab == activeTab) tab.Activate(targetItem, controller, OnPrimary, OnSecondary);
-                    else tab.Deactivate();
-                }
-            }
+            centerTabWidget?.UpdateTabs(targetItem, controller, OnPrimary, OnSecondary);
 
             void onBadgeClick(string tag) { if (searchBox != null) searchBox.Text = tag; UpdateSearch(tag); }
 
@@ -974,15 +920,17 @@ namespace SOS
                 OnClicked = (_, _) =>
                 {
                     string newName = $"Layout {controller.CustomLayouts.Count + 1}";
-                    controller.CustomLayouts[newName] = new SavedLayout
+                    var saved = new SavedLayout
                     {
                         WindowSize = mainFrame.Rect.Size,
                         LeftPanelWidth = leftPanel?.Rect.Width ?? 0,
                         RightPanelWidth = rightPanel?.Rect.Width ?? 0
                     };
+                    controller.CustomLayouts[newName] = saved;
+                    AddPresetRow(list, newName, () => controller.ApplyLayout(saved.WindowSize, saved.LeftPanelWidth, saved.RightPanelWidth), true, anchor);
                     controller.MarkDirty();
-                    ToggleLayoutMenu(anchor);
-                    ToggleLayoutMenu(anchor);
+                    //ToggleLayoutMenu(anchor);
+                    //ToggleLayoutMenu(anchor);
                     return true;
                 }
             };
@@ -1012,7 +960,7 @@ namespace SOS
 
             if (canDelete)
             {
-                _ = new GUIButton(new RectTransform(new Vector2(0.18f, 1f), row.RectTransform), "", style: "CategoryButton.All")
+                _ = new GUIButton(new RectTransform(new Vector2(0.18f, 1f), row.RectTransform), "", style: "GUICancelButton", color: Color.IndianRed) // OLD: CategoryButton.All
                 {
                     OnClicked = (_, _) =>
                     {

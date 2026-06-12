@@ -16,7 +16,7 @@ namespace SOS
 
         public void InitClient()
         {
-            controller = new SOSController();
+            controller = SOSController.Instance;
 
             if (!DebugConsole.commands.Exists(c => c.Names.ToString() == "sos")) // \\//
                 DebugConsole.commands.Add(new DebugConsole.Command(
@@ -39,10 +39,6 @@ namespace SOS
         public void OnKeyUpdate(double deltaTime)
         {
             controller?.Update();
-
-#if DEBUG
-            DebugSOSWindow.Instance?.Update();
-#endif
         }
 
         public void DisposeClient()
@@ -60,15 +56,6 @@ namespace SOS
     // TODO: Must to Change site...
     public class PrefabAdapter
     {
-        public static LocalizedString Name(Prefab prefab)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.Name,
-                AfflictionPrefab affliction => affliction.Name,
-                _ => TextSOS.Get("sos.gen.unknown", "???")
-            };
-        }
         public static Sprite? Icon(Prefab prefab)
         {
             return prefab switch

@@ -53,16 +53,17 @@ namespace SOS
             if (string.IsNullOrEmpty(value) || currentLayout == null) return;
 
             var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), style: null) { CanBeFocused = false };
-            _ = new GUITextBlock(new RectTransform(new Vector2(0.40f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+            var lblBlock = new GUITextBlock(new RectTransform(new Vector2(0.40f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray, wrap: true) { CanBeFocused = false };
             var valBlock = new GUITextBlock(new RectTransform(new Vector2(0.60f, 1f), row.RectTransform, Anchor.CenterRight), value, font: GUIStyle.SmallFont, textColor: valColor, textAlignment: Alignment.Right, wrap: true) { CanBeFocused = false };
 
             void UpdateHeight()
             {
-                int h = Math.Max(20, (int)valBlock.TextSize.Y + 4);
+                int h = Math.Max(20, (int)Math.Max(lblBlock.TextSize.Y, valBlock.TextSize.Y) + 4);
                 row.RectTransform.MinSize = new Point(0, h);
                 row.RectTransform.MaxSize = new Point(int.MaxValue, h);
             }
             UpdateHeight();
+            lblBlock.RectTransform.SizeChanged += UpdateHeight;
             valBlock.RectTransform.SizeChanged += UpdateHeight;
 
             rowsCreated++;

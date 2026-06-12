@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Retype15
+// Copyright (c) 2026 Retype15
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
@@ -22,6 +22,7 @@ namespace SOS
         public uint TrackedRecipeHash { get; set; } = 0;
         public bool RawXmlMode { get; set; } = false;
         public float XmlFontScale { get; set; } = 0.9f;
+        public List<string> TabHistory { get; set; } = [];
 
         // UI Persistence
         public Point? WindowSize { get; set; }
@@ -29,6 +30,11 @@ namespace SOS
         public int? LeftPanelWidth { get; set; }
         public int? RightPanelWidth { get; set; }
         public Dictionary<string, SavedLayout> CustomLayouts { get; set; } = [];
+
+        // Medical SIM
+        public int DummyDeathCount { get; set; } = 0;
+        public bool DummySimulated { get; set; } = false;
+        public string? DummyCharacterXML { get; set; } = null;
     }
 
     public class SavedLayout
@@ -66,8 +72,15 @@ namespace SOS
                         new XElement("State",
                             new XAttribute("lastItem", data.LastItemId ?? ""),
                             new XAttribute("lastSearch", data.LastSearchQuery ?? ""),
+                            new XAttribute("tabHistory", string.Join(",", data.TabHistory)),
                             new XAttribute("rawXml", data.RawXmlMode),
                             new XAttribute("xmlScale", data.XmlFontScale)
+                        ),
+
+                        new XElement("MedicalSim",
+                            new XAttribute("deathCount", data.DummyDeathCount),
+                            new XAttribute("simulated", data.DummySimulated),
+                            string.IsNullOrEmpty(data.DummyCharacterXML) ? null : XElement.Parse(data.DummyCharacterXML)
                         ),
 
                         new XElement("Tracker",
@@ -148,8 +161,27 @@ namespace SOS
                     {
                         data.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
                         data.LastItemId = state.Attribute("lastItem")?.Value ?? "";
+                        
+                        string historyStr = state.Attribute("tabHistory")?.Value ?? "";
+                        if (!string.IsNullOrEmpty(historyStr))
+                        {
+                            data.TabHistory = historyStr.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+                        }
+                        
                         data.RawXmlMode = ImGoodBoolParser(state.Attribute("rawXml")?.Value, false);
                         data.XmlFontScale = ImGoodFloatParser(state.Attribute("xmlScale")?.Value, 0.9f);
+                    }
+
+                    var simulator = root.Element("MedicalSim");
+                    if (simulator != null)
+                    {
+                        data.DummyDeathCount = ImGoodParser(simulator.Attribute("deathCount")?.Value, 0);
+                        data.DummySimulated = ImGoodBoolParser(simulator.Attribute("simulated")?.Value, false);
+                        var dummyNode = simulator.Elements().FirstOrDefault();
+                        if (dummyNode != null)
+                        {
+                            data.DummyCharacterXML = dummyNode.ToString();
+                        }
                     }
 
                     var tracker = root.Element("Tracker");

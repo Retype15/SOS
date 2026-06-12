@@ -15,8 +15,8 @@ namespace SOS
     {
         private static readonly Dictionary<Identifier, LinkedListNode<ItemAnalysis>> analysisCache = [];
         private static readonly LinkedList<ItemAnalysis> lruList = new();
-        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, FabricationRecipe>>> usesCache = [];
-        private static readonly Dictionary<Identifier, List<Tuple<ItemPrefab, DeconstructItem>>> sourcesCache = [];
+        private static readonly Dictionary<Identifier, List<(ItemPrefab Item, FabricationRecipe Recipe)>> usesCache = [];
+        private static readonly Dictionary<Identifier, List<(ItemPrefab Item, DeconstructItem DeconstructItem)>> sourcesCache = [];
 
         private const int MaxAnalysisCacheSize = 30;
 
@@ -66,13 +66,13 @@ namespace SOS
         public static List<DeconstructItem> GetDeconstructionOutputs(ItemPrefab item)
             => item.DeconstructItems.IsDefaultOrEmpty ? [] : [.. item.DeconstructItems];
 
-        public static List<Tuple<ItemPrefab, FabricationRecipe>> GetUsesAsIngredient(ItemPrefab targetItem)
+        public static List<(ItemPrefab Item, FabricationRecipe Recipe)> GetUsesAsIngredient(ItemPrefab targetItem)
         {
             if (targetItem == null) return [];
 
             if (usesCache.TryGetValue(targetItem.Identifier, out var cachedResult)) return cachedResult;
 
-            var results = new List<Tuple<ItemPrefab, FabricationRecipe>>();
+            var results = new List<(ItemPrefab Item, FabricationRecipe Recipe)>();
             foreach (var prefab in ItemPrefab.Prefabs)
             {
                 if (prefab.FabricationRecipes == null) continue;
@@ -80,7 +80,7 @@ namespace SOS
                 {
                     if (recipe.RequiredItems.Length > 0 && recipe.RequiredItems.Any(req => req.ItemPrefabs != null && req.ItemPrefabs.Any(p => p != null && p.Identifier == targetItem.Identifier)))
                     {
-                        results.Add(new Tuple<ItemPrefab, FabricationRecipe>(prefab, recipe));
+                        results.Add((prefab, recipe));
                     }
                 }
             }
@@ -89,13 +89,13 @@ namespace SOS
             return results;
         }
 
-        public static List<Tuple<ItemPrefab, DeconstructItem>> GetSourcesFromDeconstruction(ItemPrefab targetItem)
+        public static List<(ItemPrefab Item, DeconstructItem DeconstructItem)> GetSourcesFromDeconstruction(ItemPrefab targetItem)
         {
             if (targetItem == null) return [];
 
             if (sourcesCache.TryGetValue(targetItem.Identifier, out var cachedResult)) return cachedResult;
 
-            var results = new List<Tuple<ItemPrefab, DeconstructItem>>();
+            var results = new List<(ItemPrefab Item, DeconstructItem DeconstructItem)>();
             foreach (var prefab in ItemPrefab.Prefabs)
             {
                 if (prefab.DeconstructItems.IsDefaultOrEmpty) continue;
@@ -104,7 +104,7 @@ namespace SOS
                 {
                     if (di.ItemIdentifier == targetItem.Identifier)
                     {
-                        results.Add(new Tuple<ItemPrefab, DeconstructItem>(prefab, di));
+                        results.Add((prefab, di));
                     }
                 }
             }
@@ -132,7 +132,7 @@ namespace SOS
                             {
                                 if (p == null) continue;
                                 if (!usesCache.ContainsKey(p.Identifier)) usesCache[p.Identifier] = [];
-                                usesCache[p.Identifier].Add(new Tuple<ItemPrefab, FabricationRecipe>(prefab, recipe));
+                                usesCache[p.Identifier].Add((prefab, recipe));
                             }
                         }
                     }
@@ -143,14 +143,14 @@ namespace SOS
                     foreach (var di in prefab.DeconstructItems)
                     {
                         if (!sourcesCache.ContainsKey(di.ItemIdentifier)) sourcesCache[di.ItemIdentifier] = [];
-                        sourcesCache[di.ItemIdentifier].Add(new Tuple<ItemPrefab, DeconstructItem>(prefab, di));
+                        sourcesCache[di.ItemIdentifier].Add((prefab, di));
                     }
                 }
             }
             // MARK: AAAA
 #if DEBUG
             //System.Threading.Thread.Sleep(1000);
-            LuaCsLogger.LogMessage("[SOS] Dependency graph precomputed (Debug Sleep 3s finished).");
+            RLogger.LogDebug("[SOS] Dependency graph precomputed.");
 #endif
         }
     }
