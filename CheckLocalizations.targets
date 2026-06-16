@@ -4,7 +4,7 @@
     This file runs during compilation to ensure all localization keys are translated.
     AI GENERATED FILE.
   -->
-  <UsingTask TaskName="VerifyLocalizationsTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+  <UsingTask TaskName="VerifyLocalizationTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <ParameterGroup>
       <LocalizationFolder ParameterType="System.String" Required="true" />
       <OutputFile ParameterType="System.String" Required="true" />
@@ -73,8 +73,8 @@
     </Task>
   </UsingTask>
 
-  <Target Name="VerifyLocalizations" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Assets'">
-    <VerifyLocalizationsTask 
+  <Target Name="VerifyLocalization" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Assets'">
+    <VerifyLocalizationTask 
       LocalizationFolder="$(MSBuildThisFileDirectory)/Assets/Localization/" 
       OutputFile="$(MSBuildThisFileDirectory)/missingtranslation.xml"
       />
