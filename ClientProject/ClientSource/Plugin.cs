@@ -33,7 +33,7 @@ namespace SOS
 
             LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
 
-            LuaCsLogger.LogMessage(TextSOS.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
+            RLogger.Log(TextSOS.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
         }
 
         public void OnKeyUpdate(double deltaTime)

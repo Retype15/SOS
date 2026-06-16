@@ -75,7 +75,7 @@
 
   <Target Name="VerifyLocalizations" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Assets'">
     <VerifyLocalizationsTask 
-      LocalizationFolder="$(MSBuildThisFileDirectory)/Assets/Localizations/" 
+      LocalizationFolder="$(MSBuildThisFileDirectory)/Assets/Localization/" 
       OutputFile="$(MSBuildThisFileDirectory)/missingtranslation.xml"
       />
   </Target>

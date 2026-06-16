@@ -238,7 +238,7 @@ namespace SOS
             if (deathCount < 50)
             {
                 int tier = deathCount / 10;
-                nameTemplate = TextSOS.Get($"sos.dummyname.tier{tier}", $"Dummy Subject #[id]").Value;
+                nameTemplate = TextSOS.Get($"sos.dummyname.rand.{tier}", $"Dummy Subject #[id]").Value;
             }
             else
             {
@@ -569,7 +569,7 @@ namespace SOS
                 }
                 catch (System.Exception e)
                 {
-                    LuaCsLogger.LogMessage($"[SOS] Safety warning during native window rescue: {e.Message}");
+                    RLogger.LogWarning($"[SOS] Safety warning during native window rescue: {e.Message}");
                 }
                 finally
                 {

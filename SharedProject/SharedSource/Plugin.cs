@@ -6,11 +6,11 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Barotrauma;
 using Barotrauma.LuaCs;
 using Microsoft.Xna.Framework;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 [assembly: IgnoresAccessChecksTo("Barotrauma")]
 [assembly: IgnoresAccessChecksTo("DedicatedServer")]
 [assembly: IgnoresAccessChecksTo("BarotraumaCore")]
@@ -29,10 +29,8 @@ namespace SOS
         public void OnLoadCompleted()
         {
             //TextManager.VerifyLanguageAvailable();
-#if DEBUG
-            LuaCsLogger.LogMessage(TextSOS.Get("sos.shared.loaded", "[SOS] Loaded Successfully.").Value);
-            LuaCsLogger.LogMessage(TextSOS.Get("sos.shared.debugmode", "[SOS] Debug Mode is enabled.").Value);
-#endif
+            RLogger.Log(TextSOS.Get("sos.shared.loaded", "[SOS] Loaded Successfully.").Value);
+            RLogger.LogDebug(TextSOS.Get("sos.shared.debugmode", "[SOS] Debug Mode is enabled.").Value);
         }
 
         public void PreInitPatching() { }
@@ -43,9 +41,7 @@ namespace SOS
             RecipeAnalyzer.ClearSessionCache();
             DisposeClient();
 #endif
-#if DEBUG
-            LuaCsLogger.LogMessage(TextSOS.Get("sos.shared.unloaded", "[SOS] Mod Unloaded.").Value);
-#endif
+            RLogger.LogDebug(TextSOS.Get("sos.shared.unloaded", "[SOS] Mod Unloaded.").Value);
             GC.SuppressFinalize(this);
         }
     }
