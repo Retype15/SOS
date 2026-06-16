@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<infotexts language="Latinamerican Spanish" nowhitespace="false" translatedname="Español Latinoamericano">
+<infotexts language="Castilian Spanish" nowhitespace="false" translatedname="Castellano">
 	<Override>
 		<!-- Commands & Init -->
-		<sos.client.init>[SOS] Client: Inicializado. Presiona 'J' para abrir.</sos.client.init>
+		<sos.client.init>[SOS] Client: Inicializado. Pulsa 'J' para abrir.</sos.client.init>
 		<sos.command.help>Abre/Cierra SOS.</sos.command.help>
 		<sos.command.name>sos</sos.command.name>
 		<sos.shared.debugmode>[SOS] Modo depuración activado.</sos.shared.debugmode>
@@ -34,11 +34,11 @@
 		<!-- Window -->
 		<sos.window.additional_info>INFO ADICIONAL</sos.window.additional_info>
 		<sos.window.back>Atrás</sos.window.back>
-		<sos.window.back.shortcuts>Atajos:&#xA;- Alt + Flecha Izquierda&#xA;- Retroceso&#xA;- Mouse 4</sos.window.back.shortcuts>
+		<sos.window.back.shortcuts>Atajos:&#xA;- Alt + Flecha Izquierda&#xA;- Retroceso&#xA;- Ratón 4</sos.window.back.shortcuts>
 		<sos.window.clear_hud>Limpiar HUD</sos.window.clear_hud>
 		<sos.window.clear_hud_tooltip>Limpia el rastreador del HUD</sos.window.clear_hud_tooltip>
 		<sos.window.forward>Adelante</sos.window.forward>
-		<sos.window.forward.shortcuts>Atajos:&#xA;- Alt + Flecha Derecha&#xA;- Shift + Retroceso&#xA;- Mouse 5</sos.window.forward.shortcuts>
+		<sos.window.forward.shortcuts>Atajos:&#xA;- Alt + Flecha Derecha&#xA;- Mayús + Retroceso&#xA;- Ratón 5</sos.window.forward.shortcuts>
 		<sos.window.loading>Cargando dependencias...</sos.window.loading>
 		<sos.window.loading.complete>¡Carga completa!</sos.window.loading.complete>
 		<sos.window.obtain>OBTENCIÓN</sos.window.obtain>
@@ -110,11 +110,11 @@
 		<!-- Medical -->
 		<sos.med.always_causes>Siempre Aplica:</sos.med.always_causes>
 		<sos.med.always_heals>Siempre Cura:</sos.med.always_heals>
-		<sos.med.failure_causes>En Fracaso Aplica:</sos.med.failure_causes>
-		<sos.med.failure_heals>En Fracaso Cura:</sos.med.failure_heals>
+		<sos.med.failure_causes>En Fallo Aplica:</sos.med.failure_causes>
+		<sos.med.failure_heals>En Fallo Cura:</sos.med.failure_heals>
 		<sos.med.skill_req>Req. Habilidad Médica:</sos.med.skill_req>
-		<sos.med.success_causes>En Éxito Aplica:</sos.med.success_causes>
-		<sos.med.success_heals>En Éxito Cura:</sos.med.success_heals>
+		<sos.med.success_causes>En Acierto Aplica:</sos.med.success_causes>
+		<sos.med.success_heals>En Acierto Cura:</sos.med.success_heals>
 		<sos.med.suitable>Recomendado:</sos.med.suitable>
 
 		<!-- Treatments & Afflictions -->
