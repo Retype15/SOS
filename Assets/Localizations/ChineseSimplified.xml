@@ -1,101 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
 <infotexts language="Simplified Chinese" nowhitespace="true" translatedname="中文">
 	<Override>
-		<sos.command.name>sos</sos.command.name>
-		<sos.command.help>打开/关闭 SOS。</sos.command.help>
+		<!-- Commands & Init -->
 		<sos.client.init>[SOS] 客户端：已初始化。按 'J' 键打开。</sos.client.init>
-		<sos.config.saved>[SOS] 设置已保存 (v[version])。</sos.config.saved>
-		<sos.config.save_error>[SOS] 无法保存设置：[error]</sos.config.save_error>
-		<sos.config.loaded>[SOS] 设置 v[version] 已成功加载。</sos.config.loaded>
-		<sos.config.load_error>[SOS] 读取设置文件时出错：[error]</sos.config.load_error>
-		<sos.context.track>追踪到 HUD</sos.context.track>
-		<sos.context.view_recipes>查看配方</sos.context.view_recipes>
-		<sos.context.remove_favorite>从收藏中移除</sos.context.remove_favorite>
-		<sos.context.add_favorite>添加到收藏</sos.context.add_favorite>
-		<sos.context.untrack>从 HUD 移除</sos.context.untrack>
-		<sos.context.track_recipe>添加到 HUD</sos.context.track_recipe>
-		<sos.context.recipe_options>配方选项</sos.context.recipe_options>
-		<sos.window.title>SOS - 配方浏览器</sos.window.title>
-		<sos.window.raw_xml>原始 XML</sos.window.raw_xml>
-		<sos.window.clear_hud>清除 HUD</sos.window.clear_hud>
-		<sos.window.search_placeholder>搜索物品...</sos.window.search_placeholder>
-		<sos.window.obtain>获取途径</sos.window.obtain>
-		<sos.window.usage>用途</sos.window.usage>
-		<sos.window.additional_info>额外信息</sos.window.additional_info>
-		<sos.hud.tracking>追踪中：</sos.hud.tracking>
-		<sos.item.header_info>ID: [id] | 价格: [price] mk</sos.item.header_info>
-		<sos.item.id>ID:</sos.item.id>
-		<sos.item.price>价格:</sos.item.price>
-		<sos.item.max_stack>最大堆叠:</sos.item.max_stack>
-		<sos.item.description>描述：</sos.item.description>
-		<sos.item.tags>标签：</sos.item.tags>
-		<sos.recipe.hand>手持</sos.recipe.hand>
-		<sos.recipe.deconstructor>分解仪</sos.recipe.deconstructor>
-		<sos.recipe.random_outputs>随机给予 [amount] 个：</sos.recipe.random_outputs>
-		<sos.recipe.deconstructing>分解：</sos.recipe.deconstructing>
+		<sos.command.help>打开/关闭 SOS。</sos.command.help>
+		<sos.command.name>sos</sos.command.name>
+		<sos.shared.debugmode>[SOS] 调试模式已启用。</sos.shared.debugmode>
 		<sos.shared.loaded>[SOS] 已成功加载。</sos.shared.loaded>
 		<sos.shared.unloaded>[SOS] 模组已卸载。</sos.shared.unloaded>
-		<sos.recipe.unlocked>配方已解锁</sos.recipe.unlocked>
-		<sos.recipe.locked>需要配方来解锁</sos.recipe.locked>
-		<sos.window.section_general>常规</sos.window.section_general>
-		<sos.window.section_economy>经济</sos.window.section_economy>
-		<sos.window.section_spawning>获取位置</sos.window.section_spawning>
-		<sos.window.section_weapon>作为武器</sos.window.section_weapon>
-		<sos.window.section_equipment>作为装备</sos.window.section_equipment>
-		<sos.window.section_utility>功能</sos.window.section_utility>
-		<sos.window.section_container>作为容器</sos.window.section_container>
-		<sos.gen.yes>是</sos.gen.yes>
+
+		<!-- Config -->
+		<sos.config.load_error>[SOS] 读取设置文件时出错：[error]</sos.config.load_error>
+		<sos.config.loaded>[SOS] 设置 v[version] 已成功加载。</sos.config.loaded>
+		<sos.config.migrating>[SOS] 正在从旧路径迁移设置...</sos.config.migrating>
+		<sos.config.save_error>[SOS] 无法保存设置：[error]</sos.config.save_error>
+		<sos.config.saved>[SOS] 设置已保存 (v[version])。</sos.config.saved>
+
+		<!-- General -->
+		<sos.gen.close>关闭 [Esc]</sos.gen.close>
 		<sos.gen.no>否</sos.gen.no>
 		<sos.gen.unknown>???</sos.gen.unknown>
+		<sos.gen.yes>是</sos.gen.yes>
+
+		<!-- Context Menu -->
+		<sos.context.add_favorite>添加到收藏</sos.context.add_favorite>
+		<sos.context.recipe_options>配方选项</sos.context.recipe_options>
+		<sos.context.remove_favorite>从收藏中移除</sos.context.remove_favorite>
+		<sos.context.track>追踪到 HUD</sos.context.track>
+		<sos.context.track_recipe>添加到 HUD</sos.context.track_recipe>
+		<sos.context.untrack>从 HUD 移除</sos.context.untrack>
+		<sos.context.view_recipes>查看配方</sos.context.view_recipes>
+
+		<!-- Window -->
+		<sos.window.additional_info>额外信息</sos.window.additional_info>
+		<sos.window.back>返回</sos.window.back>
+		<sos.window.back.shortcuts>快捷键：&#xA;- Alt + 左箭头&#xA;- 退格键&#xA;- 鼠标 4</sos.window.back.shortcuts>
+		<sos.window.clear_hud>清除 HUD</sos.window.clear_hud>
+		<sos.window.clear_hud_tooltip>清除活跃的 HUD 追踪器</sos.window.clear_hud_tooltip>
+		<sos.window.forward>前进</sos.window.forward>
+		<sos.window.forward.shortcuts>快捷键：&#xA;- Alt + 右箭头&#xA;- Shift + 退格键&#xA;- 鼠标 5</sos.window.forward.shortcuts>
+		<sos.window.loading>正在加载依赖项...</sos.window.loading>
+		<sos.window.loading.complete>加载完成！</sos.window.loading.complete>
+		<sos.window.obtain>获取途径</sos.window.obtain>
+		<sos.window.raw_xml>原始 XML</sos.window.raw_xml>
+		<sos.window.search_placeholder>搜索物品...</sos.window.search_placeholder>
+		<sos.window.search_tooltip>按名称、ID、类别、标签、模组、类型等搜索&#xA;高级过滤器：&#xA;  @模组        (例：@Vanilla @Neuro)&#xA;  #类别        (例：#Medical #Weapon)&#xA;  $标签        (例：$smallitem $pill)&#xA;  &amp;槽位        (例：&amp;Head &amp;Inner)&#xA;  !ID          (例：!weldingtool)&#xA;示例：'Brain @NT #Medical $surgery'</sos.window.search_tooltip>
+		<sos.window.section_container>作为容器</sos.window.section_container>
+		<sos.window.section_economy>经济</sos.window.section_economy>
+		<sos.window.section_equipment>作为装备</sos.window.section_equipment>
+		<sos.window.section_general>常规</sos.window.section_general>
+		<sos.window.section_medical>医疗</sos.window.section_medical>
+		<sos.window.section_spawning>获取位置</sos.window.section_spawning>
+		<sos.window.section_treatments>治疗和药物</sos.window.section_treatments>
+		<sos.window.section_utility>功能</sos.window.section_utility>
+		<sos.window.section_weapon>作为武器</sos.window.section_weapon>
+		<sos.window.settings>设置 (WIP)</sos.window.settings>
+		<sos.window.tag_tooltip>搜索带有标签的物品：[tag]</sos.window.tag_tooltip>
+		<sos.window.title>SOS - 配方浏览器</sos.window.title>
+		<sos.window.usage>用途</sos.window.usage>
+
+		<!-- HUD -->
+		<sos.hud.tracking>追踪中：</sos.hud.tracking>
+
+		<!-- Tabs -->
+		<sos.tab.recipes>配方</sos.tab.recipes>
+		<sos.tab.simulator>模拟器</sos.tab.simulator>
+
+		<!-- Items -->
 		<sos.item.aliases>别名：</sos.item.aliases>
-		<sos.item.category>类别：</sos.item.category>
-		<sos.item.cargo_box>货物箱：</sos.item.cargo_box>
-		<sos.item.hazards>危险性：</sos.item.hazards>
-		<sos.item.causes_fire>导致火灾</sos.item.causes_fire>
-		<sos.item.drains_oxygen>消耗氧气</sos.item.drains_oxygen>
 		<sos.item.base_price>基础价格：</sos.item.base_price>
 		<sos.item.can_buy>可购买：</sos.item.can_buy>
 		<sos.item.can_sell>可出售：</sos.item.can_sell>
-		<sos.item.min_difficulty>最低难度：</sos.item.min_difficulty>
-		<sos.item.required_faction>所需派系：</sos.item.required_faction>
+		<sos.item.cargo_box>货物箱：</sos.item.cargo_box>
+		<sos.item.category>类别：</sos.item.category>
+		<sos.item.causes_fire>导致火灾</sos.item.causes_fire>
+		<sos.item.description>描述：</sos.item.description>
+		<sos.item.drains_oxygen>消耗氧气</sos.item.drains_oxygen>
+		<sos.item.hazards>危险性：</sos.item.hazards>
+		<sos.item.header_info>ID: [id] | 价格: [price] mk</sos.item.header_info>
+		<sos.item.id>ID:</sos.item.id>
 		<sos.item.locations>位置：</sos.item.locations>
-		<sos.weapon.fire_rate>射速：</sos.weapon.fire_rate>
-		<sos.weapon.reload>装填时间：</sos.weapon.reload>
-		<sos.weapon.base_spread>基础散布：</sos.weapon.base_spread>
-		<sos.weapon.dmg_multiplier>伤害倍率：</sos.weapon.dmg_multiplier>
-		<sos.weapon.armor_penetration>穿甲力：</sos.weapon.armor_penetration>
-		<sos.weapon.range>范围：</sos.weapon.range>
-		<sos.weapon.power_use>能量消耗：</sos.weapon.power_use>
-		<sos.weapon.type>类型：</sos.weapon.type>
-		<sos.weapon.throwable>可投掷</sos.weapon.throwable>
+		<sos.item.max_stack>最大堆叠:</sos.item.max_stack>
+		<sos.item.min_difficulty>最低难度：</sos.item.min_difficulty>
+		<sos.item.price>价格:</sos.item.price>
+		<sos.item.required_faction>所需派系：</sos.item.required_faction>
+		<sos.item.tags>标签：</sos.item.tags>
+
+		<!-- Weapon -->
 		<sos.weapon.area_radius>爆炸半径：</sos.weapon.area_radius>
-		<sos.weapon.hull_damage>船体伤害：</sos.weapon.hull_damage>
+		<sos.weapon.armor_penetration>穿甲力：</sos.weapon.armor_penetration>
+		<sos.weapon.base_spread>基础散布：</sos.weapon.base_spread>
 		<sos.weapon.dismember_chance>肢解率：</sos.weapon.dismember_chance>
-		<sos.equip.max_durability>最大耐久：</sos.equip.max_durability>
-		<sos.equip.equips_in>装备槽位：</sos.equip.equips_in>
-		<sos.equip.pressure_protection>水压保护：</sos.equip.pressure_protection>
+		<sos.weapon.dmg_multiplier>伤害倍率：</sos.weapon.dmg_multiplier>
+		<sos.weapon.fire_rate>射速：</sos.weapon.fire_rate>
+		<sos.weapon.hull_damage>船体伤害：</sos.weapon.hull_damage>
+		<sos.weapon.power_use>能量消耗：</sos.weapon.power_use>
+		<sos.weapon.range>范围：</sos.weapon.range>
+		<sos.weapon.reload>装填时间：</sos.weapon.reload>
+		<sos.weapon.throwable>可投掷</sos.weapon.throwable>
+		<sos.weapon.type>类型：</sos.weapon.type>
+
+		<!-- Equipment -->
 		<sos.equip.armor_special>装备特性：</sos.equip.armor_special>
 		<sos.equip.deflect_projectiles>弹开弹丸</sos.equip.deflect_projectiles>
-		<sos.util.radio_range>无线电范围</sos.util.radio_range>
+		<sos.equip.equips_in>装备槽位：</sos.equip.equips_in>
+		<sos.equip.max_durability>最大耐久：</sos.equip.max_durability>
+		<sos.equip.pressure_protection>水压保护：</sos.equip.pressure_protection>
+
+		<!-- Medical -->
+		<sos.med.always_causes>总是施加：</sos.med.always_causes>
+		<sos.med.always_heals>总是治疗：</sos.med.always_heals>
+		<sos.med.failure_causes>失败时施加：</sos.med.failure_causes>
+		<sos.med.failure_heals>失败时治疗：</sos.med.failure_heals>
+		<sos.med.skill_req>所需医疗技能：</sos.med.skill_req>
+		<sos.med.success_causes>成功时施加：</sos.med.success_causes>
+		<sos.med.success_heals>成功时治疗：</sos.med.success_heals>
+		<sos.med.suitable>推荐使用：</sos.med.suitable>
+
+		<!-- Treatments & Afflictions -->
+		<sos.affliction.alternative>替代品 / 效果弱：</sos.affliction.alternative>
+		<sos.affliction.blockedby>治疗被以下物品阻挡：</sos.affliction.blockedby>
+		<sos.affliction.contraindicated>禁忌：</sos.affliction.contraindicated>
+		<sos.affliction.contraindicated_warn>警告：以下物品会加重病情！</sos.affliction.contraindicated_warn>
+		<sos.affliction.effective>有效：</sos.affliction.effective>
+		<sos.affliction.highlyeffective>非常有效：</sos.affliction.highlyeffective>
+
+		<!-- Simulator -->
+		<sos.aff.speedDropdown>x1 以上仍在开发中。\n在单人游戏中运行良好，但在多人游戏中完全不行。</sos.aff.speedDropdown>
+
+		<!-- Utility -->
 		<sos.util.light_range>光照范围</sos.util.light_range>
 		<sos.util.pump_flow>泵最大流量</sos.util.pump_flow>
+		<sos.util.radio_range>无线电范围</sos.util.radio_range>
 		<sos.util.sonar_range>声呐范围</sos.util.sonar_range>
-		<sos.container.capacity>容量：</sos.container.capacity>
-		<sos.container.slots>[amount] 个插槽</sos.container.slots>
+
+		<!-- Container -->
 		<sos.container.accepts>可容纳：</sos.container.accepts>
+		<sos.container.capacity>容量：</sos.container.capacity>
 		<sos.container.contained>包含于:</sos.container.contained>
-		<sos.config.migrating>[SOS] 正在从旧路径迁移设置...</sos.config.migrating>
-		<sos.gen.close>关闭 [Esc]</sos.gen.close>
+		<sos.container.slots>[amount] 个插槽</sos.container.slots>
+
+		<!-- Recipe -->
 		<sos.recipe.buyable>可在 [Title] 以 [Price] mk 购买</sos.recipe.buyable>
+		<sos.recipe.deconstructing>分解：</sos.recipe.deconstructing>
+		<sos.recipe.deconstructor>分解仪</sos.recipe.deconstructor>
+		<sos.recipe.hand>手持</sos.recipe.hand>
+		<sos.recipe.locked>需要配方来解锁</sos.recipe.locked>
+		<sos.recipe.random_outputs>随机给予 [amount] 个：</sos.recipe.random_outputs>
 		<sos.recipe.requires>需要</sos.recipe.requires>
-		<sos.shared.debugmode>[SOS] 调试模式已启用。</sos.shared.debugmode>
-		<sos.window.back>返回</sos.window.back>
-		<sos.window.clear_hud_tooltip>清除活跃的 HUD 追踪器</sos.window.clear_hud_tooltip>
-		<sos.window.forward>前进</sos.window.forward>
-		<sos.window.search_tooltip>按名称、ID、类别、标签、模组、类型等搜索&#xA;高级过滤器：&#xA;  @模组        (例：@Vanilla @Neuro)&#xA;  #类别        (例：#Medical #Weapon)&#xA;  $标签        (例：$smallitem $pill)&#xA;  &amp;槽位        (例：&amp;Head &amp;Inner)&#xA;  !ID          (例：!weldingtool)&#xA;示例：'Brain @NT #Medical $surgery'</sos.window.search_tooltip>
-		<sos.window.tag_tooltip>搜索带有标签的物品：[tag]</sos.window.tag_tooltip>
-		<sos.window.settings>设置 (WIP)</sos.window.settings>
+		<sos.recipe.unlocked>配方已解锁</sos.recipe.unlocked>
+
+		<!-- XML -->
 		<sos.xml.copy>复制 XML</sos.xml.copy>
 		<sos.xml.reset_zoom>重置缩放</sos.xml.reset_zoom>
+
+		<!-- List Headers -->
+		<sos.list.header.afflictionprefab>病症</sos.list.header.afflictionprefab>
+		<sos.list.header.afflictionprefabhusk> Husk 病症</sos.list.header.afflictionprefabhusk>
+		<sos.list.header.itemprefab>物品</sos.list.header.itemprefab>
+
+		<!-- Dummie Names -->
+		<sos.dummyname.rand.1>假人对象 #[id]</sos.dummyname.rand.1>
+		<sos.dummyname.rand.2>并非真人 #[id]</sos.dummyname.rand.2>
+		<sos.dummyname.rand.3>或许有感知 #[id]</sos.dummyname.rand.3>
+		<sos.dummyname.rand.4>别去想它 #[id]</sos.dummyname.rand.4>
+		<sos.dummyname.rand.5>别在意那些尖叫声 #[id]</sos.dummyname.rand.5>
+		<sos.dummyname.rand.6>大概还好 #[id]</sos.dummyname.rand.6>
+		<sos.dummyname.rand.7>有家室的人 #[id]</sos.dummyname.rand.7>
+		<sos.dummyname.rand.8>知道你做了什么</sos.dummyname.rand.8>
 	</Override>
 </infotexts>
