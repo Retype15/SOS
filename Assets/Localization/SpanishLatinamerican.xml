@@ -160,7 +160,7 @@
 		<sos.list.header.itemprefab>Objetos</sos.list.header.itemprefab>
 
 		<!-- Dummie Names -->
-		<sos.dummyname.rand.1>Muñeco de prueba #[id]</sos.dummyname.rand.1>
+		<sos.dummyname.rand.1>Sujeto de Prueba #[id]</sos.dummyname.rand.1>
 		<sos.dummyname.rand.2>No Es Una Persona Real #[id]</sos.dummyname.rand.2>
 		<sos.dummyname.rand.3>Probablemente Siente #[id]</sos.dummyname.rand.3>
 		<sos.dummyname.rand.4>No Pienses En Ello #[id]</sos.dummyname.rand.4>

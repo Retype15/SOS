@@ -441,10 +441,13 @@ namespace SOS
 
             builder.AddRow(TextSOS.Get("sos.item.base_price", "Base Price:").Value, $"{price} mk", Color.Yellow);
 
-            builder.AddRow(TextSOS.Get("sos.item.can_buy", "Can be Bought:").Value, canBuy ? TextSOS.Get("sos.gen.yes", "Yes").Value : TextSOS.Get("sos.gen.no", "No").Value,
+            string yes = TextSOS.Get("sos.gen.yes", "Yes").Value;
+            string no = TextSOS.Get("sos.gen.no", "No").Value;
+
+            builder.AddRow(TextSOS.Get("sos.item.can_buy", "Can be Bought:").Value, canBuy ? yes : no,
                 canBuy ? Color.LightGreen : Color.Salmon);
 
-            builder.AddRow(TextSOS.Get("sos.item.can_sell", "Can be Sold:").Value, canSell ? TextSOS.Get("sos.gen.yes", "Yes").Value : TextSOS.Get("sos.gen.no", "No").Value, canSell ? Color.LightGreen : Color.Salmon);
+            builder.AddRow(TextSOS.Get("sos.item.can_sell", "Can be Sold:").Value, canSell ? yes : no, canSell ? Color.LightGreen : Color.Salmon);
 
             if (minDifficulty > 0)
                 builder.AddRow(TextSOS.Get("sos.item.min_difficulty", "Min. Difficulty:").Value, minDifficulty.ToString(), Color.White);
@@ -1269,7 +1272,7 @@ namespace SOS
         {
             if (aff == null) return;
 
-            builder.StartSection(TextSOS.Get("sos.affliction.treatments", "TREATMENTS & MEDICATION").Value, Color.SpringGreen);
+            builder.StartSection(TextSOS.Get("sos.window.section_treatments", "TREATMENTS & MEDICATION").Value, Color.SpringGreen);
 
             if (blockers.Count > 0)
             {

@@ -540,6 +540,7 @@ namespace SOS
                 if (currentType != lastTypeInList)
                 {
                     lastTypeInList = currentType;
+                    var type_name = currentType.Name;
 
                     var separatorFrame = new GUIButton(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) }, style: "GUIFrameBottom")
                     {
@@ -547,15 +548,13 @@ namespace SOS
                         CanBeFocused = true,
                         OnClicked = (btn, _) =>
                         {
-                            if (searchBox != null) searchBox.Text = $"%{currentType.Name}";
+                            if (searchBox != null) searchBox.Text = $"%{type_name}";
                             return true;
                         }
                     };
 
-                    string label = currentType.Name;
-
                     _ = new GUITextBlock(new RectTransform(Vector2.One, separatorFrame.RectTransform),
-                        TextSOS.Get($"sos.list.header.{label.ToLower()}", label.SpacedPascalCase()),
+                        TextSOS.Get($"sos.list.header.{type_name.ToLower()}", type_name.SpacedPascalCase()),
                         font: GUIStyle.SmallFont, textColor: Color.MediumPurple, textAlignment: Alignment.Center)
                     {
                         Wrap = true

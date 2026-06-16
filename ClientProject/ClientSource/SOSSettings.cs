@@ -111,9 +111,7 @@ namespace SOS
 
                 doc.Save(NewConfigPath);
 
-#if DEBUG
-                LuaCsLogger.LogMessage(TextSOS.Get("sos.config.saved", "[SOS] Settings saved (v[version]).").Replace("[version]", CurrentSaveVersion.ToString()).Value);
-#endif
+                RLogger.LogDebug(TextSOS.Get("sos.config.saved", "[SOS] Settings saved (v[version]).").Replace("[version]", CurrentSaveVersion.ToString()).Value);
             }
             catch (Exception e)
             {
@@ -132,7 +130,7 @@ namespace SOS
                 if (File.Exists(OldConfigPath))
                 {
                     activePath = OldConfigPath;
-                    LuaCsLogger.LogMessage(TextSOS.Get("sos.config.migrating", "[SOS] Migrating settings from old path...").Value);
+                    RLogger.LogWarning(TextSOS.Get("sos.config.migrating", "[SOS] Migrating settings from old path...").Value);
                 }
                 else
                 {
@@ -161,13 +159,13 @@ namespace SOS
                     {
                         data.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
                         data.LastItemId = state.Attribute("lastItem")?.Value ?? "";
-                        
+
                         string historyStr = state.Attribute("tabHistory")?.Value ?? "";
                         if (!string.IsNullOrEmpty(historyStr))
                         {
-                            data.TabHistory = historyStr.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+                            data.TabHistory = [.. historyStr.Split(',', StringSplitOptions.RemoveEmptyEntries)];
                         }
-                        
+
                         data.RawXmlMode = ImGoodBoolParser(state.Attribute("rawXml")?.Value, false);
                         data.XmlFontScale = ImGoodFloatParser(state.Attribute("xmlScale")?.Value, 0.9f);
                     }
@@ -225,13 +223,11 @@ namespace SOS
                         }
                     }
                 }
-#if DEBUG
-                LuaCsLogger.LogMessage(TextSOS.Get("sos.config.loaded", "[SOS] Settings v[version] loaded successfully.").Replace("[version]", fileVersion.ToString()).Value);
-#endif
+                RLogger.LogDebug(TextSOS.Get("sos.config.loaded", "[SOS] Settings v[version] loaded successfully.").Replace("[version]", fileVersion.ToString()).Value);
             }
             catch (Exception e)
             {
-                LuaCsLogger.LogError(TextSOS.Get("sos.config.load_error", "[SOS] Error reading settings file: [error]").Replace("[error]", e.Message).Value);
+                RLogger.LogDebugError(TextSOS.Get("sos.config.load_error", "[SOS] Error reading settings file: [error]").Replace("[error]", e.Message).Value);
             }
 
             return data;
