@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for details.
 
 #pragma warning disable IDE0130
-#pragma warning disable IDE0079
 #pragma warning disable IDE0290
 
 using Barotrauma;
@@ -57,10 +56,7 @@ namespace SOS
         {
             get
             {
-                if (_instance == null)
-                {
-                    _instance = new SOSController();
-                }
+                _instance ??= new SOSController();
                 return _instance;
             }
         }

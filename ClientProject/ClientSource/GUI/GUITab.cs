@@ -7,11 +7,9 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
-using System.Collections.Immutable;
-using System.Reflection;
-using System.Xml.Linq;
 
-namespace SOS {
+namespace SOS
+{
 
     public interface ITab
     {
@@ -20,7 +18,7 @@ namespace SOS {
         void Initialize(GUIComponent contentContainer);
         void Activate(Prefab prefab, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
         void Deactivate();
-        
+
         GUIButton CreateTabButton(string text, RectTransform parent, bool isActive, Action onClick);
     }
 
