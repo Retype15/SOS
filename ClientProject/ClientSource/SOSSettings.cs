@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for details.
 
 #pragma warning disable IDE0130
-#pragma warning disable IDE0079
 #pragma warning disable IDE0290
 
 using System.Xml.Linq;

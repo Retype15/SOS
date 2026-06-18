@@ -2,7 +2,6 @@
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
-#pragma warning disable IDE0079
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 

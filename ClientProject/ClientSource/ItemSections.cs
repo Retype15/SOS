@@ -126,7 +126,7 @@ namespace SOS
             rowsCreated++;
         }
 
-        public void AddSelectorBadgeRow(string label, IEnumerable<string> ids, IEnumerable<string>? displayNames = null, char? fallbackFilterPrefix = null)
+        public void AddSelectorBadgeRow(string label, IEnumerable<string> ids, IEnumerable<string>? displayNames = null, char? fallbackFilterPrefix = null, Color? labelColor = null)
         {
             if (ids == null || !ids.Any() || currentLayout == null) return;
 
@@ -148,7 +148,7 @@ namespace SOS
             Color GetColor(object obj) => obj is Prefab p ? p.IconColor() : Color.LightSkyBlue;
 
             var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), style: null) { CanBeFocused = false };
-            _ = new GUITextBlock(new RectTransform(new Vector2(0.40f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+            _ = new GUITextBlock(new RectTransform(new Vector2(0.40f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: labelColor ?? Color.Gray) { CanBeFocused = false };
 
             RichString rich = data.JoinToRichString(", ", obj => GetText(obj, data.IndexOf(obj)), GetColor);
 
@@ -1282,14 +1282,14 @@ namespace SOS
                 builder.AddSelectorBadgeRow(TextSOS.Get("sos.affliction.blockedby", "Treatment Blocked By:").Value, blockers, displayNames, '!');
             }
 
-            void DrawRow(string label, List<ItemPrefab> items)
+            void DrawRow(string label, List<ItemPrefab> items, Color? labelColor = null)
             {
                 if (items.Count == 0) return;
 
                 var ids = items.Select(i => i.Identifier.Value);
                 var names = items.Select(i => $"{i.Name.Value} ({aff.TreatmentSuitabilities[i.Identifier]:0})");
 
-                builder.AddSelectorBadgeRow(label, ids, names, '!');
+                builder.AddSelectorBadgeRow(label, ids, names, '!', labelColor: labelColor);
             }
 
             DrawRow(TextSOS.Get("sos.affliction.highlyeffective", "Highly Effective:").Value, highEff);
@@ -1299,7 +1299,7 @@ namespace SOS
             if (harmful.Count > 0)
             {
                 builder.AddFullWidthText(TextSOS.Get("sos.affliction.contraindicated_warn", "WARNING: The following items worsen the condition!").Value.SetColor(Color.Salmon));
-                DrawRow(TextSOS.Get("sos.affliction.contraindicated", "Contraindicated:").Value, harmful);
+                DrawRow(TextSOS.Get("sos.affliction.contraindicated", "Contraindicated:").Value, harmful, labelColor: Color.Salmon);
             }
 
             builder.EndSection();
@@ -1309,7 +1309,7 @@ namespace SOS
     //MARK: descrption
     public class DescriptionSection : BaseStatSection
     {
-        private string text = "";
+        private string? text;
         public override bool HasData => !string.IsNullOrEmpty(text);
 
         public override void Analyze(Prefab prefab)
@@ -1318,12 +1318,13 @@ namespace SOS
             {
                 ItemPrefab item => item.Description?.Value ?? "",
                 AfflictionPrefab affliction => string.Join("\n\n", affliction.Descriptions.Select(d => $"({d.MinStrength.ToString().SetColor(Color.Orange)}-{d.MaxStrength.ToString().SetColor(Color.OrangeRed)}) {d.Target.ToString().SetColor(Color.BlueViolet)}: {d.Text}")),
-                _ => ""
+                _ => null
             };
         }
 
         public override void Draw(SectionBuilder builder)
         {
+            if (text == null) return;
             builder.StartSection(TextSOS.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
 
             builder.AddFullWidthText(RichString.Rich(text));

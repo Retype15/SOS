@@ -6,7 +6,6 @@
 //   requirements.
 
 #pragma warning disable IDE0130
-#pragma warning disable IDE0079
 #pragma warning disable IDE0290
 
 using Barotrauma;
