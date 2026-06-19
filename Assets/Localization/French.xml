@@ -1,172 +1,192 @@
 <?xml version="1.0" encoding="utf-8"?>
 <infotexts language="French" nowhitespace="false" translatedname="Français">
-	<Override>
-		<!-- Commands & Init -->
-		<sos.client.init>[SOS] Client : Initialisé. Appuyez sur 'J' pour ouvrir.</sos.client.init>
-		<sos.command.help>Ouvrir/Fermer SOS.</sos.command.help>
-		<sos.command.name>sos</sos.command.name>
-		<sos.shared.debugmode>[SOS] Le mode débogage est activé.</sos.shared.debugmode>
-		<sos.shared.loaded>[SOS] Chargé avec succès.</sos.shared.loaded>
-		<sos.shared.unloaded>[SOS] Mod déchargé.</sos.shared.unloaded>
+	<!-- Commands & Init -->
+	<sos.client.init>[SOS] Client : Initialisé. Appuyez sur 'J' pour ouvrir.</sos.client.init>
+	<sos.command.help>Ouvrir/Fermer SOS.</sos.command.help>
+	<sos.command.name>sos</sos.command.name>
+	<sos.shared.debugmode>[SOS] Le mode débogage est activé.</sos.shared.debugmode>
+	<sos.shared.loaded>[SOS] Chargé avec succès.</sos.shared.loaded>
+	<sos.shared.unloaded>[SOS] Mod déchargé.</sos.shared.unloaded>
 
-		<!-- Config -->
-		<sos.config.load_error>[SOS] Erreur lors de la lecture du fichier de paramètres : [error]</sos.config.load_error>
-		<sos.config.loaded>[SOS] Paramètres v[version] chargés avec succès.</sos.config.loaded>
-		<sos.config.migrating>[SOS] Migration des paramètres depuis l'ancien chemin...</sos.config.migrating>
-		<sos.config.save_error>[SOS] Échec de la sauvegarde des paramètres : [error]</sos.config.save_error>
-		<sos.config.saved>[SOS] Paramètres sauvegardés (v[version]).</sos.config.saved>
+	<!-- Config -->
+	<sos.config.load_error>[SOS] Erreur lors de la lecture du fichier de paramètres : [error]</sos.config.load_error>
+	<sos.config.loaded>[SOS] Paramètres v[version] chargés avec succès.</sos.config.loaded>
+	<sos.config.migrating>[SOS] Migration des paramètres depuis l'ancien chemin...</sos.config.migrating>
+	<sos.config.save_error>[SOS] Échec de la sauvegarde des paramètres : [error]</sos.config.save_error>
+	<sos.config.saved>[SOS] Paramètres sauvegardés (v[version]).</sos.config.saved>
 
-		<!-- General -->
-		<sos.gen.close>Fermer [Esc]</sos.gen.close>
-		<sos.gen.no>Non</sos.gen.no>
-		<sos.gen.unknown>???</sos.gen.unknown>
-		<sos.gen.yes>Oui</sos.gen.yes>
+	<!-- General -->
+	<sos.gen.close>Fermer [Esc]</sos.gen.close>
+	<sos.gen.no>Non</sos.gen.no>
+	<sos.gen.unknown>???</sos.gen.unknown>
+	<sos.gen.yes>Oui</sos.gen.yes>
 
-		<!-- Context Menu -->
-		<sos.context.add_favorite>Ajouter aux favoris</sos.context.add_favorite>
-		<sos.context.recipe_options>Options de recette</sos.context.recipe_options>
-		<sos.context.remove_favorite>Retirer des favoris</sos.context.remove_favorite>
-		<sos.context.track>Suivre sur le HUD</sos.context.track>
-		<sos.context.track_recipe>Ajouter au HUD</sos.context.track_recipe>
-		<sos.context.untrack>Retirer du HUD</sos.context.untrack>
-		<sos.context.view_recipes>Voir les recettes</sos.context.view_recipes>
+	<!-- Context Menu -->
+	<sos.context.add_favorite>Ajouter aux favoris</sos.context.add_favorite>
+	<sos.context.recipe_options>Options de recette</sos.context.recipe_options>
+	<sos.context.remove_favorite>Retirer des favoris</sos.context.remove_favorite>
+	<sos.context.track>Suivre sur le HUD</sos.context.track>
+	<sos.context.track_recipe>Ajouter au HUD</sos.context.track_recipe>
+	<sos.context.untrack>Retirer du HUD</sos.context.untrack>
+	<sos.context.view_recipes>Voir les recettes</sos.context.view_recipes>
 
-		<!-- Window -->
-		<sos.window.additional_info>INFO SUPPLÉMENTAIRE</sos.window.additional_info>
-		<sos.window.back>Retour</sos.window.back>
-		<sos.window.back.shortcuts>Raccourcis :&#xA;- Alt + Flèche Gauche&#xA;- Retour arrière&#xA;- Souris 4</sos.window.back.shortcuts>
-		<sos.window.clear_hud>Effacer le HUD</sos.window.clear_hud>
-		<sos.window.clear_hud_tooltip>Efface le traqueur HUD actif</sos.window.clear_hud_tooltip>
-		<sos.window.forward>Avancer</sos.window.forward>
-		<sos.window.forward.shortcuts>Raccourcis :&#xA;- Alt + Flèche Droite&#xA;- Maj + Retour arrière&#xA;- Souris 5</sos.window.forward.shortcuts>
-		<sos.window.loading>Chargement des dépendances...</sos.window.loading>
-		<sos.window.loading.complete>Chargement terminé !</sos.window.loading.complete>
-		<sos.window.obtain>OBTENTION</sos.window.obtain>
-		<sos.window.raw_xml>XML BRUT</sos.window.raw_xml>
-		<sos.window.search_placeholder>Chercher un objet...</sos.window.search_placeholder>
-		<sos.window.search_tooltip>Rechercher par Nom, ID, Catégorie, Tags, ModName, ItemType, Prefab, etc.&#xA;Filtres avancés :&#xA;  @Mod        (ex., @Vanilla @Neurotrauma)&#xA;  #Catégorie  (ex., #Medical #Weapon)&#xA;  $Tag        (ex., $smallitem $diving)&#xA;  &amp;Emplac.    (ex., &amp;Head &amp;Inner)&#xA;  !ID         (ex., !weldingtool)&#xA;  %Prefab         (ex., %Affliction %Item)&#xA;Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
-		<sos.window.section_container>COMME CONTENEUR</sos.window.section_container>
-		<sos.window.section_economy>ÉCONOMIE</sos.window.section_economy>
-		<sos.window.section_equipment>COMME ÉQUIPEMENT</sos.window.section_equipment>
-		<sos.window.section_general>GÉNÉRAL</sos.window.section_general>
-		<sos.window.section_medical>MÉDICAL</sos.window.section_medical>
-		<sos.window.section_spawning>TROUVÉ DANS</sos.window.section_spawning>
-		<sos.window.section_treatments>TRAITEMENTS ET MÉDICAMENTS</sos.window.section_treatments>
-		<sos.window.section_utility>UTILITÉ</sos.window.section_utility>
-		<sos.window.section_weapon>COMME ARME</sos.window.section_weapon>
-		<sos.window.settings>Paramètres (WIP)</sos.window.settings>
-		<sos.window.tag_tooltip>Rechercher des objets avec le tag : [tag]</sos.window.tag_tooltip>
-		<sos.window.title>SOS - Navigateur de Recettes</sos.window.title>
-		<sos.window.usage>UTILISATION</sos.window.usage>
+	<!-- Window -->
+	<sos.window.additional_info>INFO SUPPLÉMENTAIRE</sos.window.additional_info>
+	<sos.window.back>Retour</sos.window.back>
+	<sos.window.back.shortcuts>Raccourcis :&#xA;- Alt + Flèche Gauche&#xA;- Retour arrière&#xA;- Souris 4</sos.window.back.shortcuts>
+	<sos.window.clear_hud>Effacer le HUD</sos.window.clear_hud>
+	<sos.window.clear_hud_tooltip>Efface le traqueur HUD actif</sos.window.clear_hud_tooltip>
+	<sos.window.forward>Avancer</sos.window.forward>
+	<sos.window.forward.shortcuts>Raccourcis :&#xA;- Alt + Flèche Droite&#xA;- Maj + Retour arrière&#xA;- Souris 5</sos.window.forward.shortcuts>
+	<sos.window.loading>Chargement des dépendances...</sos.window.loading>
+	<sos.window.loading.complete>Chargement terminé !</sos.window.loading.complete>
+	<sos.window.obtain>OBTENTION</sos.window.obtain>
+	<sos.window.raw_xml>XML BRUT</sos.window.raw_xml>
+	<sos.window.raw_xml_tooltip>Bascule entre la vue métadonnées et la vue XML brute de l'objet.</sos.window.raw_xml_tooltip>
+	<sos.window.search_placeholder>Chercher un objet...</sos.window.search_placeholder>
+	<sos.window.search_tooltip>Rechercher par Nom, ID, Catégorie, Tags, ModName, ItemType, Prefab, etc.&#xA;Filtres avancés :&#xA;  @Mod        (ex., @Vanilla @Neurotrauma)&#xA;  #Catégorie  (ex., #Medical #Weapon)&#xA;  $Tag        (ex., $smallitem $diving)&#xA;  &amp;Emplac.    (ex., &amp;Head &amp;Inner)&#xA;  !ID         (ex., !weldingtool)&#xA;  %Prefab         (ex., %Affliction %Item)&#xA;Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
+	<sos.window.section_container>COMME CONTENEUR</sos.window.section_container>
+	<sos.window.section_economy>ÉCONOMIE</sos.window.section_economy>
+	<sos.window.section_equipment>COMME ÉQUIPEMENT</sos.window.section_equipment>
+	<sos.window.section_general>GÉNÉRAL</sos.window.section_general>
+	<sos.window.section_medical>MÉDICAL</sos.window.section_medical>
+	<sos.window.section_spawning>TROUVÉ DANS</sos.window.section_spawning>
+	<sos.window.section_treatments>TRAITEMENTS ET MÉDICAMENTS</sos.window.section_treatments>
+	<sos.window.section_utility>UTILITÉ</sos.window.section_utility>
+	<sos.window.section_weapon>COMME ARME</sos.window.section_weapon>
+	<sos.window.settings>Paramètres (WIP)</sos.window.settings>
+	<sos.window.tag_tooltip>Rechercher des objets avec le tag : [tag]</sos.window.tag_tooltip>
+	<sos.window.title>SOS - Navigateur de Recettes</sos.window.title>
+	<sos.window.usage>UTILISATION</sos.window.usage>
 
-		<!-- HUD -->
-		<sos.hud.tracking>SUIVI :</sos.hud.tracking>
+	<!-- HUD -->
+	<sos.hud.tracking>SUIVI :</sos.hud.tracking>
+	<sos.hud.tracking_tooltip>Suivi de fabrication actif. Affiche les ingrédients et quantités requis.</sos.hud.tracking_tooltip>
+	<sos.hud.tracked_item_tooltip>Objet actuellement suivi.</sos.hud.tracked_item_tooltip>
+	<sos.hud.ingredient_tooltip>Ingrédient requis. Affiche combien vous en avez dans votre inventaire.</sos.hud.ingredient_tooltip>
 
-		<!-- Tabs -->
-		<sos.tab.recipes>RECETTES</sos.tab.recipes>
-		<sos.tab.simulator>SIMULATEUR</sos.tab.simulator>
+	<!-- Tabs -->
+	<sos.tab.recipes>RECETTES</sos.tab.recipes>
+	<sos.tab.recipes_tooltip>Affiche les recettes de fabrication, les sources et l'utilisation de l'objet.</sos.tab.recipes_tooltip>
+	<sos.tab.simulator>SIMULATEUR</sos.tab.simulator>
+	<sos.tab.simulator_tooltip>Ouvre le simulateur clinique pour tester traitements et affections sur un patient factice.</sos.tab.simulator_tooltip>
 
-		<!-- Items -->
-		<sos.item.aliases>Alias :</sos.item.aliases>
-		<sos.item.base_price>Prix de base :</sos.item.base_price>
-		<sos.item.can_buy>Peut être acheté :</sos.item.can_buy>
-		<sos.item.can_sell>Peut être vendu :</sos.item.can_sell>
-		<sos.item.cargo_box>Caisse de Cargaison :</sos.item.cargo_box>
-		<sos.item.category>Catégorie :</sos.item.category>
-		<sos.item.causes_fire>Cause des incendies</sos.item.causes_fire>
-		<sos.item.description>DESCRIPTION :</sos.item.description>
-		<sos.item.drains_oxygen>Consomme l'oxygène</sos.item.drains_oxygen>
-		<sos.item.hazards>Dangers :</sos.item.hazards>
-		<sos.item.header_info>ID : [id] | Prix : [price] mk</sos.item.header_info>
-		<sos.item.id>ID :</sos.item.id>
-		<sos.item.locations>Emplacements :</sos.item.locations>
-		<sos.item.max_stack>Pile Max :</sos.item.max_stack>
-		<sos.item.min_difficulty>Difficulté Min :</sos.item.min_difficulty>
-		<sos.item.price>Prix :</sos.item.price>
-		<sos.item.required_faction>Faction Requise :</sos.item.required_faction>
-		<sos.item.tags>TAGS :</sos.item.tags>
+	<!-- Items -->
+	<sos.item.aliases>Alias :</sos.item.aliases>
+	<sos.item.base_price>Prix de base :</sos.item.base_price>
+	<sos.item.can_buy>Peut être acheté :</sos.item.can_buy>
+	<sos.item.can_sell>Peut être vendu :</sos.item.can_sell>
+	<sos.item.cargo_box>Caisse de Cargaison :</sos.item.cargo_box>
+	<sos.item.category>Catégorie :</sos.item.category>
+	<sos.item.causes_fire>Cause des incendies</sos.item.causes_fire>
+	<sos.item.description>DESCRIPTION :</sos.item.description>
+	<sos.item.drains_oxygen>Consomme l'oxygène</sos.item.drains_oxygen>
+	<sos.item.hazards>Dangers :</sos.item.hazards>
+	<sos.item.header_info>ID : [id] | Prix : [price] mk</sos.item.header_info>
+	<sos.item.id>ID :</sos.item.id>
+	<sos.item.locations>Emplacements :</sos.item.locations>
+	<sos.item.max_stack>Pile Max :</sos.item.max_stack>
+	<sos.item.min_difficulty>Difficulté Min :</sos.item.min_difficulty>
+	<sos.item.price>Prix :</sos.item.price>
+	<sos.item.required_faction>Faction Requise :</sos.item.required_faction>
+	<sos.item.tags>TAGS :</sos.item.tags>
 
-		<!-- Weapon -->
-		<sos.weapon.area_radius>Rayon de zone :</sos.weapon.area_radius>
-		<sos.weapon.armor_penetration>Pénétration d'armure :</sos.weapon.armor_penetration>
-		<sos.weapon.base_spread>Dispersion de base :</sos.weapon.base_spread>
-		<sos.weapon.dismember_chance>Prob. de démembrement :</sos.weapon.dismember_chance>
-		<sos.weapon.dmg_multiplier>Mult. de dégâts :</sos.weapon.dmg_multiplier>
-		<sos.weapon.fire_rate>Cadence de tir :</sos.weapon.fire_rate>
-		<sos.weapon.hull_damage>Dégâts de coque :</sos.weapon.hull_damage>
-		<sos.weapon.power_use>Consommation d'énergie :</sos.weapon.power_use>
-		<sos.weapon.range>Portée :</sos.weapon.range>
-		<sos.weapon.reload>Recharge :</sos.weapon.reload>
-		<sos.weapon.throwable>Lançable</sos.weapon.throwable>
-		<sos.weapon.type>Type :</sos.weapon.type>
+	<!-- Weapon -->
+	<sos.weapon.area_radius>Rayon de zone :</sos.weapon.area_radius>
+	<sos.weapon.armor_penetration>Pénétration d'armure :</sos.weapon.armor_penetration>
+	<sos.weapon.base_spread>Dispersion de base :</sos.weapon.base_spread>
+	<sos.weapon.dismember_chance>Prob. de démembrement :</sos.weapon.dismember_chance>
+	<sos.weapon.dmg_multiplier>Mult. de dégâts :</sos.weapon.dmg_multiplier>
+	<sos.weapon.fire_rate>Cadence de tir :</sos.weapon.fire_rate>
+	<sos.weapon.hull_damage>Dégâts de coque :</sos.weapon.hull_damage>
+	<sos.weapon.power_use>Consommation d'énergie :</sos.weapon.power_use>
+	<sos.weapon.range>Portée :</sos.weapon.range>
+	<sos.weapon.reload>Recharge :</sos.weapon.reload>
+	<sos.weapon.throwable>Lançable</sos.weapon.throwable>
+	<sos.weapon.type>Type :</sos.weapon.type>
 
-		<!-- Equipment -->
-		<sos.equip.armor_special>Spécial d'armure :</sos.equip.armor_special>
-		<sos.equip.deflect_projectiles>Dévie les projectiles</sos.equip.deflect_projectiles>
-		<sos.equip.equips_in>S'équipe dans :</sos.equip.equips_in>
-		<sos.equip.max_durability>Durabilité Max :</sos.equip.max_durability>
-		<sos.equip.pressure_protection>Protection de pression :</sos.equip.pressure_protection>
+	<!-- Equipment -->
+	<sos.equip.armor_special>Spécial d'armure :</sos.equip.armor_special>
+	<sos.equip.deflect_projectiles>Dévie les projectiles</sos.equip.deflect_projectiles>
+	<sos.equip.equips_in>S'équipe dans :</sos.equip.equips_in>
+	<sos.equip.max_durability>Durabilité Max :</sos.equip.max_durability>
+	<sos.equip.pressure_protection>Protection de pression :</sos.equip.pressure_protection>
 
-		<!-- Medical -->
-		<sos.med.always_causes>Applique Toujours :</sos.med.always_causes>
-		<sos.med.always_heals>Soigne Toujours :</sos.med.always_heals>
-		<sos.med.failure_causes>En Cas d'Échec Applique :</sos.med.failure_causes>
-		<sos.med.failure_heals>En Cas d'Échec Soigne :</sos.med.failure_heals>
-		<sos.med.skill_req>Compétence Médicale Req. :</sos.med.skill_req>
-		<sos.med.success_causes>En Cas de Succès Applique :</sos.med.success_causes>
-		<sos.med.success_heals>En Cas de Succès Soigne :</sos.med.success_heals>
-		<sos.med.suitable>Recommandé :</sos.med.suitable>
+	<!-- Medical -->
+	<sos.med.always_causes>Applique Toujours :</sos.med.always_causes>
+	<sos.med.always_heals>Soigne Toujours :</sos.med.always_heals>
+	<sos.med.failure_causes>En Cas d'Échec Applique :</sos.med.failure_causes>
+	<sos.med.failure_heals>En Cas d'Échec Soigne :</sos.med.failure_heals>
+	<sos.med.skill_req>Compétence Médicale Req. :</sos.med.skill_req>
+	<sos.med.success_causes>En Cas de Succès Applique :</sos.med.success_causes>
+	<sos.med.success_heals>En Cas de Succès Soigne :</sos.med.success_heals>
+	<sos.med.suitable>Recommandé :</sos.med.suitable>
 
-		<!-- Treatments & Afflictions -->
-		<sos.affliction.alternative>Alternative / Faible :</sos.affliction.alternative>
-		<sos.affliction.blockedby>Traitement Bloqué Par :</sos.affliction.blockedby>
-		<sos.affliction.contraindicated>Contre-indiqué :</sos.affliction.contraindicated>
-		<sos.affliction.contraindicated_warn>AVERTISSEMENT : Les objets suivants aggravent la condition !</sos.affliction.contraindicated_warn>
-		<sos.affliction.effective>Efficace :</sos.affliction.effective>
-		<sos.affliction.highlyeffective>Très Efficace :</sos.affliction.highlyeffective>
+	<!-- Treatments & Afflictions -->
+	<sos.affliction.alternative>Alternative / Faible :</sos.affliction.alternative>
+	<sos.affliction.blockedby>Traitement Bloqué Par :</sos.affliction.blockedby>
+	<sos.affliction.contraindicated>Contre-indiqué :</sos.affliction.contraindicated>
+	<sos.affliction.contraindicated_warn>AVERTISSEMENT : Les objets suivants aggravent la condition !</sos.affliction.contraindicated_warn>
+	<sos.affliction.effective>Efficace :</sos.affliction.effective>
+	<sos.affliction.highlyeffective>Très Efficace :</sos.affliction.highlyeffective>
 
-		<!-- Simulator -->
-		<sos.aff.speedDropdown>Plus de x1 sont encore en cours. \nFonctionne correctement en solo, mais pas du tout en multijoueur.</sos.aff.speedDropdown>
+	<!-- Simulator -->
+	<sos.aff.speedDropdown>Plus de x1 sont encore en cours. \nFonctionne correctement en solo, mais pas du tout en multijoueur.</sos.aff.speedDropdown>
+	<sos.sim.play_tooltip>Démarre la simulation clinique.</sos.sim.play_tooltip>
+	<sos.sim.pause_tooltip>Met en pause la simulation clinique.</sos.sim.pause_tooltip>
+	<sos.sim.reset_tooltip>Réinitialise la santé du patient à son état initial.</sos.sim.reset_tooltip>
+	<sos.sim.drop_tooltip>Abandonne le patient actuel.</sos.sim.drop_tooltip>
+	<sos.sim.set_max_tooltip>Définit la force de cette affection au maximum.</sos.sim.set_max_tooltip>
+	<sos.sim.remove_tooltip>Retire cette affection du patient.</sos.sim.remove_tooltip>
+	<sos.sim.apply_item_tooltip>Simule l'utilisation de cet objet sur le patient pour voir ses effets.</sos.sim.apply_item_tooltip>
+	<sos.misc.close_button>Ferme ce menu.</sos.misc.close_button>
 
-		<!-- Utility -->
-		<sos.util.light_range>Portée de la lumière</sos.util.light_range>
-		<sos.util.pump_flow>Débit max de la pompe</sos.util.pump_flow>
-		<sos.util.radio_range>Portée radio</sos.util.radio_range>
-		<sos.util.sonar_range>Portée du sonar</sos.util.sonar_range>
+	<!-- Utility -->
+	<sos.util.light_range>Portée de la lumière</sos.util.light_range>
+	<sos.util.pump_flow>Débit max de la pompe</sos.util.pump_flow>
+	<sos.util.radio_range>Portée radio</sos.util.radio_range>
+	<sos.util.sonar_range>Portée du sonar</sos.util.sonar_range>
 
-		<!-- Container -->
-		<sos.container.accepts>Accepte :</sos.container.accepts>
-		<sos.container.capacity>Capacité :</sos.container.capacity>
-		<sos.container.contained>Contenu Par :</sos.container.contained>
-		<sos.container.slots>[amount] Emplacements</sos.container.slots>
+	<!-- Container -->
+	<sos.container.accepts>Accepte :</sos.container.accepts>
+	<sos.container.capacity>Capacité :</sos.container.capacity>
+	<sos.container.contained>Contenu Par :</sos.container.contained>
+	<sos.container.slots>[amount] Emplacements</sos.container.slots>
 
-		<!-- Recipe -->
-		<sos.recipe.buyable>Achetable à [Title] pour [Price] mk</sos.recipe.buyable>
-		<sos.recipe.deconstructing>DÉCONSTRUCTION :</sos.recipe.deconstructing>
-		<sos.recipe.deconstructor>DÉCONSTRUCTEUR</sos.recipe.deconstructor>
-		<sos.recipe.hand>Main</sos.recipe.hand>
-		<sos.recipe.locked>Recette requise pour débloquer</sos.recipe.locked>
-		<sos.recipe.random_outputs>Donne [amount] au hasard :</sos.recipe.random_outputs>
-		<sos.recipe.requires>Requiert</sos.recipe.requires>
-		<sos.recipe.unlocked>Recette Débloquée</sos.recipe.unlocked>
+	<!-- Recipe -->
+	<sos.recipe.buyable>Achetable à [Title] pour [Price] mk</sos.recipe.buyable>
+	<sos.recipe.deconstructing>DÉCONSTRUCTION :</sos.recipe.deconstructing>
+	<sos.recipe.deconstructor>DÉCONSTRUCTEUR</sos.recipe.deconstructor>
+	<sos.recipe.hand>Main</sos.recipe.hand>
+	<sos.recipe.locked>Recette requise pour débloquer</sos.recipe.locked>
+	<sos.recipe.random_outputs>Donne [amount] au hasard :</sos.recipe.random_outputs>
+	<sos.recipe.requires>Requiert</sos.recipe.requires>
+	<sos.recipe.unlocked>Recette Débloquée</sos.recipe.unlocked>
 
-		<!-- XML -->
-		<sos.xml.copy>Copier XML</sos.xml.copy>
-		<sos.xml.reset_zoom>Réinitialiser le zoom</sos.xml.reset_zoom>
+	<!-- XML -->
+	<sos.xml.copy>Copier XML</sos.xml.copy>
+	<sos.xml.reset_zoom>Réinitialiser le zoom</sos.xml.reset_zoom>
 
-		<!-- List Headers -->
-		<sos.list.header.afflictionprefab>Afflictions</sos.list.header.afflictionprefab>
-		<sos.list.header.afflictionprefabhusk>Afflictions Husk</sos.list.header.afflictionprefabhusk>
-		<sos.list.header.itemprefab>Objets</sos.list.header.itemprefab>
+	<!-- List Headers -->
+	<sos.list.header.afflictionprefab>Afflictions</sos.list.header.afflictionprefab>
+	<sos.list.header.afflictionprefabhusk>Afflictions Husk</sos.list.header.afflictionprefabhusk>
+	<sos.list.header.itemprefab>Objets</sos.list.header.itemprefab>
 
-		<!-- Dummie Names -->
-		<sos.dummyname.rand.1>Sujet Factice #[id]</sos.dummyname.rand.1>
-		<sos.dummyname.rand.2>Pas Une Vraie Personne #[id]</sos.dummyname.rand.2>
-		<sos.dummyname.rand.3>Probablement Doué de Sensibilité #[id]</sos.dummyname.rand.3>
-		<sos.dummyname.rand.4>N'y Pensez Pas #[id]</sos.dummyname.rand.4>
-		<sos.dummyname.rand.5>Ne Faites Pas Attention Aux Cris #[id]</sos.dummyname.rand.5>
-		<sos.dummyname.rand.6>Probablement En Vie #[id]</sos.dummyname.rand.6>
-		<sos.dummyname.rand.7>A Une Famille #[id]</sos.dummyname.rand.7>
-		<sos.dummyname.rand.8>Sait Ce Que Vous Avez Fait</sos.dummyname.rand.8>
-	</Override>
+	<!-- List -->
+	<sos.list.separator_tooltip>Cliquez pour filtrer la liste par ce type d'objet.</sos.list.separator_tooltip>
+
+	<!-- Layout -->
+	<sos.layout.save_tooltip>Enregistre la disposition actuelle des panneaux comme nouveau préréglage.</sos.layout.save_tooltip>
+	<sos.layout.apply_tooltip>Applique ce préréglage de disposition des panneaux.</sos.layout.apply_tooltip>
+	<sos.layout.delete_tooltip>Supprime ce préréglage de disposition.</sos.layout.delete_tooltip>
+
+	<!-- Dummie Names -->
+	<sos.dummyname.rand.1>Sujet Factice #[id]</sos.dummyname.rand.1>
+	<sos.dummyname.rand.2>Pas Une Vraie Personne #[id]</sos.dummyname.rand.2>
+	<sos.dummyname.rand.3>Probablement Doué de Sensibilité #[id]</sos.dummyname.rand.3>
+	<sos.dummyname.rand.4>N'y Pensez Pas #[id]</sos.dummyname.rand.4>
+	<sos.dummyname.rand.5>Ne Faites Pas Attention Aux Cris #[id]</sos.dummyname.rand.5>
+	<sos.dummyname.rand.6>Probablement En Vie #[id]</sos.dummyname.rand.6>
+	<sos.dummyname.rand.7>A Une Famille #[id]</sos.dummyname.rand.7>
+	<sos.dummyname.rand.8>Sait Ce Que Vous Avez Fait</sos.dummyname.rand.8>
 </infotexts>

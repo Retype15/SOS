@@ -84,11 +84,17 @@ namespace SOS
 
             var titleBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0.2f), contentLayout.RectTransform),
                 TextSOS.Get("sos.hud.tracking", "TRACKING:").Value, font: GUIStyle.SubHeadingFont, textColor: Color.Gold)
-            { CanBeFocused = false };
+            {
+                CanBeFocused = false,
+                ToolTip = TextSOS.Get("sos.hud.tracking_tooltip", "Active crafting tracker. Shows required ingredients and amounts.")
+            };
 
             var itemBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0.15f), contentLayout.RectTransform),
                 TrackedItem?.Name.Value ?? "", font: GUIStyle.SmallFont, textColor: Color.Cyan)
-            { CanBeFocused = false };
+            {
+                CanBeFocused = false,
+                ToolTip = TextSOS.Get("sos.hud.tracked_item_tooltip", "Currently tracked item.")
+            };
 
             ingredientTexts.Clear();
 
@@ -96,7 +102,10 @@ namespace SOS
             {
                 var text = new GUITextBlock(new RectTransform(new Vector2(1f, 0.12f), contentLayout.RectTransform),
                     "", font: GUIStyle.SmallFont)
-                { CanBeFocused = false };
+                {
+                    CanBeFocused = false,
+                    ToolTip = TextSOS.Get("sos.hud.ingredient_tooltip", "Required ingredient. Shows how many you have in your inventory.")
+                };
                 ingredientTexts.Add(text);
             }
 

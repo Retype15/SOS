@@ -19,12 +19,13 @@
 ## Key Features
 
 - **Comprehensive Browser:** View Fabrication, Deconstruction, and "Used In" recipes for any object in the game.
-- **NEW! Now Includes Afflictions!** View information of ALL afflictions (Status Effects), including those from mods.
+- **Affliction Browser:** Browse detailed information of ALL afflictions (Status Effects), including modded ones. View their effects, treatments, contraindications, and more — just like items.
+- **Clinical Simulator:** Open the SIMULATOR tab to test afflictions and treatments on a dummy patient. Add or remove afflictions, adjust their strength, and apply items to preview real-time effects — without consuming resources or risking your crew.
 - **HUD Tracker:** Track ingredients in real-time with an on-screen checklist that updates as you gather materials.
 - **Dynamic Meta-Info:** View base prices, object tags, stack sizes, and detailed descriptions in a structured Wiki-style panel.
-- **Responsive UI:** High-precision resizable interface that ensures the UI is always displayed in any position, scale or aspect ratio do you want, as a real window.
-- **Adaptive Layout Modes:** Smart "Compact" view that intelligently wraps icon grids and scales content to fit any window dimension.
 - **Detailed Recipe Analytics:** Refined "Obtain" and "Usage" sections with context-aware filtering and smart ingredient wrapping.
+- **Smart List Filters:** Click on the separator bars (Items, Afflictions, etc.) in the results list to instantly filter by that object type.
+- **Responsive UI:** High-precision resizable interface that ensures the UI is always displayed in any position, scale or aspect ratio do you want, as a real window.
 - **Favorites & History:** Web-browser style navigation (Back/Forward) and a pinning system for quick access to frequent items.
 - **Multi-language Support:** Native support for English, Spanish, Russian, French, and Chinese. (Last 3 are translated by AI, if anyone wants to correct them, are free to make a pull request and help us.)
 
@@ -66,9 +67,9 @@ Advanced Filters:
 | `$Tag`      | Tag             | `$smallitem $pill`  |
 | `&Slot`     | Slot            | `&Head &Inner`      |
 | `!ID`       | Item ID         | `!weldingtool`      |
-| `%Type`     | Class Type Name | `%item %affliction` |
+| `%Type`     | Class Type Name | `%Item %Affliction %TalentPrefab` |
 
-**Example:** `Brain @NT #Medical $surgery`
+**Example:** `Brain @NT #Medical $surgery %Item`
 
 ## Project Status: Beta
 
@@ -82,15 +83,15 @@ Advanced Filters:
 
 **Q:** *Can it be used on vanilla servers?*
 
-- **A:** Absolutely. The most it will require from the server is new items, nothing more.
+- **A:** Absolutely, this is a clien-only mod, so only matters for you, doesn't affect any partner or server what you play.
 
-**Q:** *Is this a client-only mod, or does it need to be included on the server?*
+**Q:** *Are compatible with all mods?*
 
-- **A:** Currently, it's entirely client-only. We plan for it to always be client-only, so you can use it even on a completely vanilla server without mods. If the server doesn't have it, then the full system unlocked in the beta version will be used.
+- **A:** At the moment, yes. Should be compatible with ALL content mods. If encounters any error or bug with other mods, please report them in Github or Steam page.
 
 **Q:** *Is it really compatible with ALL in-game items?*
 
-- **A:** *Yes! Absolutely everything, including submarine parts that are impossible to obtain. I've decided not to exclude these items for now for descriptions and another useful metadata. If they bother you, you can create an issue in the Git project, leave a comment on itch.io, or contact me directly, and I'll prioritize it.*
+- **A:** *Yes! Everything, including submarine parts and items from mods. I've decided not to exclude these items for now for descriptions and another useful metadata. If they bother you, you can create an issue in the Git project, leave a comment on steam page, or contact me directly, and I'll prioritize it.*
 
 ## License & Copyright
 

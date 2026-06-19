@@ -27,7 +27,7 @@
 
               var englishDoc = XDocument.Load(englishPath);
               var englishKeys = new HashSet<string>(
-                  englishDoc.Descendants("Override").Elements().Select(e => e.Name.LocalName)
+                  englishDoc.Elements().Select(e => e.Name.LocalName)
               );
 
               var reportRoot = new XElement("LocalizationReport");
@@ -39,7 +39,7 @@
 
                   var otherDoc = XDocument.Load(file);
                   var otherKeys = new HashSet<string>(
-                      otherDoc.Descendants("Override").Elements().Select(e => e.Name.LocalName)
+                      otherDoc.Elements().Select(e => e.Name.LocalName)
                   );
 
                   string langName = Path.GetFileNameWithoutExtension(file);

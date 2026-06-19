@@ -398,7 +398,6 @@ namespace SOS
                         ic.ApplyStatusEffects(ActionType.OnUse, 1.0f, Patient, target, useTarget: Patient, user: user);
                     }
                 }
-                mockItem.Remove();
 
                 SoundPlayer.PlayUISound(GUISoundType.PickItem);
             }

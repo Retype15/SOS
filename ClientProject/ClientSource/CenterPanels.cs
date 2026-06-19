@@ -13,6 +13,7 @@ namespace SOS
 
     public abstract class CenterPanelTab
     {
+        public virtual string TabTooltip => "";
 
         public virtual GUIButton CreateTabButton(string text, RectTransform parent, bool isActive, Action onClick)
         {
@@ -22,6 +23,7 @@ namespace SOS
             var tabBtn = new GUIButton(new RectTransform(new Point(width, 32), parent), text, style: "MainMenuNotificationButton") //MainMenuNotificationButton,
             {
                 Selected = isActive,
+                ToolTip = TextSOS.Get(TabTooltip, ""),
                 OnClicked = (_, _) => { onClick(); return true; },
             };
             //tabBtn.ExBlink(3f, 0.5f, 1f, 0.5f).WaitFinish();
@@ -34,6 +36,7 @@ namespace SOS
     public class ItemCenterPanelTab : CenterPanelTab, ITab
     {
         public string TabName => TextSOS.Get("sos.tab.recipes", "RECIPES").Value;
+        public override string TabTooltip => "sos.tab.recipes_tooltip";
         private GUIFrame? _container;
 
         public bool CanHandle(Prefab prefab) => prefab is ItemPrefab;
@@ -136,6 +139,7 @@ namespace SOS
     public class AfflictionCenterPanelTab : CenterPanelTab, ITab
     {
         public string TabName => TextSOS.Get("sos.tab.simulator", "SIMULATOR").Value;
+        public override string TabTooltip => "sos.tab.simulator_tooltip";
         private GUIFrame? _container;
         private static GUIComponent? activeAfflictionMenu;
         private static Prefab? CurrentPrefab;
@@ -233,6 +237,9 @@ namespace SOS
 
             var playBtn = new GUIButton(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), "START", style: "DeviceButton")
             {
+                OnDrawToolTip = component => component.ToolTip = TextSOS.Get(
+                    ClinicalSimulatorManager.IsPlaying ? "sos.sim.pause_tooltip" : "sos.sim.play_tooltip",
+                    ClinicalSimulatorManager.IsPlaying ? "Pauses the clinical simulation." : "Starts the clinical simulation."),
                 OnClicked = (_, _) => { ClinicalSimulatorManager.HasPlaying(!ClinicalSimulatorManager.IsPlaying); return true; }
             };
             _ = new GUICustomComponent(new RectTransform(Vector2.Zero, playBtn.RectTransform), onUpdate: (dt, c) =>
@@ -255,6 +262,9 @@ namespace SOS
 
             var actionBtn = new GUIButton(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), "DROP", style: "DeviceButton")
             {
+                OnDrawToolTip = component => component.ToolTip = TextSOS.Get(
+                    ClinicalSimulatorManager.HasStarted ? "sos.sim.drop_tooltip" : "sos.sim.reset_tooltip",
+                    ClinicalSimulatorManager.HasStarted ? "Discards the current patient." : "Resets the patient's health to its initial state."),
                 OnClicked = (_, _) =>
                 {
                     if (ClinicalSimulatorManager.HasStarted)
@@ -396,6 +406,7 @@ namespace SOS
             {
                 _ = new GUIButton(new RectTransform(new Vector2(1f, 0.18f), menuLayout.RectTransform), "SET MAX (100%)", style: "GUIButtonSmall")
                 {
+                    ToolTip = TextSOS.Get("sos.sim.set_max_tooltip", "Sets this affliction's strength to maximum."),
                     OnClicked = (_, _) => { ClinicalSimulatorManager.SetAfflictionStrength(affPrefab, affPrefab.MaxStrength, targetLimb); activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu); activeAfflictionMenu = null; return true; }
                 };
 
@@ -419,6 +430,7 @@ namespace SOS
 
                 _ = new GUIButton(new RectTransform(new Vector2(1f, 0.18f), menuLayout.RectTransform), "REMOVE", style: "GUIButtonSmall")
                 {
+                    ToolTip = TextSOS.Get("sos.sim.remove_tooltip", "Removes this affliction from the patient."),
                     OnClicked = (_, _) => { ClinicalSimulatorManager.RemoveAffliction(affPrefab, targetLimb); activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu); activeAfflictionMenu = null; return true; }
                 };
             }
@@ -428,6 +440,7 @@ namespace SOS
 
                 _ = new GUIButton(new RectTransform(new Vector2(1f, 0.25f), menuLayout.RectTransform), "USE / APPLY", style: "GUIButton")
                 {
+                    ToolTip = TextSOS.Get("sos.sim.apply_item_tooltip", "Simulates using this item on the patient to see its effects."),
                     OnClicked = (_, _) =>
                     {
                         ClinicalSimulatorManager.ApplyMockItem(itemPrefab, targetLimb);
@@ -440,6 +453,7 @@ namespace SOS
 
             _ = new GUIButton(new RectTransform(new Vector2(1f, 0.18f), menuLayout.RectTransform), "CLOSE", style: "GUIButtonSmall")
             {
+                ToolTip = TextSOS.Get("sos.misc.close_button", "Closes this menu."),
                 OnClicked = (_, _) => { activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu); activeAfflictionMenu = null; return true; }
             };
         }
