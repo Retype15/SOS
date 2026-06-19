@@ -44,7 +44,7 @@
 		<sos.window.obtain>获取途径</sos.window.obtain>
 		<sos.window.raw_xml>原始 XML</sos.window.raw_xml>
 		<sos.window.search_placeholder>搜索物品...</sos.window.search_placeholder>
-		<sos.window.search_tooltip>按名称、ID、类别、标签、模组、类型等搜索&#xA;高级过滤器：&#xA;  @模组        (例：@Vanilla @Neuro)&#xA;  #类别        (例：#Medical #Weapon)&#xA;  $标签        (例：$smallitem $pill)&#xA;  &amp;槽位        (例：&amp;Head &amp;Inner)&#xA;  !ID          (例：!weldingtool)&#xA;示例：'Brain @NT #Medical $surgery'</sos.window.search_tooltip>
+		<sos.window.search_tooltip>按名称、ID、类别、标签、ModName、ItemType、Prefab等搜索&#xA;高级过滤器：&#xA;  @模组        (例：@Vanilla @Neurotrauma)&#xA;  #类别        (例：#Medical #Weapon)&#xA;  $标签        (例：$smallitem $diving)&#xA;  &amp;槽位        (例：&amp;Head &amp;Inner)&#xA;  !ID          (例：!weldingtool)&#xA;  %Prefab         (例：%Affliction %Item)&#xA;示例：'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 		<sos.window.section_container>作为容器</sos.window.section_container>
 		<sos.window.section_economy>经济</sos.window.section_economy>
 		<sos.window.section_equipment>作为装备</sos.window.section_equipment>

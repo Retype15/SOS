@@ -405,3 +405,4 @@ FodyWeavers.xsd
 # Extra unnecesary files
 SOS*.txt
 TODOs.md
+missingtranslation.xml
