@@ -372,8 +372,10 @@ namespace SOS
                         targetLimb: target,
                         worldPosition: target.WorldPosition,
                         deltaTime: 1.0f,
-                        playSound: true
+                        playSound: false
                     );
+
+                    //SoundPlayer.PlaySound("LimbSlash", 100f);
                 }
                 else if (projectile?.Attack != null)
                 {
@@ -382,8 +384,10 @@ namespace SOS
                         targetLimb: target,
                         worldPosition: target.WorldPosition,
                         deltaTime: 1.0f,
-                        playSound: true
+                        playSound: false
                     );
+
+                    //SoundPlayer.PlaySound("LimbSlash", 100f);
                 }
                 else
                 {
@@ -396,10 +400,10 @@ namespace SOS
 
                         ic.ApplyStatusEffects(conditionalType, 1.0f, Patient, target, useTarget: Patient, user: user);
                         ic.ApplyStatusEffects(ActionType.OnUse, 1.0f, Patient, target, useTarget: Patient, user: user);
+
+                        SoundPlayer.PlayUISound(GUISoundType.PickItem);
                     }
                 }
-
-                SoundPlayer.PlayUISound(GUISoundType.PickItem);
             }
             catch (Exception e)
             {
