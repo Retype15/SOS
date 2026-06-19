@@ -14,6 +14,7 @@ namespace SOS
     public interface ITab
     {
         string TabName { get; }
+        string TabTooltip { get; }
         bool CanHandle(Prefab prefab);
         void Initialize(GUIComponent contentContainer);
         void Activate(Prefab prefab, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary);

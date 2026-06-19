@@ -293,7 +293,8 @@ namespace SOS
             rightHeaderArea.RectTransform.MinSize = new Point(0, 32);
             rawXmlTickBox = new GUITickBox(new RectTransform(new Vector2(1f, 0.45f), rightHeaderArea.RectTransform, Anchor.CenterLeft), TextSOS.Get("sos.window.raw_xml", "RAW XML"), font: GUIStyle.SmallFont)
             {
-                Selected = controller.RawXmlMode
+                Selected = controller.RawXmlMode,
+                ToolTip = TextSOS.Get("sos.window.raw_xml_tooltip", "Toggles between metadata view and raw XML view of the item.")
             };
 
             var rightContentArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.955f), rightLayout.RectTransform), style: null);
@@ -545,6 +546,7 @@ namespace SOS
                     {
                         Color = Color.White * 0.1f,
                         CanBeFocused = true,
+                        ToolTip = TextSOS.Get("sos.list.separator_tooltip", "Click to filter the list by this type of object."),
                         OnClicked = (btn, _) =>
                         {
                             if (searchBox != null) searchBox.Text = $"%{type_name}";
@@ -915,6 +917,7 @@ namespace SOS
 
             _ = new GUIButton(new RectTransform(new Vector2(0.9f, 0.1f), layoutMenuFrame.RectTransform, Anchor.BottomCenter) { AbsoluteOffset = new Point(0, 10) }, "+ SAVE ACTUAL", style: "DeviceButton")
             {
+                ToolTip = TextSOS.Get("sos.layout.save_tooltip", "Saves the current panel layout as a new preset."),
                 OnClicked = (_, _) =>
                 {
                     string newName = $"Layout {controller.CustomLayouts.Count + 1}";
@@ -953,6 +956,7 @@ namespace SOS
 
             var btn = new GUIButton(new RectTransform(new Vector2(canDelete ? 0.82f : 1f, 1f), row.RectTransform), name, style: "ListBoxElement")
             {
+                ToolTip = TextSOS.Get("sos.layout.apply_tooltip", "Applies this panel layout preset."),
                 OnClicked = (_, _) => { onApply(); ToggleLayoutMenu(anchor); return true; }
             };
 
@@ -960,6 +964,7 @@ namespace SOS
             {
                 _ = new GUIButton(new RectTransform(new Vector2(0.18f, 1f), row.RectTransform), "", style: "GUICancelButton", color: Color.IndianRed) // OLD: CategoryButton.All
                 {
+                    ToolTip = TextSOS.Get("sos.layout.delete_tooltip", "Deletes this layout preset."),
                     OnClicked = (_, _) =>
                     {
                         controller.CustomLayouts.Remove(name);

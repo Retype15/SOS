@@ -1,172 +1,192 @@
 <?xml version="1.0" encoding="utf-8"?>
 <infotexts language="Russian" nowhitespace="false" translatedname="Русский">
-	<Override>
-		<!-- Commands & Init -->
-		<sos.client.init>[SOS] Клиент: Инициализирован. Нажмите 'J', чтобы открыть.</sos.client.init>
-		<sos.command.help>Открыть/Закрыть SOS.</sos.command.help>
-		<sos.command.name>sos</sos.command.name>
-		<sos.shared.debugmode>[SOS] Режим отладки включен.</sos.shared.debugmode>
-		<sos.shared.loaded>[SOS] Успешно загружено.</sos.shared.loaded>
-		<sos.shared.unloaded>[SOS] Мод выгружен.</sos.shared.unloaded>
+	<!-- Commands & Init -->
+	<sos.client.init>[SOS] Клиент: Инициализирован. Нажмите 'J', чтобы открыть.</sos.client.init>
+	<sos.command.help>Открыть/Закрыть SOS.</sos.command.help>
+	<sos.command.name>sos</sos.command.name>
+	<sos.shared.debugmode>[SOS] Режим отладки включен.</sos.shared.debugmode>
+	<sos.shared.loaded>[SOS] Успешно загружено.</sos.shared.loaded>
+	<sos.shared.unloaded>[SOS] Мод выгружен.</sos.shared.unloaded>
 
-		<!-- Config -->
-		<sos.config.load_error>[SOS] Ошибка чтения файла настроек: [error]</sos.config.load_error>
-		<sos.config.loaded>[SOS] Настройки v[version] успешно загружены.</sos.config.loaded>
-		<sos.config.migrating>[SOS] Перенос настроек из старого пути...</sos.config.migrating>
-		<sos.config.save_error>[SOS] Не удалось сохранить настройки: [error]</sos.config.save_error>
-		<sos.config.saved>[SOS] Настройки сохранены (v[version]).</sos.config.saved>
+	<!-- Config -->
+	<sos.config.load_error>[SOS] Ошибка чтения файла настроек: [error]</sos.config.load_error>
+	<sos.config.loaded>[SOS] Настройки v[version] успешно загружены.</sos.config.loaded>
+	<sos.config.migrating>[SOS] Перенос настроек из старого пути...</sos.config.migrating>
+	<sos.config.save_error>[SOS] Не удалось сохранить настройки: [error]</sos.config.save_error>
+	<sos.config.saved>[SOS] Настройки сохранены (v[version]).</sos.config.saved>
 
-		<!-- General -->
-		<sos.gen.close>Закрыть [Esc]</sos.gen.close>
-		<sos.gen.no>Нет</sos.gen.no>
-		<sos.gen.unknown>???</sos.gen.unknown>
-		<sos.gen.yes>Да</sos.gen.yes>
+	<!-- General -->
+	<sos.gen.close>Закрыть [Esc]</sos.gen.close>
+	<sos.gen.no>Нет</sos.gen.no>
+	<sos.gen.unknown>???</sos.gen.unknown>
+	<sos.gen.yes>Да</sos.gen.yes>
 
-		<!-- Context Menu -->
-		<sos.context.add_favorite>Добавить в избранное</sos.context.add_favorite>
-		<sos.context.recipe_options>Параметры рецепта</sos.context.recipe_options>
-		<sos.context.remove_favorite>Удалить из избранного</sos.context.remove_favorite>
-		<sos.context.track>Отслеживать в HUD</sos.context.track>
-		<sos.context.track_recipe>Добавить в HUD</sos.context.track_recipe>
-		<sos.context.untrack>Убрать из HUD</sos.context.untrack>
-		<sos.context.view_recipes>Посмотреть рецепты</sos.context.view_recipes>
+	<!-- Context Menu -->
+	<sos.context.add_favorite>Добавить в избранное</sos.context.add_favorite>
+	<sos.context.recipe_options>Параметры рецепта</sos.context.recipe_options>
+	<sos.context.remove_favorite>Удалить из избранного</sos.context.remove_favorite>
+	<sos.context.track>Отслеживать в HUD</sos.context.track>
+	<sos.context.track_recipe>Добавить в HUD</sos.context.track_recipe>
+	<sos.context.untrack>Убрать из HUD</sos.context.untrack>
+	<sos.context.view_recipes>Посмотреть рецепты</sos.context.view_recipes>
 
-		<!-- Window -->
-		<sos.window.additional_info>ДОП. ИНФОРМАЦИЯ</sos.window.additional_info>
-		<sos.window.back>Назад</sos.window.back>
-		<sos.window.back.shortcuts>Горячие клавиши:&#xA;- Alt + Стрелка влево&#xA;- Backspace&#xA;- Мышь 4</sos.window.back.shortcuts>
-		<sos.window.clear_hud>Очистить HUD</sos.window.clear_hud>
-		<sos.window.clear_hud_tooltip>Очищает активный HUD-трекер</sos.window.clear_hud_tooltip>
-		<sos.window.forward>Вперед</sos.window.forward>
-		<sos.window.forward.shortcuts>Горячие клавиши:&#xA;- Alt + Стрелка вправо&#xA;- Shift + Backspace&#xA;- Мышь 5</sos.window.forward.shortcuts>
-		<sos.window.loading>Загрузка зависимостей...</sos.window.loading>
-		<sos.window.loading.complete>Загрузка завершена!</sos.window.loading.complete>
-		<sos.window.obtain>ПОЛУЧЕНИЕ</sos.window.obtain>
-		<sos.window.raw_xml>RAW XML</sos.window.raw_xml>
-		<sos.window.search_placeholder>Поиск предмета...</sos.window.search_placeholder>
-		<sos.window.search_tooltip>Поиск по Имени, ID, Категории, Тегам, ModName, ItemType, Prefab и т.д.&#xA;Расширенные фильтры:&#xA;  @Мод        (напр., @Vanilla @Neurotrauma)&#xA;  #Категория  (напр., #Medical #Weapon)&#xA;  $Тег        (напр., $smallitem $diving)&#xA;  &amp;Слот      (напр., &amp;Head &amp;Inner)&#xA;  !ID         (напр., !weldingtool)&#xA;  %Prefab         (напр., %Affliction %Item)&#xA;Пример: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
-		<sos.window.section_container>КОНТЕЙНЕР</sos.window.section_container>
-		<sos.window.section_economy>ЭКОНОМИКА</sos.window.section_economy>
-		<sos.window.section_equipment>СНАРЯЖЕНИЕ</sos.window.section_equipment>
-		<sos.window.section_general>ОБЩЕЕ</sos.window.section_general>
-		<sos.window.section_medical>МЕДИЦИНА</sos.window.section_medical>
-		<sos.window.section_spawning>ГДЕ НАЙТИ</sos.window.section_spawning>
-		<sos.window.section_treatments>ЛЕЧЕНИЕ И МЕДИКАМЕНТЫ</sos.window.section_treatments>
-		<sos.window.section_utility>УТИЛИТЫ</sos.window.section_utility>
-		<sos.window.section_weapon>ОРУЖИЕ</sos.window.section_weapon>
-		<sos.window.settings>Настройки (WIP)</sos.window.settings>
-		<sos.window.tag_tooltip>Поиск предметов с тегом: [tag]</sos.window.tag_tooltip>
-		<sos.window.title>SOS - Просмотр рецептов</sos.window.title>
-		<sos.window.usage>ИСПОЛЬЗОВАНИЕ</sos.window.usage>
+	<!-- Window -->
+	<sos.window.additional_info>ДОП. ИНФОРМАЦИЯ</sos.window.additional_info>
+	<sos.window.back>Назад</sos.window.back>
+	<sos.window.back.shortcuts>Горячие клавиши:&#xA;- Alt + Стрелка влево&#xA;- Backspace&#xA;- Мышь 4</sos.window.back.shortcuts>
+	<sos.window.clear_hud>Очистить HUD</sos.window.clear_hud>
+	<sos.window.clear_hud_tooltip>Очищает активный HUD-трекер</sos.window.clear_hud_tooltip>
+	<sos.window.forward>Вперед</sos.window.forward>
+	<sos.window.forward.shortcuts>Горячие клавиши:&#xA;- Alt + Стрелка вправо&#xA;- Shift + Backspace&#xA;- Мышь 5</sos.window.forward.shortcuts>
+	<sos.window.loading>Загрузка зависимостей...</sos.window.loading>
+	<sos.window.loading.complete>Загрузка завершена!</sos.window.loading.complete>
+	<sos.window.obtain>ПОЛУЧЕНИЕ</sos.window.obtain>
+	<sos.window.raw_xml>RAW XML</sos.window.raw_xml>
+	<sos.window.raw_xml_tooltip>Переключает между просмотром метаданных и сырым XML предмета.</sos.window.raw_xml_tooltip>
+	<sos.window.search_placeholder>Поиск предмета...</sos.window.search_placeholder>
+	<sos.window.search_tooltip>Поиск по Имени, ID, Категории, Тегам, ModName, ItemType, Prefab и т.д.&#xA;Расширенные фильтры:&#xA;  @Мод        (напр., @Vanilla @Neurotrauma)&#xA;  #Категория  (напр., #Medical #Weapon)&#xA;  $Тег        (напр., $smallitem $diving)&#xA;  &amp;Слот      (напр., &amp;Head &amp;Inner)&#xA;  !ID         (напр., !weldingtool)&#xA;  %Prefab         (напр., %Affliction %Item)&#xA;Пример: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
+	<sos.window.section_container>КОНТЕЙНЕР</sos.window.section_container>
+	<sos.window.section_economy>ЭКОНОМИКА</sos.window.section_economy>
+	<sos.window.section_equipment>СНАРЯЖЕНИЕ</sos.window.section_equipment>
+	<sos.window.section_general>ОБЩЕЕ</sos.window.section_general>
+	<sos.window.section_medical>МЕДИЦИНА</sos.window.section_medical>
+	<sos.window.section_spawning>ГДЕ НАЙТИ</sos.window.section_spawning>
+	<sos.window.section_treatments>ЛЕЧЕНИЕ И МЕДИКАМЕНТЫ</sos.window.section_treatments>
+	<sos.window.section_utility>УТИЛИТЫ</sos.window.section_utility>
+	<sos.window.section_weapon>ОРУЖИЕ</sos.window.section_weapon>
+	<sos.window.settings>Настройки (WIP)</sos.window.settings>
+	<sos.window.tag_tooltip>Поиск предметов с тегом: [tag]</sos.window.tag_tooltip>
+	<sos.window.title>SOS - Просмотр рецептов</sos.window.title>
+	<sos.window.usage>ИСПОЛЬЗОВАНИЕ</sos.window.usage>
 
-		<!-- HUD -->
-		<sos.hud.tracking>ОТСЛЕЖИВАНИЕ:</sos.hud.tracking>
+	<!-- HUD -->
+	<sos.hud.tracking>ОТСЛЕЖИВАНИЕ:</sos.hud.tracking>
+	<sos.hud.tracking_tooltip>Активный трекер создания. Показывает требуемые ингредиенты и количество.</sos.hud.tracking_tooltip>
+	<sos.hud.tracked_item_tooltip>Текущий отслеживаемый предмет.</sos.hud.tracked_item_tooltip>
+	<sos.hud.ingredient_tooltip>Требуемый ингредиент. Показывает, сколько у вас в инвентаре.</sos.hud.ingredient_tooltip>
 
-		<!-- Tabs -->
-		<sos.tab.recipes>РЕЦЕПТЫ</sos.tab.recipes>
-		<sos.tab.simulator>СИМУЛЯТОР</sos.tab.simulator>
+	<!-- Tabs -->
+	<sos.tab.recipes>РЕЦЕПТЫ</sos.tab.recipes>
+	<sos.tab.recipes_tooltip>Показывает рецепты создания, источники и использование предмета.</sos.tab.recipes_tooltip>
+	<sos.tab.simulator>СИМУЛЯТОР</sos.tab.simulator>
+	<sos.tab.simulator_tooltip>Открывает клинический симулятор для тестирования лечения и недугов на манекене.</sos.tab.simulator_tooltip>
 
-		<!-- Items -->
-		<sos.item.aliases>Алиасы:</sos.item.aliases>
-		<sos.item.base_price>Базовая цена:</sos.item.base_price>
-		<sos.item.can_buy>Можно купить:</sos.item.can_buy>
-		<sos.item.can_sell>Можно продать:</sos.item.can_sell>
-		<sos.item.cargo_box>Грузовой ящик:</sos.item.cargo_box>
-		<sos.item.category>Категория:</sos.item.category>
-		<sos.item.causes_fire>Вызывает пожар</sos.item.causes_fire>
-		<sos.item.description>ОПИСАНИЕ:</sos.item.description>
-		<sos.item.drains_oxygen>Потребляет кислород</sos.item.drains_oxygen>
-		<sos.item.hazards>Опасности:</sos.item.hazards>
-		<sos.item.header_info>ID: [id] | Цена: [price] мк</sos.item.header_info>
-		<sos.item.id>ID:</sos.item.id>
-		<sos.item.locations>Места:</sos.item.locations>
-		<sos.item.max_stack>Макс. стек:</sos.item.max_stack>
-		<sos.item.min_difficulty>Мин. сложность:</sos.item.min_difficulty>
-		<sos.item.price>Цена:</sos.item.price>
-		<sos.item.required_faction>Требуемая фракция:</sos.item.required_faction>
-		<sos.item.tags>ТЕГИ:</sos.item.tags>
+	<!-- Items -->
+	<sos.item.aliases>Алиасы:</sos.item.aliases>
+	<sos.item.base_price>Базовая цена:</sos.item.base_price>
+	<sos.item.can_buy>Можно купить:</sos.item.can_buy>
+	<sos.item.can_sell>Можно продать:</sos.item.can_sell>
+	<sos.item.cargo_box>Грузовой ящик:</sos.item.cargo_box>
+	<sos.item.category>Категория:</sos.item.category>
+	<sos.item.causes_fire>Вызывает пожар</sos.item.causes_fire>
+	<sos.item.description>ОПИСАНИЕ:</sos.item.description>
+	<sos.item.drains_oxygen>Потребляет кислород</sos.item.drains_oxygen>
+	<sos.item.hazards>Опасности:</sos.item.hazards>
+	<sos.item.header_info>ID: [id] | Цена: [price] мк</sos.item.header_info>
+	<sos.item.id>ID:</sos.item.id>
+	<sos.item.locations>Места:</sos.item.locations>
+	<sos.item.max_stack>Макс. стек:</sos.item.max_stack>
+	<sos.item.min_difficulty>Мин. сложность:</sos.item.min_difficulty>
+	<sos.item.price>Цена:</sos.item.price>
+	<sos.item.required_faction>Требуемая фракция:</sos.item.required_faction>
+	<sos.item.tags>ТЕГИ:</sos.item.tags>
 
-		<!-- Weapon -->
-		<sos.weapon.area_radius>Радиус области:</sos.weapon.area_radius>
-		<sos.weapon.armor_penetration>Пробитие брони:</sos.weapon.armor_penetration>
-		<sos.weapon.base_spread>Базовый разброс:</sos.weapon.base_spread>
-		<sos.weapon.dismember_chance>Шанс расчленения:</sos.weapon.dismember_chance>
-		<sos.weapon.dmg_multiplier>Множ. урона:</sos.weapon.dmg_multiplier>
-		<sos.weapon.fire_rate>Скорострельность:</sos.weapon.fire_rate>
-		<sos.weapon.hull_damage>Урон корпусу:</sos.weapon.hull_damage>
-		<sos.weapon.power_use>Потребление энергии:</sos.weapon.power_use>
-		<sos.weapon.range>Дистанция:</sos.weapon.range>
-		<sos.weapon.reload>Перезарядка:</sos.weapon.reload>
-		<sos.weapon.throwable>Метательное</sos.weapon.throwable>
-		<sos.weapon.type>Тип:</sos.weapon.type>
+	<!-- Weapon -->
+	<sos.weapon.area_radius>Радиус области:</sos.weapon.area_radius>
+	<sos.weapon.armor_penetration>Пробитие брони:</sos.weapon.armor_penetration>
+	<sos.weapon.base_spread>Базовый разброс:</sos.weapon.base_spread>
+	<sos.weapon.dismember_chance>Шанс расчленения:</sos.weapon.dismember_chance>
+	<sos.weapon.dmg_multiplier>Множ. урона:</sos.weapon.dmg_multiplier>
+	<sos.weapon.fire_rate>Скорострельность:</sos.weapon.fire_rate>
+	<sos.weapon.hull_damage>Урон корпусу:</sos.weapon.hull_damage>
+	<sos.weapon.power_use>Потребление энергии:</sos.weapon.power_use>
+	<sos.weapon.range>Дистанция:</sos.weapon.range>
+	<sos.weapon.reload>Перезарядка:</sos.weapon.reload>
+	<sos.weapon.throwable>Метательное</sos.weapon.throwable>
+	<sos.weapon.type>Тип:</sos.weapon.type>
 
-		<!-- Equipment -->
-		<sos.equip.armor_special>Особенности брони:</sos.equip.armor_special>
-		<sos.equip.deflect_projectiles>Отражает снаряды</sos.equip.deflect_projectiles>
-		<sos.equip.equips_in>Экипируется в:</sos.equip.equips_in>
-		<sos.equip.max_durability>Макс. прочность:</sos.equip.max_durability>
-		<sos.equip.pressure_protection>Защита от давления:</sos.equip.pressure_protection>
+	<!-- Equipment -->
+	<sos.equip.armor_special>Особенности брони:</sos.equip.armor_special>
+	<sos.equip.deflect_projectiles>Отражает снаряды</sos.equip.deflect_projectiles>
+	<sos.equip.equips_in>Экипируется в:</sos.equip.equips_in>
+	<sos.equip.max_durability>Макс. прочность:</sos.equip.max_durability>
+	<sos.equip.pressure_protection>Защита от давления:</sos.equip.pressure_protection>
 
-		<!-- Medical -->
-		<sos.med.always_causes>Всегда Налагает:</sos.med.always_causes>
-		<sos.med.always_heals>Всегда Лечит:</sos.med.always_heals>
-		<sos.med.failure_causes>При Провале Налагает:</sos.med.failure_causes>
-		<sos.med.failure_heals>При Провале Лечит:</sos.med.failure_heals>
-		<sos.med.skill_req>Треб. Медицинский Навык:</sos.med.skill_req>
-		<sos.med.success_causes>При Успехе Налагает:</sos.med.success_causes>
-		<sos.med.success_heals>При Успехе Лечит:</sos.med.success_heals>
-		<sos.med.suitable>Рекомендуется:</sos.med.suitable>
+	<!-- Medical -->
+	<sos.med.always_causes>Всегда Налагает:</sos.med.always_causes>
+	<sos.med.always_heals>Всегда Лечит:</sos.med.always_heals>
+	<sos.med.failure_causes>При Провале Налагает:</sos.med.failure_causes>
+	<sos.med.failure_heals>При Провале Лечит:</sos.med.failure_heals>
+	<sos.med.skill_req>Треб. Медицинский Навык:</sos.med.skill_req>
+	<sos.med.success_causes>При Успехе Налагает:</sos.med.success_causes>
+	<sos.med.success_heals>При Успехе Лечит:</sos.med.success_heals>
+	<sos.med.suitable>Рекомендуется:</sos.med.suitable>
 
-		<!-- Treatments & Afflictions -->
-		<sos.affliction.alternative>Альтернатива / Слабое:</sos.affliction.alternative>
-		<sos.affliction.blockedby>Лечение Блокируется:</sos.affliction.blockedby>
-		<sos.affliction.contraindicated>Противопоказано:</sos.affliction.contraindicated>
-		<sos.affliction.contraindicated_warn>ПРЕДУПРЕЖДЕНИЕ: Следующие предметы ухудшают состояние!</sos.affliction.contraindicated_warn>
-		<sos.affliction.effective>Эффективно:</sos.affliction.effective>
-		<sos.affliction.highlyeffective>Высокоэффективно:</sos.affliction.highlyeffective>
+	<!-- Treatments & Afflictions -->
+	<sos.affliction.alternative>Альтернатива / Слабое:</sos.affliction.alternative>
+	<sos.affliction.blockedby>Лечение Блокируется:</sos.affliction.blockedby>
+	<sos.affliction.contraindicated>Противопоказано:</sos.affliction.contraindicated>
+	<sos.affliction.contraindicated_warn>ПРЕДУПРЕЖДЕНИЕ: Следующие предметы ухудшают состояние!</sos.affliction.contraindicated_warn>
+	<sos.affliction.effective>Эффективно:</sos.affliction.effective>
+	<sos.affliction.highlyeffective>Высокоэффективно:</sos.affliction.highlyeffective>
 
-		<!-- Simulator -->
-		<sos.aff.speedDropdown>Более x1 все еще в разработке. \nРаботает в одиночной игре, но не в многопользовательской.</sos.aff.speedDropdown>
+	<!-- Simulator -->
+	<sos.aff.speedDropdown>Более x1 все еще в разработке. \nРаботает в одиночной игре, но не в многопользовательской.</sos.aff.speedDropdown>
+	<sos.sim.play_tooltip>Запускает клиническую симуляцию.</sos.sim.play_tooltip>
+	<sos.sim.pause_tooltip>Приостанавливает клиническую симуляцию.</sos.sim.pause_tooltip>
+	<sos.sim.reset_tooltip>Сбрасывает здоровье пациента до начального состояния.</sos.sim.reset_tooltip>
+	<sos.sim.drop_tooltip>Отбрасывает текущего пациента.</sos.sim.drop_tooltip>
+	<sos.sim.set_max_tooltip>Устанавливает силу этого недуга на максимум.</sos.sim.set_max_tooltip>
+	<sos.sim.remove_tooltip>Удаляет этот недуг у пациента.</sos.sim.remove_tooltip>
+	<sos.sim.apply_item_tooltip>Симулирует использование этого предмета на пациенте.</sos.sim.apply_item_tooltip>
+	<sos.misc.close_button>Закрывает это меню.</sos.misc.close_button>
 
-		<!-- Utility -->
-		<sos.util.light_range>Дальность света</sos.util.light_range>
-		<sos.util.pump_flow>Макс. поток насоса</sos.util.pump_flow>
-		<sos.util.radio_range>Дальность радиосвязи</sos.util.radio_range>
-		<sos.util.sonar_range>Дальность сонара</sos.util.sonar_range>
+	<!-- Utility -->
+	<sos.util.light_range>Дальность света</sos.util.light_range>
+	<sos.util.pump_flow>Макс. поток насоса</sos.util.pump_flow>
+	<sos.util.radio_range>Дальность радиосвязи</sos.util.radio_range>
+	<sos.util.sonar_range>Дальность сонара</sos.util.sonar_range>
 
-		<!-- Container -->
-		<sos.container.accepts>Принимает:</sos.container.accepts>
-		<sos.container.capacity>Вместимость:</sos.container.capacity>
-		<sos.container.contained>Содержится в:</sos.container.contained>
-		<sos.container.slots>Слотов: [amount]</sos.container.slots>
+	<!-- Container -->
+	<sos.container.accepts>Принимает:</sos.container.accepts>
+	<sos.container.capacity>Вместимость:</sos.container.capacity>
+	<sos.container.contained>Содержится в:</sos.container.contained>
+	<sos.container.slots>Слотов: [amount]</sos.container.slots>
 
-		<!-- Recipe -->
-		<sos.recipe.buyable>Купить в [Title] за [Price] mk</sos.recipe.buyable>
-		<sos.recipe.deconstructing>РАЗБОР:</sos.recipe.deconstructing>
-		<sos.recipe.deconstructor>ДЕКОНСТРУКТОР</sos.recipe.deconstructor>
-		<sos.recipe.hand>Вручную</sos.recipe.hand>
-		<sos.recipe.locked>Требуется рецепт для разблокировки</sos.recipe.locked>
-		<sos.recipe.random_outputs>Дает [amount] случайно:</sos.recipe.random_outputs>
-		<sos.recipe.requires>Требует</sos.recipe.requires>
-		<sos.recipe.unlocked>Рецепт разблокирован</sos.recipe.unlocked>
+	<!-- Recipe -->
+	<sos.recipe.buyable>Купить в [Title] за [Price] mk</sos.recipe.buyable>
+	<sos.recipe.deconstructing>РАЗБОР:</sos.recipe.deconstructing>
+	<sos.recipe.deconstructor>ДЕКОНСТРУКТОР</sos.recipe.deconstructor>
+	<sos.recipe.hand>Вручную</sos.recipe.hand>
+	<sos.recipe.locked>Требуется рецепт для разблокировки</sos.recipe.locked>
+	<sos.recipe.random_outputs>Дает [amount] случайно:</sos.recipe.random_outputs>
+	<sos.recipe.requires>Требует</sos.recipe.requires>
+	<sos.recipe.unlocked>Рецепт разблокирован</sos.recipe.unlocked>
 
-		<!-- XML -->
-		<sos.xml.copy>Копировать XML</sos.xml.copy>
-		<sos.xml.reset_zoom>Сбросить масштаб</sos.xml.reset_zoom>
+	<!-- XML -->
+	<sos.xml.copy>Копировать XML</sos.xml.copy>
+	<sos.xml.reset_zoom>Сбросить масштаб</sos.xml.reset_zoom>
 
-		<!-- List Headers -->
-		<sos.list.header.afflictionprefab>Недуги</sos.list.header.afflictionprefab>
-		<sos.list.header.afflictionprefabhusk>Недуги Хуска</sos.list.header.afflictionprefabhusk>
-		<sos.list.header.itemprefab>Предметы</sos.list.header.itemprefab>
+	<!-- List Headers -->
+	<sos.list.header.afflictionprefab>Недуги</sos.list.header.afflictionprefab>
+	<sos.list.header.afflictionprefabhusk>Недуги Хуска</sos.list.header.afflictionprefabhusk>
+	<sos.list.header.itemprefab>Предметы</sos.list.header.itemprefab>
 
-		<!-- Dummie Names -->
-		<sos.dummyname.rand.1>Подопытный #[id]</sos.dummyname.rand.1>
-		<sos.dummyname.rand.2>Не Настоящий Человек #[id]</sos.dummyname.rand.2>
-		<sos.dummyname.rand.3>Вероятно Чувствующий #[id]</sos.dummyname.rand.3>
-		<sos.dummyname.rand.4>Не Думайте Об Этом #[id]</sos.dummyname.rand.4>
-		<sos.dummyname.rand.5>Не Обращайте Внимания На Крики #[id]</sos.dummyname.rand.5>
-		<sos.dummyname.rand.6>Вероятно В Порядке #[id]</sos.dummyname.rand.6>
-		<sos.dummyname.rand.7>У Него Есть Семья #[id]</sos.dummyname.rand.7>
-		<sos.dummyname.rand.8>Знает Что Вы Сделали</sos.dummyname.rand.8>
-	</Override>
+	<!-- List -->
+	<sos.list.separator_tooltip>Нажмите, чтобы отфильтровать список по этому типу объекта.</sos.list.separator_tooltip>
+
+	<!-- Layout -->
+	<sos.layout.save_tooltip>Сохраняет текущую раскладку панелей как новый пресет.</sos.layout.save_tooltip>
+	<sos.layout.apply_tooltip>Применяет этот пресет раскладки панелей.</sos.layout.apply_tooltip>
+	<sos.layout.delete_tooltip>Удаляет этот пресет раскладки.</sos.layout.delete_tooltip>
+
+	<!-- Dummie Names -->
+	<sos.dummyname.rand.1>Подопытный #[id]</sos.dummyname.rand.1>
+	<sos.dummyname.rand.2>Не Настоящий Человек #[id]</sos.dummyname.rand.2>
+	<sos.dummyname.rand.3>Вероятно Чувствующий #[id]</sos.dummyname.rand.3>
+	<sos.dummyname.rand.4>Не Думайте Об Этом #[id]</sos.dummyname.rand.4>
+	<sos.dummyname.rand.5>Не Обращайте Внимания На Крики #[id]</sos.dummyname.rand.5>
+	<sos.dummyname.rand.6>Вероятно В Порядке #[id]</sos.dummyname.rand.6>
+	<sos.dummyname.rand.7>У Него Есть Семья #[id]</sos.dummyname.rand.7>
+	<sos.dummyname.rand.8>Знает Что Вы Сделали</sos.dummyname.rand.8>
 </infotexts>

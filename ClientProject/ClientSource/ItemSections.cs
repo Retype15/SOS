@@ -53,14 +53,26 @@ namespace SOS
             if (string.IsNullOrEmpty(value) || currentLayout == null) return;
 
             var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), style: null) { CanBeFocused = false };
-            var lblBlock = new GUITextBlock(new RectTransform(new Vector2(0.40f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray, wrap: true) { CanBeFocused = false };
-            var valBlock = new GUITextBlock(new RectTransform(new Vector2(0.60f, 1f), row.RectTransform, Anchor.CenterRight), value, font: GUIStyle.SmallFont, textColor: valColor, textAlignment: Alignment.Right, wrap: true) { CanBeFocused = false };
+
+            float rowWidth = currentLayout.Rect.Width > 0 ? currentLayout.Rect.Width : 400f;
+            float labelW = GUIStyle.SmallFont.MeasureString(label).X + 8f;
+            float labelRatio = Math.Min(labelW / rowWidth, 0.70f);
+
+            var lblBlock = new GUITextBlock(
+                new RectTransform(new Vector2(labelRatio, 1f), row.RectTransform, Anchor.CenterLeft),
+                label, font: GUIStyle.SmallFont, textColor: Color.Gray, wrap: false)
+            { CanBeFocused = false };
+
+            var valBlock = new GUITextBlock(
+                new RectTransform(new Vector2(1f - labelRatio, 1f), row.RectTransform, Anchor.CenterRight),
+                value, font: GUIStyle.SmallFont, textColor: valColor, textAlignment: Alignment.Right, wrap: true)
+            { CanBeFocused = false };
 
             void UpdateHeight()
             {
-                int h = Math.Max(20, (int)Math.Max(lblBlock.TextSize.Y, valBlock.TextSize.Y) + 4);
-                row.RectTransform.MinSize = new Point(0, h);
-                row.RectTransform.MaxSize = new Point(int.MaxValue, h);
+                float h = Math.Max(lblBlock.TextSize.Y, valBlock.TextSize.Y) + 4f;
+                row.RectTransform.MinSize = new Point(0, (int)h);
+                row.RectTransform.MaxSize = new Point(int.MaxValue, (int)h);
             }
             UpdateHeight();
             lblBlock.RectTransform.SizeChanged += UpdateHeight;
