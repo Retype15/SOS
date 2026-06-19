@@ -41,21 +41,13 @@ namespace SOS
             hijackedNativeWindow = window;
         }
 
-        private static ushort currentClientOnlyID = 60000;
+        private static ushort GetFreshDummyID() => EnsureID(65435);
+        private static ushort GetFreshMockID() => EnsureID(65434);
 
-
-        public static ushort GetNextClientOnlyID()
+        public static ushort EnsureID(ushort ID)
         {
-            currentClientOnlyID++;
-            if (currentClientOnlyID > 65000) currentClientOnlyID = 60000;
-
-
-            while (Entity.FindEntityByID(currentClientOnlyID) != null)
-            {
-                currentClientOnlyID++;
-                if (currentClientOnlyID > 65000) currentClientOnlyID = 60000;
-            }
-            return currentClientOnlyID;
+            Entity.FindEntityByID(ID)?.FreeID();
+            return ID;
         }
 
         // MARK: - Medical Reflector
@@ -177,8 +169,7 @@ namespace SOS
                         var contentX = new ContentXElement(null, charNode);
                         CharacterInfo info = new(contentX);
 
-                        ushort safeId = GetNextClientOnlyID();
-                        var character = Character.Create(info.SpeciesName, new Vector2(0, -10000), "SOS_DUMMY", info, isRemotePlayer: false, hasAi: false, createNetworkEvent: false, spawnInitialItems: false, id: safeId);
+                        var character = Character.Create(info.SpeciesName, new Vector2(0, -10000), "SOS_DUMMY", info, isRemotePlayer: false, hasAi: false, createNetworkEvent: false, spawnInitialItems: false, id: GetFreshDummyID());
                         ActiveDummy = new DummySubject(character, DeathCount);
                         ActiveDummy.SetupDummyEntity();
 
@@ -220,13 +211,12 @@ namespace SOS
 
         private static void CreateNewDummy()
         {
-            var prefab = CharacterPrefab.HumanPrefab;
+            CharacterPrefab? prefab = CharacterPrefab.HumanPrefab;
 
             CharacterInfo info = new(prefab.Identifier, name: "Dummy", originalName: "SOS Dummy", jobOrJobPrefab: JobPrefab.Get("medicaldoctor"));
             AssignSubjectIdentity(info, DeathCount);
 
-            ushort safeId = GetNextClientOnlyID();
-            var character = Character.Create(prefab, new Vector2(0, -10000), "SOS_DUMMY", info, isRemotePlayer: false, hasAi: false, createNetworkEvent: false, spawnInitialItems: false, id: safeId);
+            Character? character = Character.Create(prefab, new Vector2(0, -10000), "SOS_DUMMY", info, isRemotePlayer: false, hasAi: false, createNetworkEvent: false, spawnInitialItems: false, id: GetFreshDummyID());
             ActiveDummy = new DummySubject(character, DeathCount);
             ActiveDummy.SetupDummyEntity();
         }
@@ -234,10 +224,10 @@ namespace SOS
         private static void AssignSubjectIdentity(CharacterInfo info, int deathCount)
         {
             string nameTemplate;
-
             if (deathCount < 50)
             {
                 int tier = deathCount / 10;
+                if (tier == 0) tier = 1;
                 nameTemplate = TextSOS.Get($"sos.dummyname.rand.{tier}", $"Dummy Subject #[id]").Value;
             }
             else
@@ -309,6 +299,15 @@ namespace SOS
 
             Patient.CharacterHealth.UpdateHUD(deltaTime);
 
+            if (Patient.CharacterHealth.CPRButton != null)
+            {
+                Patient.CharacterHealth.CPRButton.Visible = false;
+            }
+            if (Patient.CharacterHealth.SuicideButton != null)
+            {
+                Patient.CharacterHealth.SuicideButton.Visible = false;
+            }
+
             MaybeKillDummy();
 
             if (MedicalReflector.TooltipField?.GetValue(Patient.CharacterHealth) is GUIComponent tooltip)
@@ -356,8 +355,7 @@ namespace SOS
             Item? mockItem = null;
             try
             {
-                ushort safeId = GetNextClientOnlyID();
-                mockItem = new Item(prefab, Vector2.Zero, null, id: safeId);
+                mockItem = new Item(prefab, Vector2.Zero, null, id: GetFreshMockID());
 
                 Patient.Inventory?.TryPutItem(mockItem, Patient, CharacterInventory.AnySlot, false, false);
 
@@ -400,8 +398,9 @@ namespace SOS
                         ic.ApplyStatusEffects(ActionType.OnUse, 1.0f, Patient, target, useTarget: Patient, user: user);
                     }
                 }
+                mockItem.Remove();
 
-                SoundPlayer.PlayUISound(GUISoundType.Select);
+                SoundPlayer.PlayUISound(GUISoundType.PickItem);
             }
             catch (Exception e)
             {

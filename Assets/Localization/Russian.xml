@@ -44,7 +44,7 @@
 		<sos.window.obtain>ПОЛУЧЕНИЕ</sos.window.obtain>
 		<sos.window.raw_xml>RAW XML</sos.window.raw_xml>
 		<sos.window.search_placeholder>Поиск предмета...</sos.window.search_placeholder>
-		<sos.window.search_tooltip>Поиск по имени, ID, категории, тегам, моду, типу и т.д.&#xA;Расширенные фильтры:&#xA;  @Мод        (напр., @Vanilla @Neuro)&#xA;  #Категория  (напр., #Medical #Weapon)&#xA;  $Тег        (напр., $smallitem $pill)&#xA;  &amp;Слот      (напр., &amp;Head &amp;Inner)&#xA;  !ID         (напр., !weldingtool)&#xA;Пример: 'Brain @NT #Medical $surgery'</sos.window.search_tooltip>
+		<sos.window.search_tooltip>Поиск по Имени, ID, Категории, Тегам, ModName, ItemType, Prefab и т.д.&#xA;Расширенные фильтры:&#xA;  @Мод        (напр., @Vanilla @Neurotrauma)&#xA;  #Категория  (напр., #Medical #Weapon)&#xA;  $Тег        (напр., $smallitem $diving)&#xA;  &amp;Слот      (напр., &amp;Head &amp;Inner)&#xA;  !ID         (напр., !weldingtool)&#xA;  %Prefab         (напр., %Affliction %Item)&#xA;Пример: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 		<sos.window.section_container>КОНТЕЙНЕР</sos.window.section_container>
 		<sos.window.section_economy>ЭКОНОМИКА</sos.window.section_economy>
 		<sos.window.section_equipment>СНАРЯЖЕНИЕ</sos.window.section_equipment>

@@ -44,7 +44,7 @@
 		<sos.window.obtain>OBTENTION</sos.window.obtain>
 		<sos.window.raw_xml>XML BRUT</sos.window.raw_xml>
 		<sos.window.search_placeholder>Chercher un objet...</sos.window.search_placeholder>
-		<sos.window.search_tooltip>Rechercher par nom, ID, catégorie, tags, mod, type, etc.&#xA;Filtres avancés :&#xA;  @Mod        (ex., @Vanilla @Neuro)&#xA;  #Catégorie  (ex., #Medical #Weapon)&#xA;  $Tag        (ex., $smallitem $pill)&#xA;  &amp;Emplac.    (ex., &amp;Head &amp;Inner)&#xA;  !ID         (ex., !weldingtool)&#xA;Exemple : 'Brain @NT #Medical $surgery'</sos.window.search_tooltip>
+		<sos.window.search_tooltip>Rechercher par Nom, ID, Catégorie, Tags, ModName, ItemType, Prefab, etc.&#xA;Filtres avancés :&#xA;  @Mod        (ex., @Vanilla @Neurotrauma)&#xA;  #Catégorie  (ex., #Medical #Weapon)&#xA;  $Tag        (ex., $smallitem $diving)&#xA;  &amp;Emplac.    (ex., &amp;Head &amp;Inner)&#xA;  !ID         (ex., !weldingtool)&#xA;  %Prefab         (ex., %Affliction %Item)&#xA;Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 		<sos.window.section_container>COMME CONTENEUR</sos.window.section_container>
 		<sos.window.section_economy>ÉCONOMIE</sos.window.section_economy>
 		<sos.window.section_equipment>COMME ÉQUIPEMENT</sos.window.section_equipment>
