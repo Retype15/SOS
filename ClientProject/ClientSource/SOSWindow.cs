@@ -270,7 +270,7 @@ namespace SOS
 
             centerTabWidget = new GUITabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform));
             centerTabWidget.RegisterTab(new ItemCenterPanelTab());
-            centerTabWidget.RegisterTab(new AfflictionCenterPanelTab());
+            centerTabWidget.RegisterTab(new AfflictionCenterPanelTab()); // Not compatible with scene transitions.
 
             rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), contentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
             {

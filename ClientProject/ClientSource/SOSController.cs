@@ -41,6 +41,10 @@ namespace SOS
         public List<string> TabHistory { get; } = [];
         public bool DummySimulated { get; set; } = false;
 
+        public static bool IsInLevelTransition =>
+            GameMain.Instance.LoadingScreenOpen == true ||
+            CoroutineManager.IsCoroutineRunning("LevelTransition");
+
         public void PushTabHistory(string uid)
         {
             TabHistory.Remove(uid);
@@ -86,7 +90,7 @@ namespace SOS
             }
             else
             {
-                if (Screen.Selected == null) return;
+                if (Screen.Selected == null || IsInLevelTransition) return;
 
                 mainWindow = new SOSWindow(this);
 
@@ -364,12 +368,19 @@ namespace SOS
 
             if (mainWindow != null)
             {
+                if (IsInLevelTransition)
+                {
+                    RLogger.LogDebug("[SOS-Debug] Forcing to close the window in Update.");
+                    CrossThread.RequestExecutionOnMainThread(ToggleUI);
+                    return;
+                }
+
                 if (canHandleInputs)
                 {
                     if (PlayerInput.KeyHit(Keys.Escape))
                     {
                         //mainWindow.SetSelected();
-                        CrossThread.RequestExecutionOnMainThread(() => ToggleUI());
+                        CrossThread.RequestExecutionOnMainThread(ToggleUI);
                         return;
                     }
                     else if
