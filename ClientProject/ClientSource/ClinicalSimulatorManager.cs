@@ -213,7 +213,7 @@ namespace SOS
         {
             CharacterPrefab? prefab = CharacterPrefab.HumanPrefab;
 
-            CharacterInfo info = new(prefab.Identifier, name: "Dummy", originalName: "SOS Dummy", jobOrJobPrefab: JobPrefab.Get("medicaldoctor"));
+            CharacterInfo info = new(prefab.Identifier, name: "Dummy", originalName: "SOS Dummy", jobOrJobPrefab: JobPrefab.Get("assistant")); //assistant, medicaldoctor
             AssignSubjectIdentity(info, DeathCount);
 
             Character? character = Character.Create(prefab, new Vector2(0, -10000), "SOS_DUMMY", info, isRemotePlayer: false, hasAi: false, createNetworkEvent: false, spawnInitialItems: false, id: GetFreshDummyID());
