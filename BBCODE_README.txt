@@ -76,3 +76,8 @@ A: Yes! Everything, including submarine parts and items from mods. I've decided 
 ---
 [b]Github Project:[/b] [url=https://github.com/Retype15/SOS]SOS Repository[/url]
 [b]Developed by:[/b] [url=https://github.com/Retype15]@Retype15[/url]
+
+
+[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282][img]https://img.shields.io/badge/Subscribe-2EA043?style=for-the-badge&logo=steam&logoColor=white[/img][/url]  [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282][img]https://img.shields.io/badge/Add%20to%20Favorites-F0C040?style=for-the-badge&logo=steam&logoColor=white[/img][/url]  [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282][img]https://img.shields.io/badge/Rate%20+1-3B82F6?style=for-the-badge&logo=steam&logoColor=white[/img][/url]
+
+[i]If you enjoy the mod, please consider subscribing, adding to favorites, and leaving a positive rating. It helps a lot![/i]
