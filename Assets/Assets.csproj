@@ -49,6 +49,8 @@
         <RunConfig Include="$(ProjectDir)RunConfig.xml" />
         <Content Include="$(ProjectDir)Content\**\*.*" />
 		    <Localization Include="$(ProjectDir)Localization\**\*.*" />
+		    <Config Include="$(ProjectDir)Config\SettingsClient.xml" />
+		    <ModConfig Include="$(ProjectDir)ModConfig.xml" />
       </ItemGroup>
       <Copy SourceFiles="@(FileList)" DestinationFiles="$(ModDeployDir)filelist.xml" />
       <Copy SourceFiles="@(Metadata)" DestinationFiles="$(ModDeployDir)metadata.xml" />
@@ -56,6 +58,8 @@
       <Copy SourceFiles="@(RunConfig)" DestinationFiles="$(ModDeployDir)CSharp\RunConfig.xml" />
       <Copy SourceFiles="@(Content)" DestinationFolder="$(ModDeployDir)Content\%(RecursiveDir)" />
       <Copy SourceFiles="@(Localization)" DestinationFolder="$(ModDeployDir)Localization\%(RecursiveDir)" />
+      <Copy SourceFiles="@(Config)" DestinationFiles="$(ModDeployDir)Config\SettingsClient.xml" />
+      <Copy SourceFiles="@(ModConfig)" DestinationFiles="$(ModDeployDir)ModConfig.xml" />
     </Target>
     
 </Project>

@@ -41,6 +41,8 @@ namespace SOS
         public List<string> TabHistory { get; } = [];
         public bool DummySimulated { get; set; } = false;
 
+        public Plugin.ClientConfig cfg = null!;
+
         public static bool IsInLevelTransition =>
             GameMain.Instance.LoadingScreenOpen == true ||
             CoroutineManager.IsCoroutineRunning("LevelTransition");
@@ -83,6 +85,7 @@ namespace SOS
 
         public void ToggleUI()
         {
+            RLogger.LogDebug($"{cfg?.ActivedSOS}");
             if (mainWindow != null)
             {
                 SaveSettings();

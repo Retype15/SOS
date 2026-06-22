@@ -20,6 +20,7 @@ namespace SOS
         public void InitClient()
         {
             controller = SOSController.Instance;
+            controller.cfg = new ClientConfig(ConfigService, _package);
 
             if (!DebugConsole.commands.Exists(c => c.Names.ToString() == "sos")) // \\//
                 DebugConsole.commands.Add(new DebugConsole.Command(
