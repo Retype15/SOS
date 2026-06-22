@@ -23,8 +23,12 @@ namespace SOS
         private readonly Keys toggleKey = Keys.J;
         private bool wasKeyDown = false;
 
-        public string LastSearchQuery { get; set; } = "";
-        public Prefab? CurrentTarget { get; private set; }
+        public string LastSearchQuery
+        {
+            get => cfg?.LastSearchQuery ?? "";
+            set { cfg.LastSearchQuery = value; }
+        }
+        public Prefab? CurrentTarget { get; internal set; }
 
         public Stack<Prefab> HistoryBack { get; } = new Stack<Prefab>();
         public Stack<Prefab> HistoryForward { get; } = new Stack<Prefab>();
@@ -33,19 +37,42 @@ namespace SOS
         public Point? WindowPosition { get; set; }
         public int? LeftPanelWidth { get; set; }
         public int? RightPanelWidth { get; set; }
-        public bool RawXmlMode { get; set; } = false;
-        public float XmlFontScale { get; set; } = 0.9f;
+        public bool RawXmlMode
+        {
+            get => cfg?.RawXmlMode ?? false;
+            set { cfg.RawXmlMode = value; }
+        }
+        public float XmlFontScale
+        {
+            get => cfg?.XmlFontScale ?? 0.9f;
+            set { cfg.XmlFontScale = value; }
+        }
 
-        public int DummyDeathCount { get; set; } = 0;
-        public string? DummyCharacterXML { get; set; } = null;
+        public int DummyDeathCount
+        {
+            get => cfg?.DummyDeathCount ?? 0;
+            set { cfg.DummyDeathCount = value; }
+        }
+        public string? DummyCharacterXML
+        {
+            get => cfg?.DummyCharacterXML;
+            set { cfg.DummyCharacterXML = value; }
+        }
         public List<string> TabHistory { get; } = [];
-        public bool DummySimulated { get; set; } = false;
+        public bool DummySimulated
+        {
+            get => cfg?.DummySimulated ?? false;
+            set { cfg.DummySimulated = value; }
+        }
 
         public Plugin.ClientConfig cfg = null!;
 
-        public static bool IsInLevelTransition =>
+        public static bool migrationPending = false;
+
+        public static bool IsSOSBlocked =>
             GameMain.Instance.LoadingScreenOpen == true ||
-            CoroutineManager.IsCoroutineRunning("LevelTransition");
+            CoroutineManager.IsCoroutineRunning("LevelTransition") ||
+            migrationPending;
 
         public void PushTabHistory(string uid)
         {
@@ -54,8 +81,6 @@ namespace SOS
         }
 
         public Dictionary<string, SavedLayout> CustomLayouts { get; } = [];
-
-        private bool isDirty = false;
 
         private static SOSController? _instance;
         public static SOSController Instance
@@ -69,23 +94,18 @@ namespace SOS
 
         public SOSController()
         {
-            LoadSettings();
         }
-
-        public void MarkDirty() => isDirty = true;
 
         public void SetTrackedItem(ItemPrefab? item, FabricationRecipe? recipe = null)
         {
             Tracker.SetTrackedItem(item, recipe);
-            MarkDirty();
         }
 
-        public void AddFavorite(string id) { if (FavoritedItems.Add(id)) MarkDirty(); }
-        public void RemoveFavorite(string id) { if (FavoritedItems.Remove(id)) MarkDirty(); }
+        public void AddFavorite(string id) { FavoritedItems.Add(id); }
+        public void RemoveFavorite(string id) { FavoritedItems.Remove(id); }
 
         public void ToggleUI()
         {
-            RLogger.LogDebug($"{cfg?.ActivedSOS}");
             if (mainWindow != null)
             {
                 SaveSettings();
@@ -93,7 +113,7 @@ namespace SOS
             }
             else
             {
-                if (Screen.Selected == null || IsInLevelTransition) return;
+                if (Screen.Selected == null || IsSOSBlocked) return;
 
                 mainWindow = new SOSWindow(this);
 
@@ -136,15 +156,12 @@ namespace SOS
             if (CurrentTarget != item)
             {
                 CurrentTarget = item;
-                MarkDirty();
             }
             UpdateWindowDetails(item);
         }
 
         public void SaveSettings()
         {
-            if (!isDirty) return;
-
             if (ClinicalSimulatorManager.Patient != null)
             {
                 this.DummyDeathCount = ClinicalSimulatorManager.DeathCount;
@@ -152,73 +169,84 @@ namespace SOS
                 this.DummySimulated = !ClinicalSimulatorManager.HasStarted;
             }
 
-            var data = new SettingsData
-            {
-                Favorites = this.FavoritedItems,
-                DummyDeathCount = this.DummyDeathCount,
-                DummyCharacterXML = this.DummyCharacterXML,
-                DummySimulated = this.DummySimulated,
-                TabHistory = [.. this.TabHistory],
-                LastSearchQuery = this.LastSearchQuery,
-                LastItemId = this.CurrentTarget?.Identifier.Value ?? "",
-                TrackedItemId = this.Tracker.TrackedItem?.Identifier.Value ?? "",
-                TrackedRecipeHash = this.Tracker.TrackedRecipe?.RecipeHash ?? 0,
-                WindowSize = this.WindowSize,
-                WindowPosition = this.WindowPosition,
-                LeftPanelWidth = this.LeftPanelWidth,
-                RightPanelWidth = this.RightPanelWidth,
-                CustomLayouts = this.CustomLayouts,
-                RawXmlMode = this.RawXmlMode,
-                XmlFontScale = this.XmlFontScale
-            };
+            cfg.LastItemId = CurrentTarget?.Identifier.Value ?? "";
+            cfg.WindowSizeX = WindowSize?.X ?? -1;
+            cfg.WindowSizeY = WindowSize?.Y ?? -1;
+            cfg.WindowPositionX = WindowPosition?.X ?? -1;
+            cfg.WindowPositionY = WindowPosition?.Y ?? -1;
+            cfg.LeftPanelWidth = LeftPanelWidth ?? 0;
+            cfg.RightPanelWidth = RightPanelWidth ?? 0;
+            cfg.FavoritesRaw = Plugin.ClientConfig.FavsToCsv(FavoritedItems);
+            cfg.TabHistoryRaw = Plugin.ClientConfig.HistoryToCsv(TabHistory);
+            cfg.CustomLayoutsRaw = Plugin.ClientConfig.LayoutsToXml(CustomLayouts);
+            cfg.TrackedItemId = Tracker.TrackedItem?.Identifier.Value ?? "";
+            cfg.TrackedRecipeHash = Tracker.TrackedRecipe?.RecipeHash ?? 0;
 
-            SettingsManager.Save(data);
-            isDirty = false;
+            cfg.SaveAll();
         }
 
         public void LoadSettings()
         {
-            var data = SettingsManager.Load();
+            if (cfg == null) return;
 
-            foreach (var fav in data.Favorites) FavoritedItems.Add(fav);
+            // Simple fields (auto-persisted, read from cfg)
+            LastSearchQuery = cfg.LastSearchQuery;
+            RawXmlMode = cfg.RawXmlMode;
+            XmlFontScale = cfg.XmlFontScale;
+            DummyDeathCount = cfg.DummyDeathCount;
+            DummyCharacterXML = cfg.DummyCharacterXML;
+            DummySimulated = cfg.DummySimulated;
 
-            this.DummyDeathCount = data.DummyDeathCount;
-            this.DummyCharacterXML = data.DummyCharacterXML;
-            this.DummySimulated = data.DummySimulated;
-            this.TabHistory.Clear();
-            this.TabHistory.AddRange(data.TabHistory);
+            // Window geometry (batch)
+            int wx = cfg.WindowSizeX;
+            int wy = cfg.WindowSizeY;
+            WindowSize = (wx >= 0 && wy >= 0) ? new Point(wx, wy) : null;
 
-            LastSearchQuery = data.LastSearchQuery;
-            WindowSize = data.WindowSize;
-            WindowPosition = data.WindowPosition;
-            LeftPanelWidth = data.LeftPanelWidth;
-            RightPanelWidth = data.RightPanelWidth;
-            RawXmlMode = data.RawXmlMode;
-            XmlFontScale = data.XmlFontScale;
-            foreach (var kvp in data.CustomLayouts) CustomLayouts[kvp.Key] = kvp.Value;
+            int px = cfg.WindowPositionX;
+            int py = cfg.WindowPositionY;
+            WindowPosition = (px >= 0 && py >= 0) ? new Point(px, py) : null;
 
+            LeftPanelWidth = cfg.LeftPanelWidth > 0 ? cfg.LeftPanelWidth : null;
+            RightPanelWidth = cfg.RightPanelWidth > 0 ? cfg.RightPanelWidth : null;
+
+            // Complex fields (deserialize from store)
+            FavoritedItems.Clear();
+            foreach (var fav in Plugin.ClientConfig.CsvToFavs(cfg.FavoritesRaw))
+                FavoritedItems.Add(fav);
+
+            TabHistory.Clear();
+            TabHistory.AddRange(Plugin.ClientConfig.CsvToHistory(cfg.TabHistoryRaw));
+
+            CustomLayouts.Clear();
+            var loaded = Plugin.ClientConfig.XmlToLayouts(cfg.CustomLayoutsRaw);
+            foreach (var kvp in loaded) CustomLayouts[kvp.Key] = kvp.Value;
+
+            // Defaults
             if (!WindowSize.HasValue) WindowSize = new Point(1250, 850);
             if (!LeftPanelWidth.HasValue) LeftPanelWidth = 250;
             if (!RightPanelWidth.HasValue) RightPanelWidth = 300;
 
-            if (!string.IsNullOrEmpty(data.LastItemId))
+            // Restore last selection
+            string lastId = cfg.LastItemId;
+            if (!string.IsNullOrEmpty(lastId))
             {
-                CurrentTarget = (Prefab?)ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == data.LastItemId)
-                             ?? (Prefab?)AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == data.LastItemId);
+                CurrentTarget = (Prefab?)ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == lastId)
+                             ?? (Prefab?)AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == lastId);
             }
 
-            if (!string.IsNullOrEmpty(data.TrackedItemId))
+            // Restore tracker
+            string trackedId = cfg.TrackedItemId;
+            if (!string.IsNullOrEmpty(trackedId))
             {
-                var targetPrefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == data.TrackedItemId);
+                var targetPrefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == trackedId);
                 if (targetPrefab != null)
                 {
                     var specificRecipe = targetPrefab.FabricationRecipes?.Values
-                        .FirstOrDefault(r => r.RecipeHash == data.TrackedRecipeHash);
+                        .FirstOrDefault(r => r.RecipeHash == cfg.TrackedRecipeHash);
 
                     Tracker.SetTrackedItem(targetPrefab, specificRecipe);
                 }
             }
-
         }
 
         public void ApplyLayout(Point size, int leftW, int rightW)
@@ -226,7 +254,6 @@ namespace SOS
             WindowSize = size;
             LeftPanelWidth = leftW;
             RightPanelWidth = rightW;
-            MarkDirty();
             mainWindow?.ForceLayoutUpdate();
         }
 
@@ -240,12 +267,11 @@ namespace SOS
                 LeftPanelWidth = mainWindow.GetLeftWidth(),
                 RightPanelWidth = mainWindow.GetRightWidth()
             };
-            MarkDirty();
         }
 
         public void DeleteLayout(string name)
         {
-            if (CustomLayouts.Remove(name)) MarkDirty();
+            CustomLayouts.Remove(name);
         }
 
         public void UpdateWindowDetails(Prefab target)
@@ -371,7 +397,7 @@ namespace SOS
 
             if (mainWindow != null)
             {
-                if (IsInLevelTransition)
+                if (IsSOSBlocked)
                 {
                     RLogger.LogDebug("[SOS-Debug] Forcing to close the window in Update.");
                     CrossThread.RequestExecutionOnMainThread(ToggleUI);

@@ -315,7 +315,6 @@ namespace SOS
                 OnScaleChanged = (scale) =>
                     {
                         controller.XmlFontScale = scale;
-                        controller.MarkDirty();
                     },
                 ContentMenu = XmlContextMenu
             };
@@ -327,7 +326,6 @@ namespace SOS
             rawXmlTickBox.OnSelected = (tick) =>
             {
                 controller.RawXmlMode = tick.Selected;
-                controller.MarkDirty();
                 metaPanel.Visible = !tick.Selected;
                 if (xmlContentText != null)
                 {
@@ -738,22 +736,18 @@ namespace SOS
             if (mainFrame != null && mainFrame.RectTransform.NonScaledSize != (controller.WindowSize ?? Point.Zero))
             {
                 controller.WindowSize = mainFrame.RectTransform.NonScaledSize;
-                controller.MarkDirty();
             }
             if (mainFrame != null && mainFrame.RectTransform.AbsoluteOffset != (controller.WindowPosition ?? new Point(-999)))
             {
                 controller.WindowPosition = mainFrame.RectTransform.AbsoluteOffset;
-                controller.MarkDirty();
             }
             if (leftPanel != null && leftPanel.Rect.Width != (controller.LeftPanelWidth ?? 0))
             {
                 controller.LeftPanelWidth = leftPanel.Rect.Width;
-                controller.MarkDirty();
             }
             if (rightPanel != null && rightPanel.Rect.Width != (controller.RightPanelWidth ?? 0))
             {
                 controller.RightPanelWidth = rightPanel.Rect.Width;
-                controller.MarkDirty();
             }
         }
 
@@ -929,7 +923,6 @@ namespace SOS
                     };
                     controller.CustomLayouts[newName] = saved;
                     AddPresetRow(list, newName, () => controller.ApplyLayout(saved.WindowSize, saved.LeftPanelWidth, saved.RightPanelWidth), true, anchor);
-                    controller.MarkDirty();
                     //ToggleLayoutMenu(anchor);
                     //ToggleLayoutMenu(anchor);
                     return true;
@@ -968,7 +961,6 @@ namespace SOS
                     OnClicked = (_, _) =>
                     {
                         controller.CustomLayouts.Remove(name);
-                        controller.MarkDirty();
                         ToggleLayoutMenu(anchor);
                         ToggleLayoutMenu(anchor);
                         return true;
