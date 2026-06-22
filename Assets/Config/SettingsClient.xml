@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Client-only settings -->
+<Configuration>
+    <Settings>
+        <Setting Name="ActivedSOS" Type="bool" Value="false" ShowInMenus="true" />
+        <Setting Name="NameSOS" Type="string" Value="Puto el que lo lea." />
+    </Settings>
+</Configuration>

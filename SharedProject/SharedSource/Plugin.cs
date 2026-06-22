@@ -18,8 +18,22 @@ namespace SOS
 {
     public partial class Plugin : IAssemblyPlugin
     {
+
+#pragma warning disable CS8618
+        public IConfigService ConfigService { get; set; }
+        public IPluginManagementService PluginManagementService { get; set; }
+        public IConsoleCommandsService ConsoleCommandsService { get; set; }
+#pragma warning restore CS8618
+
+        public ContentPackage _package = null!;
+
         public void Initialize()
         {
+            if (!PluginManagementService.TryGetPackageForPlugin<Plugin>(out _package))
+            {
+                RLogger.LogError("Failed to find package!");
+                return;
+            }
 #if CLIENT
             InitClient();
 #endif
