@@ -189,4 +189,12 @@
 	<sos.dummyname.rand.6>Probably Fine #[id]</sos.dummyname.rand.6>
 	<sos.dummyname.rand.7>Has A Family #[id]</sos.dummyname.rand.7>
 	<sos.dummyname.rand.8>Knows What You Did</sos.dummyname.rand.8>
+
+	<!-- Migration -->
+	<sos.migration.title>SOS — Configuration Migration</sos.migration.title>
+	<sos.migration.description>A previous SOS configuration was found.&#xA;Do you want to import your data to the new system?</sos.migration.description>
+	<sos.migration.import>Import</sos.migration.import>
+	<sos.migration.discard>Discard</sos.migration.discard>
+	<sos.migration.success>[SOS] Previous configuration imported successfully.</sos.migration.success>
+	<sos.migration.error>[SOS] Error importing previous configuration: [error]</sos.migration.error>
 </infotexts>

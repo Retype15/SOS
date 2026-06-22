@@ -125,7 +125,6 @@ namespace SOS
             if (_controller != null)
             {
                 _controller.PushTabHistory(tab.GetType().Name);
-                _controller.MarkDirty();
             }
 
             if (_currentTarget != null && _controller != null && _onPrimary != null && _onSecondary != null)
