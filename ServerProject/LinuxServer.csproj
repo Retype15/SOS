@@ -52,7 +52,7 @@
         <RootNamespace>$(SolutionName.Replace(" ", "_"))</RootNamespace>
         <PlatformTarget>x64</PlatformTarget>
         <GenerateDocumentationFile>False</GenerateDocumentationFile>
-        <AssemblyName>SOS</AssemblyName>
+        <AssemblyName>$(ProjectName)</AssemblyName>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

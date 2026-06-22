@@ -5,7 +5,6 @@
 ---
 
 [![GitHub – Download](https://img.shields.io/badge/GitHub-Download-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Retype15/SOS/releases/latest/download/SOS.zip)
-[![Itch.io – Visit Site](https://img.shields.io/badge/Itch.io-Visit%20Site-FA5C5C?style=for-the-badge&logo=itch.io&logoColor=white)](https://retype15.itch.io/sos)
 [![Steam Workshop](https://img.shields.io/badge/Steam_Workshop-Add_here-1B2838?style=for-the-badge&logo=steam&logoColor=white)](https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282)
 
 ---
@@ -109,3 +108,5 @@ See the [LICENSE](LICENCE) file in the project root for the full text of the lic
 
 *Github Project: [SOS](https://github.com/Retype15/SOS)*
 *Developed by [@Retype15](https://github.com/Retype15)*
+
+[![Subscribe!](https://img.shields.io/badge/Subscribe-2EA043?style=for-the-badge&logo=steam&logoColor=white)](https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282)  [![Add to Favorites](https://img.shields.io/badge/Add%20to%20Favorites-F0C040?style=for-the-badge&logo=steam&logoColor=white)](https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282)  [![Rate with a upvote!](https://img.shields.io/badge/Rate%20+1-3B82F6?style=for-the-badge&logo=steam&logoColor=white)](https://steamcommunity.com/sharedfiles/filedetails/?id=3682891282)
