@@ -7,6 +7,7 @@
         <PlatformTarget>x64</PlatformTarget>
         <OutputPath>bin\Linux\</OutputPath>
         <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
+        <NuGetAudit>false</NuGetAudit>
     </PropertyGroup>
 
     <ItemGroup>
@@ -42,6 +43,9 @@
       </Reference>
       <Reference Include="FluentResults">
         <HintPath>..\Refs\FluentResults.dll</HintPath>
+      </Reference>
+      <Reference Include="OneOf">
+        <HintPath>..\Refs\OneOf.dll</HintPath>
       </Reference>
     </ItemGroup>
 
