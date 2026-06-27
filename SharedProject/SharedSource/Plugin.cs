@@ -20,23 +20,33 @@ namespace SOS
     {
 
 #pragma warning disable CS8618
-        public IConfigService ConfigService { get; set; }
-        public IPluginManagementService PluginManagementService { get; set; }
-        public IConsoleCommandsService ConsoleCommandsService { get; set; }
+        public IConfigService ConfigService { get; set; } = null!;
+        public IPluginManagementService PluginManagementService { get; set; } = null!;
+        public IConsoleCommandsService ConsoleCommandsService { get; set; } = null!;
 #pragma warning restore CS8618
 
-        public ContentPackage _package = null!;
+        internal ContentPackage Package = null!;
+
+        internal static Plugin Instance = null!;
 
         public void Initialize()
         {
-            if (!PluginManagementService.TryGetPackageForPlugin<Plugin>(out _package))
+            if (!PluginManagementService.TryGetPackageForPlugin<Plugin>(out Package))
             {
                 RLogger.LogError("Failed to find package!");
                 return;
             }
+
+            Instance = this;
+
 #if CLIENT
             InitClient();
 #endif
+        }
+
+        public Plugin()
+        {
+            RLogger.LogDebug("PLugin Constructor Called.");
         }
 
         public void OnLoadCompleted()
@@ -54,6 +64,11 @@ namespace SOS
             RecipeAnalyzer.ClearSessionCache();
             DisposeClient();
 #endif
+            ConfigService = null!;
+            PluginManagementService = null!;
+            ConsoleCommandsService = null!;
+            Package = null!;
+            Instance = null!;
             RLogger.LogDebug(TextSOS.Get("sos.shared.unloaded", "[SOS] Mod Unloaded.").Value);
             GC.SuppressFinalize(this);
         }
