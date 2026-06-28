@@ -18,11 +18,14 @@ namespace SOS
         {
             if (overlay != null) return;
 
-            SOSController.migrationPending = true;
+            SOSController.MigrationPending = true;
 
             // ─── Full-screen semi-transparent overlay ───
 
-            overlay = new GUIFrame(new RectTransform(Vector2.One, GUI.Canvas), style: null)
+            var parentComponent = Screen.Selected?.Frame;
+            if (parentComponent == null) return;
+
+            overlay = new GUIFrame(new RectTransform(Vector2.One, parentComponent.RectTransform), style: null)
             {
                 Color = Color.Black * 0.5f
             };
@@ -40,11 +43,10 @@ namespace SOS
 
             // ─── Description ───
 
-            var descArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.35f), dialog.RectTransform), style: null);
+            var descArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.5f), dialog.RectTransform), style: null);
             _ = new GUITextBlock(new RectTransform(Vector2.One, descArea.RectTransform, Anchor.Center),
                 TextSOS.Get("sos.migration.description",
-                    "Se encontró una configuración anterior de SOS.\n" +
-                    "¿Deseas importar tus datos al nuevo sistema?"),
+                    "Se encontró una configuración anterior de SOS.\n¿Deseas importar tus datos al nuevo sistema?"),
                 font: GUIStyle.SmallFont, textAlignment: Alignment.Center);
 
             // ─── Buttons ───
@@ -57,14 +59,23 @@ namespace SOS
             };
 
             // Import button
-            var importBtn = new GUIButton(new RectTransform(new Vector2(0.4f, 1f), btnLayout.RectTransform),
+            var importBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
                 TextSOS.Get("sos.migration.import", "Importar"));
             importBtn.OnClicked += ImportAction;
 
             // Discard button
-            var discardBtn = new GUIButton(new RectTransform(new Vector2(0.4f, 1f), btnLayout.RectTransform),
+            var discardBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
                 TextSOS.Get("sos.migration.discard", "Descartar"));
             discardBtn.OnClicked += DiscardAction;
+
+            // Ignore button
+            var ignoreBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
+                TextSOS.Get("sos.migration.ignore", "Ignorar"));
+            ignoreBtn.OnClicked += IgnoreAction;
+
+            //overlay.AddToGUIUpdateList(ignoreChildren: false, order: 10001);
+
+            RLogger.LogDebug("Showing MigrationDialog");
         }
 
         private static bool ImportAction(GUIButton button, object userdata)
@@ -150,6 +161,12 @@ namespace SOS
             return true;
         }
 
+        private static bool IgnoreAction(GUIButton button, object userdata)
+        {
+            Close();
+            return true;
+        }
+
         private static void RenameOldFile()
         {
             const string oldPath = "Data/sossettings.xml";
@@ -170,13 +187,15 @@ namespace SOS
             }
         }
 
-        private static void Close()
+        public static void Close()
         {
-            SOSController.migrationPending = false;
+            SOSController.MigrationPending = false;
 
+            overlay?.RemoveFromGUIUpdateList();
             overlay?.Parent?.RemoveChild(overlay);
             overlay = null;
             dialog = null;
+            SOSController.Instance.ToggleUI();
         }
     }
 }

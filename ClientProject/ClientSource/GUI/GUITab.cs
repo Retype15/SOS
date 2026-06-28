@@ -75,7 +75,7 @@ namespace SOS
             _onSecondary = onSecondary;
 
             _buttonArea.Content.ClearChildren();
-            var validTabs = _tabs.Where(t => t.CanHandle(target)).ToList();
+            List<ITab> validTabs = [.. _tabs.Where(t => t.CanHandle(target))];
 
             ITab? resolved = null;
             foreach (var uid in controller.TabHistory)
@@ -122,10 +122,7 @@ namespace SOS
             if (_activeTab == tab) return;
             _activeTab = tab;
 
-            if (_controller != null)
-            {
-                _controller.PushTabHistory(tab.GetType().Name);
-            }
+            _controller?.PushTabHistory(tab.GetType().Name);
 
             if (_currentTarget != null && _controller != null && _onPrimary != null && _onSecondary != null)
             {

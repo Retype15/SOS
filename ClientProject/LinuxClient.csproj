@@ -44,9 +44,6 @@
       <Reference Include="FluentResults">
         <HintPath>..\Refs\FluentResults.dll</HintPath>
       </Reference>
-      <Reference Include="OneOf">
-        <HintPath>..\Refs\OneOf.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
     <Import Project="..\SharedProject\SharedProject.projitems" Label="Shared" />

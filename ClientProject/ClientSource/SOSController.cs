@@ -6,26 +6,40 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
+using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace SOS
 {
-    public class SOSController
+    public sealed class SOSController
     {
         private SOSWindow? mainWindow;
 
+        public bool HaveOldConfigFile = false;
+
         public bool DataInitialized { get; private set; } = false;
 
-        public HashSet<string> FavoritedItems { get; } = [];
+        private HashSet<string>? _favoritedItems;
+        public HashSet<string> FavoritedItems
+        {
+            get
+            {
+                _favoritedItems ??= ClientConfig.CsvToHashSet(cfg.FavoritesRaw ?? "");
+                return _favoritedItems;
+            }
+        }
 
         public TrackerManager Tracker { get; } = new();
-        private readonly Keys toggleKey = Keys.J;
+
+        public ClientConfig cfg = ClientConfig.Instance;
+
+        private Keys ToggleKey => cfg.SOSOpenKey.Key;
         private bool wasKeyDown = false;
 
         public string LastSearchQuery
         {
-            get => cfg?.LastSearchQuery ?? "";
+            get => cfg.LastSearchQuery ?? "";
             set { cfg.LastSearchQuery = value; }
         }
         public Prefab? CurrentTarget { get; internal set; }
@@ -39,40 +53,39 @@ namespace SOS
         public int? RightPanelWidth { get; set; }
         public bool RawXmlMode
         {
-            get => cfg?.RawXmlMode ?? false;
+            get => cfg.RawXmlMode;
             set { cfg.RawXmlMode = value; }
         }
         public float XmlFontScale
         {
-            get => cfg?.XmlFontScale ?? 0.9f;
+            get => cfg.XmlFontScale;
             set { cfg.XmlFontScale = value; }
         }
 
         public int DummyDeathCount
         {
-            get => cfg?.DummyDeathCount ?? 0;
+            get => cfg.DummyDeathCount;
             set { cfg.DummyDeathCount = value; }
         }
         public string? DummyCharacterXML
         {
-            get => cfg?.DummyCharacterXML;
+            get => cfg.DummyCharacterXML;
             set { cfg.DummyCharacterXML = value; }
         }
         public List<string> TabHistory { get; } = [];
         public bool DummySimulated
         {
-            get => cfg?.DummySimulated ?? false;
+            get => cfg.DummySimulated;
             set { cfg.DummySimulated = value; }
         }
 
-        public Plugin.ClientConfig cfg = null!;
-
-        public static bool migrationPending = false;
+        private static bool migrationPending = false;
+        public static bool MigrationPending { get => migrationPending; set => migrationPending = value; }
 
         public static bool IsSOSBlocked =>
             GameMain.Instance.LoadingScreenOpen == true ||
-            CoroutineManager.IsCoroutineRunning("LevelTransition") ||
-            migrationPending;
+            migrationPending ||
+            CoroutineManager.IsCoroutineRunning("LevelTransition");
 
         public void PushTabHistory(string uid)
         {
@@ -92,9 +105,7 @@ namespace SOS
             }
         }
 
-        public SOSController()
-        {
-        }
+        private SOSController() { }
 
         public void SetTrackedItem(ItemPrefab? item, FabricationRecipe? recipe = null)
         {
@@ -113,6 +124,14 @@ namespace SOS
             }
             else
             {
+                if (HaveOldConfigFile)
+                {
+                    MigrationDialog.Show();
+                    HaveOldConfigFile = false;
+                    RLogger.LogDebug("Abriendo la ventana de migracion");
+                    return;
+                }
+
                 if (Screen.Selected == null || IsSOSBlocked) return;
 
                 mainWindow = new SOSWindow(this);
@@ -139,8 +158,12 @@ namespace SOS
 
         public void Destroy()
         {
+            GUIAnimSequence.ClearAll();
+
+            _favoritedItems = null;
             mainWindow?.Destroy();
             mainWindow = null;
+            cfg = null!;
         }
 
         public void OnTargetSelected(Prefab item, bool isHistoryNavigation = false)
@@ -176,9 +199,9 @@ namespace SOS
             cfg.WindowPositionY = WindowPosition?.Y ?? -1;
             cfg.LeftPanelWidth = LeftPanelWidth ?? 0;
             cfg.RightPanelWidth = RightPanelWidth ?? 0;
-            cfg.FavoritesRaw = Plugin.ClientConfig.FavsToCsv(FavoritedItems);
-            cfg.TabHistoryRaw = Plugin.ClientConfig.HistoryToCsv(TabHistory);
-            cfg.CustomLayoutsRaw = Plugin.ClientConfig.LayoutsToXml(CustomLayouts);
+            cfg.FavoritesRaw = FavoritedItems.ToCsv();
+            cfg.TabHistoryRaw = TabHistory.ToCsv();
+            cfg.CustomLayoutsRaw = ClientConfig.LayoutsToXml(CustomLayouts);
             cfg.TrackedItemId = Tracker.TrackedItem?.Identifier.Value ?? "";
             cfg.TrackedRecipeHash = Tracker.TrackedRecipe?.RecipeHash ?? 0;
 
@@ -211,14 +234,13 @@ namespace SOS
 
             // Complex fields (deserialize from store)
             FavoritedItems.Clear();
-            foreach (var fav in Plugin.ClientConfig.CsvToFavs(cfg.FavoritesRaw))
+            foreach (var fav in ClientConfig.CsvToHashSet(cfg.FavoritesRaw))
                 FavoritedItems.Add(fav);
-
             TabHistory.Clear();
-            TabHistory.AddRange(Plugin.ClientConfig.CsvToHistory(cfg.TabHistoryRaw));
+            TabHistory.AddRange(ClientConfig.CsvToList(cfg.TabHistoryRaw));
 
             CustomLayouts.Clear();
-            var loaded = Plugin.ClientConfig.XmlToLayouts(cfg.CustomLayoutsRaw);
+            var loaded = ClientConfig.XmlToLayouts(cfg.CustomLayoutsRaw);
             foreach (var kvp in loaded) CustomLayouts[kvp.Key] = kvp.Value;
 
             // Defaults
@@ -366,8 +388,9 @@ namespace SOS
 
             if (canHandleInputs)
             {
-                var kb = Keyboard.GetState();
-                bool isKeyDownNow = kb.IsKeyDown(toggleKey);
+                //var kb = Keyboard.GetState();
+                //bool isKeyDownNow = kb.IsKeyDown(ToggleKey);
+                bool isKeyDownNow = cfg.SOSOpenKeyDown;
 
                 if (isKeyDownNow && !wasKeyDown)
                 {
@@ -392,7 +415,7 @@ namespace SOS
             }
             else
             {
-                wasKeyDown = Keyboard.GetState().IsKeyDown(toggleKey);
+                wasKeyDown = cfg.SOSOpenKeyDown;
             }
 
             if (mainWindow != null)

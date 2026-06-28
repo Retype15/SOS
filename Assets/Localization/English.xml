@@ -197,4 +197,31 @@
 	<sos.migration.discard>Discard</sos.migration.discard>
 	<sos.migration.success>[SOS] Previous configuration imported successfully.</sos.migration.success>
 	<sos.migration.error>[SOS] Error importing previous configuration: [error]</sos.migration.error>
+
+	<!-- DB-Location -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.Type.DisplayName>TEST</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.Type.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.Type.Tooltip>TEST.DESC</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.Type.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.Type.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.Type.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>Key to open SOS Menu</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>PUTO</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>Raw XML Font Scale</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>PUTO</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedItemId.DisplayName>SOS Tracked Item</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedItemId.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedItemId.Tooltip>Si presenta algún problema con eliminar el item trackeado, prueba a eliminar el texto en esta opción y recargar partida.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedItemId.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedItemId.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedItemId.DisplayCategory>
+
+	<!-- Window position X -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>SOS Window position X</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>If the window falls outside of the UI, try adjusting these values until it is repositioned. Recommended: 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>
+
+	<!-- Window position Y -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>SOS Window position Y</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>If the window falls outside of the UI, try adjusting these values until it is repositioned. Recommended: 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>
 </infotexts>

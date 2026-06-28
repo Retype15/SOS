@@ -8,7 +8,6 @@
 using Barotrauma;
 using Microsoft.Xna.Framework;
 using MonoMod.Utils;
-using static SOS.CardBuilder;
 
 namespace SOS
 {
@@ -19,7 +18,7 @@ namespace SOS
         Hidden
     }
 
-    public class SOSWindow
+    public sealed class SOSWindow
     {
         private GUIFrame? loadingFrame;
         private readonly GUIResizableFrame? mainFrame;
@@ -106,6 +105,8 @@ namespace SOS
 
             mainFrame.RectTransform.NonScaledSize = initialSize;
 
+            mainFrame.AddToGUIUpdateList(ignoreChildren: false, order: 10000);
+
             if (controller.WindowPosition.HasValue)
             {
                 mainFrame.RectTransform.AbsoluteOffset = controller.WindowPosition.Value;
@@ -129,7 +130,7 @@ namespace SOS
             }
         }
 
-        protected void BuildLoadingUI()
+        internal void BuildLoadingUI()
         {
             if (mainFrame == null) return;
 
@@ -155,7 +156,7 @@ namespace SOS
             LoadingCompletedText.Wait(0.5f).ExFadeIn(duration: 0.5f);
         }
 
-        protected void BuildMainUI()
+        internal void BuildMainUI()
         {
             if (mainFrame == null) return;
 
@@ -621,10 +622,6 @@ namespace SOS
         {
             if (mainFrame == null) return;
 
-            mainFrame.AddToGUIUpdateList(ignoreChildren: false, order: 10000);
-
-            layoutMenuFrame?.AddToGUIUpdateList(ignoreChildren: false, order: 10001);
-
             UpdateLayout();
 
             if (pendingSearchQuery != null && Timing.TotalTime >= searchExecutionTime)
@@ -772,7 +769,7 @@ namespace SOS
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.15f, 0.9f), headerLayout.RectTransform, Anchor.CenterLeft), style: null)
                 {
-                    OnDrawToolTip = component => component.ToolTip = GetDetailedTooltip(targetItem)
+                    OnDrawToolTip = component => component.ToolTip = CardBuilder.GetDetailedTooltip(targetItem)
                 };
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = PrefabAdapter.IconColor(targetItem), CanBeFocused = false };
             }
