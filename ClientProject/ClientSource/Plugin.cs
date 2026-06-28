@@ -20,7 +20,6 @@ namespace SOS
         public void InitClient()
         {
             controller = SOSController.Instance;
-            controller.cfg = new ClientConfig(ConfigService, _package);
             controller.LoadSettings();
 
             if (!DebugConsole.commands.Exists(c => c.Names.ToString() == "sos")) // \\//
@@ -41,7 +40,7 @@ namespace SOS
             // Migration: old config file detected
             if (File.Exists("Data/sossettings.xml"))
             {
-                MigrationDialog.Show();
+                controller.HaveOldConfigFile = true;
             }
 
             RLogger.Log(TextSOS.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);

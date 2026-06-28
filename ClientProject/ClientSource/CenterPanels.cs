@@ -229,8 +229,8 @@ namespace SOS
             {
                 if (ClinicalSimulatorManager.Patient != null)
                 {
-                    float v = ClinicalSimulatorManager.Patient.CharacterHealth.Vitality;
-                    hpText.Text = $"HP: {(int)v}%";
+                    int v = (int)ClinicalSimulatorManager.Patient.CharacterHealth.Vitality;
+                    hpText.Text = (v > -100) ? $"HP: {v}%" : TextManager.Get("deceased").ToUpper();
                     hpText.TextColor = v <= 0 ? Color.Red : (v < 50 ? Color.Orange : Color.Lime);
                 }
             });
