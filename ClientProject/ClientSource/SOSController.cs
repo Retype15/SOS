@@ -338,7 +338,7 @@ namespace SOS
             var options = new List<ContextMenuOption>();
 
             if (target is ItemPrefab item)
-                options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(item).Value, isEnabled: true, onSelected: () => Tracker.AddOrRemoveRecipe(item)))
+                options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(item).Value, isEnabled: true, onSelected: () => Tracker.AddOrRemoveRecipe(item)));
 
             //options.Add(new ContextMenuOption("Ver más info (WIP)", isEnabled: false));
 
