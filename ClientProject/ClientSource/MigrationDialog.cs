@@ -14,7 +14,7 @@ namespace SOS
         private static GUIFrame? overlay;
         private static GUIFrame? dialog;
 
-        public static void Update() => overlay?.AddToGUIUpdateList(1);
+        public static void Update() => overlay?.AddToGUIUpdateList(order: 1);
 
         public static void Show()
         {
@@ -112,7 +112,7 @@ namespace SOS
                         controller.CustomLayouts[kvp.Key] = kvp.Value;
 
                     // Transfer tracker
-                        controller.Tracker.AddRecipe(data.TrackedItemId, data.TrackedRecipeHash);
+                    controller.Tracker.AddRecipe(data.TrackedItemId, data.TrackedRecipeHash);
 
                     // Restore last selected item
                     if (!string.IsNullOrEmpty(data.LastItemId))

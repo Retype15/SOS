@@ -24,22 +24,29 @@ namespace SOS
 
         private readonly GUILayoutGroup contentLayout;
         private bool layoutDirty = false;
+        private sealed class IngredientUI
+        {
+            public GUIFrame row = null!;
+            public GUIImage icon = null!;
+            public GUITextBlock text = null!;
+        }
+
         private sealed class ItemUIRecipe
         {
             public GUIFrame itemRow = null!;
             public GUIImage indicatorImage = null!;
             public GUIImage? itemIcon;
             public GUITextBlock nameText = null!;
-            public Dictionary<FabricationRecipe.RequiredItem, GUITextBlock> reqList = null!;
+            public Dictionary<FabricationRecipe.RequiredItem, IngredientUI> reqList = null!;
 
             public void Destroy()
             {
                 itemRow.RectTransform.Parent = null;
                 itemRow.RemoveFromGUIUpdateList();
-                foreach (var textBlock in reqList.Values)
+                foreach (var ing in reqList.Values)
                 {
-                    textBlock.RectTransform.Parent = null;
-                    textBlock.RemoveFromGUIUpdateList();
+                    ing.row.RectTransform.Parent = null;
+                    ing.row.RemoveFromGUIUpdateList();
                 }
             }
         }
@@ -188,7 +195,7 @@ namespace SOS
             { CanBeFocused = false };
 
             var indicator = new GUIImage(
-                new RectTransform(new Point(16, 16), itemRow.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(4, 0) },
+                new RectTransform(new Point(22, 22), itemRow.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(4, 0) },
                 "ObjectiveIndicatorIncomplete", scaleToFit: true)
             { CanBeFocused = false };
 
@@ -197,27 +204,50 @@ namespace SOS
             if (iconSprite != null)
             {
                 iconImage = new GUIImage(
-                    new RectTransform(new Point(16, 16), itemRow.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(22, 0) },
+                    new RectTransform(new Point(16, 16), itemRow.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(28, 0) },
                     iconSprite, scaleToFit: true)
                 { CanBeFocused = false, Color = recipe.TargetItem.InventoryIconColor };
             }
 
             var nameText = new GUITextBlock(
-                new RectTransform(new Vector2(1f, 1f), itemRow.RectTransform) { AbsoluteOffset = new Point(42, 0) },
+                new RectTransform(new Vector2(1f, 1f), itemRow.RectTransform) { AbsoluteOffset = new Point(48, 0) },
                 recipe.TargetItem.Name.Value, font: GUIStyle.SmallFont, textColor: Color.Cyan)
             { CanBeFocused = false, ToolTip = TextSOS.Get("sos.hud.tracked_item_tooltip", "Currently tracked item.") };
 
-            Dictionary<FabricationRecipe.RequiredItem, GUITextBlock> reqList = [];
+            Dictionary<FabricationRecipe.RequiredItem, IngredientUI> reqList = [];
             foreach (var req in recipe.RequiredItems)
             {
-                var text = new GUITextBlock(
-                    new RectTransform(new Vector2(1f, 0f), contentLayout.RectTransform) { MinSize = new Point(0, 16) },
+                var ingRow = new GUIFrame(
+                    new RectTransform(new Vector2(1f, 0f), contentLayout.RectTransform) { MinSize = new Point(0, 18) },
+                    style: null)
+                { CanBeFocused = false };
+
+                var ingIconSprite = req.FirstMatchingPrefab?.InventoryIcon;
+                GUIImage ingIcon;
+                if (ingIconSprite != null)
+                {
+                    ingIcon = new GUIImage(
+                        new RectTransform(new Point(16, 16), ingRow.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(28, 0) },
+                        ingIconSprite, scaleToFit: true)
+                    { CanBeFocused = false };
+                }
+                else
+                {
+                    ingIcon = new GUIImage(
+                        new RectTransform(new Point(16, 16), ingRow.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(28, 0) },
+                        style: null)
+                    { CanBeFocused = false, Color = Color.Transparent };
+                }
+
+                var ingText = new GUITextBlock(
+                    new RectTransform(new Vector2(1f, 1f), ingRow.RectTransform) { AbsoluteOffset = new Point(48, 0) },
                     "", font: GUIStyle.SmallFont)
                 {
                     CanBeFocused = false,
                     ToolTip = TextSOS.Get("sos.hud.ingredient_tooltip", "Required ingredient. Shows how many you have in your inventory.")
                 };
-                reqList.Add(req, text);
+
+                reqList.Add(req, new IngredientUI { row = ingRow, icon = ingIcon, text = ingText });
             }
 
             return new ItemUIRecipe
@@ -240,7 +270,7 @@ namespace SOS
             foreach (var (_, itemUIRecipe) in trackedRecipes)
             {
                 bool allComplete = true;
-                foreach (var (req, textBlock) in itemUIRecipe.reqList)
+                foreach (var (req, ingUI) in itemUIRecipe.reqList)
                 {
                     if (!cache.TryGetValue(req.ToIdentifier(), out var owned))
                     {
@@ -253,8 +283,8 @@ namespace SOS
 
                     string? value = req.FirstMatchingPrefab?.Name.Value;
                     string name = value.IsNullOrEmpty() ? TextSOS.Get("sos.gen.unknown", "???").Value : value;
-                    textBlock.Text = $"  {name}: {owned}/{req.Amount}";
-                    textBlock.TextColor = hasEnough ? Color.LightGreen : Color.Salmon;
+                    ingUI.text.Text = $"{name}: {owned}/{req.Amount}";
+                    ingUI.text.TextColor = hasEnough ? Color.LightGreen : Color.Salmon;
                 }
 
                 var style = GUIStyle.GetComponentStyle(allComplete ? "ObjectiveIndicatorCompleted" : "ObjectiveIndicatorIncomplete");
