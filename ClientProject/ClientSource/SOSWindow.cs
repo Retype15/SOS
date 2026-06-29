@@ -194,10 +194,18 @@ namespace SOS
                 OnClicked = (_, _) => { controller.ToggleUI(); return true; },
                 ToolTip = TextSOS.Get("sos.gen.close", "Close [Esc]")
             };
-            _ = new GUIButton(new RectTransform(new Vector2(0.65f, 1f), topButtons.RectTransform), TextSOS.Get("sos.window.clear_hud", "Clear HUD"), style: "DeviceButton")
+            _ = new GUIButton(new RectTransform(new Vector2(0.65f, 1f), topButtons.RectTransform), TextSOS.Get("sos.window.manage_hud", "MANAGE HUD"), style: "DeviceButton")
             {
-                OnClicked = (_, _) => { controller.Tracker.Clear(); return true; },
-                ToolTip = TextSOS.Get("sos.window.clear_hud_tooltip", "Clears the active HUD tracker")
+                OnClicked = (_, _) =>
+                {
+                    var options = controller.Tracker.GetManageHudContextMenuOptions();
+                    GUIContextMenu.CreateContextMenu(
+                        PlayerInput.MousePosition,
+                        TextSOS.Get("sos.window.remove_recipes", "Remove Recipes"),
+                        null, [.. options]);
+                    return true;
+                },
+                ToolTip = TextSOS.Get("sos.window.manage_hud_tooltip", "Manage tracked recipes on the HUD")
             };
 
             contentArea = new GUIFrame(new RectTransform(new Vector2(0.98f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter)

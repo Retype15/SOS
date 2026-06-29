@@ -415,8 +415,8 @@ namespace SOS
 
                 mainWindow.Update();
             }
-            if(migrationPending) MigrationDialog.Update();
-            if (!IsSOSBlocked) Tracker.Update();
+            if (migrationPending) MigrationDialog.Update();
+            if (!IsSOSBlocked && Screen.Selected == GameMain.GameScreen) Tracker.Update();
         }
 
         private static Prefab? GetPrefabUnderMouse()
