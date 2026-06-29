@@ -70,18 +70,23 @@ namespace SOS
             set { if (_xmlFontScale.Value != value) _xmlFontScale.TrySetValue(value); }
         }
 
-        private readonly ISettingBase<string> _trackedItemId = null!;
-        public string TrackedItemId
+        private readonly ISettingBase<string> _trackedRecipesRaw = null!;
+        public string TrackedRecipesRaw
         {
-            get => _trackedItemId.Value;
-            set { if (_trackedItemId.Value != value) _trackedItemId.TrySetValue(value); }
+            get => _trackedRecipesRaw.Value;
+            set { if (_trackedRecipesRaw.Value != value) _trackedRecipesRaw.TrySetValue(value); }
         }
 
-        private readonly ISettingBase<int> _trackedRecipeHash = null!;
-        public uint TrackedRecipeHash
+        private readonly ISettingBase<bool> _trackerVisible = null!;
+        public bool TrackerVisible
         {
-            get => (uint)_trackedRecipeHash.Value;
-            set { if ((uint)_trackedRecipeHash.Value != value) _trackedRecipeHash.TrySetValue((int)value); }
+            get => _trackerVisible.Value;
+            set { if (_trackerVisible.Value != value) _trackerVisible.TrySetValue(value); }
+        }
+        public event Action<ISettingBase> OnTrackerVisibleValueChanged
+        {
+            add => _trackerVisible.OnValueChanged += value;
+            remove => _trackerVisible.OnValueChanged -= value;
         }
 
         private readonly ISettingBase<int> _dummyDeathCount = null!;
@@ -214,8 +219,8 @@ namespace SOS
             TryInitConfig("Favorites", out _favoritesRaw);
             TryInitConfig("TabHistory", out _tabHistoryRaw);
             TryInitConfig("CustomLayouts", out _customLayoutsRaw);
-            TryInitConfig("TrackedItemId", out _trackedItemId);
-            TryInitConfig("TrackedRecipeHash", out _trackedRecipeHash);
+            TryInitConfig("TrackedRecipes", out _trackedRecipesRaw);
+            TryInitConfig("TrackerVisible", out _trackerVisible);
             TryInitConfig("WindowSizeX", out _windowSizeX);
             TryInitConfig("WindowSizeY", out _windowSizeY);
             TryInitConfig("WindowPositionX", out _windowPositionX);
@@ -246,6 +251,11 @@ namespace SOS
             setting.AddDisplayComponent(row, Vector2.One, value => value.ToString());
 #endif
             return true;
+        }
+
+        public static void Destroy()
+        {
+            _instance = null;
         }
     }
 

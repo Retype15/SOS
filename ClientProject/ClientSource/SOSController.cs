@@ -30,7 +30,7 @@ namespace SOS
             }
         }
 
-        public TrackerManager Tracker { get; } = new();
+        public GUIRecipeTracker Tracker { get; } = GUIRecipeTracker.InstantiateWithDefault();
 
         public ClientConfig cfg = ClientConfig.Instance;
 
@@ -96,21 +96,9 @@ namespace SOS
         public Dictionary<string, SavedLayout> CustomLayouts { get; } = [];
 
         private static SOSController? _instance;
-        public static SOSController Instance
-        {
-            get
-            {
-                _instance ??= new SOSController();
-                return _instance;
-            }
-        }
+        public static SOSController Instance => _instance ??= new SOSController();
 
         private SOSController() { }
-
-        public void SetTrackedItem(ItemPrefab? item, FabricationRecipe? recipe = null)
-        {
-            Tracker.SetTrackedItem(item, recipe);
-        }
 
         public void AddFavorite(string id) { FavoritedItems.Add(id); }
         public void RemoveFavorite(string id) { FavoritedItems.Remove(id); }
@@ -163,7 +151,7 @@ namespace SOS
             _favoritedItems = null;
             mainWindow?.Destroy();
             mainWindow = null;
-            cfg = null!;
+            ClientConfig.Destroy();
         }
 
         public void OnTargetSelected(Prefab item, bool isHistoryNavigation = false)
@@ -202,8 +190,8 @@ namespace SOS
             cfg.FavoritesRaw = FavoritedItems.ToCsv();
             cfg.TabHistoryRaw = TabHistory.ToCsv();
             cfg.CustomLayoutsRaw = ClientConfig.LayoutsToXml(CustomLayouts);
-            cfg.TrackedItemId = Tracker.TrackedItem?.Identifier.Value ?? "";
-            cfg.TrackedRecipeHash = Tracker.TrackedRecipe?.RecipeHash ?? 0;
+            cfg.TrackedRecipesRaw = Tracker.ToCsv();
+            cfg.TrackerVisible = Tracker.Visible;
 
             cfg.SaveAll();
         }
@@ -257,18 +245,8 @@ namespace SOS
             }
 
             // Restore tracker
-            string trackedId = cfg.TrackedItemId;
-            if (!string.IsNullOrEmpty(trackedId))
-            {
-                var targetPrefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == trackedId);
-                if (targetPrefab != null)
-                {
-                    var specificRecipe = targetPrefab.FabricationRecipes?.Values
-                        .FirstOrDefault(r => r.RecipeHash == cfg.TrackedRecipeHash);
-
-                    Tracker.SetTrackedItem(targetPrefab, specificRecipe);
-                }
-            }
+            Tracker.FromCsv(cfg.TrackedRecipesRaw);
+            Tracker.Visible = cfg.TrackerVisible;
         }
 
         public void ApplyLayout(Point size, int leftW, int rightW)
@@ -329,7 +307,7 @@ namespace SOS
         {
             if (target == null) return;
             List<ContextMenuOption> options = [];
-            if (target is ItemPrefab item) options.Add(new ContextMenuOption(TextSOS.Get("sos.context.track", "Track to HUD"), isEnabled: true, onSelected: () => Tracker.SetTrackedItem(item)));
+            if (target is ItemPrefab item) options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(item).Value, isEnabled: true, onSelected: () => Tracker.AddOrRemoveRecipe(item)));
 
             options.Add(new ContextMenuOption(TextSOS.Get("sos.context.view_recipes", "View Recipes"), isEnabled: true, onSelected: () =>
             {
@@ -360,16 +338,7 @@ namespace SOS
             var options = new List<ContextMenuOption>();
 
             if (target is ItemPrefab item)
-                if (Tracker.TrackedRecipe == recipe)
-                    options.Add(new ContextMenuOption(TextSOS.Get("sos.context.untrack", "Remove from HUD"), isEnabled: true, onSelected: () =>
-                    {
-                        Tracker.SetTrackedItem(null);
-                    }));
-                else
-                    options.Add(new ContextMenuOption(TextSOS.Get("sos.context.track_recipe", "Add to HUD"), isEnabled: true, onSelected: () =>
-                    {
-                        Tracker.SetTrackedItem(item, recipe);
-                    }));
+                options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(item).Value, isEnabled: true, onSelected: () => Tracker.AddOrRemoveRecipe(item)))
 
             //options.Add(new ContextMenuOption("Ver más info (WIP)", isEnabled: false));
 
@@ -378,7 +347,7 @@ namespace SOS
 
         public void OnRecipeSelected(ItemPrefab item, FabricationRecipe recipe)
         {
-            Tracker.SetTrackedItem(item, recipe);
+            Tracker.AddOrRemoveRecipe(recipe);
             OnTargetSelected(item);
         }
 
@@ -420,13 +389,6 @@ namespace SOS
 
             if (mainWindow != null)
             {
-                if (IsSOSBlocked)
-                {
-                    RLogger.LogDebug("[SOS-Debug] Forcing to close the window in Update.");
-                    CrossThread.RequestExecutionOnMainThread(ToggleUI);
-                    return;
-                }
-
                 if (canHandleInputs)
                 {
                     if (PlayerInput.KeyHit(Keys.Escape))
@@ -453,8 +415,8 @@ namespace SOS
 
                 mainWindow.Update();
             }
-
-            Tracker.UpdateHUD();
+            if(migrationPending) MigrationDialog.Update();
+            if (!IsSOSBlocked) Tracker.Update();
         }
 
         private static Prefab? GetPrefabUnderMouse()

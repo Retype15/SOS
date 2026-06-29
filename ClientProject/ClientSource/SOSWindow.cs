@@ -92,7 +92,7 @@ namespace SOS
             var parentComponent = Screen.Selected?.Frame;
             if (parentComponent == null) return;
 
-            mainFrame = new GUIResizableFrame(new RectTransform(new Vector2(0.95f, 0.9f), parentComponent.RectTransform, Anchor.TopLeft), style: "CircuitBoxFrame")
+            mainFrame = new GUIResizableFrame(new RectTransform(new Vector2(0.95f, 0.9f), GUI.Canvas, Anchor.TopLeft), style: "CircuitBoxFrame")
             {
                 CanBeFocused = true,
                 Selected = true,
@@ -104,8 +104,6 @@ namespace SOS
             Point initialSize = controller.WindowSize ?? new Point(1000, 700);
 
             mainFrame.RectTransform.NonScaledSize = initialSize;
-
-            mainFrame.AddToGUIUpdateList(ignoreChildren: false, order: 10000);
 
             if (controller.WindowPosition.HasValue)
             {
@@ -198,7 +196,7 @@ namespace SOS
             };
             _ = new GUIButton(new RectTransform(new Vector2(0.65f, 1f), topButtons.RectTransform), TextSOS.Get("sos.window.clear_hud", "Clear HUD"), style: "DeviceButton")
             {
-                OnClicked = (_, _) => { controller.Tracker.SetTrackedItem(null); return true; },
+                OnClicked = (_, _) => { controller.Tracker.Clear(); return true; },
                 ToolTip = TextSOS.Get("sos.window.clear_hud_tooltip", "Clears the active HUD tracker")
             };
 
@@ -730,22 +728,24 @@ namespace SOS
             }
 
             // aaaa
-            if (mainFrame != null && mainFrame.RectTransform.NonScaledSize != (controller.WindowSize ?? Point.Zero))
+            if (mainFrame.RectTransform.NonScaledSize != (controller.WindowSize ?? Point.Zero))
             {
                 controller.WindowSize = mainFrame.RectTransform.NonScaledSize;
             }
-            if (mainFrame != null && mainFrame.RectTransform.AbsoluteOffset != (controller.WindowPosition ?? new Point(-999)))
+            if (mainFrame.RectTransform.AbsoluteOffset != (controller.WindowPosition ?? new Point(-999)))
             {
                 controller.WindowPosition = mainFrame.RectTransform.AbsoluteOffset;
             }
-            if (leftPanel != null && leftPanel.Rect.Width != (controller.LeftPanelWidth ?? 0))
+            if (leftPanel.Rect.Width != (controller.LeftPanelWidth ?? 0))
             {
                 controller.LeftPanelWidth = leftPanel.Rect.Width;
             }
-            if (rightPanel != null && rightPanel.Rect.Width != (controller.RightPanelWidth ?? 0))
+            if (rightPanel.Rect.Width != (controller.RightPanelWidth ?? 0))
             {
                 controller.RightPanelWidth = rightPanel.Rect.Width;
             }
+
+            mainFrame.AddToGUIUpdateList(order: 1);
         }
 
         private static DisplayMode GetModeForWidth(int width, int hiddenThreshold, int compactThreshold)

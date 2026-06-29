@@ -126,7 +126,7 @@ namespace SOS
 
             public void Draw(GUIListBox list)
             {
-                bool isTracked = Controller.Tracker.TrackedRecipe == Recipe;
+                bool isTracked = Controller.Tracker.ContainsRecipe(Recipe);
                 bool showName = !Recipe.RequiresRecipe && Recipe.RequiredSkills.Length == 0;
                 int rows = (showName ? 1 : 0) + (Recipe.RequiresRecipe ? 1 : 0) + Recipe.RequiredSkills.Length + Recipe.RequiredItems.Length;
                 int height = (rows * RowHeight) + (rows * 2) + CardPadding;

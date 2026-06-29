@@ -307,11 +307,6 @@ namespace SOS
 
             MaybeKillDummy();
 
-            if (MedicalReflector.TooltipField?.GetValue(Patient.CharacterHealth) is GUIComponent tooltip)
-            {
-                tooltip.AddToGUIUpdateList(ignoreChildren: false, order: 100000);
-            }
-
             if (MedicalReflector.TreatmentContainerField?.GetValue(Patient.CharacterHealth) is GUIListBox treatmentList)
             {
                 foreach (GUIComponent component in treatmentList.Content.Children)

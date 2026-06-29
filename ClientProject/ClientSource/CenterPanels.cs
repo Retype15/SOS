@@ -138,6 +138,9 @@ namespace SOS
     // MARK: - Clinic SIM
     public class AfflictionCenterPanelTab : CenterPanelTab, ITab
     {
+        public const int MENU_WIDTH = 280;
+        public const int MENU_HEIGHT = 220;
+
         public string TabName => TextSOS.Get("sos.tab.simulator", "SIMULATOR").Value;
         public override string TabTooltip => "sos.tab.simulator_tooltip";
         private GUIFrame? _container;
@@ -165,8 +168,6 @@ namespace SOS
 
                     if (activeAfflictionMenu != null)
                     {
-                        activeAfflictionMenu.AddToGUIUpdateList(order: 10005);
-
                         if (PlayerInput.PrimaryMouseButtonClicked() && !activeAfflictionMenu.Rect.Contains(PlayerInput.MousePosition.ToPoint()))
                         {
                             activeAfflictionMenu.Parent?.RemoveChild(activeAfflictionMenu);
@@ -191,7 +192,7 @@ namespace SOS
                         if (GUI.MouseOn?.UserData is Affliction highlightedAff)
                         {
                             if (primaryClicked) _onPrimary?.Invoke(highlightedAff.Prefab);
-                            else if (secondaryClicked) ShowSimulationMenu(highlightedAff.Prefab, null);
+                            else if (secondaryClicked) ShowSimulationMenu(_container, highlightedAff.Prefab, null);
                             return;
                         }
 
@@ -202,7 +203,7 @@ namespace SOS
                             if (hovered?.UserData is Affliction affFromList)
                             {
                                 if (primaryClicked) _onPrimary?.Invoke(affFromList.Prefab);
-                                else if (secondaryClicked) ShowSimulationMenu(affFromList.Prefab, null);
+                                else if (secondaryClicked) ShowSimulationMenu(_container, affFromList.Prefab, null);
                                 return;
                             }
                         }
@@ -213,7 +214,7 @@ namespace SOS
                             var limbHealth = health.limbHealths[highlighted];
                             var limb = health.Character.AnimController.Limbs.FirstOrDefault(l => health.GetMatchingLimbHealth(l) == limbHealth);
                             if (limb != null && CurrentPrefab != null)
-                                ShowSimulationMenu(CurrentPrefab, limb);
+                                ShowSimulationMenu(_container, CurrentPrefab, limb);
                         }
                     }
                 });
@@ -372,29 +373,28 @@ namespace SOS
             if (_container != null) _container.Visible = false;
         }
 
-        private static void ShowSimulationMenu(Prefab prefab, Limb? targetLimb)
+        private static void ShowSimulationMenu(GUIFrame mainFrame, Prefab prefab, Limb? targetLimb)
         {
             activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu);
             activeAfflictionMenu = null;
-
-            int menuWidth = 280;
-            int menuHeight = 220;
 
             Vector2 mousePos = PlayerInput.MousePosition;
             int x = (int)mousePos.X;
             int y = (int)mousePos.Y;
 
-            if (x + menuWidth > GameMain.GraphicsWidth) x = GameMain.GraphicsWidth - menuWidth;
-            if (y + menuHeight > GameMain.GraphicsHeight) y = GameMain.GraphicsHeight - menuHeight;
+            //if (x + MENU_WIDTH > GameMain.GraphicsWidth) x = GameMain.GraphicsWidth - MENU_WIDTH;
+            //if (y + MENU_HEIGHT > GameMain.GraphicsHeight) y = GameMain.GraphicsHeight - MENU_HEIGHT;
 
-            var menu = new GUIFrame(new RectTransform(new Point(menuWidth, menuHeight), GUI.Canvas) { AbsoluteOffset = new Point(x, y) }, style: "GUIFrame")
+            int relX = x - mainFrame.Rect.X;
+            int relY = y - mainFrame.Rect.Y;
+
+            activeAfflictionMenu = new GUIFrame(new RectTransform(new Point(MENU_WIDTH, MENU_HEIGHT), mainFrame.RectTransform) { AbsoluteOffset = new Point(relX, relY) }, style: "GUIFrame")
             {
                 CanBeFocused = true,
                 UserData = "SimMenu"
             };
-            activeAfflictionMenu = menu;
 
-            var menuLayout = new GUILayoutGroup(new RectTransform(new Vector2(0.9f, 0.9f), menu.RectTransform, Anchor.Center)) { Stretch = true, AbsoluteSpacing = 8 };
+            var menuLayout = new GUILayoutGroup(new RectTransform(new Vector2(0.9f, 0.9f), activeAfflictionMenu.RectTransform, Anchor.Center)) { Stretch = true, AbsoluteSpacing = 8 };
 
             string targetName = targetLimb != null ? targetLimb.type.ToString().ToUpper() : "OVERALL";
             string title = $"{prefab.Name().ToUpper()} ON {targetName}";
