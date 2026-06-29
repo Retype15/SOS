@@ -5,7 +5,6 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
-using System.Collections;
 using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
@@ -23,21 +22,38 @@ namespace SOS
         private ushort timeCache = 0;
 
         private readonly GUILayoutGroup contentLayout;
+        private readonly GUITextBlock emptyLabel;
         private bool layoutDirty = false;
         private sealed class IngredientUI
         {
-            public GUIFrame row = null!;
-            public GUIImage icon = null!;
-            public GUITextBlock text = null!;
+            public GUIFrame row;
+            public GUIImage icon;
+            public GUITextBlock text;
+
+            public IngredientUI(GUIFrame row, GUIImage icon, GUITextBlock text)
+            {
+                this.row = row;
+                this.icon = icon;
+                this.text = text;
+            }
         }
 
         private sealed class ItemUIRecipe
         {
-            public GUIFrame itemRow = null!;
-            public GUIImage indicatorImage = null!;
+            public GUIFrame itemRow;
+            public GUIImage indicatorImage;
             public GUIImage? itemIcon;
-            public GUITextBlock nameText = null!;
-            public Dictionary<FabricationRecipe.RequiredItem, IngredientUI> reqList = null!;
+            public GUITextBlock nameText;
+            public Dictionary<FabricationRecipe.RequiredItem, IngredientUI> reqList;
+
+            public ItemUIRecipe(GUIFrame itemRow, GUIImage indicatorImage, GUIImage? itemIcon, GUITextBlock nameText, Dictionary<FabricationRecipe.RequiredItem, IngredientUI> reqList)
+            {
+                this.itemRow = itemRow;
+                this.indicatorImage = indicatorImage;
+                this.itemIcon = itemIcon;
+                this.nameText = nameText;
+                this.reqList = reqList;
+            }
 
             public void Destroy()
             {
@@ -64,7 +80,12 @@ namespace SOS
         public bool AddRecipe(FabricationRecipe? recipe)
         {
             bool added = recipe != null && !trackedRecipes.ContainsKey(recipe) && trackedRecipes.TryAdd(recipe, BuildUIRecipe(recipe));
-            if (added) layoutDirty = true;
+            if (added)
+            {
+                layoutDirty = true;
+                emptyLabel.Visible = false;
+                this.Visible = true;
+            }
             return added;
         }
         public bool AddRecipe(ItemPrefab? itemPrefab, uint? recipeHash = null)
@@ -104,6 +125,7 @@ namespace SOS
             if (recipe == null) return false;
             trackedRecipes.GetValueOrDefault(recipe)?.Destroy();
             layoutDirty |= trackedRecipes.Remove(recipe);
+            if (trackedRecipes.Count == 0) emptyLabel.Visible = true;
             return layoutDirty;
         }
         public bool RemoveRecipe(ItemPrefab? itemPrefab, uint? recipeHash = null)
@@ -141,6 +163,7 @@ namespace SOS
         {
             foreach (var recipe in trackedRecipes.Values) recipe.Destroy();
             trackedRecipes.Clear();
+            emptyLabel.Visible = true;
             layoutDirty = true;
             return true;
         }
@@ -186,6 +209,27 @@ namespace SOS
         public LocalizedString GetStringTrackToHUD(ItemPrefab itemPrefab) => GetTrackOrUntrack(!ContainsAnyRecipe(itemPrefab));
 
         public void Clear() => RemoveRecipes();
+
+        public List<ContextMenuOption> GetManageHudContextMenuOptions()
+        {
+            var options = new List<ContextMenuOption>
+            {
+                new(
+                TextSOS.Get("sos.window.remove_all", "Remove All"),
+                isEnabled: trackedRecipes.Count > 0,
+                onSelected: Clear)
+            };
+
+            foreach (var recipe in trackedRecipes.Keys)
+            {
+                options.Add(new ContextMenuOption(
+                    recipe.TargetItem.Name,
+                    isEnabled: true,
+                    onSelected: () => RemoveRecipe(recipe)));
+            }
+
+            return options;
+        }
 
         private ItemUIRecipe BuildUIRecipe(FabricationRecipe recipe)
         {
@@ -247,22 +291,15 @@ namespace SOS
                     ToolTip = TextSOS.Get("sos.hud.ingredient_tooltip", "Required ingredient. Shows how many you have in your inventory.")
                 };
 
-                reqList.Add(req, new IngredientUI { row = ingRow, icon = ingIcon, text = ingText });
+                reqList.Add(req, new IngredientUI(ingRow, ingIcon, ingText));
             }
 
-            return new ItemUIRecipe
-            {
-                itemRow = itemRow,
-                indicatorImage = indicator,
-                itemIcon = iconImage,
-                nameText = nameText,
-                reqList = reqList
-            };
+            return new ItemUIRecipe(itemRow, indicator, iconImage, nameText, reqList);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (Visible == false || trackedRecipes.Count == 0 || Screen.Selected is not GameScreen) return;
+            if (Visible == false || Screen.Selected is not GameScreen) return;
             base.Draw(spriteBatch);
 
             if (timeCache > TIMECACHERESET) { timeCache = 0; cache.Clear(); }
@@ -313,6 +350,11 @@ namespace SOS
                 ToolTip = TextSOS.Get("sos.hud.tracking_tooltip", "Active crafting tracker. Shows required ingredients and amounts.")
             };
 
+            emptyLabel = new GUITextBlock(
+                new RectTransform(new Vector2(1f, 0f), contentLayout.RectTransform) { MinSize = new Point(0, 22) },
+                TextSOS.Get("sos.hud.nothing_tracked", "Nothing tracked here."), font: GUIStyle.SmallFont, textColor: Color.Gray)
+            { CanBeFocused = false };
+
             ClientConfig.Instance.OnTrackerVisibleValueChanged += RegisterIfChange;
         }
 
@@ -350,11 +392,12 @@ namespace SOS
             int childCount = 0;
             foreach (var child in contentLayout.Children)
             {
+                if (!child.Visible) continue;
                 height += child.Rect.Height;
                 childCount++;
             }
             height += contentLayout.AbsoluteSpacing * Math.Max(0, childCount - 1);
-            height += 8;
+            height += 32;
             RectTransform.NonScaledSize = new Point(Rect.Width, Math.Max(height, 60));
             layoutDirty = false;
         }

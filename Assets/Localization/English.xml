@@ -34,8 +34,8 @@
 	<sos.window.additional_info>ADDITIONAL INFO</sos.window.additional_info>
 	<sos.window.back>Back</sos.window.back>
 	<sos.window.back.shortcuts>Shortcuts:&#xA;- Alt + Left Arrow&#xA;- Backspace&#xA;- Mouse 4</sos.window.back.shortcuts>
-	<sos.window.clear_hud>Clear HUD</sos.window.clear_hud>
-	<sos.window.clear_hud_tooltip>Clears the active HUD tracker</sos.window.clear_hud_tooltip>
+	<sos.window.manage_hud>MANAGE HUD</sos.window.manage_hud>
+	<sos.window.manage_hud_tooltip>Manage tracked recipes on the HUD</sos.window.manage_hud_tooltip>
 	<sos.window.forward>Forward</sos.window.forward>
 	<sos.window.forward.shortcuts>Shortcuts:&#xA;- Alt + Right Arrow&#xA;- Shift + Backspace&#xA;- Mouse 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Loading dependencies...</sos.window.loading>
@@ -57,9 +57,12 @@
 	<sos.window.settings>Settings (WIP)</sos.window.settings>
 	<sos.window.tag_tooltip>Search items with tag: [tag]</sos.window.tag_tooltip>
 	<sos.window.title>SOS - Recipe Browser</sos.window.title>
+	<sos.window.remove_recipes>Remove Recipes</sos.window.remove_recipes>
+	<sos.window.remove_all>Remove All</sos.window.remove_all>
 	<sos.window.usage>USAGE</sos.window.usage>
 
 	<!-- HUD -->
+	<sos.hud.nothing_tracked>Nothing tracked here.</sos.hud.nothing_tracked>
 	<sos.hud.tracking>TRACKING:</sos.hud.tracking>
 	<sos.hud.tracking_tooltip>Active crafting tracker. Shows required ingredients and amounts.</sos.hud.tracking_tooltip>
 	<sos.hud.tracked_item_tooltip>Currently tracked item.</sos.hud.tracked_item_tooltip>
