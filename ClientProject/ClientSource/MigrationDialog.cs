@@ -14,6 +14,8 @@ namespace SOS
         private static GUIFrame? overlay;
         private static GUIFrame? dialog;
 
+        public static void Update() => overlay?.AddToGUIUpdateList(1);
+
         public static void Show()
         {
             if (overlay != null) return;
@@ -22,10 +24,7 @@ namespace SOS
 
             // ─── Full-screen semi-transparent overlay ───
 
-            var parentComponent = Screen.Selected?.Frame;
-            if (parentComponent == null) return;
-
-            overlay = new GUIFrame(new RectTransform(Vector2.One, parentComponent.RectTransform), style: null)
+            overlay = new GUIFrame(new RectTransform(Vector2.One, GUI.Canvas), style: null)
             {
                 Color = Color.Black * 0.5f
             };
@@ -73,8 +72,6 @@ namespace SOS
                 TextSOS.Get("sos.migration.ignore", "Ignorar"));
             ignoreBtn.OnClicked += IgnoreAction;
 
-            //overlay.AddToGUIUpdateList(ignoreChildren: false, order: 10001);
-
             RLogger.LogDebug("Showing MigrationDialog");
         }
 
@@ -115,16 +112,7 @@ namespace SOS
                         controller.CustomLayouts[kvp.Key] = kvp.Value;
 
                     // Transfer tracker
-                    if (!string.IsNullOrEmpty(data.TrackedItemId))
-                    {
-                        var targetPrefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == data.TrackedItemId);
-                        if (targetPrefab != null)
-                        {
-                            var specificRecipe = targetPrefab.FabricationRecipes?.Values
-                                .FirstOrDefault(r => r.RecipeHash == data.TrackedRecipeHash);
-                            controller.Tracker.SetTrackedItem(targetPrefab, specificRecipe);
-                        }
-                    }
+                        controller.Tracker.AddRecipe(data.TrackedItemId, data.TrackedRecipeHash);
 
                     // Restore last selected item
                     if (!string.IsNullOrEmpty(data.LastItemId))
