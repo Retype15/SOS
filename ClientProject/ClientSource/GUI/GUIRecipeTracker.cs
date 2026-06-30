@@ -24,6 +24,7 @@ namespace SOS
         private readonly GUILayoutGroup contentLayout;
         private readonly GUITextBlock emptyLabel;
         private bool layoutDirty = false;
+
         private sealed class IngredientUI
         {
             public GUIFrame row;
@@ -67,14 +68,33 @@ namespace SOS
             }
         }
 
-        private static ItemPrefab? GetItemPrefab() => ItemPrefab.Prefabs.FirstOrDefault();
-        private static ItemPrefab? GetItemPrefab(string? itemString) => (itemString == null) ? GetItemPrefab() : ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == itemString);
-
-        private static FabricationRecipe? GetFabricationRecipe(ItemPrefab itemPrefab) => itemPrefab.FabricationRecipes?.Values.FirstOrDefault();
-        private static FabricationRecipe? GetFabricationRecipe(ItemPrefab itemPrefab, uint? recipeHash = null)
+        public GUIRecipeTracker(RectTransform rectT, string style = "", Color? color = null) : base(rectT, style, color)
         {
-            if (recipeHash == null) return GetFabricationRecipe(itemPrefab);
-            return itemPrefab.FabricationRecipes?.Values.FirstOrDefault(rec => rec.RecipeHash == recipeHash);
+            contentLayout = new GUILayoutGroup(
+                new RectTransform(new Vector2(1f, 1f), RectTransform) { AbsoluteOffset = new Point(8, 8) })
+            {
+                AbsoluteSpacing = 4,
+                CanBeFocused = false
+            };
+
+            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), contentLayout.RectTransform) { MinSize = new Point(0, 22) },
+                TextSOS.Get("sos.hud.tracking", "TRACKING:").Value, font: GUIStyle.SubHeadingFont, textColor: Color.Gold)
+            {
+                CanBeFocused = false,
+                ToolTip = TextSOS.Get("sos.hud.tracking_tooltip", "Active crafting tracker. Shows required ingredients and amounts.")
+            };
+
+            emptyLabel = new GUITextBlock(
+                new RectTransform(new Vector2(1f, 0f), RectTransform)
+                {
+                    AbsoluteOffset = new Point(8, 34),
+                    MinSize = new Point(0, 22)
+                },
+                TextSOS.Get("sos.hud.nothing_tracked", "Nothing tracked here."),
+                font: GUIStyle.SmallFont, textColor: Color.Gray)
+            { CanBeFocused = false };
+
+            ClientConfig.Instance.OnTrackerVisibleValueChanged += RegisterIfChange;
         }
 
         public bool AddRecipe(FabricationRecipe? recipe)
@@ -84,23 +104,13 @@ namespace SOS
             {
                 layoutDirty = true;
                 emptyLabel.Visible = false;
-                this.Visible = true;
+                Visible = true;
             }
             return added;
         }
-        public bool AddRecipe(ItemPrefab? itemPrefab, uint? recipeHash = null)
-        {
-            if (itemPrefab == null) return false;
-            var recipe = GetFabricationRecipe(itemPrefab, recipeHash);
-            return AddRecipe(recipe);
-        }
-        public bool AddRecipe(string? itemString, uint? recipeHash = null)
-        {
-            if (string.IsNullOrEmpty(itemString)) return false;
-
-            var itemPrefab = GetItemPrefab(itemString);
-            return AddRecipe(itemPrefab, recipeHash);
-        }
+        public bool AddRecipe(ItemPrefab? itemPrefab, IConvertible? recipeHash = null) => AddRecipe(PrefabResolver.GetFabricationRecipe(itemPrefab, recipeHash));
+        public bool AddRecipe(string? itemString, IConvertible? recipeHash = null) => AddRecipe(PrefabResolver.GetFabricationRecipe(itemString, recipeHash));
+        public bool AddRecipe(IEnumerable<FabricationRecipe>? recipes) => AddRecipes(recipes);
 
         public bool AddRecipes(IEnumerable<FabricationRecipe>? recipes)
         {
@@ -108,17 +118,12 @@ namespace SOS
             if (recipes == null) return response;
             foreach (var recipe in recipes)
             {
-                if (AddRecipe(recipe)) response = true;
+                response |= AddRecipe(recipe);
             }
             return response;
         }
         public bool AddRecipes(ItemPrefab? itemPrefab) => AddRecipes(itemPrefab?.FabricationRecipes.Values);
-        public bool AddRecipes(string? itemString)
-        {
-            if (string.IsNullOrEmpty(itemString)) return false;
-            var itemPrefab = GetItemPrefab(itemString);
-            return AddRecipes(itemPrefab);
-        }
+        public bool AddRecipes(string? itemString) => AddRecipes(PrefabResolver.GetItemPrefab(itemString));
 
         public bool RemoveRecipe(FabricationRecipe? recipe)
         {
@@ -128,19 +133,9 @@ namespace SOS
             if (trackedRecipes.Count == 0) emptyLabel.Visible = true;
             return layoutDirty;
         }
-        public bool RemoveRecipe(ItemPrefab? itemPrefab, uint? recipeHash = null)
-        {
-            if (itemPrefab == null) return false;
-            var recipe = GetFabricationRecipe(itemPrefab, recipeHash);
-            return RemoveRecipe(recipe);
-        }
-        public bool RemoveRecipe(string? itemString, uint? recipeHash = null)
-        {
-            if (string.IsNullOrEmpty(itemString)) return false;
-
-            var itemPrefab = GetItemPrefab(itemString);
-            return RemoveRecipe(itemPrefab, recipeHash);
-        }
+        public bool RemoveRecipe(ItemPrefab? itemPrefab, IConvertible? recipeHash = null) => RemoveRecipe(PrefabResolver.GetFabricationRecipe(itemPrefab, recipeHash));
+        public bool RemoveRecipe(string? itemString, IConvertible? recipeHash = null) => RemoveRecipe(PrefabResolver.GetFabricationRecipe(itemString, recipeHash));
+        public bool RemoveRecipe(IEnumerable<FabricationRecipe>? recipes) => RemoveRecipes(recipes);
 
         public bool RemoveRecipes(IEnumerable<FabricationRecipe>? recipes)
         {
@@ -148,15 +143,14 @@ namespace SOS
             if (recipes == null) return response;
             foreach (var recipe in recipes)
             {
-                if (RemoveRecipe(recipe)) response = true;
+                response |= RemoveRecipe(recipe);
             }
             return response;
         }
         public bool RemoveRecipes(ItemPrefab? itemPrefab) => RemoveRecipes(itemPrefab?.FabricationRecipes.Values);
         public bool RemoveRecipes(string? itemString)
         {
-            if (string.IsNullOrEmpty(itemString)) return false;
-            var itemPrefab = GetItemPrefab(itemString);
+            var itemPrefab = PrefabResolver.GetItemPrefab(itemString);
             return RemoveRecipes(itemPrefab);
         }
         public bool RemoveRecipes()
@@ -169,39 +163,16 @@ namespace SOS
         }
 
         public bool ContainsRecipe(FabricationRecipe? recipe) => recipe != null && trackedRecipes.ContainsKey(recipe);
-        public bool ContainsRecipe(ItemPrefab itemPrefab, uint? recipeHash = null)
-        {
-            var recipe = GetFabricationRecipe(itemPrefab, recipeHash);
-            return ContainsRecipe(recipe);
-        }
-        public bool ContainsRecipe(string itemString, uint? recipeHash = null)
-        {
-            var itemPrefab = GetItemPrefab(itemString);
-            if (itemPrefab == null) return false;
-            return ContainsRecipe(itemPrefab, recipeHash);
-        }
+        public bool ContainsRecipe(ItemPrefab itemPrefab, IConvertible? recipeHash = null) => ContainsRecipe(PrefabResolver.GetFabricationRecipe(itemPrefab, recipeHash));
+        public bool ContainsRecipe(string itemString, IConvertible? recipeHash = null) => ContainsRecipe(PrefabResolver.GetFabricationRecipe(itemString, recipeHash));
 
         public bool ContainsAnyRecipe(FabricationRecipe? recipe) => ContainsRecipe(recipe);
         public bool ContainsAnyRecipe(ItemPrefab? itemPrefab) => itemPrefab != null && itemPrefab!.FabricationRecipes.Values.Intersect(trackedRecipes.Keys).Any();
-        public bool ContainsAnyRecipe(string itemString)
-        {
-            var itemPrefab = GetItemPrefab(itemString);
-            return ContainsAnyRecipe(itemPrefab);
-        }
+        public bool ContainsAnyRecipe(string itemString) => ContainsAnyRecipe(PrefabResolver.GetFabricationRecipe(itemString));
 
-        public bool AddOrRemoveRecipe(FabricationRecipe recipe) => ContainsRecipe(recipe) ? RemoveRecipe(recipe) : AddRecipe(recipe);
-        public bool AddOrRemoveRecipe(ItemPrefab itemPrefab, uint? recipeHash = null)
-        {
-            var recipe = GetFabricationRecipe(itemPrefab, recipeHash);
-            if (recipe == null) return false;
-            return AddOrRemoveRecipe(recipe);
-        }
-        public bool AddOrRemoveRecipe(string itemString, uint? recipeHash = null)
-        {
-            var itemPrefab = GetItemPrefab(itemString);
-            if (itemPrefab == null) return false;
-            return AddOrRemoveRecipe(itemPrefab, recipeHash);
-        }
+        public bool AddOrRemoveRecipe(FabricationRecipe? recipe) => ContainsRecipe(recipe) ? RemoveRecipe(recipe) : AddRecipe(recipe);
+        public bool AddOrRemoveRecipe(ItemPrefab itemPrefab, IConvertible? recipeHash = null) => AddOrRemoveRecipe(PrefabResolver.GetFabricationRecipe(itemPrefab, recipeHash));
+        public bool AddOrRemoveRecipe(string itemString, IConvertible? recipeHash = null) => AddOrRemoveRecipe(PrefabResolver.GetFabricationRecipe(itemString, recipeHash));
 
         public static LocalizedString GetTrackOrUntrack(bool state) => state ? TextSOS.Get("sos.context.track", "Track to HUD") : TextSOS.Get("sos.context.untrack", "Remove from HUD");
 
@@ -301,6 +272,17 @@ namespace SOS
         {
             if (Visible == false || Screen.Selected is not GameScreen) return;
             base.Draw(spriteBatch);
+        }
+
+        public void Update()
+        {
+            AddToGUIUpdateList(order: -1);
+            RefreshIfVisible();
+        }
+
+        private void RefreshIfVisible()
+        {
+            if (!Visible || Screen.Selected is not GameScreen) return;
 
             if (timeCache > TIMECACHERESET) { timeCache = 0; cache.Clear(); }
             else timeCache++;
@@ -331,33 +313,6 @@ namespace SOS
             if (layoutDirty) RecalculateSize();
         }
 
-        public void Update() => AddToGUIUpdateList(order: -1);
-
-
-        public GUIRecipeTracker(RectTransform rectT, string style = "", Color? color = null) : base(rectT, style, color)
-        {
-            contentLayout = new GUILayoutGroup(
-                new RectTransform(new Vector2(1f, 1f), RectTransform) { AbsoluteOffset = new Point(8, 8) })
-            {
-                AbsoluteSpacing = 4,
-                CanBeFocused = false
-            };
-
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), contentLayout.RectTransform) { MinSize = new Point(0, 22) },
-                TextSOS.Get("sos.hud.tracking", "TRACKING:").Value, font: GUIStyle.SubHeadingFont, textColor: Color.Gold)
-            {
-                CanBeFocused = false,
-                ToolTip = TextSOS.Get("sos.hud.tracking_tooltip", "Active crafting tracker. Shows required ingredients and amounts.")
-            };
-
-            emptyLabel = new GUITextBlock(
-                new RectTransform(new Vector2(1f, 0f), contentLayout.RectTransform) { MinSize = new Point(0, 22) },
-                TextSOS.Get("sos.hud.nothing_tracked", "Nothing tracked here."), font: GUIStyle.SmallFont, textColor: Color.Gray)
-            { CanBeFocused = false };
-
-            ClientConfig.Instance.OnTrackerVisibleValueChanged += RegisterIfChange;
-        }
-
         public static GUIRecipeTracker InstantiateWithDefault()
         {
             return new(new RectTransform(new Point(280, 180), GUI.Canvas, Anchor.TopRight) { AbsoluteOffset = new Point(20, 150) }, style: "InnerFrame")
@@ -368,11 +323,13 @@ namespace SOS
             ;
         }
 
-        private void RegisterIfChange(ISettingBase trk) => this.Visible = ClientConfig.Instance.TrackerVisible;
+        private void RegisterIfChange(ISettingBase trk) => Visible = ClientConfig.Instance.TrackerVisible;
 
         public void Destroy()
         {
             RemoveFromGUIUpdateList();
+            emptyLabel.RectTransform.Parent = null;
+            emptyLabel.RemoveFromGUIUpdateList();
             RemoveRecipes();
             ClientConfig.Instance.OnTrackerVisibleValueChanged -= RegisterIfChange;
         }
@@ -388,7 +345,7 @@ namespace SOS
         private void RecalculateSize()
         {
             contentLayout.Recalculate();
-            int height = 8;
+            int height = 16;
             int childCount = 0;
             foreach (var child in contentLayout.Children)
             {
@@ -397,30 +354,8 @@ namespace SOS
                 childCount++;
             }
             height += contentLayout.AbsoluteSpacing * Math.Max(0, childCount - 1);
-            height += 32;
             RectTransform.NonScaledSize = new Point(Rect.Width, Math.Max(height, 60));
             layoutDirty = false;
-        }
-
-        public static FabricationRecipe? TryGetRecipe(ItemPrefab itemPrefab, uint? recipeHash = null)
-        {
-
-            if (recipeHash != null) return itemPrefab.FabricationRecipes?.Values.FirstOrDefault(r => r.RecipeHash == recipeHash);
-            return itemPrefab.FabricationRecipes?.Values.FirstOrDefault();
-        }
-        public static FabricationRecipe? TryGetRecipe(string itemString, uint? recipeHash = null)
-        {
-            if (!string.IsNullOrEmpty(itemString))
-            {
-                var targetPrefab = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == itemString);
-                if (targetPrefab != null)
-                {
-
-                    if (recipeHash != null) return targetPrefab.FabricationRecipes?.Values.FirstOrDefault(r => r.RecipeHash == recipeHash);
-                    return targetPrefab.FabricationRecipes?.Values.FirstOrDefault();
-                }
-            }
-            return null;
         }
 
         public string ToCsv(char itemSeparator = ',', char recipeSeparator = '|')
@@ -442,6 +377,38 @@ namespace SOS
                     AddRecipe(parts[0], hash);
                 else if (parts.Length == 1) AddRecipe(parts[0]);
             }
+        }
+    }
+
+    internal static class PrefabResolver
+    {
+        public static ItemPrefab? GetItemPrefab() =>
+            ItemPrefab.Prefabs.FirstOrDefault();
+
+        public static ItemPrefab? GetItemPrefab(string? itemString) =>
+            itemString == null
+            ? GetItemPrefab()
+            : ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == itemString);
+
+        public static FabricationRecipe? GetFabricationRecipe(ItemPrefab? itemPrefab, IConvertible? recipeHash = null)
+        {
+            uint? uintRecipeHash = recipeHash?.ToUInt32Safe();
+            if (itemPrefab == null) return null;
+            if (uintRecipeHash == null) return itemPrefab.FabricationRecipes?.Values.FirstOrDefault();
+            return itemPrefab.FabricationRecipes?.Values.FirstOrDefault(r => r.RecipeHash == uintRecipeHash);
+        }
+
+        public static FabricationRecipe? GetFabricationRecipe(string? itemString, IConvertible? recipeHash = null) =>
+            GetFabricationRecipe(GetItemPrefab(itemString), recipeHash);
+    }
+
+    internal static class ConvertibleExtension
+    {
+        public static uint? ToUInt32Safe(this IConvertible value)
+        {
+            if (value is string s && uint.TryParse(s, out uint parsed)) return parsed;
+            try { return value.ToUInt32(null); }
+            catch { return null; }
         }
     }
 }
