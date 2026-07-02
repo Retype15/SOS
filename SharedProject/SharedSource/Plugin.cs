@@ -67,6 +67,7 @@ namespace SOS
             ConfigService = null!;
             PluginManagementService = null!;
             ConsoleCommandsService = null!;
+            Package.UnloadContent();
             Package = null!;
             Instance = null!;
             RLogger.LogDebug(TextSOS.Get("sos.shared.unloaded", "[SOS] Mod Unloaded.").Value);

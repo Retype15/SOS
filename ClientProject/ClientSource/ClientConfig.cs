@@ -18,7 +18,6 @@ namespace SOS
         private static ClientConfig? _instance;
         public static ClientConfig Instance => _instance ??= new ClientConfig();
 
-
         private readonly HashSet<ISettingBase> _dirtySettings = [];
 
         private void MarkDirty(ISettingBase setting) => _dirtySettings.Add(setting);
@@ -242,13 +241,7 @@ namespace SOS
             }
             setting.OnValueChanged += MarkDirty;
 #if DEBUG
-            setting.OnValueChanged += setting => RLogger.LogDebug($"Changed: {setting.InternalName}");
-
-            var row = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), GUI.Canvas), isHorizontal: true) { CanBeFocused = true };
-            _ = new GUITextBlock(new RectTransform(new Vector2(0.7f, 1f), row.RectTransform), "PUTTO", font: GUIStyle.SmallFont, textColor: Color.Blue) { CanBeFocused = true };
-
-
-            setting.AddDisplayComponent(row, Vector2.One, value => value.ToString());
+            setting.OnValueChanged += setting => RLogger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue()}");
 #endif
             return true;
         }

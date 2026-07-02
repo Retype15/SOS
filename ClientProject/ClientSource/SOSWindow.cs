@@ -7,6 +7,7 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using MonoMod.Utils;
 
 namespace SOS
@@ -51,7 +52,7 @@ namespace SOS
         private DisplayMode rightPanelMode = DisplayMode.Normal;
         private int lastLeftWForReflow = 0;
 
-        private const int HeaderHeight = 48;
+        private const int HeaderHeight = 42;
         private const int BottomMargin = 10;
         private const int SidebarHiddenThreshold = 100;
         private const int SidebarCompactThreshold = 240;
@@ -89,8 +90,6 @@ namespace SOS
         public SOSWindow(SOSController controller)
         {
             this.controller = controller;
-            var parentComponent = Screen.Selected?.Frame;
-            if (parentComponent == null) return;
 
             mainFrame = new GUIResizableFrame(new RectTransform(new Vector2(0.95f, 0.9f), GUI.Canvas, Anchor.TopLeft), style: "CircuitBoxFrame")
             {
@@ -172,29 +171,32 @@ namespace SOS
                 Stretch = false
             };
 
-            var btnLayouts = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform), "", style: "GUIButtonSettings")
+            var btnLayouts = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform, isFixedSize: true), "", style: "GUIButtonSettings")
             {
                 ToolTip = TextSOS.Get("sos.window.settings", "Settings (WIP)"),
                 OnClicked = (btn, _) => { ToggleLayoutMenu(btn); return true; }
             };
-            btnBack = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform), "", style: "GUIButtonToggleLeft")
+            btnBack = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform, isFixedSize: true), "", style: "GUIButtonToggleLeft")
             {
                 OnClicked = (_, _) => { controller.NavigateBack(); return true; }
             };
             if (btnBack.Children.FirstOrDefault() is GUIImage imgB) imgB.SpriteEffects = Microsoft.Xna.Framework.Graphics.SpriteEffects.FlipHorizontally;
 
-            btnForward = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform), "", style: "GUIButtonToggleRight")
+            btnForward = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform, isFixedSize: true), "", style: "GUIButtonToggleRight")
             {
                 OnClicked = (_, _) => { controller.NavigateForward(); return true; }
             };
 
             var topButtons = new GUILayoutGroup(new RectTransform(new Vector2(0.2f, 0.8f), topBar.RectTransform, Anchor.CenterRight) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true) { Stretch = false, RelativeSpacing = 0.05f, ChildAnchor = Anchor.CenterRight };
-            _ = new GUIButton(new RectTransform(new Vector2(0.2f, 1f), topButtons.RectTransform), "", style: "GUICancelButton")
+            _ = new GUIButton(new RectTransform(new Point(32, 32), topButtons.RectTransform, isFixedSize: true), "", style: "GUICancelButton")
             {
                 OnClicked = (_, _) => { controller.ToggleUI(); return true; },
                 ToolTip = TextSOS.Get("sos.gen.close", "Close [Esc]")
             };
-            _ = new GUIButton(new RectTransform(new Vector2(0.65f, 1f), topButtons.RectTransform), TextSOS.Get("sos.window.manage_hud", "MANAGE HUD"), style: "DeviceButton")
+            var manageGroup = new GUILayoutGroup(new RectTransform(new Vector2(0.65f, 1f), topButtons.RectTransform), isHorizontal: true)
+            { RelativeSpacing = 0f, Stretch = false, ChildAnchor = Anchor.CenterRight };
+            var text = TextSOS.Get("sos.window.manage_hud", "MANAGE HUD");
+            _ = new GUIButton(new RectTransform(new Point(text.Length * 12, 32), manageGroup.RectTransform, isFixedSize: true), text, style: "DeviceButton")
             {
                 OnClicked = (_, _) =>
                 {
@@ -206,6 +208,11 @@ namespace SOS
                     return true;
                 },
                 ToolTip = TextSOS.Get("sos.window.manage_hud_tooltip", "Manage tracked recipes on the HUD")
+            };
+            _ = new GUIButton(new RectTransform(new Point(32, 32), manageGroup.RectTransform, isFixedSize: true), "o", style: "DeviceButton")
+            {
+                OnClicked = (_, _) => { controller.Tracker.ToggleTracker(); return true; },
+                ToolTip = TextSOS.Get("sos.window.toggle_tracker_tooltip", "Toggle HUD tracker (Ctrl+[key])").Replace("[key]", Keys.J.ToString())
             };
 
             contentArea = new GUIFrame(new RectTransform(new Vector2(0.98f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter)
