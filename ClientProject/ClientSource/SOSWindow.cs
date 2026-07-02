@@ -212,7 +212,7 @@ namespace SOS
             _ = new GUIButton(new RectTransform(new Point(32, 32), manageGroup.RectTransform, isFixedSize: true), "o", style: "DeviceButton")
             {
                 OnClicked = (_, _) => { controller.Tracker.ToggleTracker(); return true; },
-                ToolTip = TextSOS.Get("sos.window.toggle_tracker_tooltip", "Toggle HUD tracker (Ctrl+[key])").Replace("[key]", Keys.J.ToString())
+                ToolTip = TextSOS.Get("sos.window.toggle_tracker_tooltip", "Toggle HUD tracker (Ctrl+[key])").Replace("[key]", controller.cfg.SOSOpenKey.Key.ToString())
             };
 
             contentArea = new GUIFrame(new RectTransform(new Vector2(0.98f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter)
