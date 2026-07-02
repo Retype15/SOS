@@ -36,6 +36,9 @@
 	<sos.window.back.shortcuts>Shortcuts:&#xA;- Alt + Left Arrow&#xA;- Backspace&#xA;- Mouse 4</sos.window.back.shortcuts>
 	<sos.window.manage_hud>MANAGE HUD</sos.window.manage_hud>
 	<sos.window.manage_hud_tooltip>Manage tracked recipes on the HUD</sos.window.manage_hud_tooltip>
+	<sos.window.toggle_tracker_tooltip>Toggle HUD tracker visibility (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
+	<sos.window.toggle_tracker_visible>Hide Tracker</sos.window.toggle_tracker_visible>
+	<sos.window.toggle_tracker_hidden>Show Tracker</sos.window.toggle_tracker_hidden>
 	<sos.window.forward>Forward</sos.window.forward>
 	<sos.window.forward.shortcuts>Shortcuts:&#xA;- Alt + Right Arrow&#xA;- Shift + Backspace&#xA;- Mouse 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Loading dependencies...</sos.window.loading>

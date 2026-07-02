@@ -363,22 +363,28 @@ namespace SOS
 
                 if (isKeyDownNow && !wasKeyDown)
                 {
-                    Prefab? detected = GetPrefabUnderMouse();
-
-                    CrossThread.RequestExecutionOnMainThread(() =>
+                    if (PlayerInput.IsCtrlDown())
                     {
+                        CrossThread.RequestExecutionOnMainThread(() => Tracker.ToggleTracker());
+                    }
+                    else
+                    {
+                        Prefab? detected = GetPrefabUnderMouse();
 
-                        if (detected != null)
+                        CrossThread.RequestExecutionOnMainThread(() =>
                         {
-                            OnTargetSelected(detected);
-                            if (mainWindow == null) ToggleUI();
-                        }
-                        else
-                        {
-                            ToggleUI();
-                        }
-                    });
 
+                            if (detected != null)
+                            {
+                                OnTargetSelected(detected);
+                                if (mainWindow == null) ToggleUI();
+                            }
+                            else
+                            {
+                                ToggleUI();
+                            }
+                        });
+                    }
                 }
                 wasKeyDown = isKeyDownNow;
             }
