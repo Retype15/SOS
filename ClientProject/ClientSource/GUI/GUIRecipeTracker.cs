@@ -5,6 +5,7 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using System.Text;
 using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
@@ -148,18 +149,15 @@ namespace SOS
             return response;
         }
         public bool RemoveRecipes(ItemPrefab? itemPrefab) => RemoveRecipes(itemPrefab?.FabricationRecipes.Values);
-        public bool RemoveRecipes(string? itemString)
-        {
-            var itemPrefab = PrefabResolver.GetItemPrefab(itemString);
-            return RemoveRecipes(itemPrefab);
-        }
+        public bool RemoveRecipes(string? itemString) => RemoveRecipes(PrefabResolver.GetItemPrefab(itemString));
         public bool RemoveRecipes()
         {
+            bool any_destroyed = trackedRecipes.Count != 0;
             foreach (var recipe in trackedRecipes.Values) recipe.Destroy();
             trackedRecipes.Clear();
-            emptyLabel.Visible = true;
-            layoutDirty = true;
-            return true;
+            emptyLabel.Visible |= any_destroyed;
+            layoutDirty |= any_destroyed;
+            return any_destroyed;
         }
 
         public bool ContainsRecipe(FabricationRecipe? recipe) => recipe != null && trackedRecipes.ContainsKey(recipe);
@@ -201,10 +199,11 @@ namespace SOS
 
             foreach (var recipe in trackedRecipes.Keys)
             {
-                options.Add(new ContextMenuOption(
-                    recipe.TargetItem.Name,
-                    isEnabled: true,
-                    onSelected: () => RemoveRecipe(recipe)));
+                StringBuilder str_b = new();
+                str_b.AppendLine(recipe.DisplayName.ToString());
+                foreach (var req in recipe.RequiredItems) str_b.AppendLine($"- {req.FirstMatchingPrefab.Name}: {req.Amount}");
+
+                options.Add(new ContextMenuOption(recipe.TargetItem.Name, isEnabled: true, onSelected: () => RemoveRecipe(recipe)) { Tooltip = str_b.ToString() });
             }
 
             return options;
