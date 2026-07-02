@@ -34,8 +34,13 @@
 	<sos.window.additional_info>ДОП. ИНФОРМАЦИЯ</sos.window.additional_info>
 	<sos.window.back>Назад</sos.window.back>
 	<sos.window.back.shortcuts>Горячие клавиши:&#xA;- Alt + Стрелка влево&#xA;- Backspace&#xA;- Мышь 4</sos.window.back.shortcuts>
-	<sos.window.clear_hud>Очистить HUD</sos.window.clear_hud>
-	<sos.window.clear_hud_tooltip>Очищает активный HUD-трекер</sos.window.clear_hud_tooltip>
+	<sos.window.manage_hud>УПРАВЛЯТЬ HUD</sos.window.manage_hud>
+	<sos.window.manage_hud_tooltip>Управление отслеживаемыми рецептами на HUD</sos.window.manage_hud_tooltip>
+	<sos.window.toggle_tracker_tooltip>Переключить видимость HUD-трекера (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
+	<sos.window.toggle_tracker_visible>Скрыть Трекер</sos.window.toggle_tracker_visible>
+	<sos.window.toggle_tracker_hidden>Показать Трекер</sos.window.toggle_tracker_hidden>
+	<sos.window.remove_recipes>Удалить Рецепты</sos.window.remove_recipes>
+	<sos.window.remove_all>Удалить Все</sos.window.remove_all>
 	<sos.window.forward>Вперед</sos.window.forward>
 	<sos.window.forward.shortcuts>Горячие клавиши:&#xA;- Alt + Стрелка вправо&#xA;- Shift + Backspace&#xA;- Мышь 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Загрузка зависимостей...</sos.window.loading>
@@ -60,6 +65,7 @@
 	<sos.window.usage>ИСПОЛЬЗОВАНИЕ</sos.window.usage>
 
 	<!-- HUD -->
+	<sos.hud.nothing_tracked>Здесь ничего не отслеживается.</sos.hud.nothing_tracked>
 	<sos.hud.tracking>ОТСЛЕЖИВАНИЕ:</sos.hud.tracking>
 	<sos.hud.tracking_tooltip>Активный трекер создания. Показывает требуемые ингредиенты и количество.</sos.hud.tracking_tooltip>
 	<sos.hud.tracked_item_tooltip>Текущий отслеживаемый предмет.</sos.hud.tracked_item_tooltip>
@@ -189,4 +195,43 @@
 	<sos.dummyname.rand.6>Вероятно В Порядке #[id]</sos.dummyname.rand.6>
 	<sos.dummyname.rand.7>У Него Есть Семья #[id]</sos.dummyname.rand.7>
 	<sos.dummyname.rand.8>Знает Что Вы Сделали</sos.dummyname.rand.8>
+
+	<!-- Migration -->
+	<sos.migration.title>SOS — Миграция Настроек</sos.migration.title>
+	<sos.migration.description>Обнаружена предыдущая конфигурация SOS.&#xA;Хотите импортировать данные в новую систему?</sos.migration.description>
+	<sos.migration.import>Импорт</sos.migration.import>
+	<sos.migration.discard>Отбросить</sos.migration.discard>
+	<sos.migration.ignore>Пропустить</sos.migration.ignore>
+	<sos.migration.success>[SOS] Предыдущая конфигурация успешно импортирована.</sos.migration.success>
+	<sos.migration.error>[SOS] Ошибка импорта предыдущей конфигурации: [error]</sos.migration.error>
+	<sos.migration.import_tooltip>Импортирует старые настройки и переименовывает "Data/sossettings.xml" в "Data/sossettings_old.xml".</sos.migration.import_tooltip>
+	<sos.migration.discard_tooltip>Отбрасывает старые настройки и переименовывает "Data/sossettings.xml" в "Data/sossettings_old.xml".</sos.migration.discard_tooltip>
+	<sos.migration.ignore_tooltip>Закрывает без изменений. Старый файл остается нетронутым; при следующем запуске вы снова получите запрос.</sos.migration.ignore_tooltip>
+
+	<!-- DB-Location -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>SOS: Клавиша для открытия меню</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>Клавиша для открытия меню SOS и переключения видимости трекера рецептов. По умолчанию: J</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>SOS: Масштаб шрифта XML</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>Множитель масштаба для размера шрифта в окне сырого XML. Также можно использовать Ctrl+Колёсико мыши внутри окна XML для более удобного и точного масштабирования.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayName>SOS: Отслеживаемые рецепты</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.Tooltip>ID текущих отслеживаемых рецептов. Если возникли проблемы с удалением отслеживаемых предметов, попробуйте очистить этот текст, выйти в главное меню и снова присоединиться к игре.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayName>SOS: Видимость трекера</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.Tooltip>Переключает видимость трекера рецептов на HUD. Также можно нажать Ctrl+[SOSKey] для переключения во время игры.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayCategory>
+
+	<!-- Window position X -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>SOS: Позиция окна по X</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>Если окно выходит за пределы интерфейса, попробуйте изменить эти значения, пока оно не переместится. Рекомендуется: 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>
+
+	<!-- Window position Y -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>SOS: Позиция окна по Y</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>Если окно выходит за пределы интерфейса, попробуйте изменить эти значения, пока оно не переместится. Рекомендуется: 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>
 </infotexts>

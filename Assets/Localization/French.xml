@@ -34,8 +34,13 @@
 	<sos.window.additional_info>INFO SUPPLÉMENTAIRE</sos.window.additional_info>
 	<sos.window.back>Retour</sos.window.back>
 	<sos.window.back.shortcuts>Raccourcis :&#xA;- Alt + Flèche Gauche&#xA;- Retour arrière&#xA;- Souris 4</sos.window.back.shortcuts>
-	<sos.window.clear_hud>Effacer le HUD</sos.window.clear_hud>
-	<sos.window.clear_hud_tooltip>Efface le traqueur HUD actif</sos.window.clear_hud_tooltip>
+	<sos.window.manage_hud>GÉRER LE HUD</sos.window.manage_hud>
+	<sos.window.manage_hud_tooltip>Gérer les recettes suivies sur le HUD</sos.window.manage_hud_tooltip>
+	<sos.window.toggle_tracker_tooltip>Basculer la visibilité du traqueur HUD (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
+	<sos.window.toggle_tracker_visible>Masquer le Traqueur</sos.window.toggle_tracker_visible>
+	<sos.window.toggle_tracker_hidden>Afficher le Traqueur</sos.window.toggle_tracker_hidden>
+	<sos.window.remove_recipes>Supprimer les Recettes</sos.window.remove_recipes>
+	<sos.window.remove_all>Tout Supprimer</sos.window.remove_all>
 	<sos.window.forward>Avancer</sos.window.forward>
 	<sos.window.forward.shortcuts>Raccourcis :&#xA;- Alt + Flèche Droite&#xA;- Maj + Retour arrière&#xA;- Souris 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Chargement des dépendances...</sos.window.loading>
@@ -60,6 +65,7 @@
 	<sos.window.usage>UTILISATION</sos.window.usage>
 
 	<!-- HUD -->
+	<sos.hud.nothing_tracked>Rien de suivi ici.</sos.hud.nothing_tracked>
 	<sos.hud.tracking>SUIVI :</sos.hud.tracking>
 	<sos.hud.tracking_tooltip>Suivi de fabrication actif. Affiche les ingrédients et quantités requis.</sos.hud.tracking_tooltip>
 	<sos.hud.tracked_item_tooltip>Objet actuellement suivi.</sos.hud.tracked_item_tooltip>
@@ -189,4 +195,43 @@
 	<sos.dummyname.rand.6>Probablement En Vie #[id]</sos.dummyname.rand.6>
 	<sos.dummyname.rand.7>A Une Famille #[id]</sos.dummyname.rand.7>
 	<sos.dummyname.rand.8>Sait Ce Que Vous Avez Fait</sos.dummyname.rand.8>
+
+	<!-- Migration -->
+	<sos.migration.title>SOS — Migration de Configuration</sos.migration.title>
+	<sos.migration.description>Une ancienne configuration SOS a été trouvée.&#xA;Voulez-vous importer vos données vers le nouveau système ?</sos.migration.description>
+	<sos.migration.import>Importer</sos.migration.import>
+	<sos.migration.discard>Rejeter</sos.migration.discard>
+	<sos.migration.ignore>Ignorer</sos.migration.ignore>
+	<sos.migration.success>[SOS] Configuration précédente importée avec succès.</sos.migration.success>
+	<sos.migration.error>[SOS] Erreur lors de l'importation de la configuration précédente : [error]</sos.migration.error>
+	<sos.migration.import_tooltip>Importe vos anciens paramètres et renomme "Data/sossettings.xml" en "Data/sossettings_old.xml".</sos.migration.import_tooltip>
+	<sos.migration.discard_tooltip>Rejette les anciens paramètres et renomme "Data/sossettings.xml" en "Data/sossettings_old.xml".</sos.migration.discard_tooltip>
+	<sos.migration.ignore_tooltip>Ferme sans modification. L'ancien fichier reste intact ; vous serez à nouveau invité au prochain lancement.</sos.migration.ignore_tooltip>
+
+	<!-- DB-Location -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>SOS: Touche pour ouvrir le menu</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>Touche pour ouvrir le menu SOS et basculer la visibilité du traqueur de recettes. Par défaut : J</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>SOS: Échelle de police XML</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>Multiplicateur d'échelle pour la taille de police de la vue XML brute. Vous pouvez aussi utiliser Ctrl+Molette dans la fenêtre XML pour un zoom plus confortable et précis.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayName>SOS: Recettes suivies</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.Tooltip>IDs des recettes actuellement suivies. En cas de problème pour supprimer des objets suivis, essayez de vider ce texte, de revenir au menu principal et de rejoindre une partie.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayName>SOS: Visibilité du traqueur</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.Tooltip>Bascule la visibilité du traqueur de recettes sur le HUD. Vous pouvez aussi appuyer sur Ctrl+[SOSKey] pour l'activer ou le désactiver en jeu.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayCategory>
+
+	<!-- Window position X -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>SOS: Position X de la fenêtre</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>Si la fenêtre sort de l'interface, essayez d'ajuster ces valeurs jusqu'à ce qu'elle se repositionne. Recommandé : 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>
+
+	<!-- Window position Y -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>SOS: Position Y de la fenêtre</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>Si la fenêtre sort de l'interface, essayez d'ajuster ces valeurs jusqu'à ce qu'elle se repositionne. Recommandé : 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>
 </infotexts>
