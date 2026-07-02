@@ -7,8 +7,8 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using MonoMod.Utils;
-using static SOS.CardBuilder;
 
 namespace SOS
 {
@@ -19,7 +19,7 @@ namespace SOS
         Hidden
     }
 
-    public class SOSWindow
+    public sealed class SOSWindow
     {
         private GUIFrame? loadingFrame;
         private readonly GUIResizableFrame? mainFrame;
@@ -52,7 +52,7 @@ namespace SOS
         private DisplayMode rightPanelMode = DisplayMode.Normal;
         private int lastLeftWForReflow = 0;
 
-        private const int HeaderHeight = 48;
+        private const int HeaderHeight = 42;
         private const int BottomMargin = 10;
         private const int SidebarHiddenThreshold = 100;
         private const int SidebarCompactThreshold = 240;
@@ -90,10 +90,8 @@ namespace SOS
         public SOSWindow(SOSController controller)
         {
             this.controller = controller;
-            var parentComponent = Screen.Selected?.Frame;
-            if (parentComponent == null) return;
 
-            mainFrame = new GUIResizableFrame(new RectTransform(new Vector2(0.95f, 0.9f), parentComponent.RectTransform, Anchor.TopLeft), style: "CircuitBoxFrame")
+            mainFrame = new GUIResizableFrame(new RectTransform(new Vector2(0.95f, 0.9f), GUI.Canvas, Anchor.TopLeft), style: "CircuitBoxFrame")
             {
                 CanBeFocused = true,
                 Selected = true,
@@ -129,7 +127,7 @@ namespace SOS
             }
         }
 
-        protected void BuildLoadingUI()
+        internal void BuildLoadingUI()
         {
             if (mainFrame == null) return;
 
@@ -155,7 +153,7 @@ namespace SOS
             LoadingCompletedText.Wait(0.5f).ExFadeIn(duration: 0.5f);
         }
 
-        protected void BuildMainUI()
+        internal void BuildMainUI()
         {
             if (mainFrame == null) return;
 
@@ -173,32 +171,48 @@ namespace SOS
                 Stretch = false
             };
 
-            var btnLayouts = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform), "", style: "GUIButtonSettings")
+            var btnLayouts = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform, isFixedSize: true), "", style: "GUIButtonSettings")
             {
                 ToolTip = TextSOS.Get("sos.window.settings", "Settings (WIP)"),
                 OnClicked = (btn, _) => { ToggleLayoutMenu(btn); return true; }
             };
-            btnBack = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform), "", style: "GUIButtonToggleLeft")
+            btnBack = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform, isFixedSize: true), "", style: "GUIButtonToggleLeft")
             {
                 OnClicked = (_, _) => { controller.NavigateBack(); return true; }
             };
             if (btnBack.Children.FirstOrDefault() is GUIImage imgB) imgB.SpriteEffects = Microsoft.Xna.Framework.Graphics.SpriteEffects.FlipHorizontally;
 
-            btnForward = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform), "", style: "GUIButtonToggleRight")
+            btnForward = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform, isFixedSize: true), "", style: "GUIButtonToggleRight")
             {
                 OnClicked = (_, _) => { controller.NavigateForward(); return true; }
             };
 
             var topButtons = new GUILayoutGroup(new RectTransform(new Vector2(0.2f, 0.8f), topBar.RectTransform, Anchor.CenterRight) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true) { Stretch = false, RelativeSpacing = 0.05f, ChildAnchor = Anchor.CenterRight };
-            _ = new GUIButton(new RectTransform(new Vector2(0.2f, 1f), topButtons.RectTransform), "", style: "GUICancelButton")
+            _ = new GUIButton(new RectTransform(new Point(32, 32), topButtons.RectTransform, isFixedSize: true), "", style: "GUICancelButton")
             {
                 OnClicked = (_, _) => { controller.ToggleUI(); return true; },
                 ToolTip = TextSOS.Get("sos.gen.close", "Close [Esc]")
             };
-            _ = new GUIButton(new RectTransform(new Vector2(0.65f, 1f), topButtons.RectTransform), TextSOS.Get("sos.window.clear_hud", "Clear HUD"), style: "DeviceButton")
+            var manageGroup = new GUILayoutGroup(new RectTransform(new Vector2(0.65f, 1f), topButtons.RectTransform), isHorizontal: true)
+            { RelativeSpacing = 0f, Stretch = false, ChildAnchor = Anchor.CenterRight };
+            var text = TextSOS.Get("sos.window.manage_hud", "MANAGE HUD");
+            _ = new GUIButton(new RectTransform(new Point(text.Length * 12, 32), manageGroup.RectTransform, isFixedSize: true), text, style: "DeviceButton")
             {
-                OnClicked = (_, _) => { controller.Tracker.SetTrackedItem(null); return true; },
-                ToolTip = TextSOS.Get("sos.window.clear_hud_tooltip", "Clears the active HUD tracker")
+                OnClicked = (_, _) =>
+                {
+                    var options = controller.Tracker.GetManageHudContextMenuOptions();
+                    GUIContextMenu.CreateContextMenu(
+                        PlayerInput.MousePosition,
+                        TextSOS.Get("sos.window.remove_recipes", "Remove Recipes"),
+                        null, [.. options]);
+                    return true;
+                },
+                ToolTip = TextSOS.Get("sos.window.manage_hud_tooltip", "Manage tracked recipes on the HUD")
+            };
+            _ = new GUIButton(new RectTransform(new Point(32, 32), manageGroup.RectTransform, isFixedSize: true), "o", style: "DeviceButton")
+            {
+                OnClicked = (_, _) => { controller.Tracker.ToggleTracker(); return true; },
+                ToolTip = TextSOS.Get("sos.window.toggle_tracker_tooltip", "Toggle HUD tracker (Ctrl+[key])").Replace("[key]", controller.cfg.SOSOpenKey.Key.ToString())
             };
 
             contentArea = new GUIFrame(new RectTransform(new Vector2(0.98f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter)
@@ -315,7 +329,6 @@ namespace SOS
                 OnScaleChanged = (scale) =>
                     {
                         controller.XmlFontScale = scale;
-                        controller.MarkDirty();
                     },
                 ContentMenu = XmlContextMenu
             };
@@ -327,7 +340,6 @@ namespace SOS
             rawXmlTickBox.OnSelected = (tick) =>
             {
                 controller.RawXmlMode = tick.Selected;
-                controller.MarkDirty();
                 metaPanel.Visible = !tick.Selected;
                 if (xmlContentText != null)
                 {
@@ -623,10 +635,6 @@ namespace SOS
         {
             if (mainFrame == null) return;
 
-            mainFrame.AddToGUIUpdateList(ignoreChildren: false, order: 10000);
-
-            layoutMenuFrame?.AddToGUIUpdateList(ignoreChildren: false, order: 10001);
-
             UpdateLayout();
 
             if (pendingSearchQuery != null && Timing.TotalTime >= searchExecutionTime)
@@ -735,26 +743,24 @@ namespace SOS
             }
 
             // aaaa
-            if (mainFrame != null && mainFrame.RectTransform.NonScaledSize != (controller.WindowSize ?? Point.Zero))
+            if (mainFrame.RectTransform.NonScaledSize != (controller.WindowSize ?? Point.Zero))
             {
                 controller.WindowSize = mainFrame.RectTransform.NonScaledSize;
-                controller.MarkDirty();
             }
-            if (mainFrame != null && mainFrame.RectTransform.AbsoluteOffset != (controller.WindowPosition ?? new Point(-999)))
+            if (mainFrame.RectTransform.AbsoluteOffset != (controller.WindowPosition ?? new Point(-999)))
             {
                 controller.WindowPosition = mainFrame.RectTransform.AbsoluteOffset;
-                controller.MarkDirty();
             }
-            if (leftPanel != null && leftPanel.Rect.Width != (controller.LeftPanelWidth ?? 0))
+            if (leftPanel.Rect.Width != (controller.LeftPanelWidth ?? 0))
             {
                 controller.LeftPanelWidth = leftPanel.Rect.Width;
-                controller.MarkDirty();
             }
-            if (rightPanel != null && rightPanel.Rect.Width != (controller.RightPanelWidth ?? 0))
+            if (rightPanel.Rect.Width != (controller.RightPanelWidth ?? 0))
             {
                 controller.RightPanelWidth = rightPanel.Rect.Width;
-                controller.MarkDirty();
             }
+
+            mainFrame.AddToGUIUpdateList(order: 1);
         }
 
         private static DisplayMode GetModeForWidth(int width, int hiddenThreshold, int compactThreshold)
@@ -778,7 +784,7 @@ namespace SOS
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.15f, 0.9f), headerLayout.RectTransform, Anchor.CenterLeft), style: null)
                 {
-                    OnDrawToolTip = component => component.ToolTip = GetDetailedTooltip(targetItem)
+                    OnDrawToolTip = component => component.ToolTip = CardBuilder.GetDetailedTooltip(targetItem)
                 };
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = PrefabAdapter.IconColor(targetItem), CanBeFocused = false };
             }
@@ -929,7 +935,6 @@ namespace SOS
                     };
                     controller.CustomLayouts[newName] = saved;
                     AddPresetRow(list, newName, () => controller.ApplyLayout(saved.WindowSize, saved.LeftPanelWidth, saved.RightPanelWidth), true, anchor);
-                    controller.MarkDirty();
                     //ToggleLayoutMenu(anchor);
                     //ToggleLayoutMenu(anchor);
                     return true;
@@ -968,7 +973,6 @@ namespace SOS
                     OnClicked = (_, _) =>
                     {
                         controller.CustomLayouts.Remove(name);
-                        controller.MarkDirty();
                         ToggleLayoutMenu(anchor);
                         ToggleLayoutMenu(anchor);
                         return true;

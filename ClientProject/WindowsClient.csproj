@@ -10,6 +10,7 @@
     <FileVersion>1.0.0.0</FileVersion>
     <OutputPath>bin\Windows\</OutputPath>
     <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 
   <Import Project="..\SharedProject\SharedProject.projitems" Label="Shared" />

@@ -25,17 +25,25 @@
 	<sos.context.add_favorite>Añadir a Favoritos</sos.context.add_favorite>
 	<sos.context.recipe_options>Opción de Receta</sos.context.recipe_options>
 	<sos.context.remove_favorite>Quitar de Favoritos</sos.context.remove_favorite>
-	<sos.context.track>Rastrear al HUD</sos.context.track>
+	<sos.context.track_to_hud>Rastrear al HUD</sos.context.track_to_hud>
+	<sos.context.track>Rastrear</sos.context.track>
+	<sos.context.untrack>Dejar de rastrear</sos.context.untrack>
 	<sos.context.track_recipe>Añadir al HUD</sos.context.track_recipe>
-	<sos.context.untrack>Quitar del HUD</sos.context.untrack>
+	<sos.context.untrack_from_hud>Quitar del HUD</sos.context.untrack_from_hud>
 	<sos.context.view_recipes>Ver Recetas</sos.context.view_recipes>
 
 	<!-- Window -->
 	<sos.window.additional_info>INFO ADICIONAL</sos.window.additional_info>
 	<sos.window.back>Atrás</sos.window.back>
 	<sos.window.back.shortcuts>Atajos:&#xA;- Alt + Flecha Izquierda&#xA;- Retroceso&#xA;- Mouse 4</sos.window.back.shortcuts>
-	<sos.window.clear_hud>Limpiar HUD</sos.window.clear_hud>
-	<sos.window.clear_hud_tooltip>Limpia el rastreador del HUD</sos.window.clear_hud_tooltip>
+	<sos.window.manage_hud>GESTIONAR HUD</sos.window.manage_hud>
+	<sos.window.manage_hud_tooltip>Gestiona las recetas rastreadas en el HUD</sos.window.manage_hud_tooltip>
+	<sos.window.toggle_tracker_tooltip>Alternar visibilidad del rastreador HUD (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
+	<sos.window.toggle_tracker_visible>Ocultar Rastreador</sos.window.toggle_tracker_visible>
+	<sos.window.toggle_tracker_hidden>Mostrar Rastreador</sos.window.toggle_tracker_hidden>
+	<sos.window.remove_recipes>Eliminar Recetas</sos.window.remove_recipes>
+	<sos.window.remove_all>Eliminar Todo</sos.window.remove_all>
+	<sos.window.track_all>Rastrear Todo</sos.window.track_all>
 	<sos.window.forward>Adelante</sos.window.forward>
 	<sos.window.forward.shortcuts>Atajos:&#xA;- Alt + Flecha Derecha&#xA;- Shift + Retroceso&#xA;- Mouse 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Cargando dependencias...</sos.window.loading>
@@ -60,10 +68,12 @@
 	<sos.window.usage>USOS</sos.window.usage>
 
 	<!-- HUD -->
+	<sos.hud.nothing_tracked>Nada rastreado aquí.</sos.hud.nothing_tracked>
 	<sos.hud.tracking>RASTREANDO:</sos.hud.tracking>
 	<sos.hud.tracking_tooltip>Rastreador de fabricación activo. Muestra los ingredientes y cantidades requeridas.</sos.hud.tracking_tooltip>
-	<sos.hud.tracked_item_tooltip>Objeto actualmente rastreado.</sos.hud.tracked_item_tooltip>
-	<sos.hud.ingredient_tooltip>Ingrediente requerido. Muestra cuántos tienes en tu inventario.</sos.hud.ingredient_tooltip>
+
+	<!-- Tracker -->
+	<sos.tracker.track-untrack.tooltip>Rastrea o deja de rastrear todas las recetas de este objeto.</sos.tracker.track-untrack.tooltip>
 
 	<!-- Tabs -->
 	<sos.tab.recipes>RECETAS</sos.tab.recipes>
@@ -189,4 +199,43 @@
 	<sos.dummyname.rand.6>Probablemente Está Bien #[id]</sos.dummyname.rand.6>
 	<sos.dummyname.rand.7>#[id] Tiene Una Familia</sos.dummyname.rand.7>
 	<sos.dummyname.rand.8>#[id] Sabe Lo Que Hiciste</sos.dummyname.rand.8>
+
+	<!-- Migration -->
+	<sos.migration.title>SOS — Migración de Configuración</sos.migration.title>
+	<sos.migration.description>Se encontró una configuración anterior de SOS.&#xA;¿Deseas importar tus datos al nuevo sistema?</sos.migration.description>
+	<sos.migration.import>Importar</sos.migration.import>
+	<sos.migration.discard>Descartar</sos.migration.discard>
+	<sos.migration.ignore>Ignorar</sos.migration.ignore>
+	<sos.migration.success>[SOS] Configuración anterior importada correctamente.</sos.migration.success>
+	<sos.migration.error>[SOS] Error al importar la configuración anterior: [error]</sos.migration.error>
+	<sos.migration.import_tooltip>Importa tu configuración anterior y renombra "Data/sossettings.xml" a "Data/sossettings_old.xml".</sos.migration.import_tooltip>
+	<sos.migration.discard_tooltip>Descarta la configuración anterior y renombra "Data/sossettings.xml" a "Data/sossettings_old.xml".</sos.migration.discard_tooltip>
+	<sos.migration.ignore_tooltip>Cierra sin hacer cambios. El archivo anterior permanece intacto; se te volverá a preguntar al próximo inicio.</sos.migration.ignore_tooltip>
+
+	<!-- DB-Location -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>SOS: Tecla para abrir el menú</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>Tecla para abrir el menú de SOS y alternar la visibilidad del rastreador de recetas. Por defecto: J</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>SOS: Escala de fuente XML</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>Multiplicador de escala para el tamaño de fuente de la vista XML. También puedes usar Ctrl+Rueda del Mouse dentro de la ventana XML para un zoom más cómodo y preciso.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayName>SOS: Recetas rastreadas</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.Tooltip>IDs de las recetas actualmente rastreadas. Si tienes problemas al eliminar objetos rastreados, prueba a limpiar este texto, salir al menú principal y volver a unirte a una partida.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayName>SOS: Visibilidad del rastreador</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.Tooltip>Alterna la visibilidad del rastreador de recetas en el HUD. También puedes pulsar Ctrl+[SOSKey] para activarlo o desactivarlo durante la partida.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayCategory>
+
+	<!-- Window position X -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>SOS: Posición X de la ventana</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>Si la ventana se sale de la interfaz, prueba a ajustar estos valores hasta que se reubique. Recomendado: 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>
+
+	<!-- Window position Y -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>SOS: Posición Y de la ventana</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>Si la ventana se sale de la interfaz, prueba a ajustar estos valores hasta que se reubique. Recomendado: 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>
 </infotexts>

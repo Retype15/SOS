@@ -25,17 +25,25 @@
 	<sos.context.add_favorite>添加到收藏</sos.context.add_favorite>
 	<sos.context.recipe_options>配方选项</sos.context.recipe_options>
 	<sos.context.remove_favorite>从收藏中移除</sos.context.remove_favorite>
-	<sos.context.track>追踪到 HUD</sos.context.track>
+	<sos.context.track_to_hud>追踪到 HUD</sos.context.track_to_hud>
+	<sos.context.track>追踪</sos.context.track>
+	<sos.context.untrack>取消追踪</sos.context.untrack>
 	<sos.context.track_recipe>添加到 HUD</sos.context.track_recipe>
-	<sos.context.untrack>从 HUD 移除</sos.context.untrack>
+	<sos.context.untrack_from_hud>从 HUD 移除</sos.context.untrack_from_hud>
 	<sos.context.view_recipes>查看配方</sos.context.view_recipes>
 
 	<!-- Window -->
 	<sos.window.additional_info>额外信息</sos.window.additional_info>
 	<sos.window.back>返回</sos.window.back>
 	<sos.window.back.shortcuts>快捷键：&#xA;- Alt + 左箭头&#xA;- 退格键&#xA;- 鼠标 4</sos.window.back.shortcuts>
-	<sos.window.clear_hud>清除 HUD</sos.window.clear_hud>
-	<sos.window.clear_hud_tooltip>清除活跃的 HUD 追踪器</sos.window.clear_hud_tooltip>
+	<sos.window.manage_hud>管理 HUD</sos.window.manage_hud>
+	<sos.window.manage_hud_tooltip>管理 HUD 上的追踪配方</sos.window.manage_hud_tooltip>
+	<sos.window.toggle_tracker_tooltip>切换 HUD 追踪器可见性 (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
+	<sos.window.toggle_tracker_visible>隐藏追踪器</sos.window.toggle_tracker_visible>
+	<sos.window.toggle_tracker_hidden>显示追踪器</sos.window.toggle_tracker_hidden>
+	<sos.window.remove_recipes>移除配方</sos.window.remove_recipes>
+	<sos.window.remove_all>全部移除</sos.window.remove_all>
+	<sos.window.track_all>追踪全部</sos.window.track_all>
 	<sos.window.forward>前进</sos.window.forward>
 	<sos.window.forward.shortcuts>快捷键：&#xA;- Alt + 右箭头&#xA;- Shift + 退格键&#xA;- 鼠标 5</sos.window.forward.shortcuts>
 	<sos.window.loading>正在加载依赖项...</sos.window.loading>
@@ -60,10 +68,12 @@
 	<sos.window.usage>用途</sos.window.usage>
 
 	<!-- HUD -->
+	<sos.hud.nothing_tracked>暂无追踪内容</sos.hud.nothing_tracked>
 	<sos.hud.tracking>追踪中：</sos.hud.tracking>
 	<sos.hud.tracking_tooltip>制作追踪已激活。显示所需的材料和数量。</sos.hud.tracking_tooltip>
-	<sos.hud.tracked_item_tooltip>当前追踪的物品。</sos.hud.tracked_item_tooltip>
-	<sos.hud.ingredient_tooltip>所需材料。显示你背包中有多少。</sos.hud.ingredient_tooltip>
+
+	<!-- Tracker -->
+	<sos.tracker.track-untrack.tooltip>追踪或取消追踪此物品的所有配方。</sos.tracker.track-untrack.tooltip>
 
 	<!-- Tabs -->
 	<sos.tab.recipes>配方</sos.tab.recipes>
@@ -189,4 +199,43 @@
 	<sos.dummyname.rand.6>大概还好 #[id]</sos.dummyname.rand.6>
 	<sos.dummyname.rand.7>有家室的人 #[id]</sos.dummyname.rand.7>
 	<sos.dummyname.rand.8>知道你做了什么</sos.dummyname.rand.8>
+
+	<!-- Migration -->
+	<sos.migration.title>SOS — 设置迁移</sos.migration.title>
+	<sos.migration.description>检测到旧版 SOS 设置。&#xA;是否要导入已有数据到新系统？</sos.migration.description>
+	<sos.migration.import>导入</sos.migration.import>
+	<sos.migration.discard>丢弃</sos.migration.discard>
+	<sos.migration.ignore>忽略</sos.migration.ignore>
+	<sos.migration.success>[SOS] 旧设置导入成功。</sos.migration.success>
+	<sos.migration.error>[SOS] 导入旧设置时出错：[error]</sos.migration.error>
+	<sos.migration.import_tooltip>导入旧设置并将 "Data/sossettings.xml" 重命名为 "Data/sossettings_old.xml"。</sos.migration.import_tooltip>
+	<sos.migration.discard_tooltip>丢弃旧设置并将 "Data/sossettings.xml" 重命名为 "Data/sossettings_old.xml"。</sos.migration.discard_tooltip>
+	<sos.migration.ignore_tooltip>关闭而不做任何更改。旧文件保持不变；下次启动时会再次提示。</sos.migration.ignore_tooltip>
+
+	<!-- DB-Location -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>SOS: 打开菜单的按键</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>用于打开SOS菜单和切换配方追踪器可见性的按键。默认：J</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>SOS: XML字体缩放</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>原始XML视图字体大小的缩放倍数。你也可以在原始XML窗口内使用Ctrl+鼠标滚轮进行更方便精确的缩放。</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayName>SOS: 追踪的配方</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.Tooltip>当前追踪的配方ID。如果移除追踪物品时遇到问题，请尝试清除此文本，退出到主菜单，然后重新加入游戏。</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayName>SOS: 追踪器可见性</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.Tooltip>切换HUD上配方追踪器的可见性。你也可以在游戏中按Ctrl+[SOSKey]进行切换。</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayCategory>
+
+	<!-- Window position X -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>SOS: 窗口位置 X</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>如果窗口超出UI范围，请尝试调整这些数值直到重新定位。推荐值：0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>
+
+	<!-- Window position Y -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>SOS: 窗口位置 Y</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>如果窗口超出UI范围，请尝试调整这些数值直到重新定位。推荐值：0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>
 </infotexts>

@@ -49,7 +49,7 @@ namespace SOS
             return analysis;
         }
 
-        public static void ClearSessionCache()
+        public static void Clear()
         {
             analysisCache.Clear();
             lruList.Clear();

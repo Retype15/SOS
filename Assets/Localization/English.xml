@@ -25,17 +25,22 @@
 	<sos.context.add_favorite>Add to Favorites</sos.context.add_favorite>
 	<sos.context.recipe_options>Recipe Options</sos.context.recipe_options>
 	<sos.context.remove_favorite>Remove from Favorites</sos.context.remove_favorite>
-	<sos.context.track>Track to HUD</sos.context.track>
+	<sos.context.track_to_hud>Track to HUD</sos.context.track_to_hud>
+	<sos.context.track>Track</sos.context.track>
+	<sos.context.untrack>Untrack</sos.context.untrack>
 	<sos.context.track_recipe>Add to HUD</sos.context.track_recipe>
-	<sos.context.untrack>Remove from HUD</sos.context.untrack>
+	<sos.context.untrack_from_hud>Remove from HUD</sos.context.untrack_from_hud>
 	<sos.context.view_recipes>View Recipes</sos.context.view_recipes>
 
 	<!-- Window -->
 	<sos.window.additional_info>ADDITIONAL INFO</sos.window.additional_info>
 	<sos.window.back>Back</sos.window.back>
 	<sos.window.back.shortcuts>Shortcuts:&#xA;- Alt + Left Arrow&#xA;- Backspace&#xA;- Mouse 4</sos.window.back.shortcuts>
-	<sos.window.clear_hud>Clear HUD</sos.window.clear_hud>
-	<sos.window.clear_hud_tooltip>Clears the active HUD tracker</sos.window.clear_hud_tooltip>
+	<sos.window.manage_hud>MANAGE HUD</sos.window.manage_hud>
+	<sos.window.manage_hud_tooltip>Manage tracked recipes on the HUD</sos.window.manage_hud_tooltip>
+	<sos.window.toggle_tracker_tooltip>Toggle HUD tracker visibility (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
+	<sos.window.toggle_tracker_visible>Hide Tracker</sos.window.toggle_tracker_visible>
+	<sos.window.toggle_tracker_hidden>Show Tracker</sos.window.toggle_tracker_hidden>
 	<sos.window.forward>Forward</sos.window.forward>
 	<sos.window.forward.shortcuts>Shortcuts:&#xA;- Alt + Right Arrow&#xA;- Shift + Backspace&#xA;- Mouse 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Loading dependencies...</sos.window.loading>
@@ -57,13 +62,18 @@
 	<sos.window.settings>Settings (WIP)</sos.window.settings>
 	<sos.window.tag_tooltip>Search items with tag: [tag]</sos.window.tag_tooltip>
 	<sos.window.title>SOS - Recipe Browser</sos.window.title>
+	<sos.window.remove_recipes>Remove Recipes</sos.window.remove_recipes>
+	<sos.window.remove_all>Remove All</sos.window.remove_all>
+	<sos.window.track_all>Track All</sos.window.track_all>
 	<sos.window.usage>USAGE</sos.window.usage>
 
 	<!-- HUD -->
+	<sos.hud.nothing_tracked>Nothing tracked here.</sos.hud.nothing_tracked>
 	<sos.hud.tracking>TRACKING:</sos.hud.tracking>
 	<sos.hud.tracking_tooltip>Active crafting tracker. Shows required ingredients and amounts.</sos.hud.tracking_tooltip>
-	<sos.hud.tracked_item_tooltip>Currently tracked item.</sos.hud.tracked_item_tooltip>
-	<sos.hud.ingredient_tooltip>Required ingredient. Shows how many you have in your inventory.</sos.hud.ingredient_tooltip>
+
+	<!-- Tracker -->
+	<sos.tracker.track-untrack.tooltip>Track or untrack all recipes from this item.</sos.tracker.track-untrack.tooltip>
 
 	<!-- Tabs -->
 	<sos.tab.recipes>RECIPES</sos.tab.recipes>
@@ -189,4 +199,43 @@
 	<sos.dummyname.rand.6>Probably Fine #[id]</sos.dummyname.rand.6>
 	<sos.dummyname.rand.7>Has A Family #[id]</sos.dummyname.rand.7>
 	<sos.dummyname.rand.8>Knows What You Did</sos.dummyname.rand.8>
+
+	<!-- Migration -->
+	<sos.migration.title>SOS — Configuration Migration</sos.migration.title>
+	<sos.migration.description>A previous SOS configuration was found.&#xA;Do you want to import your data to the new system?</sos.migration.description>
+	<sos.migration.import>Import</sos.migration.import>
+	<sos.migration.discard>Discard</sos.migration.discard>
+	<sos.migration.ignore>Ignore</sos.migration.ignore>
+	<sos.migration.import_tooltip>Imports your old settings and renames "Data/sossettings.xml" to "Data/sossettings_old.xml".</sos.migration.import_tooltip>
+	<sos.migration.discard_tooltip>Discards the old settings and renames "Data/sossettings.xml" to "Data/sossettings_old.xml".</sos.migration.discard_tooltip>
+	<sos.migration.ignore_tooltip>Closes without changes. The old file remains untouched; you will be prompted again on next launch.</sos.migration.ignore_tooltip>
+	<sos.migration.success>[SOS] Previous configuration imported successfully.</sos.migration.success>
+	<sos.migration.error>[SOS] Error importing previous configuration: [error]</sos.migration.error>
+
+	<!-- DB-Location -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>SOS: Key to open the menu</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>Key used to open the SOS menu and toggle the recipe tracker visibility. Default: J</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>SOS: Raw XML Font Scale</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>Scaling multiplier for the raw XML view font size. You can also use Ctrl+Mouse Wheel inside the raw XML window for more convenient and precise zooming.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.XmlFontScale.DisplayCategory>
+
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayName>SOS: Tracked Recipes</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.Tooltip>Currently tracked recipe IDs. If you encounter issues removing tracked items, try clearing this text, exit to the main menu, then join a game again.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackedRecipes.DisplayCategory>
+	
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayName>SOS: Tracker Visibility</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.Tooltip>Toggles the recipe tracker visibility on the HUD. You can also press Ctrl+[SOSKey] to toggle it in-game.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.TrackerVisible.DisplayCategory>
+	
+	<!-- Window position X -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>SOS: Window position X</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>If the window falls outside of the UI, try adjusting these values until it is repositioned. Recommended: 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeX.DisplayCategory>
+
+	<!-- Window position Y -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>SOS: Window position Y</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>If the window falls outside of the UI, try adjusting these values until it is repositioned. Recommended: 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>
 </infotexts>

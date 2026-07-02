@@ -180,6 +180,13 @@ namespace SOS
         }
     }
 
+    public static class IEnumerableExt
+    {
+        internal static string ToCsv<T>(this T collection) where T : IEnumerable<string>
+        {
+            return string.Join(",", collection);
+        }
+    }
 
     // AI Generated Code
     public static class GUIComponentExt
@@ -711,6 +718,12 @@ namespace SOS
             }
 
             yield return CoroutineStatus.Success;
+        }
+
+        public static void ClearAll()
+        {
+            designColors.Clear();
+            designTextColors.Clear();
         }
     }
 }

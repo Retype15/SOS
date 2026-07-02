@@ -36,14 +36,7 @@ namespace SOS
         public string? DummyCharacterXML { get; set; } = null;
     }
 
-    public class SavedLayout
-    {
-        public Point WindowSize { get; set; }
-        public int LeftPanelWidth { get; set; }
-        public int RightPanelWidth { get; set; }
-    }
-
-    // MARK: - Settings Manager
+    // MARK: - Settings Manager (legacy — only used for migration)
     public static class SettingsManager
     {
         private const int CurrentSaveVersion = 1;
@@ -251,21 +244,4 @@ namespace SOS
         }
     }
 
-    // MARK: - Settings Menu
-    public class SettingsMenu
-    {
-        private GUIFrame? settingsFrame;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Quitar el parámetro no utilizado", Justification = "<pendiente>")]
-        public static void OpenMenu(GUIComponent parent)
-        {
-            // TODO
-        }
-
-        public void CloseMenu()
-        {
-            settingsFrame?.Parent.RemoveChild(settingsFrame);
-            settingsFrame = null;
-        }
-    }
 }

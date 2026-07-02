@@ -20,6 +20,7 @@ namespace SOS
         public void InitClient()
         {
             controller = SOSController.Instance;
+            controller.LoadSettings();
 
             if (!DebugConsole.commands.Exists(c => c.Names.ToString() == "sos")) // \\//
                 DebugConsole.commands.Add(new DebugConsole.Command(
@@ -35,6 +36,12 @@ namespace SOS
                 });
 
             LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
+
+            // Migration: old config file detected
+            if (File.Exists("Data/sossettings.xml"))
+            {
+                controller.HaveOldConfigFile = true;
+            }
 
             RLogger.Log(TextSOS.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
         }

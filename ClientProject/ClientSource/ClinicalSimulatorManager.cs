@@ -193,7 +193,6 @@ namespace SOS
             if (!loadedSuccessfully)
             {
                 CreateNewDummy();
-                Controller.MarkDirty();
             }
 
             IsPlaying = false;
@@ -248,7 +247,6 @@ namespace SOS
         public static void DiscardPatient()
         {
             DeathCount++;
-            Controller.MarkDirty();
 
             ActiveDummy?.Discard();
 
@@ -276,7 +274,6 @@ namespace SOS
                 }
                 float dt = deltaTime * TimeScale;
                 MedicalReflector.HealthBiologicalUpdateMethod?.Invoke(Patient.CharacterHealth, [dt]);
-                Controller.MarkDirty();
             }
 
             var controlled = Character.Controlled;
@@ -309,11 +306,6 @@ namespace SOS
             }
 
             MaybeKillDummy();
-
-            if (MedicalReflector.TooltipField?.GetValue(Patient.CharacterHealth) is GUIComponent tooltip)
-            {
-                tooltip.AddToGUIUpdateList(ignoreChildren: false, order: 100000);
-            }
 
             if (MedicalReflector.TreatmentContainerField?.GetValue(Patient.CharacterHealth) is GUIListBox treatmentList)
             {
@@ -351,7 +343,6 @@ namespace SOS
         public static void ApplyMockItem(ItemPrefab prefab, Limb? targetLimb)
         {
             if (Patient == null) return;
-            Controller.MarkDirty();
             Item? mockItem = null;
             try
             {
@@ -446,14 +437,11 @@ namespace SOS
 
             Patient.CharacterHealth?.CalculateVitality();
             IsPlaying = false;
-
-            Controller.MarkDirty();
         }
 
         public static void InjectAffliction(AfflictionPrefab prefab, float strength, Limb? targetLimb = null)
         {
             if (Patient?.CharacterHealth == null) return;
-            Controller.MarkDirty();
             var inst = prefab.Instantiate(strength);
             var limb = targetLimb ?? Patient.AnimController.GetLimb(prefab.IndicatorLimb != LimbType.None ? prefab.IndicatorLimb : LimbType.Torso) ?? Patient.AnimController.MainLimb;
             Patient.CharacterHealth.ApplyAffliction(limb, inst);
@@ -462,8 +450,6 @@ namespace SOS
         public static void RemoveAffliction(AfflictionPrefab prefab, Limb? targetLimb = null)
         {
             if (Patient?.CharacterHealth == null) return;
-
-            Controller.MarkDirty();
 
             if (targetLimb != null)
             {
@@ -480,8 +466,6 @@ namespace SOS
         public static void SetAfflictionStrength(AfflictionPrefab prefab, float strength, Limb? targetLimb = null)
         {
             if (Patient?.CharacterHealth == null) return;
-
-            Controller.MarkDirty();
 
             var aff = targetLimb != null ?
                 Patient.CharacterHealth.GetAffliction(prefab.Identifier, targetLimb) :
@@ -524,7 +508,6 @@ namespace SOS
             Patient.CharacterHealth?.CalculateVitality();
             IsPlaying = false;
             HasStarted = true;
-            Controller.MarkDirty();
         }
 
         public static void CleanPatient()
@@ -537,7 +520,6 @@ namespace SOS
             IsPlaying = false;
             HasStarted = true;
             snapshot = null;
-            Controller.MarkDirty();
         }
 
         private static void TakeSnapshot()
