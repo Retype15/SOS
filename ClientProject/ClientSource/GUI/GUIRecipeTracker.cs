@@ -410,7 +410,7 @@ namespace SOS
             GetFabricationRecipe(GetItemPrefab(itemString), recipeHash);
     }
 
-    internal static class ConvertibleExtension
+    internal static class ConvertibleExt
     {
         public static uint? ToUInt32Safe(this IConvertible value)
         {
