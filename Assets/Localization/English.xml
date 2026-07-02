@@ -201,6 +201,10 @@
 	<sos.migration.description>A previous SOS configuration was found.&#xA;Do you want to import your data to the new system?</sos.migration.description>
 	<sos.migration.import>Import</sos.migration.import>
 	<sos.migration.discard>Discard</sos.migration.discard>
+	<sos.migration.ignore>Ignore</sos.migration.ignore>
+	<sos.migration.import_tooltip>Imports your old settings and renames "Data/sossettings.xml" to "Data/sossettings_old.xml".</sos.migration.import_tooltip>
+	<sos.migration.discard_tooltip>Discards the old settings and renames "Data/sossettings.xml" to "Data/sossettings_old.xml".</sos.migration.discard_tooltip>
+	<sos.migration.ignore_tooltip>Closes without changes. The old file remains untouched; you will be prompted again on next launch.</sos.migration.ignore_tooltip>
 	<sos.migration.success>[SOS] Previous configuration imported successfully.</sos.migration.success>
 	<sos.migration.error>[SOS] Error importing previous configuration: [error]</sos.migration.error>
 

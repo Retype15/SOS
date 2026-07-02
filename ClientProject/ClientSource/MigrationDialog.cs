@@ -59,17 +59,29 @@ namespace SOS
 
             // Import button
             var importBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
-                TextSOS.Get("sos.migration.import", "Importar"));
+                TextSOS.Get("sos.migration.import", "Import"))
+            {
+                ToolTip = TextSOS.Get("sos.migration.import_tooltip",
+                    "Imports your old settings and renames \"Data/sossettings.xml\" to \"Data/sossettings_old.xml\".")
+            };
             importBtn.OnClicked += ImportAction;
 
             // Discard button
             var discardBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
-                TextSOS.Get("sos.migration.discard", "Descartar"));
+                TextSOS.Get("sos.migration.discard", "Discard"))
+            {
+                ToolTip = TextSOS.Get("sos.migration.discard_tooltip",
+                    "Discards the old settings and renames \"Data/sossettings.xml\" to \"Data/sossettings_old.xml\".")
+            };
             discardBtn.OnClicked += DiscardAction;
 
             // Ignore button
             var ignoreBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
-                TextSOS.Get("sos.migration.ignore", "Ignorar"));
+                TextSOS.Get("sos.migration.ignore", "Ignore"))
+            {
+                ToolTip = TextSOS.Get("sos.migration.ignore_tooltip",
+                    "Closes without changes. The old file remains untouched; you will be prompted again on next launch.")
+            };
             ignoreBtn.OnClicked += IgnoreAction;
 
             RLogger.LogDebug("Showing MigrationDialog");
