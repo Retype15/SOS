@@ -61,7 +61,7 @@ namespace SOS
         public void Dispose()
         {
 #if CLIENT
-            RecipeAnalyzer.ClearSessionCache();
+            RecipeAnalyzer.Clear();
             DisposeClient();
 #endif
             ConfigService = null!;
