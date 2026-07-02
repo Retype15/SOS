@@ -35,7 +35,6 @@ namespace SOS
         public ClientConfig cfg = ClientConfig.Instance;
 
         private Keys ToggleKey => cfg.SOSOpenKey.Key;
-        private bool wasKeyDown = false;
 
         public string LastSearchQuery
         {
@@ -357,11 +356,7 @@ namespace SOS
 
             if (canHandleInputs)
             {
-                //var kb = Keyboard.GetState();
-                //bool isKeyDownNow = kb.IsKeyDown(ToggleKey);
-                bool isKeyDownNow = cfg.SOSOpenKeyDown;
-
-                if (isKeyDownNow && !wasKeyDown)
+                if (cfg.SOSOpenKeyHit)
                 {
                     if (PlayerInput.IsCtrlDown())
                     {
@@ -386,11 +381,6 @@ namespace SOS
                         });
                     }
                 }
-                wasKeyDown = isKeyDownNow;
-            }
-            else
-            {
-                wasKeyDown = cfg.SOSOpenKeyDown;
             }
 
             if (mainWindow != null)
