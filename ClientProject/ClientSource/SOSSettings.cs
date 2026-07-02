@@ -5,243 +5,259 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
 using Barotrauma;
+using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 
 namespace SOS
 {
-    // MARK: - Settings Data
-    public class SettingsData
+    public sealed class ClientConfig
     {
-        public HashSet<string> Favorites { get; set; } = [];
-        public string LastSearchQuery { get; set; } = "";
-        public string LastItemId { get; set; } = "";
-        public string TrackedItemId { get; set; } = "";
-        public uint TrackedRecipeHash { get; set; } = 0;
-        public bool RawXmlMode { get; set; } = false;
-        public float XmlFontScale { get; set; } = 0.9f;
-        public List<string> TabHistory { get; set; } = [];
+        private static ClientConfig? _instance;
+        public static ClientConfig Instance => _instance ??= new ClientConfig();
 
-        // UI Persistence
-        public Point? WindowSize { get; set; }
-        public Point? WindowPosition { get; set; }
-        public int? LeftPanelWidth { get; set; }
-        public int? RightPanelWidth { get; set; }
-        public Dictionary<string, SavedLayout> CustomLayouts { get; set; } = [];
+        private readonly HashSet<ISettingBase> _dirtySettings = [];
 
-        // Medical SIM
-        public int DummyDeathCount { get; set; } = 0;
-        public bool DummySimulated { get; set; } = false;
-        public string? DummyCharacterXML { get; set; } = null;
-    }
+        private void MarkDirty(ISettingBase setting) => _dirtySettings.Add(setting);
 
-    // MARK: - Settings Manager (legacy — only used for migration)
-    public static class SettingsManager
-    {
-        private const int CurrentSaveVersion = 1;
-        private const string NewConfigPath = "Data/sossettings.xml";
-        private const string OldConfigPath = "SOS_Settings.xml";
+        public bool HasChanges => _dirtySettings.Count > 0;
 
-        public static void Save(SettingsData data)
+        public void SaveAll()
         {
-            try
+            if (!HasChanges) return;
+
+            if (Plugin.Instance.ConfigService is Barotrauma.LuaCs.ConfigService cs)
             {
-                string? directory = Path.GetDirectoryName(NewConfigPath);
-                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
+                foreach (ISettingBase setting in _dirtySettings)
+                    cs.SaveConfigValue(setting);
+            }
+            _dirtySettings.Clear();
+        }
 
-                var doc = new XDocument(
-                    new XElement("SOSSettings",
-                        new XAttribute("version", CurrentSaveVersion),
+        private readonly ISettingControl _sosOpenKey = null!;
+        public KeyOrMouse SOSOpenKey { get => _sosOpenKey.Value; set => _sosOpenKey.TrySetValue(value); }
+        public bool SOSOpenKeyHit => _sosOpenKey.IsHit();
+        public bool SOSOpenKeyDown => _sosOpenKey.IsDown();
 
-                        new XElement("Favorites",
-                            data.Favorites.Select(f => new XElement("Item", new XAttribute("id", f)))
-                        ),
+        private readonly ISettingBase<string> _lastSearchQuery = null!;
+        public string LastSearchQuery
+        {
+            get => _lastSearchQuery.Value;
+            set { if (_lastSearchQuery.Value != value) _lastSearchQuery.TrySetValue(value); }
+        }
 
-                        new XElement("State",
-                            new XAttribute("lastItem", data.LastItemId ?? ""),
-                            new XAttribute("lastSearch", data.LastSearchQuery ?? ""),
-                            new XAttribute("tabHistory", string.Join(",", data.TabHistory)),
-                            new XAttribute("rawXml", data.RawXmlMode),
-                            new XAttribute("xmlScale", data.XmlFontScale)
-                        ),
+        private readonly ISettingBase<string> _lastItemId = null!;
+        public string LastItemId
+        {
+            get => _lastItemId.Value;
+            set { if (_lastItemId.Value != value) _lastItemId.TrySetValue(value); }
+        }
 
-                        new XElement("MedicalSim",
-                            new XAttribute("deathCount", data.DummyDeathCount),
-                            new XAttribute("simulated", data.DummySimulated),
-                            string.IsNullOrEmpty(data.DummyCharacterXML) ? null : XElement.Parse(data.DummyCharacterXML)
-                        ),
+        private readonly ISettingBase<bool> _rawXmlMode = null!;
+        public bool RawXmlMode
+        {
+            get => _rawXmlMode.Value;
+            set { if (_rawXmlMode.Value != value) _rawXmlMode.TrySetValue(value); }
+        }
 
-                        new XElement("Tracker",
-                            new XAttribute("targetId", data.TrackedItemId ?? ""),
-                            new XAttribute("recipeHash", data.TrackedRecipeHash.ToString())
-                        ),
+        private readonly ISettingBase<float> _xmlFontScale = null!;
+        public float XmlFontScale
+        {
+            get => _xmlFontScale.Value;
+            set { if (_xmlFontScale.Value != value) _xmlFontScale.TrySetValue(value); }
+        }
 
-                        new XElement("Layout",
-                            new XAttribute("winX", data.WindowPosition?.X ?? -1),
-                            new XAttribute("winY", data.WindowPosition?.Y ?? -1),
-                            new XAttribute("winW", data.WindowSize?.X ?? 0),
-                            new XAttribute("winH", data.WindowSize?.Y ?? 0),
-                            new XAttribute("leftW", data.LeftPanelWidth ?? 0),
-                            new XAttribute("rightW", data.RightPanelWidth ?? 0)
-                        ),
+        private readonly ISettingBase<string> _trackedRecipesRaw = null!;
+        public string TrackedRecipesRaw
+        {
+            get => _trackedRecipesRaw.Value;
+            set { if (_trackedRecipesRaw.Value != value) _trackedRecipesRaw.TrySetValue(value); }
+        }
 
-                        new XElement("Layouts",
-                            data.CustomLayouts.Select(kvp => new XElement("Preset",
-                                new XAttribute("name", kvp.Key),
-                                new XAttribute("winW", kvp.Value.WindowSize.X),
-                                new XAttribute("winH", kvp.Value.WindowSize.Y),
-                                new XAttribute("leftW", kvp.Value.LeftPanelWidth),
-                                new XAttribute("rightW", kvp.Value.RightPanelWidth)
-                            ))
+        private readonly ISettingBase<bool> _trackerVisible = null!;
+        public bool TrackerVisible
+        {
+            get => _trackerVisible.Value;
+            set { if (_trackerVisible.Value != value) _trackerVisible.TrySetValue(value); }
+        }
+        public event Action<ISettingBase> OnTrackerVisibleValueChanged
+        {
+            add => _trackerVisible.OnValueChanged += value;
+            remove => _trackerVisible.OnValueChanged -= value;
+        }
+
+        private readonly ISettingBase<int> _dummyDeathCount = null!;
+        public int DummyDeathCount
+        {
+            get => _dummyDeathCount.Value;
+            set { if (_dummyDeathCount.Value != value) _dummyDeathCount.TrySetValue(value); }
+        }
+
+        private readonly ISettingBase<bool> _dummySimulated = null!;
+        public bool DummySimulated
+        {
+            get => _dummySimulated.Value;
+            set { if (_dummySimulated.Value != value) _dummySimulated.TrySetValue(value); }
+        }
+
+        private readonly ISettingBase<string> _dummyCharacterXML = null!;
+        public string? DummyCharacterXML
+        {
+            get => string.IsNullOrEmpty(_dummyCharacterXML.Value) ? null : _dummyCharacterXML.Value;
+            set
+            {
+                string normalized = value ?? "";
+                if (_dummyCharacterXML.Value != normalized) _dummyCharacterXML.TrySetValue(normalized);
+            }
+        }
+
+        // ─── Batch-save (window geometry) ───
+
+        private readonly ISettingBase<int> _windowSizeX = null!;
+        private readonly ISettingBase<int> _windowSizeY = null!;
+        private readonly ISettingBase<int> _windowPositionX = null!;
+        private readonly ISettingBase<int> _windowPositionY = null!;
+        private readonly ISettingBase<int> _leftPanelWidth = null!;
+        private readonly ISettingBase<int> _rightPanelWidth = null!;
+
+        internal int WindowSizeX { get => _windowSizeX.Value; set { if (_windowSizeX.Value != value) _windowSizeX.TrySetValue(value); } }
+        internal int WindowSizeY { get => _windowSizeY.Value; set { if (_windowSizeY.Value != value) _windowSizeY.TrySetValue(value); } }
+        internal int WindowPositionX { get => _windowPositionX.Value; set { if (_windowPositionX.Value != value) _windowPositionX.TrySetValue(value); } }
+        internal int WindowPositionY { get => _windowPositionY.Value; set { if (_windowPositionY.Value != value) _windowPositionY.TrySetValue(value); } }
+        internal int LeftPanelWidth { get => _leftPanelWidth.Value; set { if (_leftPanelWidth.Value != value) _leftPanelWidth.TrySetValue(value); } }
+        internal int RightPanelWidth { get => _rightPanelWidth.Value; set { if (_rightPanelWidth.Value != value) _rightPanelWidth.TrySetValue(value); } }
+
+        // ─── Batch-save (complex serialized) ───
+
+        private readonly ISettingBase<string> _favoritesRaw = null!;
+        private readonly ISettingBase<string> _tabHistoryRaw = null!;
+        private readonly ISettingBase<string> _customLayoutsRaw = null!;
+
+        internal string FavoritesRaw { get => _favoritesRaw.Value; set { if (_favoritesRaw.Value != value) _favoritesRaw.TrySetValue(value); } }
+        internal string TabHistoryRaw { get => _tabHistoryRaw.Value; set { if (_tabHistoryRaw.Value != value) _tabHistoryRaw.TrySetValue(value); } }
+        internal string CustomLayoutsRaw { get => _customLayoutsRaw.Value; set { if (_customLayoutsRaw.Value != value) _customLayoutsRaw.TrySetValue(value); } }
+
+        // ─── CSV Serialization Helpers ───
+
+        internal static HashSet<string> CsvToHashSet(string csv)
+        {
+            if (string.IsNullOrEmpty(csv)) return [];
+            return [.. csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+        }
+
+        internal static List<string> CsvToList(string csv)
+        {
+            if (string.IsNullOrEmpty(csv)) return [];
+            return [.. csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+        }
+
+        // ─── XML Serialization Helpers (CustomLayouts) ───
+
+        internal static string LayoutsToXml(Dictionary<string, SavedLayout> layouts)
+        {
+            if (layouts.Count == 0) return "";
+
+            var doc = new XDocument(
+                new XElement("Layouts",
+                    layouts.Select(kvp =>
+                        new XElement("Preset",
+                            new XAttribute("name", kvp.Key),
+                            new XAttribute("winW", kvp.Value.WindowSize.X),
+                            new XAttribute("winH", kvp.Value.WindowSize.Y),
+                            new XAttribute("leftW", kvp.Value.LeftPanelWidth),
+                            new XAttribute("rightW", kvp.Value.RightPanelWidth)
                         )
                     )
-                );
+                )
+            );
 
-                doc.Save(NewConfigPath);
-
-                RLogger.LogDebug(TextSOS.Get("sos.config.saved", "[SOS] Settings saved (v[version]).").Replace("[version]", CurrentSaveVersion.ToString()).Value);
-            }
-            catch (Exception e)
-            {
-                LuaCsLogger.LogError(TextSOS.Get("sos.config.save_error", "[SOS] Failed to save settings: [error]").Replace("[error]", e.Message).Value);
-            }
+            return doc.ToString(SaveOptions.DisableFormatting);
         }
 
-
-        public static SettingsData Load()
+        internal static Dictionary<string, SavedLayout> XmlToLayouts(string xml)
         {
-            var data = new SettingsData();
-
-            string activePath = NewConfigPath;
-            if (!File.Exists(NewConfigPath))
-            {
-                if (File.Exists(OldConfigPath))
-                {
-                    activePath = OldConfigPath;
-                    RLogger.LogWarning(TextSOS.Get("sos.config.migrating", "[SOS] Migrating settings from old path...").Value);
-                }
-                else
-                {
-                    return data;
-                }
-            }
+            var result = new Dictionary<string, SavedLayout>();
+            if (string.IsNullOrEmpty(xml)) return result;
 
             try
             {
-                XDocument doc = XDocument.Load(activePath);
-                XElement? root = doc.Element("SOSSettings");
-                if (root == null) return data;
+                var doc = XDocument.Parse(xml);
+                XElement? root = doc.Root;
+                if (root == null || root.Name != "Layouts") return result;
 
-                int fileVersion = int.Parse(root.Attribute("version")?.Value ?? "0");
-
-                if (fileVersion >= 1)
+                foreach (var preset in root.Elements("Preset"))
                 {
-                    var favs = root.Element("Favorites")?.Elements("Item");
-                    if (favs != null)
+                    string name = preset.Attribute("name")?.Value ?? "Unnamed";
+                    result[name] = new SavedLayout
                     {
-                        foreach (var f in favs) data.Favorites.Add(f.Attribute("id")?.Value ?? "");
-                    }
-
-                    var state = root.Element("State");
-                    if (state != null)
-                    {
-                        data.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
-                        data.LastItemId = state.Attribute("lastItem")?.Value ?? "";
-
-                        string historyStr = state.Attribute("tabHistory")?.Value ?? "";
-                        if (!string.IsNullOrEmpty(historyStr))
-                        {
-                            data.TabHistory = [.. historyStr.Split(',', StringSplitOptions.RemoveEmptyEntries)];
-                        }
-
-                        data.RawXmlMode = ImGoodBoolParser(state.Attribute("rawXml")?.Value, false);
-                        data.XmlFontScale = ImGoodFloatParser(state.Attribute("xmlScale")?.Value, 0.9f);
-                    }
-
-                    var simulator = root.Element("MedicalSim");
-                    if (simulator != null)
-                    {
-                        data.DummyDeathCount = ImGoodParser(simulator.Attribute("deathCount")?.Value, 0);
-                        data.DummySimulated = ImGoodBoolParser(simulator.Attribute("simulated")?.Value, false);
-                        var dummyNode = simulator.Elements().FirstOrDefault();
-                        if (dummyNode != null)
-                        {
-                            data.DummyCharacterXML = dummyNode.ToString();
-                        }
-                    }
-
-                    var tracker = root.Element("Tracker");
-                    if (tracker != null)
-                    {
-                        data.TrackedItemId = tracker.Attribute("targetId")?.Value ?? "";
-                        _ = uint.TryParse(tracker.Attribute("recipeHash")?.Value, out uint hash);
-                        data.TrackedRecipeHash = hash;
-                    }
-
-                    var layout = root.Element("Layout");
-                    if (layout != null)
-                    {
-                        int winX = ImGoodParser(layout.Attribute("winX")?.Value, -1);
-                        int winY = ImGoodParser(layout.Attribute("winY")?.Value, -1);
-                        if (winX >= 0 && winY >= 0) data.WindowPosition = new Point(winX, winY);
-
-                        int winW = ImGoodParser(layout.Attribute("winW")?.Value, 0);
-                        int winH = ImGoodParser(layout.Attribute("winH")?.Value, 0);
-                        if (winW > 0 && winH > 0) data.WindowSize = new Point(winW, winH);
-
-                        int leftW = ImGoodParser(layout.Attribute("leftW")?.Value, 0);
-                        if (leftW > 0) data.LeftPanelWidth = leftW;
-
-                        int rightW = ImGoodParser(layout.Attribute("rightW")?.Value, 0);
-                        if (rightW > 0) data.RightPanelWidth = rightW;
-                    }
-
-                    var layouts = root.Element("Layouts")?.Elements("Preset");
-                    if (layouts != null)
-                    {
-                        foreach (var l in layouts)
-                        {
-                            string name = l.Attribute("name")?.Value ?? "Unnamed";
-                            data.CustomLayouts[name] = new SavedLayout
-                            {
-                                WindowSize = new Point(ImGoodParser(l.Attribute("winW")?.Value, 0), ImGoodParser(l.Attribute("winH")?.Value, 0)),
-                                LeftPanelWidth = ImGoodParser(l.Attribute("leftW")?.Value, 0),
-                                RightPanelWidth = ImGoodParser(l.Attribute("rightW")?.Value, 0)
-                            };
-                        }
-                    }
+                        WindowSize = new Point(
+                            int.TryParse(preset.Attribute("winW")?.Value, out int winW) ? winW : 0,
+                            int.TryParse(preset.Attribute("winH")?.Value, out int winH) ? winH : 0
+                        ),
+                        LeftPanelWidth = int.TryParse(preset.Attribute("leftW")?.Value, out int leftW) ? leftW : 0,
+                        RightPanelWidth = int.TryParse(preset.Attribute("rightW")?.Value, out int rightW) ? rightW : 0
+                    };
                 }
-                RLogger.LogDebug(TextSOS.Get("sos.config.loaded", "[SOS] Settings v[version] loaded successfully.").Replace("[version]", fileVersion.ToString()).Value);
             }
-            catch (Exception e)
+            catch { }
+
+            return result;
+        }
+
+        // ─── Constructor ───
+
+        private ClientConfig()
+        {
+            TryInitConfig("SOSOpenKey", out _sosOpenKey);
+            TryInitConfig("LastSearchQuery", out _lastSearchQuery);
+            TryInitConfig("LastItemId", out _lastItemId);
+            TryInitConfig("RawXmlMode", out _rawXmlMode);
+            TryInitConfig("XmlFontScale", out _xmlFontScale);
+            TryInitConfig("Favorites", out _favoritesRaw);
+            TryInitConfig("TabHistory", out _tabHistoryRaw);
+            TryInitConfig("CustomLayouts", out _customLayoutsRaw);
+            TryInitConfig("TrackedRecipes", out _trackedRecipesRaw);
+            TryInitConfig("TrackerVisible", out _trackerVisible);
+            TryInitConfig("WindowSizeX", out _windowSizeX);
+            TryInitConfig("WindowSizeY", out _windowSizeY);
+            TryInitConfig("WindowPositionX", out _windowPositionX);
+            TryInitConfig("WindowPositionY", out _windowPositionY);
+            TryInitConfig("LeftPanelWidth", out _leftPanelWidth);
+            TryInitConfig("RightPanelWidth", out _rightPanelWidth);
+            TryInitConfig("DummyDeathCount", out _dummyDeathCount);
+            TryInitConfig("DummySimulated", out _dummySimulated);
+            TryInitConfig("DummyCharacterXML", out _dummyCharacterXML);
+        }
+
+        private bool TryInitConfig<T>(string name, [NotNullWhen(true)] out T setting)
+                where T : ISettingBase
+        {
+            if (!Plugin.Instance.ConfigService.TryGetConfig(Plugin.Instance.Package, name, out setting))
             {
-                RLogger.LogDebugError(TextSOS.Get("sos.config.load_error", "[SOS] Error reading settings file: [error]").Replace("[error]", e.Message).Value);
+                RLogger.LogError($"Failed to find config named {name}!");
+                return false;
             }
-
-            return data;
+            setting.OnValueChanged += MarkDirty;
+#if DEBUG
+            setting.OnValueChanged += setting => RLogger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue()}");
+#endif
+            return true;
         }
 
-        private static int ImGoodParser(string? value, int fallback)
+        public static void Destroy()
         {
-            if (string.IsNullOrWhiteSpace(value)) return fallback;
-            return int.TryParse(value, out int result) ? result : fallback;
-        }
-
-        private static bool ImGoodBoolParser(string? value, bool fallback)
-        {
-            if (string.IsNullOrWhiteSpace(value)) return fallback;
-            return bool.TryParse(value, out bool result) ? result : fallback;
-        }
-
-        private static float ImGoodFloatParser(string? value, float fallback)
-        {
-            if (string.IsNullOrWhiteSpace(value)) return fallback;
-            return float.TryParse(value, out float result) ? result : fallback;
+            _instance = null;
         }
     }
 
+    // ─── Layout DTO ───
+
+    public class SavedLayout
+    {
+        public Point WindowSize { get; set; }
+        public int LeftPanelWidth { get; set; }
+        public int RightPanelWidth { get; set; }
+    }
 }

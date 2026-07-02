@@ -4,6 +4,7 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
@@ -11,6 +12,8 @@ namespace SOS
 {
     public static class MigrationDialog
     {
+        private const string LegacyConfigPath = "Data/sossettings.xml";
+
         private static GUIFrame? overlay;
         private static GUIFrame? dialog;
 
@@ -93,53 +96,121 @@ namespace SOS
 
             try
             {
-                var data = SettingsManager.Load();
-                if (data != null)
+                if (!File.Exists(LegacyConfigPath))
                 {
-                    // Transfer favorites
-                    foreach (var fav in data.Favorites)
-                        controller.FavoritedItems.Add(fav);
-
-                    // Transfer tab history
-                    controller.TabHistory.Clear();
-                    controller.TabHistory.AddRange(data.TabHistory);
-
-                    // Transfer simple fields (auto-persists via cfg delegates)
-                    controller.LastSearchQuery = data.LastSearchQuery;
-                    controller.RawXmlMode = data.RawXmlMode;
-                    controller.XmlFontScale = data.XmlFontScale;
-                    controller.DummyDeathCount = data.DummyDeathCount;
-                    controller.DummyCharacterXML = data.DummyCharacterXML;
-                    controller.DummySimulated = data.DummySimulated;
-
-                    // Transfer window geometry
-                    controller.WindowSize = data.WindowSize;
-                    controller.WindowPosition = data.WindowPosition;
-                    controller.LeftPanelWidth = data.LeftPanelWidth;
-                    controller.RightPanelWidth = data.RightPanelWidth;
-
-                    // Transfer custom layouts
-                    controller.CustomLayouts.Clear();
-                    foreach (var kvp in data.CustomLayouts)
-                        controller.CustomLayouts[kvp.Key] = kvp.Value;
-
-                    // Transfer tracker
-                    controller.Tracker.AddRecipe(data.TrackedItemId, data.TrackedRecipeHash);
-
-                    // Restore last selected item
-                    if (!string.IsNullOrEmpty(data.LastItemId))
-                    {
-                        controller.CurrentTarget = (Prefab?)ItemPrefab.Prefabs
-                            .FirstOrDefault(p => p.Identifier.Value == data.LastItemId)
-                            ?? (Prefab?)AfflictionPrefab.List
-                                .FirstOrDefault(a => a.Identifier.Value == data.LastItemId);
-                    }
-
-                    // Persist all imported data to the new config system
-                    controller.SaveSettings();
-
-                    RLogger.Log(TextSOS.Get("sos.migration.success", "[SOS] Previous configuration imported successfully.").Value);
+                    RenameOldFile();
+                    Close();
+                    return true;
                 }
+
+                XDocument doc = XDocument.Load(LegacyConfigPath);
+                XElement? root = doc.Element("SOSSettings");
+                if (root == null)
+                {
+                    RenameOldFile();
+                    Close();
+                    return true;
+                }
+
+                int fileVersion = int.Parse(root.Attribute("version")?.Value ?? "0");
+                if (fileVersion < 1) { RenameOldFile(); Close(); return true; }
+
+                // Favorites
+                var favs = root.Element("Favorites")?.Elements("Item");
+                if (favs != null)
+                    foreach (var f in favs)
+                        controller.FavoritedItems.Add(f.Attribute("id")?.Value ?? "");
+
+                // State
+                string lastItemId = "";
+                var state = root.Element("State");
+                if (state != null)
+                {
+                    lastItemId = state.Attribute("lastItem")?.Value ?? "";
+                    controller.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
+                    string historyStr = state.Attribute("tabHistory")?.Value ?? "";
+                    if (!string.IsNullOrEmpty(historyStr))
+                    {
+                        controller.TabHistory.Clear();
+                        controller.TabHistory.AddRange(historyStr.Split(',', StringSplitOptions.RemoveEmptyEntries));
+                    }
+                    controller.RawXmlMode = ParseBool(state.Attribute("rawXml")?.Value);
+                    controller.XmlFontScale = ParseFloat(state.Attribute("xmlScale")?.Value, 0.9f);
+                }
+
+                // MedicalSim
+                var simulator = root.Element("MedicalSim");
+                if (simulator != null)
+                {
+                    controller.DummyDeathCount = ParseInt(simulator.Attribute("deathCount")?.Value);
+                    controller.DummySimulated = ParseBool(simulator.Attribute("simulated")?.Value);
+                    var dummyNode = simulator.Elements().FirstOrDefault();
+                    if (dummyNode != null)
+                        controller.DummyCharacterXML = dummyNode.ToString();
+                }
+
+                // Tracker
+                var tracker = root.Element("Tracker");
+                if (tracker != null)
+                {
+                    string targetId = tracker.Attribute("targetId")?.Value ?? "";
+                    _ = uint.TryParse(tracker.Attribute("recipeHash")?.Value, out uint hash);
+                    controller.Tracker.AddRecipe(targetId, hash);
+                }
+
+                // Layout
+                var layout = root.Element("Layout");
+                if (layout != null)
+                {
+                    int winX = ParseInt(layout.Attribute("winX")?.Value, -1);
+                    int winY = ParseInt(layout.Attribute("winY")?.Value, -1);
+                    if (winX >= 0 && winY >= 0)
+                        controller.WindowPosition = new Point(winX, winY);
+
+                    int winW = ParseInt(layout.Attribute("winW")?.Value);
+                    int winH = ParseInt(layout.Attribute("winH")?.Value);
+                    if (winW > 0 && winH > 0)
+                        controller.WindowSize = new Point(winW, winH);
+
+                    int leftW = ParseInt(layout.Attribute("leftW")?.Value);
+                    if (leftW > 0) controller.LeftPanelWidth = leftW;
+
+                    int rightW = ParseInt(layout.Attribute("rightW")?.Value);
+                    if (rightW > 0) controller.RightPanelWidth = rightW;
+                }
+
+                // Layouts
+                var layouts = root.Element("Layouts")?.Elements("Preset");
+                if (layouts != null)
+                {
+                    controller.CustomLayouts.Clear();
+                    foreach (var l in layouts)
+                    {
+                        string name = l.Attribute("name")?.Value ?? "Unnamed";
+                        controller.CustomLayouts[name] = new SavedLayout
+                        {
+                            WindowSize = new Point(
+                                ParseInt(l.Attribute("winW")?.Value),
+                                ParseInt(l.Attribute("winH")?.Value)),
+                            LeftPanelWidth = ParseInt(l.Attribute("leftW")?.Value),
+                            RightPanelWidth = ParseInt(l.Attribute("rightW")?.Value)
+                        };
+                    }
+                }
+
+                // Restore last selected item
+                if (!string.IsNullOrEmpty(lastItemId))
+                {
+                    controller.CurrentTarget = (Prefab?)ItemPrefab.Prefabs
+                        .FirstOrDefault(p => p.Identifier.Value == lastItemId)
+                        ?? (Prefab?)AfflictionPrefab.List
+                            .FirstOrDefault(a => a.Identifier.Value == lastItemId);
+                }
+
+                // Persist to new config system
+                controller.SaveSettings();
+
+                RLogger.Log(TextSOS.Get("sos.migration.success", "[SOS] Previous configuration imported successfully.").Value);
             }
             catch (Exception e)
             {
@@ -169,16 +240,15 @@ namespace SOS
 
         private static void RenameOldFile()
         {
-            const string oldPath = "Data/sossettings.xml";
             const string backupPath = "Data/sossettings_old.xml";
 
             try
             {
-                if (File.Exists(oldPath))
+                if (File.Exists(LegacyConfigPath))
                 {
                     if (File.Exists(backupPath))
                         File.Delete(backupPath);
-                    File.Move(oldPath, backupPath);
+                    File.Move(LegacyConfigPath, backupPath);
                 }
             }
             catch (Exception e)
@@ -196,6 +266,24 @@ namespace SOS
             overlay = null;
             dialog = null;
             SOSController.Instance.ToggleUI();
+        }
+
+        private static int ParseInt(string? value, int fallback = 0)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return fallback;
+            return int.TryParse(value, out int result) ? result : fallback;
+        }
+
+        private static bool ParseBool(string? value, bool fallback = false)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return fallback;
+            return bool.TryParse(value, out bool result) ? result : fallback;
+        }
+
+        private static float ParseFloat(string? value, float fallback = 0f)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return fallback;
+            return float.TryParse(value, out float result) ? result : fallback;
         }
     }
 }
