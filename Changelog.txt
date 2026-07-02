@@ -1,0 +1,21 @@
+v1.0.0-beta:
+- feat: Migrate configuration management from own xml(Data/sossetings.xml) to LuaCs settings system
+- feat: Implement ClientConfig as singleton pattern for centralized settings access
+- feat: Add SOS open key selector with LuaCs config integration
+- feat: Add Ctrl+[SOSOpenKey] shortcut to toggle recipe tracker visibility in-game
+- feat: Add Show/Hide button to recipe tracker header
+- feat: Rewrite TrackerManager to use per-recipe tracking instead of per-item
+- feat: Rewrite recipe tracker UI for improved ingredient display and status indicators
+- feat: Replace "Clear HUD" button with contextual "Manage HUD" dropdown menu
+- feat: Add contextual submenu for items with multiple recipes (Track All / per-recipe selection)
+- feat: Add Remove Recipes / Remove All options to HUD management
+- feat: Add tooltips to all tracker elements (tracked items, ingredients, remove actions)
+- feat: Add migration dialog for importing old SOS settings to new LuaCs-based config
+- feat: Standardize recipe resolution methods
+- fix: Prevent tracker from showing on non-GameScreen states
+- fix: Fix critical error when unloading all mod content (cleanup static references)
+- fix: Change SOS open key from KeyDown to KeyHit for better responsiveness
+- fix: Fix per-recipe tracking conflict preventing multiple recipes of the same item
+- chore: Delete ServerProject (unused)
+- chore: Rename PluginSettings.cs to ClientConfig.cs
+- loc: Add localization support for all new features across 6 languages
