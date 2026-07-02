@@ -25,9 +25,11 @@
 	<sos.context.add_favorite>Add to Favorites</sos.context.add_favorite>
 	<sos.context.recipe_options>Recipe Options</sos.context.recipe_options>
 	<sos.context.remove_favorite>Remove from Favorites</sos.context.remove_favorite>
-	<sos.context.track>Track to HUD</sos.context.track>
+	<sos.context.track_to_hud>Track to HUD</sos.context.track_to_hud>
+	<sos.context.track>Track</sos.context.track>
+	<sos.context.untrack>Untrack</sos.context.untrack>
 	<sos.context.track_recipe>Add to HUD</sos.context.track_recipe>
-	<sos.context.untrack>Remove from HUD</sos.context.untrack>
+	<sos.context.untrack_from_hud>Remove from HUD</sos.context.untrack_from_hud>
 	<sos.context.view_recipes>View Recipes</sos.context.view_recipes>
 
 	<!-- Window -->
@@ -62,14 +64,16 @@
 	<sos.window.title>SOS - Recipe Browser</sos.window.title>
 	<sos.window.remove_recipes>Remove Recipes</sos.window.remove_recipes>
 	<sos.window.remove_all>Remove All</sos.window.remove_all>
+	<sos.window.track_all>Track All</sos.window.track_all>
 	<sos.window.usage>USAGE</sos.window.usage>
 
 	<!-- HUD -->
 	<sos.hud.nothing_tracked>Nothing tracked here.</sos.hud.nothing_tracked>
 	<sos.hud.tracking>TRACKING:</sos.hud.tracking>
 	<sos.hud.tracking_tooltip>Active crafting tracker. Shows required ingredients and amounts.</sos.hud.tracking_tooltip>
-	<sos.hud.tracked_item_tooltip>Currently tracked item.</sos.hud.tracked_item_tooltip>
-	<sos.hud.ingredient_tooltip>Required ingredient. Shows how many you have in your inventory.</sos.hud.ingredient_tooltip>
+
+	<!-- Tracker -->
+	<sos.tracker.track-untrack.tooltip>Track or untrack all recipes from this item.</sos.tracker.track-untrack.tooltip>
 
 	<!-- Tabs -->
 	<sos.tab.recipes>RECIPES</sos.tab.recipes>

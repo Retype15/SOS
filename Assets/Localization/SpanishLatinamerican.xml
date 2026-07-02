@@ -25,9 +25,11 @@
 	<sos.context.add_favorite>Añadir a Favoritos</sos.context.add_favorite>
 	<sos.context.recipe_options>Opción de Receta</sos.context.recipe_options>
 	<sos.context.remove_favorite>Quitar de Favoritos</sos.context.remove_favorite>
-	<sos.context.track>Rastrear al HUD</sos.context.track>
+	<sos.context.track_to_hud>Rastrear al HUD</sos.context.track_to_hud>
+	<sos.context.track>Rastrear</sos.context.track>
+	<sos.context.untrack>Dejar de rastrear</sos.context.untrack>
 	<sos.context.track_recipe>Añadir al HUD</sos.context.track_recipe>
-	<sos.context.untrack>Quitar del HUD</sos.context.untrack>
+	<sos.context.untrack_from_hud>Quitar del HUD</sos.context.untrack_from_hud>
 	<sos.context.view_recipes>Ver Recetas</sos.context.view_recipes>
 
 	<!-- Window -->
@@ -41,6 +43,7 @@
 	<sos.window.toggle_tracker_hidden>Mostrar Rastreador</sos.window.toggle_tracker_hidden>
 	<sos.window.remove_recipes>Eliminar Recetas</sos.window.remove_recipes>
 	<sos.window.remove_all>Eliminar Todo</sos.window.remove_all>
+	<sos.window.track_all>Rastrear Todo</sos.window.track_all>
 	<sos.window.forward>Adelante</sos.window.forward>
 	<sos.window.forward.shortcuts>Atajos:&#xA;- Alt + Flecha Derecha&#xA;- Shift + Retroceso&#xA;- Mouse 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Cargando dependencias...</sos.window.loading>
@@ -68,8 +71,9 @@
 	<sos.hud.nothing_tracked>Nada rastreado aquí.</sos.hud.nothing_tracked>
 	<sos.hud.tracking>RASTREANDO:</sos.hud.tracking>
 	<sos.hud.tracking_tooltip>Rastreador de fabricación activo. Muestra los ingredientes y cantidades requeridas.</sos.hud.tracking_tooltip>
-	<sos.hud.tracked_item_tooltip>Objeto actualmente rastreado.</sos.hud.tracked_item_tooltip>
-	<sos.hud.ingredient_tooltip>Ingrediente requerido. Muestra cuántos tienes en tu inventario.</sos.hud.ingredient_tooltip>
+
+	<!-- Tracker -->
+	<sos.tracker.track-untrack.tooltip>Rastrea o deja de rastrear todas las recetas de este objeto.</sos.tracker.track-untrack.tooltip>
 
 	<!-- Tabs -->
 	<sos.tab.recipes>RECETAS</sos.tab.recipes>

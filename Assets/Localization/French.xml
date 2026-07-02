@@ -25,9 +25,11 @@
 	<sos.context.add_favorite>Ajouter aux favoris</sos.context.add_favorite>
 	<sos.context.recipe_options>Options de recette</sos.context.recipe_options>
 	<sos.context.remove_favorite>Retirer des favoris</sos.context.remove_favorite>
-	<sos.context.track>Suivre sur le HUD</sos.context.track>
+	<sos.context.track_to_hud>Suivre sur le HUD</sos.context.track_to_hud>
+	<sos.context.track>Suivre</sos.context.track>
+	<sos.context.untrack>Ne plus suivre</sos.context.untrack>
 	<sos.context.track_recipe>Ajouter au HUD</sos.context.track_recipe>
-	<sos.context.untrack>Retirer du HUD</sos.context.untrack>
+	<sos.context.untrack_from_hud>Retirer du HUD</sos.context.untrack_from_hud>
 	<sos.context.view_recipes>Voir les recettes</sos.context.view_recipes>
 
 	<!-- Window -->
@@ -41,6 +43,7 @@
 	<sos.window.toggle_tracker_hidden>Afficher le Traqueur</sos.window.toggle_tracker_hidden>
 	<sos.window.remove_recipes>Supprimer les Recettes</sos.window.remove_recipes>
 	<sos.window.remove_all>Tout Supprimer</sos.window.remove_all>
+	<sos.window.track_all>Tout Suivre</sos.window.track_all>
 	<sos.window.forward>Avancer</sos.window.forward>
 	<sos.window.forward.shortcuts>Raccourcis :&#xA;- Alt + Flèche Droite&#xA;- Maj + Retour arrière&#xA;- Souris 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Chargement des dépendances...</sos.window.loading>
@@ -68,8 +71,9 @@
 	<sos.hud.nothing_tracked>Rien de suivi ici.</sos.hud.nothing_tracked>
 	<sos.hud.tracking>SUIVI :</sos.hud.tracking>
 	<sos.hud.tracking_tooltip>Suivi de fabrication actif. Affiche les ingrédients et quantités requis.</sos.hud.tracking_tooltip>
-	<sos.hud.tracked_item_tooltip>Objet actuellement suivi.</sos.hud.tracked_item_tooltip>
-	<sos.hud.ingredient_tooltip>Ingrédient requis. Affiche combien vous en avez dans votre inventaire.</sos.hud.ingredient_tooltip>
+
+	<!-- Tracker -->
+	<sos.tracker.track-untrack.tooltip>Suivre ou ne plus suivre toutes les recettes de cet objet.</sos.tracker.track-untrack.tooltip>
 
 	<!-- Tabs -->
 	<sos.tab.recipes>RECETTES</sos.tab.recipes>

@@ -25,9 +25,11 @@
 	<sos.context.add_favorite>添加到收藏</sos.context.add_favorite>
 	<sos.context.recipe_options>配方选项</sos.context.recipe_options>
 	<sos.context.remove_favorite>从收藏中移除</sos.context.remove_favorite>
-	<sos.context.track>追踪到 HUD</sos.context.track>
+	<sos.context.track_to_hud>追踪到 HUD</sos.context.track_to_hud>
+	<sos.context.track>追踪</sos.context.track>
+	<sos.context.untrack>取消追踪</sos.context.untrack>
 	<sos.context.track_recipe>添加到 HUD</sos.context.track_recipe>
-	<sos.context.untrack>从 HUD 移除</sos.context.untrack>
+	<sos.context.untrack_from_hud>从 HUD 移除</sos.context.untrack_from_hud>
 	<sos.context.view_recipes>查看配方</sos.context.view_recipes>
 
 	<!-- Window -->
@@ -41,6 +43,7 @@
 	<sos.window.toggle_tracker_hidden>显示追踪器</sos.window.toggle_tracker_hidden>
 	<sos.window.remove_recipes>移除配方</sos.window.remove_recipes>
 	<sos.window.remove_all>全部移除</sos.window.remove_all>
+	<sos.window.track_all>追踪全部</sos.window.track_all>
 	<sos.window.forward>前进</sos.window.forward>
 	<sos.window.forward.shortcuts>快捷键：&#xA;- Alt + 右箭头&#xA;- Shift + 退格键&#xA;- 鼠标 5</sos.window.forward.shortcuts>
 	<sos.window.loading>正在加载依赖项...</sos.window.loading>
@@ -68,8 +71,9 @@
 	<sos.hud.nothing_tracked>暂无追踪内容</sos.hud.nothing_tracked>
 	<sos.hud.tracking>追踪中：</sos.hud.tracking>
 	<sos.hud.tracking_tooltip>制作追踪已激活。显示所需的材料和数量。</sos.hud.tracking_tooltip>
-	<sos.hud.tracked_item_tooltip>当前追踪的物品。</sos.hud.tracked_item_tooltip>
-	<sos.hud.ingredient_tooltip>所需材料。显示你背包中有多少。</sos.hud.ingredient_tooltip>
+
+	<!-- Tracker -->
+	<sos.tracker.track-untrack.tooltip>追踪或取消追踪此物品的所有配方。</sos.tracker.track-untrack.tooltip>
 
 	<!-- Tabs -->
 	<sos.tab.recipes>配方</sos.tab.recipes>

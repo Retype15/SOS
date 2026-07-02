@@ -164,18 +164,24 @@ namespace SOS
         public bool ContainsRecipe(ItemPrefab itemPrefab, IConvertible? recipeHash = null) => ContainsRecipe(PrefabResolver.GetFabricationRecipe(itemPrefab, recipeHash));
         public bool ContainsRecipe(string itemString, IConvertible? recipeHash = null) => ContainsRecipe(PrefabResolver.GetFabricationRecipe(itemString, recipeHash));
 
-        public bool ContainsAnyRecipe(FabricationRecipe? recipe) => ContainsRecipe(recipe);
-        public bool ContainsAnyRecipe(ItemPrefab? itemPrefab) => itemPrefab != null && itemPrefab!.FabricationRecipes.Values.Intersect(trackedRecipes.Keys).Any();
-        public bool ContainsAnyRecipe(string itemString) => ContainsAnyRecipe(PrefabResolver.GetFabricationRecipe(itemString));
+        public bool ContainsAnyRecipes(FabricationRecipe? recipe) => ContainsRecipe(recipe);
+        public bool ContainsAnyRecipes(ItemPrefab? itemPrefab) => itemPrefab != null && itemPrefab!.FabricationRecipes.Values.Intersect(trackedRecipes.Keys).Any();
+        public bool ContainsAnyRecipes(string itemString) => ContainsAnyRecipes(PrefabResolver.GetFabricationRecipe(itemString));
+
+        public bool ContainsAllRecipes(FabricationRecipe[]? recipes) => recipes != null && recipes.Length > 0 && recipes.All(x => trackedRecipes.ContainsKey(x));
+        public bool ContainsAllRecipes(ItemPrefab? itemPrefab) => ContainsAllRecipes(PrefabResolver.GetAllFabricationRecipes(itemPrefab));
+        public bool ContainsAllRecipes(string? itemString) => ContainsAllRecipes(PrefabResolver.GetAllFabricationRecipes(itemString));
 
         public bool AddOrRemoveRecipe(FabricationRecipe? recipe) => ContainsRecipe(recipe) ? RemoveRecipe(recipe) : AddRecipe(recipe);
         public bool AddOrRemoveRecipe(ItemPrefab itemPrefab, IConvertible? recipeHash = null) => AddOrRemoveRecipe(PrefabResolver.GetFabricationRecipe(itemPrefab, recipeHash));
         public bool AddOrRemoveRecipe(string itemString, IConvertible? recipeHash = null) => AddOrRemoveRecipe(PrefabResolver.GetFabricationRecipe(itemString, recipeHash));
 
-        public static LocalizedString GetTrackOrUntrack(bool state) => state ? TextSOS.Get("sos.context.track", "Track to HUD") : TextSOS.Get("sos.context.untrack", "Remove from HUD");
+        public static LocalizedString GetTrackOrUntrackToHUD(bool state) => state ? TextSOS.Get("sos.context.track_to_hud", "Track to HUD") : TextSOS.Get("sos.context.untrack_from_hud", "Remove from HUD");
 
-        public LocalizedString GetStringTrackToHUD(FabricationRecipe recipe) => GetTrackOrUntrack(!ContainsRecipe(recipe));
-        public LocalizedString GetStringTrackToHUD(ItemPrefab itemPrefab) => GetTrackOrUntrack(!ContainsAnyRecipe(itemPrefab));
+        public LocalizedString GetStringTrackToHUD(FabricationRecipe? recipe) => GetTrackOrUntrackToHUD(!ContainsRecipe(recipe));
+        public LocalizedString GetStringTrackToHUD(ItemPrefab? itemPrefab) => GetTrackOrUntrackToHUD(!ContainsAnyRecipes(itemPrefab));
+
+        public static LocalizedString GetTrackOrUntrack(bool state) => state ? TextSOS.Get("sos.context.track", "Track") : TextSOS.Get("sos.context.untrack", "Untrack");
 
         public void Clear() => RemoveRecipes();
 
@@ -196,16 +202,17 @@ namespace SOS
                 isEnabled: trackedRecipes.Count > 0,
                 onSelected: Clear)
             };
-
             foreach (var recipe in trackedRecipes.Keys)
-            {
-                StringBuilder str_b = new();
-                str_b.AppendLine(recipe.DisplayName.ToString());
-                foreach (var req in recipe.RequiredItems) str_b.AppendLine($"- {req.FirstMatchingPrefab.Name}: {req.Amount}");
+                options.Add(new ContextMenuOption(recipe.DisplayName, isEnabled: true, onSelected: () => RemoveRecipe(recipe)) { Tooltip = recipe.GetRequirementsToString() });
 
-                options.Add(new ContextMenuOption(recipe.TargetItem.Name, isEnabled: true, onSelected: () => RemoveRecipe(recipe)) { Tooltip = str_b.ToString() });
-            }
+            return options;
+        }
 
+        public static List<ContextMenuOption> GetRecipesAsContextMenuOptions(ItemPrefab itemPrefab, Action<FabricationRecipe> onSelected)
+        {
+            List<ContextMenuOption> options = [];
+            foreach (var (id, recipe) in itemPrefab.FabricationRecipes)
+                options.Add(new ContextMenuOption($"{recipe.DisplayName}-{id}", isEnabled: true, onSelected: () => onSelected(recipe)) { Tooltip = recipe.GetRequirementsToString() });
             return options;
         }
 
@@ -233,8 +240,8 @@ namespace SOS
 
             var nameText = new GUITextBlock(
                 new RectTransform(new Vector2(1f, 1f), itemRow.RectTransform) { AbsoluteOffset = new Point(48, 0) },
-                recipe.TargetItem.Name.Value, font: GUIStyle.SmallFont, textColor: Color.Cyan)
-            { CanBeFocused = false, ToolTip = TextSOS.Get("sos.hud.tracked_item_tooltip", "Currently tracked item.") };
+                recipe.DisplayName, font: GUIStyle.SmallFont, textColor: Color.Cyan)
+            { CanBeFocused = false };
 
             Dictionary<FabricationRecipe.RequiredItem, IngredientUI> reqList = [];
             foreach (var req in recipe.RequiredItems)
@@ -266,7 +273,6 @@ namespace SOS
                     "", font: GUIStyle.SmallFont)
                 {
                     CanBeFocused = false,
-                    ToolTip = TextSOS.Get("sos.hud.ingredient_tooltip", "Required ingredient. Shows how many you have in your inventory.")
                 };
 
                 reqList.Add(req, new IngredientUI(ingRow, ingIcon, ingText));
@@ -277,7 +283,7 @@ namespace SOS
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (Visible == false || Screen.Selected is not GameScreen) return;
+            if (Screen.Selected is not GameScreen) return;
             base.Draw(spriteBatch);
         }
 
@@ -407,6 +413,9 @@ namespace SOS
 
         public static FabricationRecipe? GetFabricationRecipe(string? itemString, IConvertible? recipeHash = null) =>
             GetFabricationRecipe(GetItemPrefab(itemString), recipeHash);
+
+        public static FabricationRecipe[]? GetAllFabricationRecipes(ItemPrefab? itemPrefab) => itemPrefab?.FabricationRecipes?.Values.ToArray();
+        public static FabricationRecipe[]? GetAllFabricationRecipes(string? itemString) => GetAllFabricationRecipes(GetItemPrefab(itemString));
     }
 
     internal static class ConvertibleExt
@@ -416,6 +425,17 @@ namespace SOS
             if (value is string s && uint.TryParse(s, out uint parsed)) return parsed;
             try { return value.ToUInt32(null); }
             catch { return null; }
+        }
+    }
+
+    internal static class FabricationRecipeExt
+    {
+        internal static string GetRequirementsToString(this FabricationRecipe recipe)
+        {
+            StringBuilder str_b = new();
+            str_b.AppendLine(recipe.DisplayName.ToString());
+            foreach (var req in recipe.RequiredItems) str_b.AppendLine($"- {req.FirstMatchingPrefab.Name}: {req.Amount}");
+            return str_b.ToString();
         }
     }
 }
