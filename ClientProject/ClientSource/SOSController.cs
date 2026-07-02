@@ -306,7 +306,42 @@ namespace SOS
         {
             if (target == null) return;
             List<ContextMenuOption> options = [];
-            if (target is ItemPrefab item) options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(item).Value, isEnabled: true, onSelected: () => Tracker.AddOrRemoveRecipe(item)));
+            if (target is ItemPrefab item && item.FabricationRecipes is { Count: > 0 })
+            {
+                if (item.FabricationRecipes.Count == 1)
+                {
+                    var single = PrefabResolver.GetFabricationRecipe(item);
+                    options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(single).Value, isEnabled: true, () => Tracker.AddOrRemoveRecipe(single)) { Tooltip = TextSOS.Get("sos.tracker.track-untrack.tooltip", "Track or Untrack all recipes from this item.") });
+                }
+                else
+                {
+                    var subs = new List<ContextMenuOption>
+                    {
+                        new(
+                            Tracker.ContainsAnyRecipes(item)
+                                ? TextSOS.Get("sos.window.remove_all", "Remove All")
+                                : TextSOS.Get("sos.window.track_all", "Track All"),
+                            isEnabled: true,
+                            Tracker.ContainsAnyRecipes(item)
+                                ? () => Tracker.RemoveRecipes(item)
+                                : () => Tracker.AddRecipes(item))
+                    };
+
+                    foreach (var (id, recipe) in item.FabricationRecipes)
+                    {
+                        bool tracked = Tracker.ContainsRecipe(recipe);
+                        subs.Add(new ContextMenuOption(
+                            $"{GUIRecipeTracker.GetTrackOrUntrack(!tracked)} {recipe.DisplayName}",
+                            isEnabled: true, () => Tracker.AddOrRemoveRecipe(recipe))
+                        { Tooltip = recipe.GetRequirementsToString() });
+                    }
+
+                    options.Add(new ContextMenuOption(
+                        TextSOS.Get("sos.context.track_recipe", "Add to HUD").Value,
+                        isEnabled: true, [.. subs])
+                    { Tooltip = TextSOS.Get("sos.tracker.track-untrack.tooltip", "Track or Untrack all recipes from this item.") });
+                }
+            }
 
             options.Add(new ContextMenuOption(TextSOS.Get("sos.context.view_recipes", "View Recipes"), isEnabled: true, onSelected: () =>
             {
@@ -336,8 +371,8 @@ namespace SOS
 
             var options = new List<ContextMenuOption>();
 
-            if (target is ItemPrefab item)
-                options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(item).Value, isEnabled: true, onSelected: () => Tracker.AddOrRemoveRecipe(item)));
+            if (target is ItemPrefab)
+                options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(recipe).Value, isEnabled: true, () => Tracker.AddOrRemoveRecipe(recipe)));
 
             //options.Add(new ContextMenuOption("Ver más info (WIP)", isEnabled: false));
 

@@ -25,9 +25,11 @@
 	<sos.context.add_favorite>Добавить в избранное</sos.context.add_favorite>
 	<sos.context.recipe_options>Параметры рецепта</sos.context.recipe_options>
 	<sos.context.remove_favorite>Удалить из избранного</sos.context.remove_favorite>
-	<sos.context.track>Отслеживать в HUD</sos.context.track>
+	<sos.context.track_to_hud>Отслеживать в HUD</sos.context.track_to_hud>
+	<sos.context.track>Отслеживать</sos.context.track>
+	<sos.context.untrack>Не отслеживать</sos.context.untrack>
 	<sos.context.track_recipe>Добавить в HUD</sos.context.track_recipe>
-	<sos.context.untrack>Убрать из HUD</sos.context.untrack>
+	<sos.context.untrack_from_hud>Убрать из HUD</sos.context.untrack_from_hud>
 	<sos.context.view_recipes>Посмотреть рецепты</sos.context.view_recipes>
 
 	<!-- Window -->
@@ -41,6 +43,7 @@
 	<sos.window.toggle_tracker_hidden>Показать Трекер</sos.window.toggle_tracker_hidden>
 	<sos.window.remove_recipes>Удалить Рецепты</sos.window.remove_recipes>
 	<sos.window.remove_all>Удалить Все</sos.window.remove_all>
+	<sos.window.track_all>Отслеживать Все</sos.window.track_all>
 	<sos.window.forward>Вперед</sos.window.forward>
 	<sos.window.forward.shortcuts>Горячие клавиши:&#xA;- Alt + Стрелка вправо&#xA;- Shift + Backspace&#xA;- Мышь 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Загрузка зависимостей...</sos.window.loading>
@@ -68,8 +71,9 @@
 	<sos.hud.nothing_tracked>Здесь ничего не отслеживается.</sos.hud.nothing_tracked>
 	<sos.hud.tracking>ОТСЛЕЖИВАНИЕ:</sos.hud.tracking>
 	<sos.hud.tracking_tooltip>Активный трекер создания. Показывает требуемые ингредиенты и количество.</sos.hud.tracking_tooltip>
-	<sos.hud.tracked_item_tooltip>Текущий отслеживаемый предмет.</sos.hud.tracked_item_tooltip>
-	<sos.hud.ingredient_tooltip>Требуемый ингредиент. Показывает, сколько у вас в инвентаре.</sos.hud.ingredient_tooltip>
+
+	<!-- Tracker -->
+	<sos.tracker.track-untrack.tooltip>Отслеживать или перестать отслеживать все рецепты этого предмета.</sos.tracker.track-untrack.tooltip>
 
 	<!-- Tabs -->
 	<sos.tab.recipes>РЕЦЕПТЫ</sos.tab.recipes>
