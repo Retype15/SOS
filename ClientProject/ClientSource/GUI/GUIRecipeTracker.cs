@@ -181,6 +181,14 @@ namespace SOS
 
         public void Clear() => RemoveRecipes();
 
+        public void ToggleTracker()
+        {
+            if (Visible) HideTracker();
+            else ShowTracker();
+        }
+        public static void ShowTracker() => ClientConfig.Instance.TrackerVisible = true;
+        public static void HideTracker() => ClientConfig.Instance.TrackerVisible = false;
+
         public List<ContextMenuOption> GetManageHudContextMenuOptions()
         {
             var options = new List<ContextMenuOption>
