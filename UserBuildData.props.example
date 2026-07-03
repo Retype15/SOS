@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <!-- IMPORTANT: All paths must end with '\' -->
+    <!-- Path to Barotrauma folder -->
+    <GameExecutableDir>C:\Program Files (x86)\Steam\steamapps\common\Barotrauma\</GameExecutableDir>
+    <!-- Deploy path of the mod -->
+    <ModDeployDir>$(GameExecutableDir)LocalMods\$(ProjectName)\</ModDeployDir>
+    <!-- Path to reference DLLs -->
+    <RefsPath>$(MSBuildThisFileDirectory)Refs</RefsPath>
+  </PropertyGroup>
+</Project>

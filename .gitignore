@@ -406,3 +406,6 @@ FodyWeavers.xsd
 SOS*.txt
 TODOs.md
 missingtranslation.xml
+
+# User-specific build configuration
+/UserBuildData.props

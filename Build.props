@@ -1,10 +1,14 @@
 <Project>
     <PropertyGroup>
-        <!-- IMPORTANT: Should point to <Barotrauma_Install>\LocalMods\<MyModName>\ -->
-        <!-- IMPORTANT: ModDeplyDir Path must end with '\' -->
         <ProjectName>SOS</ProjectName>
-        <ModDeployDir>D:\ProgramS\ProgramFiles\Steam\steamapps\common\Barotrauma\LocalMods\$(ProjectName)\</ModDeployDir>
         <AssemblyName>Retype.SOS</AssemblyName>
     </PropertyGroup>
+
+    <Import Project="UserBuildData.props" Condition="Exists('UserBuildData.props')" />
+
+    <ItemGroup>
+        <PackageReference Include="FluentResults" Version="3.16.0" />
+    </ItemGroup>
+
     <Import Project="CheckLocalization.targets" />
 </Project>

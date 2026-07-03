@@ -10,45 +10,41 @@
         <NuGetAudit>false</NuGetAudit>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Reference Include="0Harmony">
-        <HintPath>..\Refs\0Harmony.dll</HintPath>
-      </Reference>
-      <Reference Include="Barotrauma">
-        <HintPath>..\Refs\OSX\Barotrauma.dll</HintPath>
-      </Reference>
-      <Reference Include="BarotraumaCore">
-        <HintPath>..\Refs\OSX\BarotraumaCore.dll</HintPath>
-      </Reference>
-      <Reference Include="Farseer.NetStandard">
-        <HintPath>..\Refs\Farseer.NetStandard.dll</HintPath>
-      </Reference>
-      <Reference Include="Lidgren.NetStandard">
-        <HintPath>..\Refs\Lidgren.NetStandard.dll</HintPath>
-      </Reference>
-      <Reference Include="Mono.Cecil">
-        <HintPath>..\Refs\Mono.Cecil.dll</HintPath>
-      </Reference>
-      <Reference Include="MonoGame.Framework.MacOS.NetStandard">
-        <HintPath>..\Refs\MonoGame.Framework.MacOS.NetStandard.dll</HintPath>
-      </Reference>
-      <Reference Include="MonoMod.Utils">
-        <HintPath>..\Refs\MonoMod.Utils.dll</HintPath>
-      </Reference>
-      <Reference Include="MoonSharp.Interpreter">
-        <HintPath>..\Refs\MoonSharp.Interpreter.dll</HintPath>
-      </Reference>
-      <Reference Include="XNATypes">
-        <HintPath>..\Refs\XNATypes.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="FluentResults" Version="3.16.0" />
-    </ItemGroup>
-
   <Import Project="..\SharedProject\SharedProject.projitems" Label="Shared" />
   <Import Project="../Build.props" />
+
+    <ItemGroup>
+    <Reference Include="0Harmony">
+        <HintPath>$(RefsPath)\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Barotrauma">
+        <HintPath>$(RefsPath)\OSX\Barotrauma.dll</HintPath>
+    </Reference>
+    <Reference Include="BarotraumaCore">
+        <HintPath>$(RefsPath)\OSX\BarotraumaCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Farseer.NetStandard">
+        <HintPath>$(RefsPath)\Farseer.NetStandard.dll</HintPath>
+    </Reference>
+    <Reference Include="Lidgren.NetStandard">
+        <HintPath>$(RefsPath)\Lidgren.NetStandard.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+        <HintPath>$(RefsPath)\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework.MacOS.NetStandard">
+        <HintPath>$(RefsPath)\MonoGame.Framework.MacOS.NetStandard.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+        <HintPath>$(RefsPath)\MonoMod.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="MoonSharp.Interpreter">
+        <HintPath>$(RefsPath)\MoonSharp.Interpreter.dll</HintPath>
+    </Reference>
+    <Reference Include="XNATypes">
+        <HintPath>$(RefsPath)\XNATypes.dll</HintPath>
+    </Reference>
+    </ItemGroup>
 
   <PropertyGroup>
     <RootNamespace>$(SolutionName.Replace(" ", "_"))</RootNamespace>
