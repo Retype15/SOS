@@ -338,8 +338,7 @@ namespace SOS
 
                     options.Add(new ContextMenuOption(
                         TextSOS.Get("sos.context.track_recipe", "Add to HUD").Value,
-                        isEnabled: true, [.. subs])
-                    { Tooltip = TextSOS.Get("sos.tracker.track-untrack.tooltip", "Track or Untrack all recipes from this item.") });
+                        isEnabled: true, [.. subs]));
                 }
             }
 

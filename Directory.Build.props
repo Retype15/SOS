@@ -1,5 +1,8 @@
 <Project>
   <PropertyGroup>
     <BaseIntermediateOutputPath>obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Authors>Retype15</Authors>
   </PropertyGroup>
 </Project>

@@ -41,9 +41,10 @@
       <Reference Include="XNATypes">
         <HintPath>..\Refs\XNATypes.dll</HintPath>
       </Reference>
-      <Reference Include="FluentResults">
-        <HintPath>..\Refs\FluentResults.dll</HintPath>
-      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentResults" Version="3.16.0" />
     </ItemGroup>
 
   <Import Project="..\SharedProject\SharedProject.projitems" Label="Shared" />

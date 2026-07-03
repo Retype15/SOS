@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore Refs
+        shell: pwsh
+        run: ./restore-refs.ps1 -Token "${{ github.token }}"
+
+      - name: Set mod version from tag
+        shell: pwsh
+        run: |
+          $ver = "${{ github.ref_name }}" -replace '^v', ''
+          echo "MOD_VERSION=$ver" >> $env:GITHUB_ENV
+
+      - name: Sync filelist.xml modversion
+        shell: pwsh
+        run: |
+          $content = Get-Content Assets/filelist.xml -Raw
+          $content = $content -replace 'modversion="[^"]*"', "modversion=`"$env:MOD_VERSION`""
+          Set-Content Assets/filelist.xml $content
+
+      - name: Build
+        run: dotnet build SOS.sln -c Release /p:ModDeployDir="${{ runner.temp }}\SOS\"
+
+      - name: Package SOS.zip
+        shell: pwsh
+        run: Compress-Archive -Path "${{ runner.temp }}\SOS\*" -DestinationPath SOS.zip -Force
+
+      - name: Draft Release
+        shell: pwsh
+        run: |
+          gh release create "${{ github.ref_name }}" SOS.zip `
+            --draft `
+            --generate-notes `
+            --title "v$env:MOD_VERSION"
+        env:
+          GH_TOKEN: ${{ github.token }}
