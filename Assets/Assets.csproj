@@ -23,9 +23,9 @@
 		</Content>
 	</ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Content" />
-    </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<Folder Include="Localization" />
