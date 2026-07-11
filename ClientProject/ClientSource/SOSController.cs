@@ -6,9 +6,11 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
-using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using SOS.GUI;
+
+using BGUI = Barotrauma.GUI;
 
 namespace SOS
 {
@@ -386,7 +388,7 @@ namespace SOS
 
         public void Update()
         {
-            bool canHandleInputs = GUI.KeyboardDispatcher.Subscriber == null || GUI.KeyboardDispatcher.Subscriber is GUIDropDown2;
+            bool canHandleInputs = BGUI.KeyboardDispatcher.Subscriber == null || BGUI.KeyboardDispatcher.Subscriber is GUIDropDown2;
 
             if (canHandleInputs)
             {
@@ -464,9 +466,9 @@ namespace SOS
             }
 
             // 3. other GUIs
-            if (GUI.MouseOn != null)
+            if (BGUI.MouseOn != null)
             {
-                GUIComponent? curr = GUI.MouseOn;
+                GUIComponent? curr = BGUI.MouseOn;
                 while (curr != null)
                 {
                     // Any direct

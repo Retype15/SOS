@@ -9,7 +9,9 @@ using Barotrauma;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace SOS
+using BGUI = Barotrauma.GUI;
+
+namespace SOS.GUI
 {
     public class GUITextViewer : GUITextBlock
     {
@@ -32,7 +34,7 @@ namespace SOS
             get
             {
                 float desiredSize = 20.0f;
-                float scaledSize = desiredSize * GUI.Scale;
+                float scaledSize = desiredSize * BGUI.Scale;
                 return (int)Math.Min((desiredSize + scaledSize) / 2.0f, Rect.Height / 3);
             }
         }
@@ -136,7 +138,7 @@ namespace SOS
 
             if (!Visible) return;
 
-            if (GUI.IsMouseOn(this))
+            if (BGUI.IsMouseOn(this))
             {
                 if (ContentMenu != null && PlayerInput.SecondaryMouseButtonClicked())
                 {

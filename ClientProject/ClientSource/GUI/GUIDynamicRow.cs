@@ -11,7 +11,7 @@
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
-namespace SOS
+namespace SOS.GUI
 {
     public enum SizingMode
     {

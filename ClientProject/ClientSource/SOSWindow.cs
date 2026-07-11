@@ -7,8 +7,10 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using MonoMod.Utils;
+using SOS.GUI;
+
+using BGUI = Barotrauma.GUI;
 
 namespace SOS
 {
@@ -91,7 +93,7 @@ namespace SOS
         {
             this.controller = controller;
 
-            mainFrame = new GUIResizableFrame(new RectTransform(new Vector2(0.95f, 0.9f), GUI.Canvas, Anchor.TopLeft), style: "CircuitBoxFrame")
+            mainFrame = new GUIResizableFrame(new RectTransform(new Vector2(0.95f, 0.9f), BGUI.Canvas, Anchor.TopLeft), style: "CircuitBoxFrame")
             {
                 CanBeFocused = true,
                 Selected = true,
@@ -242,7 +244,7 @@ namespace SOS
             searchContainer.RectTransform.MinSize = new Point(0, 35);
             searchContainer.RectTransform.MaxSize = new Point(int.MaxValue, 35);
 
-            searchBox = GUI.CreateTextBoxWithPlaceholder(new RectTransform(Vector2.One, searchContainer.RectTransform), controller.LastSearchQuery, TextSOS.Get("sos.window.search_placeholder", "Search item..."));
+            searchBox = BGUI.CreateTextBoxWithPlaceholder(new RectTransform(Vector2.One, searchContainer.RectTransform), controller.LastSearchQuery, TextSOS.Get("sos.window.search_placeholder", "Search item..."));
             searchBox.ToolTip = TextSOS.Get("sos.window.search_tooltip",
                 "Search by Name, ID, Category, Tags, ModName, ItemType, etc.\n" +
                 "Advanced Filters:\n" +
@@ -652,9 +654,9 @@ namespace SOS
 
             if (layoutMenuFrame != null && PlayerInput.PrimaryMouseButtonClicked())
             {
-                bool overButton = GUI.MouseOn is GUIButton;
+                bool overButton = BGUI.MouseOn is GUIButton;
 
-                if (!layoutMenuFrame.IsParentOf(GUI.MouseOn) && GUI.MouseOn != layoutMenuFrame && !overButton)
+                if (!layoutMenuFrame.IsParentOf(BGUI.MouseOn) && BGUI.MouseOn != layoutMenuFrame && !overButton)
                 {
                     mainFrame.RemoveChild(layoutMenuFrame);
                     layoutMenuFrame = null;

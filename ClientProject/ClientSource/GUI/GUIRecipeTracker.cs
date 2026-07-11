@@ -11,7 +11,9 @@ using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace SOS
+using BGUI = Barotrauma.GUI;
+
+namespace SOS.GUI
 {
     public class GUIRecipeTracker : GUIFrame
     {
@@ -328,7 +330,7 @@ namespace SOS
 
         public static GUIRecipeTracker InstantiateWithDefault()
         {
-            return new(new RectTransform(new Point(280, 180), GUI.Canvas, Anchor.TopRight) { AbsoluteOffset = new Point(20, 150) }, style: "InnerFrame")
+            return new(new RectTransform(new Point(280, 180), BGUI.Canvas, Anchor.TopRight) { AbsoluteOffset = new Point(20, 150) }, style: "InnerFrame")
             {
                 CanBeFocused = false,
                 Color = Color.Black * 0.6f

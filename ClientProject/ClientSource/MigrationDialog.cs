@@ -7,6 +7,7 @@
 using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using BGUI = Barotrauma.GUI;
 
 namespace SOS
 {
@@ -27,7 +28,7 @@ namespace SOS
 
             // ─── Full-screen semi-transparent overlay ───
 
-            overlay = new GUIFrame(new RectTransform(Vector2.One, GUI.Canvas), style: null)
+            overlay = new GUIFrame(new RectTransform(Vector2.One, BGUI.Canvas), style: null)
             {
                 Color = Color.Black * 0.5f
             };

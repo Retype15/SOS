@@ -33,7 +33,7 @@ namespace SOS
     }
 
     // MARK: Item Recipes Tab
-    public class ItemCenterPanelTab : CenterPanelTab, ITab
+    public class ItemCenterPanelTab : CenterPanelTab, SOS.GUI.ITab
     {
         public string TabName => TextSOS.Get("sos.tab.recipes", "RECIPES").Value;
         public override string TabTooltip => "sos.tab.recipes_tooltip";
@@ -136,7 +136,7 @@ namespace SOS
     }
 
     // MARK: - Clinic SIM
-    public class AfflictionCenterPanelTab : CenterPanelTab, ITab
+    public class AfflictionCenterPanelTab : CenterPanelTab, SOS.GUI.ITab
     {
         public const int MENU_WIDTH = 280;
         public const int MENU_HEIGHT = 220;
@@ -189,7 +189,7 @@ namespace SOS
                     if ((primaryClicked || secondaryClicked) && simView.Rect.Contains(PlayerInput.MousePosition.ToPoint()))
                     {
                         // iconos de afliccion
-                        if (GUI.MouseOn?.UserData is Affliction highlightedAff)
+                        if (Barotrauma.GUI.MouseOn?.UserData is Affliction highlightedAff)
                         {
                             if (primaryClicked) _onPrimary?.Invoke(highlightedAff.Prefab);
                             else if (secondaryClicked) ShowSimulationMenu(_container, highlightedAff.Prefab, null);

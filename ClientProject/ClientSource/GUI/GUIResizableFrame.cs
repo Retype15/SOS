@@ -8,7 +8,9 @@
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
-namespace SOS
+using BGUI = Barotrauma.GUI;
+
+namespace SOS.GUI
 {
     [Flags]
     public enum ResizeDirection
@@ -63,7 +65,7 @@ namespace SOS
                     bool isCorner = IsCorner(currentDragDir);
                     bool isShift = PlayerInput.IsShiftDown();
 
-                    GUI.MouseCursor = (!isCorner && isShift && !IsFixed) ? CursorState.Hand : CursorState.Move;
+                    BGUI.MouseCursor = (!isCorner && isShift && !IsFixed) ? CursorState.Hand : CursorState.Move;
 
                     if (isMouseDownNow)
                     {
@@ -72,35 +74,35 @@ namespace SOS
                         startRect = Rect;
                         startOffset = RectTransform.AbsoluteOffset;
                         startAspectRatio = (float)startRect.Width / startRect.Height;
-                        GUI.ForceMouseOn(this);
+                        BGUI.ForceMouseOn(this);
                     }
                 }
                 else if (inTitleArea)
                 {
-                    bool onInteractive = GUI.MouseOn is GUIButton or GUITextBox or GUIDropDown or GUIListBox;
+                    bool onInteractive = BGUI.MouseOn is GUIButton or GUITextBox or GUIDropDown or GUIListBox;
 
-                    if (GUI.MouseOn != null && (GUI.MouseOn == this || IsParentOf(GUI.MouseOn)) && !onInteractive)
+                    if (BGUI.MouseOn != null && (BGUI.MouseOn == this || IsParentOf(BGUI.MouseOn)) && !onInteractive)
                     {
-                        GUI.MouseCursor = CursorState.Hand;
+                        BGUI.MouseCursor = CursorState.Hand;
                         if (isMouseDownNow)
                         {
                             isMoving = true;
                             dragStartMouse = mousePos;
                             startOffset = RectTransform.AbsoluteOffset;
-                            GUI.ForceMouseOn(this);
+                            BGUI.ForceMouseOn(this);
                         }
                     }
                 }
             }
             else if (isDragging)
             {
-                GUI.MouseCursor = CursorState.Dragging;
+                BGUI.MouseCursor = CursorState.Dragging;
                 if (!isMouseHeld) { isDragging = false; return; }
                 ApplyInteraction(mousePos);
             }
             else if (isMoving)
             {
-                GUI.MouseCursor = CursorState.Dragging;
+                BGUI.MouseCursor = CursorState.Dragging;
                 if (!isMouseHeld) { isMoving = false; return; }
 
                 float deltaX = mousePos.X - dragStartMouse.X;

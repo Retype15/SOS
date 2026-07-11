@@ -12,7 +12,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace SOS
+using BGUI = Barotrauma.GUI;
+
+namespace SOS.GUI
 {
     public class GUIDropDown2 : GUIComponent, IKeyboardSubscriber
     {
@@ -95,7 +97,7 @@ namespace SOS
             }
         }
 
-        public void ReceiveTextInput(char inputChar) => GUI.KeyboardDispatcher.Subscriber = null;
+        public void ReceiveTextInput(char inputChar) => BGUI.KeyboardDispatcher.Subscriber = null;
         public void ReceiveTextInput(string text) { }
         public void ReceiveCommandInput(char command) { }
         public void ReceiveEditingInput(string text, int start, int length) { }
@@ -107,10 +109,10 @@ namespace SOS
                 case Keys.Up:
                 case Keys.Down:
                     listBox.ReceiveSpecialInput(key);
-                    GUI.KeyboardDispatcher.Subscriber = this;
+                    BGUI.KeyboardDispatcher.Subscriber = this;
                     break;
                 default:
-                    GUI.KeyboardDispatcher.Subscriber = null;
+                    BGUI.KeyboardDispatcher.Subscriber = null;
                     break;
             }
         }
@@ -345,11 +347,11 @@ namespace SOS
                 OnDropped?.Invoke(this, UserData);
                 listBox.UpdateScrollBarSize();
                 listBox.UpdateDimensions();
-                GUI.KeyboardDispatcher.Subscriber = this;
+                BGUI.KeyboardDispatcher.Subscriber = this;
             }
-            else if (GUI.KeyboardDispatcher.Subscriber == this)
+            else if (BGUI.KeyboardDispatcher.Subscriber == this)
             {
-                GUI.KeyboardDispatcher.Subscriber = null;
+                BGUI.KeyboardDispatcher.Subscriber = null;
             }
             return true;
         }
@@ -409,7 +411,7 @@ namespace SOS
                 if (!listBoxRect.Contains(PlayerInput.MousePosition) && !button.Rect.Contains(PlayerInput.MousePosition))
                 {
                     Dropped = false;
-                    if (GUI.KeyboardDispatcher.Subscriber == this) { GUI.KeyboardDispatcher.Subscriber = null; }
+                    if (BGUI.KeyboardDispatcher.Subscriber == this) { BGUI.KeyboardDispatcher.Subscriber = null; }
                 }
             }
         }
@@ -421,9 +423,9 @@ namespace SOS
                 currentHighestParent.GUIComponent.OnAddedToGUIUpdateList -= AddListBoxToGUIUpdateList;
                 currentHighestParent = null;
             }
-            if (GUI.KeyboardDispatcher.Subscriber == this)
+            if (BGUI.KeyboardDispatcher.Subscriber == this)
             {
-                GUI.KeyboardDispatcher.Subscriber = null;
+                BGUI.KeyboardDispatcher.Subscriber = null;
             }
         }
     }
