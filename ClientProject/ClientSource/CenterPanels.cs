@@ -11,32 +11,11 @@ using Microsoft.Xna.Framework;
 namespace SOS
 {
 
-    public abstract class CenterPanelTab
-    {
-        public virtual string TabTooltip => "";
-
-        public virtual GUIButton CreateTabButton(string text, RectTransform parent, bool isActive, Action onClick)
-        {
-            Vector2 textSize = GUIStyle.SmallFont.MeasureString(text);
-            int width = (int)textSize.X + 24;
-
-            var tabBtn = new GUIButton(new RectTransform(new Point(width, 32), parent), text, style: "MainMenuNotificationButton") //MainMenuNotificationButton,
-            {
-                Selected = isActive,
-                ToolTip = TextSOS.Get(TabTooltip, ""),
-                OnClicked = (_, _) => { onClick(); return true; },
-            };
-            //tabBtn.ExBlink(3f, 0.5f, 1f, 0.5f).WaitFinish();
-
-            return tabBtn;
-        }
-    }
-
     // MARK: Item Recipes Tab
-    public class ItemCenterPanelTab : CenterPanelTab, SOS.GUI.ITab
+    public class ItemCenterPanelTab : SOS.GUI.ITab
     {
         public string TabName => TextSOS.Get("sos.tab.recipes", "RECIPES").Value;
-        public override string TabTooltip => "sos.tab.recipes_tooltip";
+        public string TabTooltip => "sos.tab.recipes_tooltip";
         private GUIFrame? _container;
 
         public bool CanHandle(Prefab prefab) => prefab is ItemPrefab;
@@ -136,13 +115,13 @@ namespace SOS
     }
 
     // MARK: - Clinic SIM
-    public class AfflictionCenterPanelTab : CenterPanelTab, SOS.GUI.ITab
+    public class AfflictionCenterPanelTab : SOS.GUI.ITab
     {
         public const int MENU_WIDTH = 280;
         public const int MENU_HEIGHT = 220;
 
         public string TabName => TextSOS.Get("sos.tab.simulator", "SIMULATOR").Value;
-        public override string TabTooltip => "sos.tab.simulator_tooltip";
+        public string TabTooltip => "sos.tab.simulator_tooltip";
         private GUIFrame? _container;
         private static GUIComponent? activeAfflictionMenu;
         private static Prefab? CurrentPrefab;

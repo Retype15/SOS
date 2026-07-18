@@ -263,7 +263,7 @@ namespace SOS
     public class ItemAnalysis
     {
         public Identifier PrefabId { get; }
-        public List<BaseStatSection> Sections { get; } = [];
+        public List<IBaseStatSection> Sections { get; } = [];
 
 
         // MARK: Adders
@@ -295,7 +295,7 @@ namespace SOS
             AddSection(new DescriptionSection(), prefab);
         }
 
-        private void AddSection(BaseStatSection section, Prefab prefab)
+        private void AddSection(IBaseStatSection section, Prefab prefab)
         {
             section.Analyze(prefab);
 
@@ -303,20 +303,20 @@ namespace SOS
         }
     }
 
-    public abstract class BaseStatSection
+    public interface IBaseStatSection
     {
-        public abstract bool HasData { get; }
-        public abstract void Analyze(Prefab item);
-        public abstract void Draw(SectionBuilder builder);
+        bool HasData { get; }
+        void Analyze(Prefab item);
+        void Draw(SectionBuilder builder);
     }
 
     // MARK: Sections
 
     // MARK: General
-    public class GeneralSection : BaseStatSection
+    public class GeneralSection : IBaseStatSection
     {
         private Prefab? prefab;
-        public override bool HasData => prefab != null;
+        public bool HasData => prefab != null;
 
         // Item
         private string cargoBox = "";
@@ -333,7 +333,7 @@ namespace SOS
         private float medSkillGain;
         private string causeOfDeath = "";
 
-        public override void Analyze(Prefab prefab)
+        public void Analyze(Prefab prefab)
         {
             this.prefab = prefab;
             switch (prefab)
@@ -372,7 +372,7 @@ namespace SOS
 
         }
 
-        public override void Draw(SectionBuilder builder)
+        public void Draw(SectionBuilder builder)
         {
             if (prefab == null) return;
 
@@ -420,7 +420,7 @@ namespace SOS
     }
 
     // MARK: Economy
-    public class EconomySection : BaseStatSection
+    public class EconomySection : IBaseStatSection
     {
         private int price;
         private bool canBuy;
@@ -428,9 +428,9 @@ namespace SOS
         private int minDifficulty;
         private Identifier requiredFaction = Identifier.Empty;
 
-        public override bool HasData => price > 0 || canBuy;
+        public bool HasData => price > 0 || canBuy;
 
-        public override void Analyze(Prefab prefab)
+        public void Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
@@ -447,7 +447,7 @@ namespace SOS
 
         }
 
-        public override void Draw(SectionBuilder builder)
+        public void Draw(SectionBuilder builder)
         {
             builder.StartSection(TextSOS.Get("sos.window.section_economy", "ECONOMY").Value, Color.Gold);
 
@@ -475,7 +475,7 @@ namespace SOS
     }
 
     // MARK: weapons
-    public class WeaponSection : BaseStatSection
+    public class WeaponSection : IBaseStatSection
     {
         private float penetration = 0f;
         private int maxTargets = 1;
@@ -502,9 +502,9 @@ namespace SOS
             public float Probability;
         }
 
-        public override bool HasData => afflictions.Count > 0 || penetration > 0 || structureDamage > 0 || itemDamage > 0 || reload > 0 || isThrowable || explosionRange > 0;
+        public bool HasData => afflictions.Count > 0 || penetration > 0 || structureDamage > 0 || itemDamage > 0 || reload > 0 || isThrowable || explosionRange > 0;
 
-        public override void Analyze(Prefab prefab)
+        public void Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
@@ -590,7 +590,7 @@ namespace SOS
             });
         }
 
-        public override void Draw(SectionBuilder builder)
+        public void Draw(SectionBuilder builder)
         {
             builder.StartSection(TextSOS.Get("sos.window.section_weapon", "COMBAT STATS").Value, Color.Gold);
 
@@ -625,7 +625,7 @@ namespace SOS
     }
 
     // MARK: equipements
-    public class EquipmentSection : BaseStatSection
+    public class EquipmentSection : IBaseStatSection
     {
         private readonly List<string> equipSlots = [];
         private readonly List<string> statModifiers = [];
@@ -635,10 +635,10 @@ namespace SOS
         private bool deflectsProjectiles = false;
         private int durability = 0;
 
-        public override bool HasData => equipSlots.Count > 0 || statModifiers.Count > 0 ||
+        public bool HasData => equipSlots.Count > 0 || statModifiers.Count > 0 ||
                                        aggregatedResistances.Count > 0 || maxPressure > 0 || durability > 0;
 
-        public override void Analyze(Prefab prefab)
+        public void Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
@@ -697,7 +697,7 @@ namespace SOS
             }
         }
 
-        public override void Draw(SectionBuilder builder)
+        public void Draw(SectionBuilder builder)
         {
             builder.StartSection(TextSOS.Get("sos.window.section_equipment", "AS EQUIPMENT").Value, Color.Gold);
 
@@ -736,7 +736,7 @@ namespace SOS
     }
 
     // MARK: Medical
-    public class MedicalSection : BaseStatSection
+    public class MedicalSection : IBaseStatSection
     {
         private int medicalSkillReq = 0;
         private readonly List<(string Identifier, string DisplayName)> suitableTreatments = [];
@@ -748,9 +748,9 @@ namespace SOS
         private readonly Dictionary<string, (string Name, float Amount)> failureHeals = [];
         private readonly Dictionary<string, (string Name, float Amount)> failureCauses = [];
 
-        public override bool HasData => suitableTreatments.Count > 0 || alwaysHeals.Count > 0 || successHeals.Count > 0 || alwaysCauses.Count > 0 || successCauses.Count > 0;
+        public bool HasData => suitableTreatments.Count > 0 || alwaysHeals.Count > 0 || successHeals.Count > 0 || alwaysCauses.Count > 0 || successCauses.Count > 0;
 
-        public override void Analyze(Prefab prefab)
+        public void Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
@@ -834,7 +834,7 @@ namespace SOS
             return idOrType;
         }
 
-        public override void Draw(SectionBuilder builder)
+        public void Draw(SectionBuilder builder)
         {
             builder.StartSection(TextSOS.Get("sos.window.section_medical", "MEDICAL").Value, Color.Gold);
 
@@ -875,13 +875,13 @@ namespace SOS
     }
 
     // MARK: utility
-    public class UtilitySection : BaseStatSection
+    public class UtilitySection : IBaseStatSection
     {
         private readonly Dictionary<string, string> deviceProperties = [];
 
-        public override bool HasData => deviceProperties.Count > 0;
+        public bool HasData => deviceProperties.Count > 0;
 
-        public override void Analyze(Prefab prefab)
+        public void Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
@@ -906,7 +906,7 @@ namespace SOS
             }
         }
 
-        public override void Draw(SectionBuilder builder)
+        public void Draw(SectionBuilder builder)
         {
             builder.StartSection(TextSOS.Get("sos.window.section_utility", "UTILITY").Value, Color.Gold);
 
@@ -920,16 +920,16 @@ namespace SOS
     }
 
     // MARK: container
-    public class ContainerSection : BaseStatSection
+    public class ContainerSection : IBaseStatSection
     {
         private string capacity = "";
         private readonly HashSet<string> acceptedTags = [];
         private readonly List<string> spawnLocations = [];
         private List<Prefab> compatibleItems = [];
 
-        public override bool HasData => !string.IsNullOrEmpty(capacity) || compatibleItems.Count > 0 || spawnLocations.Count > 0;
+        public bool HasData => !string.IsNullOrEmpty(capacity) || compatibleItems.Count > 0 || spawnLocations.Count > 0;
 
-        public override void Analyze(Prefab prefab)
+        public void Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
@@ -982,7 +982,7 @@ namespace SOS
             }
         }
 
-        public override void Draw(SectionBuilder builder)
+        public void Draw(SectionBuilder builder)
         {
             builder.StartSection(TextSOS.Get("sos.window.section_container", "CONTAINERS").Value, Color.Gold);
 
@@ -1010,7 +1010,7 @@ namespace SOS
     }
 
     // MARK: Affliction effects
-    public class AfflictionEffectsSection : BaseStatSection
+    public class AfflictionEffectsSection : IBaseStatSection
     {
         private class PhaseData
         {
@@ -1025,9 +1025,9 @@ namespace SOS
         private readonly List<PhaseData> phases = [];
         private readonly List<PhaseData> periodicPhases = [];
 
-        public override bool HasData => phases.Count > 0 || periodicPhases.Count > 0;
+        public bool HasData => phases.Count > 0 || periodicPhases.Count > 0;
 
-        public override void Analyze(Prefab prefab)
+        public void Analyze(Prefab prefab)
         {
             if (prefab is not AfflictionPrefab aff || aff.configElement == null) return;
             phases.Clear();
@@ -1159,7 +1159,7 @@ namespace SOS
             if (hasAnimations) phase.Events.Add("Forces Animations");
         }
 
-        public override void Draw(SectionBuilder builder)
+        public void Draw(SectionBuilder builder)
         {
             if (phases.Count > 0)
             {
@@ -1222,7 +1222,7 @@ namespace SOS
     }
 
     // MARK: Affliction Treatments
-    public class AfflictionTreatmentSection : BaseStatSection
+    public class AfflictionTreatmentSection : IBaseStatSection
     {
         private AfflictionPrefab? aff;
 
@@ -1233,9 +1233,9 @@ namespace SOS
 
         private readonly List<string> blockers = [];
 
-        public override bool HasData => aff != null && (highEff.Count > 0 || medEff.Count > 0 || lowEff.Count > 0 || harmful.Count > 0 || blockers.Count > 0);
+        public bool HasData => aff != null && (highEff.Count > 0 || medEff.Count > 0 || lowEff.Count > 0 || harmful.Count > 0 || blockers.Count > 0);
 
-        public override void Analyze(Prefab prefab)
+        public void Analyze(Prefab prefab)
         {
             if (prefab is not AfflictionPrefab affliction) return;
             aff = affliction;
@@ -1280,7 +1280,7 @@ namespace SOS
 
         }
 
-        public override void Draw(SectionBuilder builder)
+        public void Draw(SectionBuilder builder)
         {
             if (aff == null) return;
 
@@ -1319,12 +1319,12 @@ namespace SOS
     }
 
     //MARK: descrption
-    public class DescriptionSection : BaseStatSection
+    public class DescriptionSection : IBaseStatSection
     {
         private string? text;
-        public override bool HasData => !string.IsNullOrEmpty(text);
+        public bool HasData => !string.IsNullOrEmpty(text);
 
-        public override void Analyze(Prefab prefab)
+        public void Analyze(Prefab prefab)
         {
             text = prefab switch
             {
@@ -1334,7 +1334,7 @@ namespace SOS
             };
         }
 
-        public override void Draw(SectionBuilder builder)
+        public void Draw(SectionBuilder builder)
         {
             if (text == null) return;
             builder.StartSection(TextSOS.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
