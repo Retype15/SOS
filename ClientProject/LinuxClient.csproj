@@ -4,6 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Platforms>x64</Platforms>
         <PlatformTarget>x64</PlatformTarget>
         <OutputPath>bin\Linux\</OutputPath>
         <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
@@ -44,6 +45,10 @@
     <Reference Include="XNATypes">
         <HintPath>$(RefsPath)\XNATypes.dll</HintPath>
     </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\API\API.csproj" />
     </ItemGroup>
 
     <PropertyGroup>
