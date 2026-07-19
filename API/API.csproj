@@ -40,26 +40,9 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Assemblies Include="$(TargetDir)$(AssemblyName).dll" />
-    <DepsFiles Include="$(TargetDir)$(AssemblyName).deps.json" />
-  </ItemGroup>
-
-  <Target Name="CopyRealDll" AfterTargets="Build" Condition="!$(DefineConstants.Contains('DUMMY_BUILD'))">
-    <Copy SourceFiles="@(Assemblies)" DestinationFiles="$(ModDeployDir)bin\Shared\$(AssemblyName).dll" />
-    <Copy SourceFiles="@(DepsFiles)" DestinationFiles="$(ModDeployDir)bin\Shared\$(AssemblyName).deps.json" />
-  </Target>
-
-  <Target Name="BuildDummyDll" AfterTargets="Build" Condition="!$(DefineConstants.Contains('DUMMY_BUILD'))">
-    <MSBuild Projects="$(MSBuildProjectFullPath)"
-      Properties="Configuration=$(Configuration);
-        DefineConstants=$(DefineConstants);DUMMY_BUILD;
-        OutputPath=$(MSBuildProjectDirectory)\bin\$(Configuration)\Dummy\"
-      Targets="Build" />
-  </Target>
-
-  <Target Name="CopyDummyDll" AfterTargets="Build" Condition="$(DefineConstants.Contains('DUMMY_BUILD'))">
-    <Copy SourceFiles="@(Assemblies)" DestinationFiles="$(RefsPath)\$(AssemblyName).dll" />
+  <Target Name="Deploy" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFiles="$(ModDeployDir)bin\Shared\$(AssemblyName).dll" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).deps.json" DestinationFiles="$(ModDeployDir)bin\Shared\$(AssemblyName).deps.json" />
   </Target>
 
 </Project>
