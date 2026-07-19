@@ -409,3 +409,6 @@ missingtranslation.xml
 
 # User-specific build configuration
 /UserBuildData.props
+
+#Generally Undeseable
+_*
