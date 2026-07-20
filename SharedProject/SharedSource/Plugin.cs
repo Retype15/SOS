@@ -37,16 +37,12 @@ namespace SOS
                 return;
             }
 
-            Instance = this;
-
-#if CLIENT
             InitClient();
-#endif
         }
 
         public Plugin()
         {
-            RLogger.LogDebug("PLugin Constructor Called.");
+            Instance = this;
         }
 
         public void OnLoadCompleted()
@@ -60,10 +56,8 @@ namespace SOS
 
         public void Dispose()
         {
-#if CLIENT
-            RecipeAnalyzer.Clear();
             DisposeClient();
-#endif
+
             ConfigService = null!;
             PluginManagementService = null!;
             ConsoleCommandsService = null!;
@@ -109,21 +103,27 @@ namespace SOS
     public static class RLogger
     {
         [Conditional("DEBUG")]
-        public static void LogDebug(string message, Color? color = null) => LuaCsLogger.LogMessage(message, color);
+        public static void LogDebug(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.SkyBlue);
 
         [Conditional("DEBUG")]
         public static void LogDebugError(string message) => LuaCsLogger.LogError(message);
 
+        [Conditional("DEBUG")]
+        public static void LogDebugWarning(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.Yellow);
+
         [Conditional("RELEASE")]
-        public static void LogRelease(string message, Color? color = null) => LuaCsLogger.LogMessage(message, color);
+        public static void LogRelease(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.SkyBlue);
 
         [Conditional("RELEASE")]
         public static void LogReleaseError(string message) => LuaCsLogger.LogError(message);
 
-        public static void Log(string message, Color? color = null) => LuaCsLogger.LogMessage(message, color);
+        [Conditional("RELEASE")]
+        public static void LogReleaseWarning(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.Yellow);
+
+        public static void Log(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.SkyBlue);
 
         public static void LogError(string message) => LuaCsLogger.LogError(message);
 
-        public static void LogWarning(string message, Color? color = null) => LuaCsLogger.LogMessage(message, color ?? Color.Yellow);
+        public static void LogWarning(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.Yellow);
     }
 }
