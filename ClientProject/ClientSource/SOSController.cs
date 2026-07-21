@@ -32,7 +32,8 @@ namespace SOS
             }
         }
 
-        public GUIRecipeTracker Tracker { get; } = GUIRecipeTracker.InstantiateWithDefault();
+        private GUIRecipeTracker? _tracker;
+        public GUIRecipeTracker Tracker => _tracker ??= GUIRecipeTracker.InstantiateWithDefault();
 
         public ClientConfig cfg = ClientConfig.Instance;
 
@@ -104,6 +105,15 @@ namespace SOS
         public void AddFavorite(string id) { FavoritedItems.Add(id); }
         public void RemoveFavorite(string id) { FavoritedItems.Remove(id); }
 
+        public void SetSearchFilter(string tag)
+        {
+            if (mainWindow != null)
+            {
+                mainWindow.SetSearchFilter(tag);
+
+            }
+        }
+
         public void ToggleUI()
         {
             if (mainWindow != null)
@@ -122,6 +132,8 @@ namespace SOS
                 }
 
                 if (Screen.Selected == null || IsSOSBlocked) return;
+
+                API.Initialize(Plugin.Instance.PluginManagementService);
 
                 mainWindow = new SOSWindow(this);
 

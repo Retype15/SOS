@@ -11,318 +11,19 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
-    public class SectionBuilder
-    {
-        private readonly GUIListBox targetPanel;
-        private readonly Action<string> onBadgeClick;
-        private readonly SOSController controller;
-        private readonly Action<Prefab> onPrimaryClick;
-        private readonly Action<Prefab> onSecondaryClick;
+    public class GeneralSection : ISOSStatSection
 
-        private GUILayoutGroup? currentLayout;
-        private int rowsCreated = 0;
-
-        public SectionBuilder(GUIListBox targetPanel, Action<string> onBadgeClick, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
-            this.targetPanel = targetPanel;
-            this.onBadgeClick = onBadgeClick;
-            this.controller = controller;
-            this.onPrimaryClick = onPrimary;
-            this.onSecondaryClick = onSecondary;
-        }
-
-        public void StartSection(string title, Color color)
-        {
-            currentLayout = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), targetPanel.Content.RectTransform, Anchor.TopCenter))
-            {
-                AbsoluteSpacing = 2,
-                CanBeFocused = false,
-                Stretch = true
-            };
-
-            var titleBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), title, font: GUIStyle.SubHeadingFont, textColor: color, textAlignment: Alignment.Left) { CanBeFocused = false };
-            titleBlock.RectTransform.MinSize = new Point(0, 30);
-            titleBlock.RectTransform.MaxSize = new Point(int.MaxValue, 30);
-            titleBlock.Padding = new Vector4(10, 0, 0, 0);
-
-            rowsCreated = 0;
-        }
-
-        public void AddRow(string label, string value, Color valColor)
-        {
-            if (string.IsNullOrEmpty(value) || currentLayout == null) return;
-
-            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), style: null) { CanBeFocused = false };
-
-            float rowWidth = currentLayout.Rect.Width > 0 ? currentLayout.Rect.Width : 400f;
-            float labelW = GUIStyle.SmallFont.MeasureString(label).X + 8f;
-            float labelRatio = Math.Min(labelW / rowWidth, 0.70f);
-
-            var lblBlock = new GUITextBlock(
-                new RectTransform(new Vector2(labelRatio, 1f), row.RectTransform, Anchor.CenterLeft),
-                label, font: GUIStyle.SmallFont, textColor: Color.Gray, wrap: false)
-            { CanBeFocused = false };
-
-            var valBlock = new GUITextBlock(
-                new RectTransform(new Vector2(1f - labelRatio, 1f), row.RectTransform, Anchor.CenterRight),
-                value, font: GUIStyle.SmallFont, textColor: valColor, textAlignment: Alignment.Right, wrap: true)
-            { CanBeFocused = false };
-
-            void UpdateHeight()
-            {
-                float h = Math.Max(lblBlock.TextSize.Y, valBlock.TextSize.Y) + 4f;
-                row.RectTransform.MinSize = new Point(0, (int)h);
-                row.RectTransform.MaxSize = new Point(int.MaxValue, (int)h);
-            }
-            UpdateHeight();
-            lblBlock.RectTransform.SizeChanged += UpdateHeight;
-            valBlock.RectTransform.SizeChanged += UpdateHeight;
-
-            rowsCreated++;
-        }
-
-        public void AddBadgeRow(string label, IEnumerable<string> values, IEnumerable<string>? displayNames = null, char? filterPrefix = null, Color? linkColor = null)
-        {
-            if (values == null || !values.Any() || currentLayout == null) return;
-
-            var valList = values.ToList();
-            var dispList = displayNames?.ToList();
-
-            var data = valList.Select((val, i) => new
-            {
-                Target = filterPrefix.HasValue ? $"{filterPrefix}{val}" : val,
-                Display = dispList != null && i < dispList.Count ? dispList[i] : val
-            }).ToList();
-
-            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), style: null) { CanBeFocused = false };
-            _ = new GUITextBlock(new RectTransform(new Vector2(0.40f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
-
-            RichString rich = data.JoinToRichString(", ", d => d.Display, d => linkColor ?? Color.LightSkyBlue);
-
-            var textBlock = new GUITextBlock(new RectTransform(new Vector2(0.60f, 0f), row.RectTransform, Anchor.CenterRight), "", wrap: true, font: GUIStyle.SmallFont, textAlignment: Alignment.TopLeft);
-            textBlock.SetRichText(rich);
-
-            textBlock.BindHyperlinks(data, onPrimaryClick: d => onBadgeClick?.Invoke(d.Target));
-
-            void UpdateLayout()
-            {
-                // Spring?
-                int maxW = (int)(row.Rect.Width * 0.60f);
-                if (maxW > 0)
-                {
-                    textBlock.RectTransform.NonScaledSize = new Point(maxW, (int)textBlock.TextSize.Y);
-                    float lineH = GUIStyle.SmallFont.LineHeight;
-                    if (textBlock.TextSize.Y <= lineH * 1.5f)
-                    {
-                        int paddingH = (int)(textBlock.Padding.X + textBlock.Padding.Z);
-                        int fitW = Math.Min((int)Math.Ceiling(textBlock.TextSize.X + paddingH) + 4, maxW);
-                        textBlock.RectTransform.NonScaledSize = new Point(fitW, (int)textBlock.TextSize.Y);
-                    }
-                }
-
-                int h = Math.Max(24, (int)textBlock.TextSize.Y + 4);
-                row.RectTransform.MinSize = new Point(0, h);
-                row.RectTransform.MaxSize = new Point(int.MaxValue, h);
-            }
-            UpdateLayout();
-            row.RectTransform.SizeChanged += UpdateLayout;
-
-            if (data.Count == 1)
-            {
-                var single = data[0];
-                row.CanBeFocused = true;
-                row.HoverCursor = CursorState.Hand;
-                row.OnClicked = (comp, obj) => { onBadgeClick?.Invoke(single.Target); return true; };
-            }
-
-            rowsCreated++;
-        }
-
-        public void AddSelectorBadgeRow(string label, IEnumerable<string> ids, IEnumerable<string>? displayNames = null, char? fallbackFilterPrefix = null, Color? labelColor = null)
-        {
-            if (ids == null || !ids.Any() || currentLayout == null) return;
-
-            var idList = ids.ToList();
-            var nameList = displayNames?.ToList();
-
-            var data = new List<object>();
-            for (int i = 0; i < idList.Count; i++)
-            {
-                string id = idList[i];
-                Prefab? found = (Prefab?)AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == id)
-                             ?? ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == id);
-
-                if (found != null) data.Add(found);
-                else data.Add(fallbackFilterPrefix.HasValue ? $"{fallbackFilterPrefix}{id}" : id);
-            }
-
-            string GetText(object obj, int index) => obj is Prefab p ? p.SafeName(Color.White).Name : ((nameList != null && index < nameList.Count) ? nameList[index] : obj.ToString()!);
-            Color GetColor(object obj) => obj is Prefab p ? p.IconColor() : Color.LightSkyBlue;
-
-            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), style: null) { CanBeFocused = false };
-            _ = new GUITextBlock(new RectTransform(new Vector2(0.40f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: labelColor ?? Color.Gray) { CanBeFocused = false };
-
-            RichString rich = data.JoinToRichString(", ", obj => GetText(obj, data.IndexOf(obj)), GetColor);
-
-            var textBlock = new GUITextBlock(new RectTransform(new Vector2(0.60f, 0f), row.RectTransform, Anchor.CenterRight), "", wrap: true, font: GUIStyle.SmallFont, textAlignment: Alignment.TopLeft);
-            textBlock.SetRichText(rich);
-
-            textBlock.BindHyperlinks(
-                data,
-                onPrimaryClick: obj => { if (obj is Prefab p) onPrimaryClick?.Invoke(p); else onBadgeClick?.Invoke(obj.ToString()!); },
-                onSecondaryClick: obj => { if (obj is Prefab p) onSecondaryClick?.Invoke(p); }
-            );
-
-            void UpdateLayout()
-            {
-                int maxW = (int)(row.Rect.Width * 0.60f);
-                if (maxW > 0)
-                {
-                    textBlock.RectTransform.NonScaledSize = new Point(maxW, (int)textBlock.TextSize.Y);
-                    float lineH = GUIStyle.SmallFont.LineHeight;
-                    if (textBlock.TextSize.Y <= lineH * 1.5f)
-                    {
-                        int paddingH = (int)(textBlock.Padding.X + textBlock.Padding.Z);
-                        int fitW = Math.Min((int)Math.Ceiling(textBlock.TextSize.X + paddingH) + 4, maxW);
-                        textBlock.RectTransform.NonScaledSize = new Point(fitW, (int)textBlock.TextSize.Y);
-                    }
-                }
-
-                int h = Math.Max(24, (int)textBlock.TextSize.Y + 4);
-                row.RectTransform.MinSize = new Point(0, h);
-                row.RectTransform.MaxSize = new Point(int.MaxValue, h);
-            }
-            UpdateLayout();
-            row.RectTransform.SizeChanged += UpdateLayout;
-
-            if (data.Count == 1)
-            {
-                var single = data[0];
-                row.CanBeFocused = true;
-                row.HoverCursor = CursorState.Hand;
-                row.OnClicked = (comp, obj) =>
-                {
-                    if (single is Prefab p) onPrimaryClick?.Invoke(p);
-                    else onBadgeClick?.Invoke(single.ToString()!);
-                    return true;
-                };
-                row.OnSecondaryClicked = (comp, obj) =>
-                {
-                    if (single is Prefab p) onSecondaryClick?.Invoke(p);
-                    return true;
-                };
-            }
-
-            rowsCreated++;
-        }
-
-        public void AddDropdown(string label, IEnumerable<string> tags, IEnumerable<Prefab> items)
-        {
-            if (currentLayout == null || !items.Any()) return;
-            _ = new GUIDesplegableBox(currentLayout, onBadgeClick, label, tags, items, controller, onPrimaryClick, onSecondaryClick);
-            rowsCreated++;
-        }
-
-        public void AddFullWidthText(RichString text)
-        {
-            if (currentLayout == null || text.IsNullOrEmpty()) return;
-            var block = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), currentLayout.RectTransform), RichString.Rich(text), font: GUIStyle.SmallFont, wrap: true, textAlignment: Alignment.Left) { CanBeFocused = false, };
-
-            void UpdateHeight()
-            {
-                int h = (int)block.TextSize.Y + 10;
-                block.RectTransform.MinSize = new Point(0, h);
-                block.RectTransform.MaxSize = new Point(int.MaxValue, h);
-            }
-            UpdateHeight();
-            block.RectTransform.SizeChanged += UpdateHeight;
-            rowsCreated++;
-        }
-
-        public void EndSection()
-        {
-            if (currentLayout == null) return;
-            if (rowsCreated == 0 && currentLayout.CountChildren <= 1)
-            {
-                targetPanel.Content.RemoveChild(currentLayout);
-            }
-            else
-            {
-                int totalHeight = 0;
-                foreach (var child in currentLayout.Children)
-                {
-                    totalHeight += child.Rect.Height + currentLayout.AbsoluteSpacing;
-                }
-                currentLayout.RectTransform.MinSize = new Point(0, totalHeight + 10);
-                currentLayout.RectTransform.MaxSize = new Point(int.MaxValue, totalHeight + 10);
-            }
-            currentLayout = null;
-        }
-    }
-
-    public class ItemAnalysis
-    {
-        public Identifier PrefabId { get; }
-        public List<IBaseStatSection> Sections { get; } = [];
-
-
-        // MARK: Adders
-        public ItemAnalysis(Prefab prefab)
-        {
-            PrefabId = prefab.Identifier;
-            // All
-            AddSection(new GeneralSection(), prefab);
-
-            // Item Oriented
-            if (prefab is ItemPrefab)
-            {
-                AddSection(new EconomySection(), prefab);
-                AddSection(new WeaponSection(), prefab);
-                AddSection(new EquipmentSection(), prefab);
-                AddSection(new MedicalSection(), prefab);
-                AddSection(new UtilitySection(), prefab);
-                AddSection(new ContainerSection(), prefab);
-            }
-
-
-            // Affliction Oriented
-            if (prefab is AfflictionPrefab)
-            {
-                AddSection(new AfflictionEffectsSection(), prefab);
-                AddSection(new AfflictionTreatmentSection(), prefab);
-            }
-            // Description
-            AddSection(new DescriptionSection(), prefab);
-        }
-
-        private void AddSection(IBaseStatSection section, Prefab prefab)
-        {
-            section.Analyze(prefab);
-
-            if (section.HasData) Sections.Add(section);
-        }
-    }
-
-    public interface IBaseStatSection
-    {
-        bool HasData { get; }
-        void Analyze(Prefab item);
-        void Draw(SectionBuilder builder);
-    }
-
-    // MARK: Sections
+    #region Sections
 
     // MARK: General
-    public class GeneralSection : IBaseStatSection
     {
         private Prefab? prefab;
-        public bool HasData => prefab != null;
+        public int Order => 0;
+        public string Id => GetType().FullOrName();
 
-        // Item
         private string cargoBox = "";
         private readonly List<string> hazards = [];
 
-        // Affliction
         private bool isBuff;
         private float activationThreshold;
         private float treatmentThreshold;
@@ -333,7 +34,7 @@ namespace SOS
         private float medSkillGain;
         private string causeOfDeath = "";
 
-        public void Analyze(Prefab prefab)
+        public bool Analyze(Prefab prefab)
         {
             this.prefab = prefab;
             switch (prefab)
@@ -369,58 +70,57 @@ namespace SOS
                     }
                     break;
             }
-
+            return prefab != null;
         }
 
-        public void Draw(SectionBuilder builder)
+        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             if (prefab == null) return;
 
-            builder.StartSection(TextSOS.Get("sos.window.section_general", "GENERAL").Value, Color.Gold);
+            using var l = new SectionLayout(contentPanel);
+            l.Header(TextSOS.Get("sos.window.section_general", "GENERAL").Value, Color.Gold);
 
-            builder.AddBadgeRow(TextSOS.Get("sos.item.id", "ID:").Value, [prefab.Identifier.Value], filterPrefix: '!');
+            l.BadgeRow(TextSOS.Get("sos.item.id", "ID:").Value, [prefab.Identifier.Value], filterPrefix: '!', onSearchFilter: SOSController.Instance.SetSearchFilter);
 
             string modName = prefab.ContentPackage?.Name ?? "Vanilla";
-            builder.AddBadgeRow("Mod:", [modName], filterPrefix: '@');
+            l.BadgeRow("Mod:", [modName], filterPrefix: '@', onSearchFilter: SOSController.Instance.SetSearchFilter);
 
             if (prefab is ItemPrefab item)
             {
-                if (!item.Aliases.IsEmpty) builder.AddBadgeRow(TextSOS.Get("sos.item.aliases", "Aliases:").Value, item.Aliases);
-                builder.AddBadgeRow(TextSOS.Get("sos.item.category", "Category:").Value, item.Category.ToString().Split(','), filterPrefix: '#');
-                if (!string.IsNullOrEmpty(cargoBox)) builder.AddSelectorBadgeRow(TextSOS.Get("sos.item.cargo_box", "Cargo Box:").Value, [cargoBox]);
-                builder.AddRow(TextSOS.Get("sos.item.max_stack", "Max Stack:").Value, item.MaxStackSize.ToString(), Color.White);
-                if (hazards.Count > 0) builder.AddBadgeRow(TextSOS.Get("sos.item.hazards", "Hazards:").Value, hazards);
-                builder.AddBadgeRow(TextSOS.Get("sos.item.tags", "TAGS:").Value, item.Tags.Select(t => t.Value), filterPrefix: '$');
+                if (!item.Aliases.IsEmpty) l.BadgeRow(TextSOS.Get("sos.item.aliases", "Aliases:").Value, item.Aliases, onSearchFilter: SOSController.Instance.SetSearchFilter);
+                l.BadgeRow(TextSOS.Get("sos.item.category", "Category:").Value, item.Category.ToString().Split(','), filterPrefix: '#', onSearchFilter: SOSController.Instance.SetSearchFilter);
+                if (!string.IsNullOrEmpty(cargoBox)) l.SelectorRow(TextSOS.Get("sos.item.cargo_box", "Cargo Box:").Value, [cargoBox], onPrimary: onPrimary, onSecondary: onSecondary, onSearchFilter: SOSController.Instance.SetSearchFilter);
+                l.Row(TextSOS.Get("sos.item.max_stack", "Max Stack:").Value, item.MaxStackSize.ToString(), Color.White);
+                if (hazards.Count > 0) l.BadgeRow(TextSOS.Get("sos.item.hazards", "Hazards:").Value, hazards, onSearchFilter: SOSController.Instance.SetSearchFilter);
+                l.BadgeRow(TextSOS.Get("sos.item.tags", "TAGS:").Value, item.Tags.Select(t => t.Value), filterPrefix: '$', onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
             else if (prefab is AfflictionPrefab aff)
             {
-                builder.AddRow("Classification:", isBuff ? "Buff (Positive)" : "Debuff (Negative)", isBuff ? Color.LightGreen : Color.Salmon);
-                builder.AddBadgeRow("Type:", [aff.AfflictionType.ToString()], filterPrefix: '#');
-                builder.AddRow("Max Strength:", aff.MaxStrength.ToValue(), Color.White);
+                l.Row("Classification:", isBuff ? "Buff (Positive)" : "Debuff (Negative)", isBuff ? Color.LightGreen : Color.Salmon);
+                l.BadgeRow("Type:", [aff.AfflictionType.ToString()], filterPrefix: '#', onSearchFilter: SOSController.Instance.SetSearchFilter);
+                l.Row("Max Strength:", aff.MaxStrength.ToValue(), Color.White);
 
-                if (activationThreshold > 0) builder.AddRow("Activation Threshold:", activationThreshold.ToValue(), Color.Yellow);
-                if (iconThreshold > 0 && iconThreshold < 1000) builder.AddRow("Icon Appears At:", iconThreshold.ToValue(), Color.Cyan);
-                if (scannerThreshold > 0 && scannerThreshold < 1000) builder.AddRow("Scanner Detects At:", scannerThreshold.ToValue(), Color.Cyan);
-                if (treatmentThreshold > 0) builder.AddRow("AI Treats At:", treatmentThreshold.ToValue(), Color.LightGreen);
+                if (activationThreshold > 0) l.Row("Activation Threshold:", activationThreshold.ToValue(), Color.Yellow);
+                if (iconThreshold > 0 && iconThreshold < 1000) l.Row("Icon Appears At:", iconThreshold.ToValue(), Color.Cyan);
+                if (scannerThreshold > 0 && scannerThreshold < 1000) l.Row("Scanner Detects At:", scannerThreshold.ToValue(), Color.Cyan);
+                if (treatmentThreshold > 0) l.Row("AI Treats At:", treatmentThreshold.ToValue(), Color.LightGreen);
 
                 float totalCost = baseHealCost * healMultiplier;
-                if (totalCost > 0) builder.AddRow("Clinic Heal Cost:", $"~{(int)totalCost} mk", Color.Gold);
-                if (medSkillGain > 0) builder.AddRow("Medical Exp Gain:", $"+{medSkillGain.ToValue()}", Color.MediumPurple);
+                if (totalCost > 0) l.Row("Clinic Heal Cost:", $"~{(int)totalCost} mk", Color.Gold);
+                if (medSkillGain > 0) l.Row("Medical Exp Gain:", $"+{medSkillGain.ToValue()}", Color.MediumPurple);
 
-                if (aff.LimbSpecific) builder.AddRow("Limb Specific:", "Yes", Color.Gray);
+                if (aff.LimbSpecific) l.Row("Limb Specific:", "Yes", Color.Gray);
                 if (!string.IsNullOrEmpty(aff.IndicatorLimb.ToString()) && aff.IndicatorLimb.ToString() != "None")
-                    builder.AddRow("Indicator Limb:", aff.IndicatorLimb.ToString(), Color.Gray);
+                    l.Row("Indicator Limb:", aff.IndicatorLimb.ToString(), Color.Gray);
 
                 if (!string.IsNullOrEmpty(causeOfDeath))
-                    builder.AddFullWidthText($"Death Cause: {causeOfDeath}".SetColor(Color.Crimson));
+                    l.RichText($"Death Cause: {causeOfDeath}".SetColor(Color.Crimson));
             }
-
-            builder.EndSection();
         }
     }
 
     // MARK: Economy
-    public class EconomySection : IBaseStatSection
+    public class EconomySection : ISOSStatSection
     {
         private int price;
         private bool canBuy;
@@ -428,9 +128,10 @@ namespace SOS
         private int minDifficulty;
         private Identifier requiredFaction = Identifier.Empty;
 
-        public bool HasData => price > 0 || canBuy;
+        public int Order => 10;
+        public string Id => GetType().FullOrName();
 
-        public void Analyze(Prefab prefab)
+        public bool Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
@@ -444,38 +145,37 @@ namespace SOS
                     requiredFaction = priceInfo.RequiredFaction;
                 }
             }
-
+            return price > 0 || canBuy;
         }
 
-        public void Draw(SectionBuilder builder)
+        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            builder.StartSection(TextSOS.Get("sos.window.section_economy", "ECONOMY").Value, Color.Gold);
+            using var l = new SectionLayout(contentPanel);
+            l.Header(TextSOS.Get("sos.window.section_economy", "ECONOMY").Value, Color.Gold);
 
-            builder.AddRow(TextSOS.Get("sos.item.base_price", "Base Price:").Value, $"{price} mk", Color.Yellow);
+            l.Row(TextSOS.Get("sos.item.base_price", "Base Price:").Value, $"{price} mk", Color.Yellow);
 
             string yes = TextSOS.Get("sos.gen.yes", "Yes").Value;
             string no = TextSOS.Get("sos.gen.no", "No").Value;
 
-            builder.AddRow(TextSOS.Get("sos.item.can_buy", "Can be Bought:").Value, canBuy ? yes : no,
+            l.Row(TextSOS.Get("sos.item.can_buy", "Can be Bought:").Value, canBuy ? yes : no,
                 canBuy ? Color.LightGreen : Color.Salmon);
 
-            builder.AddRow(TextSOS.Get("sos.item.can_sell", "Can be Sold:").Value, canSell ? yes : no, canSell ? Color.LightGreen : Color.Salmon);
+            l.Row(TextSOS.Get("sos.item.can_sell", "Can be Sold:").Value, canSell ? yes : no, canSell ? Color.LightGreen : Color.Salmon);
 
             if (minDifficulty > 0)
-                builder.AddRow(TextSOS.Get("sos.item.min_difficulty", "Min. Difficulty:").Value, minDifficulty.ToString(), Color.White);
+                l.Row(TextSOS.Get("sos.item.min_difficulty", "Min. Difficulty:").Value, minDifficulty.ToString(), Color.White);
 
             if (requiredFaction != Identifier.Empty)
             {
                 string factionName = TextManager.Get("FactionName." + requiredFaction).Fallback(requiredFaction.Value).Value;
-                builder.AddBadgeRow(TextSOS.Get("sos.item.required_faction", "Required Faction:").Value, [factionName]);
+                l.BadgeRow(TextSOS.Get("sos.item.required_faction", "Required Faction:").Value, [factionName], onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
-
-            builder.EndSection();
         }
     }
 
     // MARK: weapons
-    public class WeaponSection : IBaseStatSection
+    public class WeaponSection : ISOSStatSection
     {
         private float penetration = 0f;
         private int maxTargets = 1;
@@ -502,14 +202,15 @@ namespace SOS
             public float Probability;
         }
 
-        public bool HasData => afflictions.Count > 0 || penetration > 0 || structureDamage > 0 || itemDamage > 0 || reload > 0 || isThrowable || explosionRange > 0;
+        public int Order => 20;
+        public string Id => GetType().FullOrName();
 
-        public void Analyze(Prefab prefab)
+        public bool Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
 
-                if (item.ConfigElement == null) return;
+                if (item.ConfigElement == null) return false;
 
                 foreach (var element in item.ConfigElement.Descendants())
                 {
@@ -573,6 +274,7 @@ namespace SOS
                     if (n == "throwable") isThrowable = true;
                 }
             }
+            return afflictions.Count > 0 || penetration > 0 || structureDamage > 0 || itemDamage > 0 || reload > 0 || isThrowable || explosionRange > 0;
         }
 
         private void ParseAffliction(XElement element, float prob)
@@ -590,24 +292,24 @@ namespace SOS
             });
         }
 
-        public void Draw(SectionBuilder builder)
+        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            builder.StartSection(TextSOS.Get("sos.window.section_weapon", "COMBAT STATS").Value, Color.Gold);
+            using var l = new SectionLayout(contentPanel);
+            l.Header(TextSOS.Get("sos.window.section_weapon", "COMBAT STATS").Value, Color.Gold);
 
-            //pep
-            if (reload > 0) builder.AddRow(isAutomatic ? "Fire Rate:" : "Reload:", $"{reload}s", Color.Cyan);
-            if (powerUse > 0) builder.AddRow("Power Use:", $"{powerUse}kW", Color.Orange);
-            if (range > 0) builder.AddRow("Range:", range.ToMeters(), Color.LightGray);
-            if (explosionRange > 0) builder.AddRow("Explosion Radius:", explosionRange.ToMeters(), Color.Orange);
-            if (penetration > 0) builder.AddRow("Armor Penetration:", $"{(int)(penetration * 100)}%", Color.Orange);
-            if (projectileCount > 1) builder.AddRow("Projectiles:", $"x{projectileCount}", Color.LightGray);
-            if (maxTargets > 1) builder.AddRow("Max Targets:", maxTargets.ToString(), Color.LightGray);
-            if (structureDamage > 0) builder.AddRow("Structure Damage:", structureDamage.ToValue(), Color.Salmon);
-            if (itemDamage > 0) builder.AddRow("Item Damage:", itemDamage.ToValue(), Color.Salmon);
-            if (severProb > 0) builder.AddRow("Dismember Chance:", $"{(int)(severProb * 100)}%", Color.Crimson);
-            if (spread > 0) builder.AddRow("Base Spread:", $"{spread:0.#}°", Color.LightGray);
-            if (dmgModifier != 1f) builder.AddRow("Dmg. Multiplier:", $"x{dmgModifier:0.#}", Color.LightGreen);
-            if (isThrowable) builder.AddRow("Type:", "Throwable", Color.White);
+            if (reload > 0) l.Row(isAutomatic ? "Fire Rate:" : "Reload:", $"{reload}s", Color.Cyan);
+            if (powerUse > 0) l.Row("Power Use:", $"{powerUse}kW", Color.Orange);
+            if (range > 0) l.Row("Range:", range.ToMeters(), Color.LightGray);
+            if (explosionRange > 0) l.Row("Explosion Radius:", explosionRange.ToMeters(), Color.Orange);
+            if (penetration > 0) l.Row("Armor Penetration:", $"{(int)(penetration * 100)}%", Color.Orange);
+            if (projectileCount > 1) l.Row("Projectiles:", $"x{projectileCount}", Color.LightGray);
+            if (maxTargets > 1) l.Row("Max Targets:", maxTargets.ToString(), Color.LightGray);
+            if (structureDamage > 0) l.Row("Structure Damage:", structureDamage.ToValue(), Color.Salmon);
+            if (itemDamage > 0) l.Row("Item Damage:", itemDamage.ToValue(), Color.Salmon);
+            if (severProb > 0) l.Row("Dismember Chance:", $"{(int)(severProb * 100)}%", Color.Crimson);
+            if (spread > 0) l.Row("Base Spread:", $"{spread:0.#}°", Color.LightGray);
+            if (dmgModifier != 1f) l.Row("Dmg. Multiplier:", $"x{dmgModifier:0.#}", Color.LightGreen);
+            if (isThrowable) l.Row("Type:", "Throwable", Color.White);
 
             var grouped = afflictions.GroupBy(a => a.Identifier);
             foreach (var group in grouped)
@@ -617,15 +319,13 @@ namespace SOS
                 var ids = group.Select(a => a.Identifier);
                 var displayNames = group.Select(a => a.Probability < 1.0f ? $"{a.Strength} ({(int)(a.Probability * 100)}%)" : a.Strength.ToValue());
 
-                builder.AddBadgeRow(label, ids, displayNames, linkColor: Color.Salmon);
+                l.BadgeRow(label, ids, displayNames, linkColor: Color.Salmon, onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
-
-            builder.EndSection();
         }
     }
 
     // MARK: equipements
-    public class EquipmentSection : IBaseStatSection
+    public class EquipmentSection : ISOSStatSection
     {
         private readonly List<string> equipSlots = [];
         private readonly List<string> statModifiers = [];
@@ -635,17 +335,17 @@ namespace SOS
         private bool deflectsProjectiles = false;
         private int durability = 0;
 
-        public bool HasData => equipSlots.Count > 0 || statModifiers.Count > 0 ||
-                                       aggregatedResistances.Count > 0 || maxPressure > 0 || durability > 0;
+        public int Order => 30;
+        public string Id => GetType().FullOrName();
 
-        public void Analyze(Prefab prefab)
+        public bool Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
                 int health = (int)Math.Floor(item.Health);
                 if (health > 0 && health != 100 && health < 100000) durability = health;
 
-                if (item.ConfigElement == null) return;
+                if (item.ConfigElement == null) return false;
 
                 foreach (var element in item.ConfigElement.Descendants())
                 {
@@ -695,31 +395,33 @@ namespace SOS
                     }
                 }
             }
+            return equipSlots.Count > 0 || statModifiers.Count > 0 || aggregatedResistances.Count > 0 || maxPressure > 0 || durability > 0;
         }
 
-        public void Draw(SectionBuilder builder)
+        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            builder.StartSection(TextSOS.Get("sos.window.section_equipment", "AS EQUIPMENT").Value, Color.Gold);
+            using var l = new SectionLayout(contentPanel);
+            l.Header(TextSOS.Get("sos.window.section_equipment", "AS EQUIPMENT").Value, Color.Gold);
 
             if (durability > 0)
-                builder.AddRow(TextSOS.Get("sos.equip.max_durability", "Max Durability:").Value, durability.ToString(), Color.White);
+                l.Row(TextSOS.Get("sos.equip.max_durability", "Max Durability:").Value, durability.ToString(), Color.White);
 
             if (maxPressure > 0)
-                builder.AddRow(TextSOS.Get("sos.equip.pressure_protection", "Pressure Protection:").Value, maxPressure.ToMeters(), Color.DeepSkyBlue);
+                l.Row(TextSOS.Get("sos.equip.pressure_protection", "Pressure Protection:").Value, maxPressure.ToMeters(), Color.DeepSkyBlue);
 
             if (deflectsProjectiles)
-                builder.AddRow(TextSOS.Get("sos.equip.armor_special", "Armor Special:").Value, TextSOS.Get("sos.equip.deflect_projectiles", "Deflects Projectiles").Value, Color.LightGray);
+                l.Row(TextSOS.Get("sos.equip.armor_special", "Armor Special:").Value, TextSOS.Get("sos.equip.deflect_projectiles", "Deflects Projectiles").Value, Color.LightGray);
 
             foreach (var mod in statModifiers.Distinct())
             {
                 var parts = mod.Split(':');
                 Color color = parts[1].Trim().StartsWith('-') ? Color.Salmon : Color.LightGreen;
-                builder.AddRow(parts[0] + ":", parts[1], color);
+                l.Row(parts[0] + ":", parts[1], color);
             }
 
             foreach (var res in aggregatedResistances)
             {
-                builder.AddBadgeRow(res.Key + " Res:", [res.Key], [string.Join(", ", res.Value)], linkColor: Color.LightGreen);
+                l.BadgeRow(res.Key + " Res:", [res.Key], [string.Join(", ", res.Value)], linkColor: Color.LightGreen, onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
 
             if (equipSlots.Count > 0)
@@ -728,15 +430,13 @@ namespace SOS
                     .SelectMany(s => s.Split([',', ' '], StringSplitOptions.RemoveEmptyEntries))
                     .Distinct();
 
-                builder.AddBadgeRow(TextSOS.Get("sos.equip.equips_in", "Equips In:").Value, uniqueSlots, filterPrefix: '&');
+                l.BadgeRow(TextSOS.Get("sos.equip.equips_in", "Equips In:").Value, uniqueSlots, filterPrefix: '&', onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
-
-            builder.EndSection();
         }
     }
 
     // MARK: Medical
-    public class MedicalSection : IBaseStatSection
+    public class MedicalSection : ISOSStatSection
     {
         private int medicalSkillReq = 0;
         private readonly List<(string Identifier, string DisplayName)> suitableTreatments = [];
@@ -748,13 +448,14 @@ namespace SOS
         private readonly Dictionary<string, (string Name, float Amount)> failureHeals = [];
         private readonly Dictionary<string, (string Name, float Amount)> failureCauses = [];
 
-        public bool HasData => suitableTreatments.Count > 0 || alwaysHeals.Count > 0 || successHeals.Count > 0 || alwaysCauses.Count > 0 || successCauses.Count > 0;
+        public int Order => 40;
+        public string Id => GetType().FullOrName();
 
-        public void Analyze(Prefab prefab)
+        public bool Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
-                if (item.ConfigElement == null) return;
+                if (item.ConfigElement == null) return false;
 
                 foreach (var element in item.ConfigElement.Descendants())
                 {
@@ -814,6 +515,7 @@ namespace SOS
                     }
                 }
             }
+            return suitableTreatments.Count > 0 || alwaysHeals.Count > 0 || successHeals.Count > 0 || alwaysCauses.Count > 0 || successCauses.Count > 0;
         }
 
         private static void AddStat(Dictionary<string, (string Name, float Amount)> dict, string id, string name, float amount)
@@ -834,20 +536,22 @@ namespace SOS
             return idOrType;
         }
 
-        public void Draw(SectionBuilder builder)
+        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            builder.StartSection(TextSOS.Get("sos.window.section_medical", "MEDICAL").Value, Color.Gold);
+            using var l = new SectionLayout(contentPanel);
+            l.Header(TextSOS.Get("sos.window.section_medical", "MEDICAL").Value, Color.Gold);
 
             if (medicalSkillReq > 0)
-                builder.AddBadgeRow(TextSOS.Get("sos.med.skill_req", "Medical Skill Req:").Value, [medicalSkillReq.ToString()], ["medical " + medicalSkillReq.ToString()], linkColor: Color.Orange);
+                l.BadgeRow(TextSOS.Get("sos.med.skill_req", "Medical Skill Req:").Value, [medicalSkillReq.ToString()], ["medical " + medicalSkillReq.ToString()], linkColor: Color.Orange, onSearchFilter: SOSController.Instance.SetSearchFilter);
 
             if (suitableTreatments.Count > 0)
             {
-                builder.AddBadgeRow(
+                l.BadgeRow(
                     TextSOS.Get("sos.med.suitable", "Recommended:").Value,
                     suitableTreatments.Select(t => t.Identifier),
                     suitableTreatments.Select(t => t.DisplayName),
-                    linkColor: Color.LightSkyBlue
+                    linkColor: Color.LightSkyBlue,
+                    onSearchFilter: SOSController.Instance.SetSearchFilter
                 );
             }
 
@@ -858,7 +562,7 @@ namespace SOS
                 var ids = dict.Keys;
                 var displayNames = dict.Select(kvp => $"{kvp.Value.Name} ({kvp.Value.Amount.ToValue()})");
 
-                builder.AddBadgeRow(label, ids, displayNames, linkColor: linkColor);
+                l.BadgeRow(label, ids, displayNames, linkColor: linkColor, onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
 
             DrawHyperlinkEffect(TextSOS.Get("sos.med.always_heals", "Always Heals:").Value, alwaysHeals, Color.LightGreen);
@@ -869,24 +573,22 @@ namespace SOS
 
             DrawHyperlinkEffect(TextSOS.Get("sos.med.failure_heals", "On Failure Heals:").Value, failureHeals, Color.DarkSeaGreen);
             DrawHyperlinkEffect(TextSOS.Get("sos.med.failure_causes", "On Failure Applies:").Value, failureCauses, Color.Crimson);
-
-            builder.EndSection();
         }
     }
 
     // MARK: utility
-    public class UtilitySection : IBaseStatSection
+    public class UtilitySection : ISOSStatSection
     {
         private readonly Dictionary<string, string> deviceProperties = [];
 
-        public bool HasData => deviceProperties.Count > 0;
+        public int Order => 50;
+        public string Id => GetType().FullOrName();
 
-        public void Analyze(Prefab prefab)
+        public bool Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
-                if (item.ConfigElement == null) return;
-
+                if (item.ConfigElement == null) return false;
                 foreach (var child in item.ConfigElement.Descendants())
                 {
                     string n = child.Name.ToString().ToLowerInvariant();
@@ -904,32 +606,31 @@ namespace SOS
                         deviceProperties[TextSOS.Get("sos.util.sonar_range", "Sonar Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
                 }
             }
+            return deviceProperties.Count > 0;
         }
 
-        public void Draw(SectionBuilder builder)
+        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            builder.StartSection(TextSOS.Get("sos.window.section_utility", "UTILITY").Value, Color.Gold);
+            using var l = new SectionLayout(contentPanel);
+            l.Header(TextSOS.Get("sos.window.section_utility", "UTILITY").Value, Color.Gold);
 
             foreach (var prop in deviceProperties)
-            {
-                builder.AddRow(prop.Key + ":", prop.Value, Color.Cyan);
-            }
-
-            builder.EndSection();
+                l.Row(prop.Key + ":", prop.Value, Color.Cyan);
         }
     }
 
     // MARK: container
-    public class ContainerSection : IBaseStatSection
+    public class ContainerSection : ISOSStatSection
     {
         private string capacity = "";
         private readonly HashSet<string> acceptedTags = [];
         private readonly List<string> spawnLocations = [];
         private List<Prefab> compatibleItems = [];
 
-        public bool HasData => !string.IsNullOrEmpty(capacity) || compatibleItems.Count > 0 || spawnLocations.Count > 0;
+        public int Order => 60;
+        public string Id => GetType().FullOrName();
 
-        public void Analyze(Prefab prefab)
+        public bool Analyze(Prefab prefab)
         {
             if (prefab is ItemPrefab item)
             {
@@ -980,37 +681,36 @@ namespace SOS
                 ).OrderBy(p => p.Name.Value)];
                 }
             }
+            return !string.IsNullOrEmpty(capacity) || compatibleItems.Count > 0 || spawnLocations.Count > 0;
         }
 
-        public void Draw(SectionBuilder builder)
+        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            builder.StartSection(TextSOS.Get("sos.window.section_container", "CONTAINERS").Value, Color.Gold);
+            using var l = new SectionLayout(contentPanel);
+            l.Header(TextSOS.Get("sos.window.section_container", "CONTAINERS").Value, Color.Gold);
 
             if (!string.IsNullOrEmpty(capacity))
             {
-                builder.AddRow(TextSOS.Get("sos.container.capacity", "Capacity:").Value,
+                l.Row(TextSOS.Get("sos.container.capacity", "Capacity:").Value,
                     TextSOS.Get("sos.container.slots", "[amount] Slots").Replace("[amount]", capacity).Value, Color.White);
             }
 
             if (compatibleItems.Count > 0)
             {
-                builder.AddDropdown(
+                _ = new GUIDesplegableBox(contentPanel.Content, SOSController.Instance.SetSearchFilter,
                     TextSOS.Get("sos.container.accepts", "Accepts:").Value,
-                    acceptedTags,
-                    compatibleItems);
+                    acceptedTags, compatibleItems, onPrimary, onSecondary);
             }
 
             if (spawnLocations.Count > 0)
             {
-                builder.AddBadgeRow(TextSOS.Get("sos.container.contained", "Contained_by:").Value, spawnLocations);
+                l.BadgeRow(TextSOS.Get("sos.container.contained", "Contained_by:").Value, spawnLocations, onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
-
-            builder.EndSection();
         }
     }
 
     // MARK: Affliction effects
-    public class AfflictionEffectsSection : IBaseStatSection
+    public class AfflictionEffectsSection : ISOSStatSection
     {
         private class PhaseData
         {
@@ -1025,11 +725,12 @@ namespace SOS
         private readonly List<PhaseData> phases = [];
         private readonly List<PhaseData> periodicPhases = [];
 
-        public bool HasData => phases.Count > 0 || periodicPhases.Count > 0;
+        public int Order => 70;
+        public string Id => GetType().FullOrName();
 
-        public void Analyze(Prefab prefab)
+        public bool Analyze(Prefab prefab)
         {
-            if (prefab is not AfflictionPrefab aff || aff.configElement == null) return;
+            if (prefab is not AfflictionPrefab aff || aff.configElement == null) return false;
             phases.Clear();
             periodicPhases.Clear();
 
@@ -1111,6 +812,7 @@ namespace SOS
                 if (phase.LinkedAfflictions.Count > 0 || phase.Events.Count > 0)
                     periodicPhases.Add(phase);
             }
+            return phases.Count > 0 || periodicPhases.Count > 0;
         }
 
         private static void ParseStatusEffects(Barotrauma.ContentXElement parentElement, PhaseData phase)
@@ -1159,70 +861,79 @@ namespace SOS
             if (hasAnimations) phase.Events.Add("Forces Animations");
         }
 
-        public void Draw(SectionBuilder builder)
+        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             if (phases.Count > 0)
             {
-                builder.StartSection("EFFECTS BY STRENGTH PHASE", Color.Gold);
+                using var l = new SectionLayout(contentPanel);
+                l.Header("EFFECTS BY STRENGTH PHASE", Color.Gold);
 
                 foreach (var phase in phases)
                 {
-                    builder.AddFullWidthText($"Strength Range: {phase.Range.SetColor(Color.Orange)}");
+                    l.RichText($"Strength Range: {phase.Range.SetColor(Color.Orange)}");
 
                     if (phase.StrengthChange != 0)
                     {
                         string trend = phase.StrengthChange > 0
                             ? $"Worsens: +{phase.StrengthChange}/s".SetColor(Color.Salmon)
                             : $"Natural Healing: {phase.StrengthChange}/s".SetColor(Color.LightGreen);
-                        builder.AddFullWidthText($"  -> {trend}");
+                        l.RichText($"  -> {trend}");
                     }
 
                     if (phase.Stats.Count > 0)
-                        builder.AddFullWidthText($"  -> {string.Join(" | ", phase.Stats)}");
+                        l.RichText($"  -> {string.Join(" | ", phase.Stats)}");
 
                     if (phase.Resistances.Count > 0)
-                        builder.AddFullWidthText($"  -> Resistances: {string.Join(" | ", phase.Resistances)}");
+                        l.RichText($"  -> Resistances: {string.Join(" | ", phase.Resistances)}");
 
                     if (phase.Events.Count > 0)
-                        builder.AddFullWidthText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
+                        l.RichText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
 
                     if (phase.LinkedAfflictions.Count > 0)
                     {
-                        builder.AddSelectorBadgeRow("  -> Triggers:",
-                            phase.LinkedAfflictions.Select(l => l.ID),
-                            phase.LinkedAfflictions.Select(l => l.Name.SetColor(l.Theme)), '!');
+                        l.SelectorRow("  -> Triggers:",
+                            phase.LinkedAfflictions.Select(a => a.ID),
+                            phase.LinkedAfflictions.Select(a => a.Name.SetColor(a.Theme)),
+                            fallbackFilterPrefix: '!',
+                            onPrimary: onPrimary,
+                            onSecondary: onSecondary,
+                            onSearchFilter: SOSController.Instance.SetSearchFilter);
                     }
 
-                    builder.AddFullWidthText(" ");
+                    l.RichText(" ");
+
                 }
-                builder.EndSection();
             }
 
             if (periodicPhases.Count > 0)
             {
-                builder.StartSection("PERIODIC EVENTS", Color.MediumPurple);
+                using var l = new SectionLayout(contentPanel);
+                l.Header("PERIODIC EVENTS", Color.MediumPurple);
                 foreach (var phase in periodicPhases)
                 {
-                    builder.AddFullWidthText($"Frequency: {phase.Range.SetColor(Color.Cyan)}");
+                    l.RichText($"Frequency: {phase.Range.SetColor(Color.Cyan)}");
 
                     if (phase.Events.Count > 0)
-                        builder.AddFullWidthText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
+                        l.RichText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
 
                     if (phase.LinkedAfflictions.Count > 0)
                     {
-                        builder.AddSelectorBadgeRow("  -> Triggers:",
-                            phase.LinkedAfflictions.Select(l => l.ID),
-                            phase.LinkedAfflictions.Select(l => l.Name.SetColor(l.Theme)), '!');
+                        l.SelectorRow("  -> Triggers:",
+                            phase.LinkedAfflictions.Select(a => a.ID),
+                            phase.LinkedAfflictions.Select(a => a.Name.SetColor(a.Theme)),
+                            fallbackFilterPrefix: '!',
+                            onPrimary: onPrimary,
+                            onSecondary: onSecondary,
+                            onSearchFilter: SOSController.Instance.SetSearchFilter);
                     }
-                    builder.AddFullWidthText(" ");
+                    l.RichText(" ");
+
                 }
-                builder.EndSection();
             }
         }
     }
 
-    // MARK: Affliction Treatments
-    public class AfflictionTreatmentSection : IBaseStatSection
+    public class AfflictionTreatmentSection : ISOSStatSection
     {
         private AfflictionPrefab? aff;
 
@@ -1233,19 +944,18 @@ namespace SOS
 
         private readonly List<string> blockers = [];
 
-        public bool HasData => aff != null && (highEff.Count > 0 || medEff.Count > 0 || lowEff.Count > 0 || harmful.Count > 0 || blockers.Count > 0);
+        public int Order => 80;
+        public string Id => GetType().FullOrName();
 
-        public void Analyze(Prefab prefab)
+        public bool Analyze(Prefab prefab)
         {
-            if (prefab is not AfflictionPrefab affliction) return;
+            if (prefab is not AfflictionPrefab affliction) return false;
             aff = affliction;
 
             if (aff.IgnoreTreatmentIfAfflictedBy != null)
             {
                 foreach (var blockerId in aff.IgnoreTreatmentIfAfflictedBy)
-                {
                     blockers.Add(blockerId.Value);
-                }
             }
 
             if (aff.TreatmentSuitabilities != null)
@@ -1267,7 +977,7 @@ namespace SOS
                     target?.Add(item);
                 }
             }
-            //ok
+
             if (aff.TreatmentSuitabilities != null)
             {
                 int CompareSuitDesc(ItemPrefab a, ItemPrefab b) => aff.TreatmentSuitabilities[b.Identifier].CompareTo(aff.TreatmentSuitabilities[a.Identifier]);
@@ -1277,21 +987,26 @@ namespace SOS
                 lowEff.Sort(CompareSuitDesc);
                 harmful.Sort(CompareSuitAsc);
             }
-
+            return highEff.Count > 0 || medEff.Count > 0 || lowEff.Count > 0 || harmful.Count > 0 || blockers.Count > 0;
         }
 
-        public void Draw(SectionBuilder builder)
+        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             if (aff == null) return;
 
-            builder.StartSection(TextSOS.Get("sos.window.section_treatments", "TREATMENTS & MEDICATION").Value, Color.SpringGreen);
+            using var l = new SectionLayout(contentPanel);
+            l.Header(TextSOS.Get("sos.window.section_treatments", "TREATMENTS & MEDICATION").Value, Color.SpringGreen);
 
             if (blockers.Count > 0)
             {
                 var displayNames = blockers.Select(b =>
                     AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == b)?.Name.Value ?? b);
 
-                builder.AddSelectorBadgeRow(TextSOS.Get("sos.affliction.blockedby", "Treatment Blocked By:").Value, blockers, displayNames, '!');
+                l.SelectorRow(TextSOS.Get("sos.affliction.blockedby", "Treatment Blocked By:").Value, blockers, displayNames,
+                    fallbackFilterPrefix: '!',
+                    onPrimary: onPrimary,
+                    onSecondary: onSecondary,
+                    onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
 
             void DrawRow(string label, List<ItemPrefab> items, Color? labelColor = null)
@@ -1301,7 +1016,12 @@ namespace SOS
                 var ids = items.Select(i => i.Identifier.Value);
                 var names = items.Select(i => $"{i.Name.Value} ({aff.TreatmentSuitabilities[i.Identifier]:0})");
 
-                builder.AddSelectorBadgeRow(label, ids, names, '!', labelColor: labelColor);
+                l.SelectorRow(label, ids, names,
+                    fallbackFilterPrefix: '!',
+                    labelColor: labelColor,
+                    onPrimary: onPrimary,
+                    onSecondary: onSecondary,
+                    onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
 
             DrawRow(TextSOS.Get("sos.affliction.highlyeffective", "Highly Effective:").Value, highEff);
@@ -1310,21 +1030,19 @@ namespace SOS
 
             if (harmful.Count > 0)
             {
-                builder.AddFullWidthText(TextSOS.Get("sos.affliction.contraindicated_warn", "WARNING: The following items worsen the condition!").Value.SetColor(Color.Salmon));
+                l.RichText(TextSOS.Get("sos.affliction.contraindicated_warn", "WARNING: The following items worsen the condition!").Value.SetColor(Color.Salmon));
                 DrawRow(TextSOS.Get("sos.affliction.contraindicated", "Contraindicated:").Value, harmful, labelColor: Color.Salmon);
             }
-
-            builder.EndSection();
         }
     }
 
-    //MARK: descrption
-    public class DescriptionSection : IBaseStatSection
+    public class DescriptionSection : ISOSStatSection
     {
         private string? text;
-        public bool HasData => !string.IsNullOrEmpty(text);
+        public int Order => 90;
+        public string Id => GetType().FullOrName();
 
-        public void Analyze(Prefab prefab)
+        public bool Analyze(Prefab prefab)
         {
             text = prefab switch
             {
@@ -1332,16 +1050,18 @@ namespace SOS
                 AfflictionPrefab affliction => string.Join("\n\n", affliction.Descriptions.Select(d => $"({d.MinStrength.ToString().SetColor(Color.Orange)}-{d.MaxStrength.ToString().SetColor(Color.OrangeRed)}) {d.Target.ToString().SetColor(Color.BlueViolet)}: {d.Text}")),
                 _ => null
             };
+            return !string.IsNullOrEmpty(text);
         }
 
-        public void Draw(SectionBuilder builder)
+        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             if (text == null) return;
-            builder.StartSection(TextSOS.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
 
-            builder.AddFullWidthText(RichString.Rich(text));
-
-            builder.EndSection();
+            using var l = new SectionLayout(contentPanel);
+            l.Header(TextSOS.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
+            l.RichText(RichString.Rich(text));
         }
     }
+
+    #endregion
 }

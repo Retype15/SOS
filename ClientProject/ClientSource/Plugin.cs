@@ -5,6 +5,7 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using System.Diagnostics;
 using Barotrauma;
 using Barotrauma.LuaCs;
 using Barotrauma.LuaCs.Events;
@@ -17,33 +18,40 @@ namespace SOS
     {
         private SOSController? controller;
 
+        [Conditional("CLIENT")]
         public void InitClient()
         {
-            controller = SOSController.Instance;
-            controller.LoadSettings();
-
-            if (!DebugConsole.commands.Exists(c => c.Names.ToString() == "sos")) // \\//
-                DebugConsole.commands.Add(new DebugConsole.Command(
-                    name: "sos",
-                    help: TextSOS.Get("sos.command.help", "Open/Close SOS.").Value,
-                    onExecute: _ => controller?.ToggleUI(),
-                    getValidArgs: null,
-                    isCheat: false
-                )
-                {
-                    RelayToServer = false,
-                    OnClientExecute = _ => controller?.ToggleUI()
-                });
-
-            LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
-
-            // Migration: old config file detected
-            if (File.Exists("Data/sossettings.xml"))
+            try
             {
-                controller.HaveOldConfigFile = true;
-            }
+                controller = SOSController.Instance;
+                controller.LoadSettings();
 
-            RLogger.Log(TextSOS.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
+                if (!DebugConsole.commands.Exists(c => c.Names.Any(n => n.Value == "sos")))
+                    DebugConsole.commands.Add(new DebugConsole.Command(
+                        name: "sos",
+                        help: TextSOS.Get("sos.command.help", "Open/Close SOS.").Value,
+                        onExecute: _ => controller?.ToggleUI(),
+                        getValidArgs: null,
+                        isCheat: false
+                    )
+                    {
+                        RelayToServer = false,
+                        OnClientExecute = _ => controller?.ToggleUI()
+                    });
+
+                LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
+
+                if (File.Exists("Data/sossettings.xml"))
+                {
+                    controller.HaveOldConfigFile = true;
+                }
+
+                RLogger.Log(TextSOS.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
+            }
+            catch (Exception ex)
+            {
+                RLogger.LogError($"[SOS] InitClient FAILED: {ex}");
+            }
         }
 
         public void OnKeyUpdate(double deltaTime)
@@ -51,6 +59,7 @@ namespace SOS
             controller?.Update();
         }
 
+        [Conditional("CLIENT")]
         public void DisposeClient()
         {
             LuaCsSetup.Instance.EventService.Unsubscribe<IEventKeyUpdate>(this);
@@ -59,6 +68,8 @@ namespace SOS
 
             controller?.SaveSettings();
             controller?.Destroy();
+            RecipeAnalyzer.Clear();
+            API.Clear();
             controller = null;
         }
     }

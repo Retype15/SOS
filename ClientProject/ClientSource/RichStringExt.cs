@@ -180,6 +180,11 @@ namespace SOS
         }
     }
 
+    internal static class TypeExt
+    {
+        internal static string FullOrName(this Type type) => type.FullName ?? type.Name;
+    }
+
     public static class IEnumerableExt
     {
         internal static string ToCsv<T>(this T collection) where T : IEnumerable<string>

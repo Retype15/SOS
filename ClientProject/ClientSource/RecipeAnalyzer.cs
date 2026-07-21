@@ -12,47 +12,11 @@ namespace SOS
     // MARK: RecipeAnalyzer
     public static class RecipeAnalyzer
     {
-        private static readonly Dictionary<Identifier, LinkedListNode<ItemAnalysis>> analysisCache = [];
-        private static readonly LinkedList<ItemAnalysis> lruList = new();
         private static readonly Dictionary<Identifier, List<(ItemPrefab Item, FabricationRecipe Recipe)>> usesCache = [];
         private static readonly Dictionary<Identifier, List<(ItemPrefab Item, DeconstructItem DeconstructItem)>> sourcesCache = [];
 
-        private const int MaxAnalysisCacheSize = 30;
-
-        public static ItemAnalysis? GetAnalysis(Prefab? item)
-        {
-            if (item == null) return null;
-
-            if (analysisCache.TryGetValue(item.Identifier, out var node))
-            {
-                lruList.Remove(node);
-                lruList.AddFirst(node);
-                return node.Value;
-            }
-
-            var analysis = new ItemAnalysis(item);
-
-            if (analysisCache.Count >= MaxAnalysisCacheSize)
-            {
-                var lastNode = lruList.Last;
-                if (lastNode != null)
-                {
-                    analysisCache.Remove(lastNode.Value.PrefabId);
-                    lruList.RemoveLast();
-                }
-            }
-
-            var newNode = new LinkedListNode<ItemAnalysis>(analysis);
-            lruList.AddFirst(newNode);
-            analysisCache[item.Identifier] = newNode;
-
-            return analysis;
-        }
-
         public static void Clear()
         {
-            analysisCache.Clear();
-            lruList.Clear();
             usesCache.Clear();
             sourcesCache.Clear();
         }

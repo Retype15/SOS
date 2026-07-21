@@ -808,24 +808,23 @@ namespace SOS
             };
 
             centerTabWidget?.UpdateTabs(targetItem, controller, OnPrimary, OnSecondary);
-
-            void onBadgeClick(string tag) { if (searchBox != null) searchBox.Text = tag; UpdateSearch(tag); }
-
-            var builder = new SectionBuilder
-            (
-                metaPanel,
-                onBadgeClick,
-                controller,
-                OnPrimary,
-                OnSecondary
-            );
-
-            var analysis = RecipeAnalyzer.GetAnalysis(targetItem);
-            if (analysis != null && analysis.Sections != null)
-                foreach (var section in analysis.Sections)
+            foreach (var section in API.CreateSections())
+            {
+                try
                 {
-                    section.Draw(builder);
+                    if (section.Analyze(targetItem))
+                    {
+                        section.Draw(metaPanel, OnPrimary, OnSecondary);
+                        RLogger.LogDebug($"Drawed {section.Id}", Color.YellowGreen);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    var type = section.GetType();
+                    RLogger.LogError($"[SOS.API] Exception has occurred on '{ex.TargetSite}' of type '{type.FullOrName()}'. Exception: {ex.Message}");
+                    continue;
+                }
+            }
 
             if (xmlContentText != null)
             {
@@ -1002,6 +1001,12 @@ namespace SOS
 
             GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, "XML Actions", null, [.. options]);
         }
+
+        internal void SetSearchFilter(string tag)
+        {
+            if (searchBox != null) searchBox.Text = tag;
+            UpdateSearch(tag);
+        }
     }
 
     public class GroupedSource
@@ -1024,7 +1029,7 @@ namespace SOS
 
     public class GUIDesplegableBox
     {
-        public GUIDesplegableBox(GUIComponent parent, Action<string> onBadgeClick, string labelText, IEnumerable<string> tags, IEnumerable<Prefab> items, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public GUIDesplegableBox(GUIComponent parent, Action<string> onBadgeClick, string labelText, IEnumerable<string> tags, IEnumerable<Prefab> items, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), parent.RectTransform) { MinSize = new Point(0, 24) }, style: null);
 
@@ -1042,7 +1047,7 @@ namespace SOS
 
             foreach (var item in items)
             {
-                bool isFav = controller.FavoritedItems.Contains(item.Identifier.Value);
+                bool isFav = SOSController.Instance.FavoritedItems.Contains(item.Identifier.Value);
                 string prefix = isFav ? " *" : "";
 
                 CardBuilder.DrawCompactItemRow(dropDown.ListBox.Content, item, 1, true, prefix, isFav ? Color.Gold : Color.White,
