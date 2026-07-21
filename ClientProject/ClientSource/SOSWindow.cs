@@ -89,9 +89,9 @@ namespace SOS
 
         private static readonly Dictionary<Identifier, string> itemSlotCache = [];
 
-        public SOSWindow(SOSController controller)
+        public SOSWindow()
         {
-            this.controller = controller;
+            this.controller = SOSController.Instance;
 
             mainFrame = new GUIResizableFrame(new RectTransform(new Vector2(0.95f, 0.9f), BGUI.Canvas, Anchor.TopLeft), style: "CircuitBoxFrame")
             {
@@ -807,7 +807,7 @@ namespace SOS
                 CanBeFocused = false
             };
 
-            centerTabWidget?.UpdateTabs(targetItem, controller, OnPrimary, OnSecondary);
+            centerTabWidget?.UpdateTabs(targetItem, OnPrimary, OnSecondary);
             foreach (var section in API.CreateSections())
             {
                 try

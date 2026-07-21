@@ -25,7 +25,7 @@ namespace SOS
             _container = new GUIFrame(new RectTransform(Vector2.One, parentContainer.RectTransform), style: null) { Visible = false };
         }
 
-        public void Activate(Prefab prefab, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public void Activate(Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             if (_container == null || prefab is not ItemPrefab item) return;
             _container.Visible = true;
@@ -70,6 +70,7 @@ namespace SOS
 
             // fill obtain
             var obtainGroups = new Dictionary<string, CardBuilder.UIMachineGroup>();
+            var controller = SOSController.Instance;
             foreach (var r in craft ?? [])
                 GetOrCreateMachineGroup(obtainGroups, r.SuitableFabricatorIdentifiers, TextSOS.Get("sos.recipe.hand", "Hand").Value)
                     .AddCard(new CardBuilder.CraftRecipeCard(r, item, controller, onPrimary, onSecondary));
@@ -333,11 +334,13 @@ namespace SOS
             }
         }
 
-        public void Activate(Prefab prefab, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public void Activate(Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             if (_container == null) return;
             CurrentPrefab = prefab;
             _onPrimary = onPrimary;
+
+            var controller = SOSController.Instance;
 
             if (ClinicalSimulatorManager.Patient == null || ClinicalSimulatorManager.Patient.Removed)
             {

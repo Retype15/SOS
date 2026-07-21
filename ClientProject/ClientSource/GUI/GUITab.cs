@@ -17,7 +17,7 @@ namespace SOS.GUI
         string TabTooltip => "";
         bool CanHandle(Prefab prefab);
         void Initialize(GUIComponent contentContainer);
-        void Activate(Prefab prefab, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
+        void Activate(Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
         void Deactivate();
 
         GUIButton CreateTabButton(string text, RectTransform parent, bool isActive, Action onClick)
@@ -46,7 +46,6 @@ namespace SOS.GUI
         private ITab? _activeTab;
 
         private Prefab? _currentTarget;
-        private SOSController? _controller;
         private Action<Prefab>? _onPrimary;
         private Action<Prefab>? _onSecondary;
 
@@ -81,10 +80,9 @@ namespace SOS.GUI
             tab.Initialize(_contentArea);
         }
 
-        public void UpdateTabs(Prefab target, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public void UpdateTabs(Prefab target, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             _currentTarget = target;
-            _controller = controller;
             _onPrimary = onPrimary;
             _onSecondary = onSecondary;
 
@@ -92,7 +90,7 @@ namespace SOS.GUI
             List<ITab> validTabs = [.. _tabs.Where(t => t.CanHandle(target))];
 
             ITab? resolved = null;
-            foreach (var uid in controller.TabHistory)
+            foreach (var uid in SOSController.Instance.TabHistory)
             {
                 resolved = validTabs.FirstOrDefault(t => t.GetType().Name == uid);
                 if (resolved != null) break;
@@ -136,23 +134,23 @@ namespace SOS.GUI
             if (_activeTab == tab) return;
             _activeTab = tab;
 
-            _controller?.PushTabHistory(tab.GetType().Name);
+            SOSController.Instance.PushTabHistory(tab.GetType().Name);
 
-            if (_currentTarget != null && _controller != null && _onPrimary != null && _onSecondary != null)
+            if (_currentTarget != null && _onPrimary != null && _onSecondary != null)
             {
-                UpdateTabs(_currentTarget, _controller, _onPrimary, _onSecondary);
+                UpdateTabs(_currentTarget, _onPrimary, _onSecondary);
             }
         }
 
         private void RefreshTabContent()
         {
-            if (_currentTarget == null || _controller == null || _onPrimary == null || _onSecondary == null) return;
+            if (_currentTarget == null || _onPrimary == null || _onSecondary == null) return;
 
             foreach (var tab in _tabs)
             {
                 if (tab == _activeTab)
                 {
-                    tab.Activate(_currentTarget, _controller, _onPrimary, _onSecondary);
+                    tab.Activate(_currentTarget, _onPrimary, _onSecondary);
                 }
                 else
                 {

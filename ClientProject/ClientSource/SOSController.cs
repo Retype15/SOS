@@ -105,14 +105,7 @@ namespace SOS
         public void AddFavorite(string id) { FavoritedItems.Add(id); }
         public void RemoveFavorite(string id) { FavoritedItems.Remove(id); }
 
-        public void SetSearchFilter(string tag)
-        {
-            if (mainWindow != null)
-            {
-                mainWindow.SetSearchFilter(tag);
-
-            }
-        }
+        public void SetSearchFilter(string tag) => mainWindow?.SetSearchFilter(tag);
 
         public void ToggleUI()
         {
@@ -135,7 +128,7 @@ namespace SOS
 
                 API.Initialize(Plugin.Instance.PluginManagementService);
 
-                mainWindow = new SOSWindow(this);
+                mainWindow = new SOSWindow();
 
                 if (!DataInitialized)
                 {
