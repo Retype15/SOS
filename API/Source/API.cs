@@ -19,7 +19,7 @@ namespace SOS
 {
     public static class API
     {
-        private static readonly SortedList<(int Order, string Id), Func<ISOSStatSection?>> _sectionFactories = [];
+        private static readonly SortedList<(double Order, string Id), Func<ISOSStatSection?>> _sectionFactories = [];
         private static readonly HashSet<string> _registeredIds = [];
 
         private static bool _scanned = false;
@@ -90,7 +90,7 @@ namespace SOS
                 }
 
                 string id = dummy.Id;
-                int order = dummy.Order;
+                double order = dummy.Order;
 
                 if (!_registeredIds.Add(id))
                 {
@@ -115,7 +115,7 @@ namespace SOS
             {
                 var section = obj.Cast<ISOSStatSection>();
                 string id = section.Id;
-                int order = section.Order;
+                double order = section.Order;
 
                 if (!_registeredIds.Add(id))
                 {

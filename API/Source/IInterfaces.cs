@@ -22,7 +22,7 @@ namespace SOS
 
     public interface ISOSStatSection : IIdentifier, IBaseStatSection
     {
-        int Order { get; }
+        double Order { get; }
     }
 }
 

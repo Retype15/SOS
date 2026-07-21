@@ -18,7 +18,7 @@ namespace SOS
     // MARK: General
     {
         private Prefab? prefab;
-        public int Order => 0;
+        public double Order => 0;
         public string Id => GetType().FullOrName();
 
         private string cargoBox = "";
@@ -128,7 +128,7 @@ namespace SOS
         private int minDifficulty;
         private Identifier requiredFaction = Identifier.Empty;
 
-        public int Order => 10;
+        public double Order => 10;
         public string Id => GetType().FullOrName();
 
         public bool Analyze(Prefab prefab)
@@ -202,7 +202,7 @@ namespace SOS
             public float Probability;
         }
 
-        public int Order => 20;
+        public double Order => 20;
         public string Id => GetType().FullOrName();
 
         public bool Analyze(Prefab prefab)
@@ -335,7 +335,7 @@ namespace SOS
         private bool deflectsProjectiles = false;
         private int durability = 0;
 
-        public int Order => 30;
+        public double Order => 30;
         public string Id => GetType().FullOrName();
 
         public bool Analyze(Prefab prefab)
@@ -448,7 +448,7 @@ namespace SOS
         private readonly Dictionary<string, (string Name, float Amount)> failureHeals = [];
         private readonly Dictionary<string, (string Name, float Amount)> failureCauses = [];
 
-        public int Order => 40;
+        public double Order => 40;
         public string Id => GetType().FullOrName();
 
         public bool Analyze(Prefab prefab)
@@ -581,7 +581,7 @@ namespace SOS
     {
         private readonly Dictionary<string, string> deviceProperties = [];
 
-        public int Order => 50;
+        public double Order => 50;
         public string Id => GetType().FullOrName();
 
         public bool Analyze(Prefab prefab)
@@ -627,7 +627,7 @@ namespace SOS
         private readonly List<string> spawnLocations = [];
         private List<Prefab> compatibleItems = [];
 
-        public int Order => 60;
+        public double Order => 60;
         public string Id => GetType().FullOrName();
 
         public bool Analyze(Prefab prefab)
@@ -725,7 +725,7 @@ namespace SOS
         private readonly List<PhaseData> phases = [];
         private readonly List<PhaseData> periodicPhases = [];
 
-        public int Order => 70;
+        public double Order => 70;
         public string Id => GetType().FullOrName();
 
         public bool Analyze(Prefab prefab)
@@ -944,7 +944,7 @@ namespace SOS
 
         private readonly List<string> blockers = [];
 
-        public int Order => 80;
+        public double Order => 80;
         public string Id => GetType().FullOrName();
 
         public bool Analyze(Prefab prefab)
@@ -1039,7 +1039,7 @@ namespace SOS
     public class DescriptionSection : ISOSStatSection
     {
         private string? text;
-        public int Order => 90;
+        public double Order => 90;
         public string Id => GetType().FullOrName();
 
         public bool Analyze(Prefab prefab)
