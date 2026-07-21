@@ -14,15 +14,19 @@ namespace SOS
         string Id => GetType().FullName ?? GetType().Name;
     }
 
+    public interface IOrdenable
+    {
+        double Order { get; }
+    }
+
+    public interface IIdentifierOrdenable : IIdentifier, IOrdenable;
+
     public interface IBaseStatSection
     {
         bool Analyze(Prefab item);
         void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
     }
 
-    public interface ISOSStatSection : IIdentifier, IBaseStatSection
-    {
-        double Order { get; }
-    }
+    public interface ISOSStatSection : IIdentifierOrdenable, IBaseStatSection;
 }
 

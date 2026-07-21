@@ -14,7 +14,7 @@ namespace SOS
     {
         private readonly Dictionary<MethodInfo, Func<object?[], object?>> _handlerMap = [];
 
-        private DuckProxy() { }
+        public DuckProxy() { }
 
         public static T Create(object target)
         {

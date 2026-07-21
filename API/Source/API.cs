@@ -6,7 +6,6 @@
 #pragma warning disable IDE0290
 
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Barotrauma;
 using Barotrauma.LuaCs;
@@ -19,8 +18,56 @@ namespace SOS
 {
     public static class API
     {
-        private static readonly SortedList<(double Order, string Id), Func<ISOSStatSection?>> _sectionFactories = [];
-        private static readonly HashSet<string> _registeredIds = [];
+
+        private static readonly SortedFactory<ISOSStatSection> _sectionFactories = new();
+
+        private sealed class SortedFactory<T> where T : IIdentifierOrdenable
+        {
+            private readonly Dictionary<string, (double Order, Func<T?> Factory)> _dict = [];
+            private (string Id, double Order, Func<T?> Factory)[] _cache = [];
+            private bool _isDirty = false;
+
+            public void Add(string id, double order, Func<T?> Factory)
+            {
+                _dict[id] = (order, Factory);
+                _isDirty = true;
+            }
+
+            public void Add(T instance)
+            {
+                _dict[instance.Id] = (instance.Order, () => instance);
+                _isDirty = true;
+            }
+
+            public bool Remove(string key)
+            {
+                var isSuccess = _dict.Remove(key);
+                if (isSuccess) _isDirty = true;
+                return isSuccess;
+            }
+
+            public (string Id, double Order, Func<T?> Factory)[] GetSorted()
+            {
+                if (_isDirty)
+                {
+                    _cache = [.. _dict
+                    .OrderBy(kvp => kvp.Value.Order)
+                    .ThenBy(kvp => kvp.Key)
+                    .Select(kvp => (kvp.Key, kvp.Value.Order, kvp.Value.Factory))];
+
+                    _isDirty = false;
+                }
+                return _cache;
+            }
+
+            public void Clear()
+            {
+                _dict.Clear();
+                _cache = [];
+                _isDirty = false;
+            }
+
+        }
 
         private static bool _scanned = false;
 
@@ -42,16 +89,19 @@ namespace SOS
 
         #region Lateral Sections
 
-        public static bool RegisterSection(object obj) => obj switch
+        public static bool RegisterSection(object obj)
         {
-            null => false,
-            Type type => RegisterType(type),
-            _ => RegisterInstance(obj)
-        };
-
+            bool isSuccess = obj switch
+            {
+                null => false,
+                Type type => RegisterType(type),
+                _ => RegisterInstance(obj)
+            };
+            return isSuccess;
+        }
         public static IEnumerable<ISOSStatSection> CreateSections()
         {
-            foreach (var (key, factory) in _sectionFactories)
+            foreach (var (key, _, factory) in _sectionFactories.GetSorted())
             {
                 ISOSStatSection? instance;
                 try
@@ -60,7 +110,7 @@ namespace SOS
                 }
                 catch (Exception ex)
                 {
-                    LogWarning($"[SOS.API] Failed to instantiate stat section of Id '{key.Id}'. Exception: {ex.Message}");
+                    LogWarning($"[SOS.API] Failed to instantiate stat section of Id '{key}'. \nException: {ex.Message}");
                     continue;
                 }
 
@@ -74,9 +124,7 @@ namespace SOS
 
         private static bool RegisterType(Type type)
         {
-            if (!type.IsAbstract && !type.IsInterface &&
-                type.GetConstructors(BindingFlags.Public | BindingFlags.Instance)
-                    .All(c => c.GetParameters().Length > 0))
+            if (type.IsAbstract || type.IsInterface || type.GetConstructor(Type.EmptyTypes) == null)
                 return false;
 
             try
@@ -92,19 +140,14 @@ namespace SOS
                 string id = dummy.Id;
                 double order = dummy.Order;
 
-                if (!_registeredIds.Add(id))
-                {
-                    LogWarning($"[SOS.API] Section ID '{id}' is already registered.");
-                    return false;
-                }
+                _sectionFactories.Add(id, order, () => Activator.CreateInstance(type)?.Cast<ISOSStatSection>());
 
-                _sectionFactories.Add((order, id), () => Activator.CreateInstance(type)?.Cast<ISOSStatSection>());
                 LogDebug($"Registered type: {type.FullName} [Order: {order}]", Color.Green);
                 return true;
             }
             catch (Exception ex)
             {
-                LogWarning($"[SOS.API] Failed to register type '{type.FullName}'. Type does not satisfy contract. Exception: {ex.Message}");
+                LogWarning($"[SOS.API] Failed to register type '{type.FullName}'. Type does not satisfy contract. \nException: {ex.Message}");
                 return false;
             }
         }
@@ -117,19 +160,13 @@ namespace SOS
                 string id = section.Id;
                 double order = section.Order;
 
-                if (!_registeredIds.Add(id))
-                {
-                    LogWarning($"[SOS.API] Section ID '{id}' is already registered.");
-                    return false;
-                }
-
-                _sectionFactories.Add((order, id), () => section);
+                _sectionFactories.Add(section);
                 LogDebug($"Registered instance: {id} [Order: {order}]", Color.Green);
                 return true;
             }
             catch (Exception ex)
             {
-                LogWarning($"[SOS.API] Failed to register instance from type '{obj.GetType()}'. Instance does not satisfy contract. Exception: {ex.Message}");
+                LogWarning($"[SOS.API] Failed to register instance from type '{obj.GetType()}'. Instance does not satisfy contract. \nException: {ex.Message}");
                 return false;
             }
         }
@@ -139,7 +176,6 @@ namespace SOS
         public static void Clear()
         {
             _sectionFactories.Clear();
-            _registeredIds.Clear();
             _scanned = false;
         }
 
