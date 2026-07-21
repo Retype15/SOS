@@ -42,6 +42,7 @@
 
   <Target Name="Deploy" AfterTargets="Build">
     <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFiles="$(ModDeployDir)bin\Shared\$(AssemblyName).dll" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFiles="$(RefsPath)\$(AssemblyName).dll" />
     <Copy SourceFiles="$(TargetDir)$(AssemblyName).deps.json" DestinationFiles="$(ModDeployDir)bin\Shared\$(AssemblyName).deps.json" />
   </Target>
 
