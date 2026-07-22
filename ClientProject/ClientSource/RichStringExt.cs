@@ -132,7 +132,7 @@ namespace SOS
     {
         public static string ToMeters(this float value) => (value / 10f).ToValue() + 'm';
         public static string ToValue(this float value) => value.ToString("0.###");
-        public static string ToSignedValue(this float value) => (value > 0) ? '+' + value.ToValue() : value.ToValue();
+        public static string ToSignedValue(this float value) => ((value > 0) ? '+' : (value < 0) ? '-' : ' ') + value.ToValue();
     }
 
     public static class PrefabExt
@@ -177,6 +177,25 @@ namespace SOS
                 AfflictionPrefab affliction => affliction.IconColors?.FirstOrDefault(Color.White),
                 _ => null
             } ?? Color.White;
+        }
+
+        public static PriceInfo? DefaultPrice(this Prefab prefab)
+        {
+            return prefab switch
+            {
+                ItemPrefab item => item.DefaultPrice,
+                _ => null
+            };
+        }
+
+        public static ContentXElement? ConfigElement(this Prefab prefab)
+        {
+            return prefab switch
+            {
+                ItemPrefab item => item.ConfigElement,
+                AfflictionPrefab affliction => affliction.configElement,
+                _ => null
+            };
         }
     }
 

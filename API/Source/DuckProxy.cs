@@ -10,6 +10,19 @@ using MoonSharp.Interpreter;
 
 namespace SOS
 {
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
+    public class FallbackMethodAttribute : Attribute
+    {
+        public Type HelperType { get; }
+        public string MethodName { get; }
+
+        public FallbackMethodAttribute(Type helperType, string methodName)
+        {
+            HelperType = helperType ?? throw new ArgumentNullException(nameof(helperType));
+            MethodName = methodName ?? throw new ArgumentNullException(nameof(methodName));
+        }
+    }
+
     public class DuckProxy<T> : DispatchProxy where T : class
     {
         private readonly Dictionary<MethodInfo, Func<object?[], object?>> _handlerMap = [];
@@ -67,7 +80,11 @@ namespace SOS
 
                 if (targetMethod == null)
                 {
-                    errors.Add($"Missing method or property: '{interfaceMethod.Name}'");
+                    if (TryResolveFallback(interfaceMethod, out var fallbackHandler))
+                        _handlerMap[interfaceMethod] = fallbackHandler!;
+                    else
+                        errors.Add($"Missing method or property: '{interfaceMethod.Name}'");
+
                     continue;
                 }
 
@@ -115,7 +132,11 @@ namespace SOS
 
                     if (table.Get(propName).IsNil())
                     {
-                        errors.Add($"Missing property '{propName}' in Lua table.");
+                        if (TryResolveFallback(interfaceMethod, out var fallbackHandler))
+                            _handlerMap[interfaceMethod] = fallbackHandler!;
+                        else
+                            errors.Add($"Missing property '{propName}' in Lua table.");
+
                         continue;
                     }
 
@@ -137,7 +158,11 @@ namespace SOS
 
                     if (luaFunc.Type != DataType.Function && luaFunc.Type != DataType.ClrFunction)
                     {
-                        errors.Add($"Missing function '{methodName}' in Lua table.");
+                        if (TryResolveFallback(interfaceMethod, out var fallbackHandler))
+                            _handlerMap[interfaceMethod] = fallbackHandler!;
+                        else
+                            errors.Add($"Missing function '{methodName}' in Lua table.");
+
                         continue;
                     }
 
@@ -163,6 +188,21 @@ namespace SOS
                 return handler(args ?? []);
 
             throw new NotImplementedException($"Operation '{targetMethod?.Name}' is not supported.");
+        }
+
+        private static bool TryResolveFallback(MethodInfo interfaceMethod, out Func<object?[], object?>? handler)
+        {
+            handler = null;
+            var fallbackAttr = interfaceMethod.GetCustomAttribute<FallbackMethodAttribute>();
+            if (fallbackAttr == null) return false;
+
+            var parameterTypes = interfaceMethod.GetParameters().Select(p => p.ParameterType).ToArray();
+            var staticFallbackMethod = fallbackAttr.HelperType.GetMethod(fallbackAttr.MethodName, parameterTypes);
+
+            if (staticFallbackMethod == null || !staticFallbackMethod.IsStatic) return false;
+
+            handler = args => staticFallbackMethod.Invoke(null, args);
+            return true;
         }
     }
 

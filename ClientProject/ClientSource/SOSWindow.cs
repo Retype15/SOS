@@ -285,8 +285,11 @@ namespace SOS
             detailsHeader.RectTransform.MaxSize = new Point(int.MaxValue, 65);
 
             centerTabWidget = new GUITabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform));
-            centerTabWidget.RegisterTab(new ItemCenterPanelTab());
-            centerTabWidget.RegisterTab(new AfflictionCenterPanelTab()); // Not compatible with scene transitions.
+            foreach (var tab in API.CreateTabs())
+            {
+                centerTabWidget.RegisterTab(tab);
+                //RLogger.LogDebug($"Drawed {tab.Id}", Color.LightYellow);
+            }
 
             rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), contentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
             {
@@ -781,14 +784,14 @@ namespace SOS
 
             detailsHeader.ClearChildren();
             var headerLayout = new GUILayoutGroup(new RectTransform(new Vector2(0.85f, 1f), detailsHeader.RectTransform, Anchor.CenterRight), isHorizontal: true) { AbsoluteSpacing = 15 };
-            Sprite? icon = PrefabAdapter.Icon(targetItem);
+            Sprite? icon = targetItem.Icon();
             if (icon != null)
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.15f, 0.9f), headerLayout.RectTransform, Anchor.CenterLeft), style: null)
                 {
                     OnDrawToolTip = component => component.ToolTip = CardBuilder.GetDetailedTooltip(targetItem)
                 };
-                _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = PrefabAdapter.IconColor(targetItem), CanBeFocused = false };
+                _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = targetItem.IconColor(), CanBeFocused = false };
             }
 
             var (headerName, headerColor) = targetItem.SafeName(Color.White);
@@ -834,7 +837,7 @@ namespace SOS
 
         private static string GetRawXMLSafe(Prefab item)
         {
-            var configElement = PrefabAdapter.ConfigElement(item);
+            var configElement = item.ConfigElement();
 
             if (configElement == null) return "<!-- No XML data found for this item -->";
 

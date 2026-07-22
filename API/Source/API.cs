@@ -20,6 +20,7 @@ namespace SOS
     {
 
         private static readonly SortedFactory<ISOSStatSection> _sectionFactories = new();
+        private static readonly SortedFactory<ISOSCenterTab> _tabFactories = new();
 
         private static bool _scanned = false;
 
@@ -166,6 +167,7 @@ namespace SOS
 
             LogDebug("INICIANDO DESDE SOS!!!", Color.Gold);
             _sectionFactories.AutoRegister(pluginManagementService);
+            _tabFactories.AutoRegister(pluginManagementService);
 
             _scanned = true;
         }
@@ -180,11 +182,16 @@ namespace SOS
 
         #region Tabs
 
+        public static bool RegisterTab(object obj) => _tabFactories.Register(obj);
+
+        public static IEnumerable<ISOSCenterTab> CreateTabs() => _tabFactories.Create();
+
         #endregion
 
         public static void Clear()
         {
             _sectionFactories.Clear();
+            _tabFactories.Clear();
             _scanned = false;
         }
 

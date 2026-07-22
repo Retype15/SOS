@@ -6,6 +6,7 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
+using Microsoft.Xna.Framework;
 
 namespace SOS
 {
@@ -28,5 +29,51 @@ namespace SOS
     }
 
     public interface ISOSStatSection : IIdentifierOrdenable, IBaseStatSection;
+
+    public interface ITab : IIdentifierOrdenable
+    {
+        string TabName { get; }
+        [FallbackMethod(typeof(TabDefaults), nameof(TabDefaults.ToolTip))]
+        string? ToolTip => null;
+        bool CanHandle(Prefab item);
+        void Initialize(GUIComponent contentContainer);
+        void Activate(Prefab item, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
+        void Deactivate();
+
+        [FallbackMethod(typeof(TabDefaults), nameof(TabDefaults.CreateTabButton))]
+        GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string? toolTip = null)
+        {
+            Vector2 textSize = GUIStyle.SmallFont.MeasureString(tabName);
+            int width = (int)textSize.X + 24;
+            var tabBtn = new GUIButton(new RectTransform(new Point(width, 32), parent) { IsFixedSize = true }, tabName, style: "MainMenuNotificationButton")
+            {
+                Selected = isActive,
+                OnClicked = (_, _) => { onClick(); return true; },
+            };
+            if (toolTip != null && toolTip.Length > 0)
+                tabBtn.ToolTip = toolTip;
+            return tabBtn;
+        }
+    }
+
+    public static class TabDefaults
+    {
+        public static string? ToolTip => null;
+        public static GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string? toolTip = null)
+        {
+            Vector2 textSize = GUIStyle.SmallFont.MeasureString(tabName);
+            int width = (int)textSize.X + 24;
+            var tabBtn = new GUIButton(new RectTransform(new Point(width, 32), parent) { IsFixedSize = true }, tabName, style: "MainMenuNotificationButton")
+            {
+                Selected = isActive,
+                OnClicked = (_, _) => { onClick(); return true; },
+            };
+            if (toolTip != null && toolTip.Length > 0)
+                tabBtn.ToolTip = toolTip;
+            return tabBtn;
+        }
+    }
+
+    public interface ISOSCenterTab : ITab;
 }
 

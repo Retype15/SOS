@@ -12,10 +12,11 @@ namespace SOS
 {
 
     // MARK: Item Recipes Tab
-    public class ItemCenterPanelTab : SOS.GUI.ITab
+    public class ItemCenterPanelTab : ISOSCenterTab
     {
+        public double Order => 0;
         public string TabName => TextSOS.Get("sos.tab.recipes", "RECIPES").Value;
-        public string TabTooltip => "sos.tab.recipes_tooltip";
+        public string ToolTip => TextSOS.Get("sos.tab.recipes_tooltip").Value;
         private GUIFrame? _container;
 
         public bool CanHandle(Prefab prefab) => prefab is ItemPrefab;
@@ -61,7 +62,7 @@ namespace SOS
                     if (machineIds.Any(id => id == "vendingmachine"))
                     {
                         value.IsVendingMachine = true;
-                        value.PriceString = (PrefabAdapter.DefaultPrice(item)?.Price ?? 0).ToString();
+                        value.PriceString = (item.defaultPrice?.Price ?? 0).ToString();
                     }
                     dict[key] = value;
                 }
@@ -116,13 +117,14 @@ namespace SOS
     }
 
     // MARK: - Clinic SIM
-    public class AfflictionCenterPanelTab : SOS.GUI.ITab
+    public class AfflictionCenterPanelTab : ISOSCenterTab
     {
         public const int MENU_WIDTH = 280;
         public const int MENU_HEIGHT = 220;
 
+        public double Order => 10;
         public string TabName => TextSOS.Get("sos.tab.simulator", "SIMULATOR").Value;
-        public string TabTooltip => "sos.tab.simulator_tooltip";
+        public string ToolTip => TextSOS.Get("sos.tab.simulator_tooltip").Value;
         private GUIFrame? _container;
         private static GUIComponent? activeAfflictionMenu;
         private static Prefab? CurrentPrefab;

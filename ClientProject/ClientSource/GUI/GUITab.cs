@@ -11,32 +11,6 @@ using Microsoft.Xna.Framework;
 namespace SOS.GUI
 {
 
-    public interface ITab
-    {
-        string TabName { get; }
-        string TabTooltip => "";
-        bool CanHandle(Prefab prefab);
-        void Initialize(GUIComponent contentContainer);
-        void Activate(Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
-        void Deactivate();
-
-        GUIButton CreateTabButton(string text, RectTransform parent, bool isActive, Action onClick)
-        {
-            Vector2 textSize = GUIStyle.SmallFont.MeasureString(text);
-            int width = (int)textSize.X + 24;
-
-            var tabBtn = new GUIButton(new RectTransform(new Point(width, 32), parent) { IsFixedSize = true }, text, style: "MainMenuNotificationButton") //MainMenuNotificationButton,
-            {
-                Selected = isActive,
-                ToolTip = TextSOS.Get(TabTooltip, TabTooltip.Length > 0 ? TabTooltip : ""),
-                OnClicked = (_, _) => { onClick(); return true; },
-            };
-            //tabBtn.ExBlink(3f, 0.5f, 1f, 0.5f).WaitFinish();
-
-            return tabBtn;
-        }
-    }
-
     public class GUITabWidget : GUIFrame
     {
         private readonly GUILayoutGroup _verticalLayout;
@@ -92,7 +66,7 @@ namespace SOS.GUI
             ITab? resolved = null;
             foreach (var uid in SOSController.Instance.TabHistory)
             {
-                resolved = validTabs.FirstOrDefault(t => t.GetType().Name == uid);
+                resolved = validTabs.FirstOrDefault(t => t.Id == uid);
                 if (resolved != null) break;
             }
 
@@ -113,7 +87,7 @@ namespace SOS.GUI
                 _contentArea.RectTransform.RelativeSize = new Vector2(1f, 0.92f);
                 foreach (var tab in validTabs)
                 {
-                    _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == _activeTab, () => SelectTab(tab));
+                    _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == _activeTab, () => SelectTab(tab), tab.ToolTip);
                 }
                 _buttonArea.RecalculateChildren();
             }
@@ -134,7 +108,7 @@ namespace SOS.GUI
             if (_activeTab == tab) return;
             _activeTab = tab;
 
-            SOSController.Instance.PushTabHistory(tab.GetType().Name);
+            SOSController.Instance.PushTabHistory(tab.Id);
 
             if (_currentTarget != null && _onPrimary != null && _onSecondary != null)
             {
