@@ -21,7 +21,9 @@ namespace SOS
 
         private static readonly SortedFactory<ISOSStatSection> _sectionFactories = new();
 
-        private sealed class SortedFactory<T> where T : IIdentifierOrdenable
+        private static bool _scanned = false;
+
+        private sealed class SortedFactory<T> where T : class, IIdentifierOrdenable
         {
             private readonly Dictionary<string, (double Order, Func<T?> Factory)> _dict = [];
             private (string Id, double Order, Func<T?> Factory)[] _cache = [];
@@ -46,6 +48,76 @@ namespace SOS
                 return isSuccess;
             }
 
+            public bool Register(object obj)
+            {
+                bool isSuccess = obj switch
+                {
+                    null => false,
+                    Type type => RegisterType(type),
+                    _ => RegisterInstance(obj)
+                };
+                return isSuccess;
+            }
+
+            private bool RegisterType(Type type)
+            {
+                if (type.IsAbstract || type.IsInterface || type.GetConstructor(Type.EmptyTypes) == null)
+                    return false;
+
+                try
+                {
+                    var dummy = Activator.CreateInstance(type)?.Cast<T>();
+
+                    if (dummy == null)
+                    {
+                        LogWarning($"[SOS.API] Failed to instantiate dummy for type '{type.FullName}' as '{typeof(T).Name}'.");
+                        return false;
+                    }
+
+                    string id = dummy.Id;
+                    double order = dummy.Order;
+
+                    Add(id, order, () => Activator.CreateInstance(type)?.Cast<T>());
+
+                    //LogDebug($"Registered type: {type.FullName} [Order: {order}]", Color.Green);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    LogWarning($"[SOS.API] Failed to register type '{type.FullName}' as '{typeof(T).Name}'. Type does not satisfy contract. \nException: {ex.Message}");
+                    return false;
+                }
+            }
+
+            private bool RegisterInstance(object obj)
+            {
+                try
+                {
+                    var section = obj.Cast<T>();
+                    Add(section);
+                    //LogDebug($"Registered instance: {section.Id} [Order: {section.Order}]", Color.Green);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    LogWarning($"[SOS.API] Failed to register instance from type '{obj.GetType()}' as '{typeof(T).Name}'. Instance does not satisfy contract. \nException: {ex.Message}");
+                    return false;
+                }
+            }
+
+            public bool AutoRegister(IPluginManagementService pluginManagementService)
+            {
+                var result = pluginManagementService.GetImplementingTypes<T>();
+
+                bool anySuccess = false;
+
+                if (result.IsSuccess)
+                    foreach (Type t in result.Value)
+                        anySuccess |= RegisterType(t);
+
+                return anySuccess;
+            }
+
             public (string Id, double Order, Func<T?> Factory)[] GetSorted()
             {
                 if (_isDirty)
@@ -60,116 +132,53 @@ namespace SOS
                 return _cache;
             }
 
+            public IEnumerable<T> Create()
+            {
+                foreach (var (Id, _, factory) in GetSorted())
+                {
+                    T? instance;
+                    try
+                    {
+                        instance = factory();
+                    }
+                    catch (Exception ex)
+                    {
+                        LogWarning($"[SOS.API] Failed to instantiate section '{typeof(T).Name}' of Id '{Id}'. \nException: {ex.Message}");
+                        continue;
+                    }
+
+                    if (instance != null)
+                        yield return instance;
+                }
+            }
+
             public void Clear()
             {
                 _dict.Clear();
                 _cache = [];
                 _isDirty = false;
             }
-
         }
-
-        private static bool _scanned = false;
 
         public static void Initialize(IPluginManagementService pluginManagementService)
         {
             if (_scanned) return;
 
-            //LogDebug("INICIANDO DESDE SOS!!!", Color.Gold);
+            LogDebug("INICIANDO DESDE SOS!!!", Color.Gold);
+            _sectionFactories.AutoRegister(pluginManagementService);
 
-            var result = pluginManagementService.GetImplementingTypes<ISOSStatSection>();
-
-            if (result.IsSuccess)
-            {
-                foreach (Type t in result.Value)
-                    RegisterType(t);
-            }
             _scanned = true;
         }
 
         #region Lateral Sections
 
-        public static bool RegisterSection(object obj)
-        {
-            bool isSuccess = obj switch
-            {
-                null => false,
-                Type type => RegisterType(type),
-                _ => RegisterInstance(obj)
-            };
-            return isSuccess;
-        }
-        public static IEnumerable<ISOSStatSection> CreateSections()
-        {
-            foreach (var (key, _, factory) in _sectionFactories.GetSorted())
-            {
-                ISOSStatSection? instance;
-                try
-                {
-                    instance = factory();
-                }
-                catch (Exception ex)
-                {
-                    LogWarning($"[SOS.API] Failed to instantiate stat section of Id '{key}'. \nException: {ex.Message}");
-                    continue;
-                }
+        public static bool RegisterSection(object obj) => _sectionFactories.Register(obj);
 
-                if (instance == null) continue;
+        public static IEnumerable<ISOSStatSection> CreateSections() => _sectionFactories.Create();
 
-                //LogWarning($"[SOS.API] Exception thrown during Analyze of Id '{key.Id}'. Exception: {ex.Message}");
+        #endregion
 
-                yield return instance;
-            }
-        }
-
-        private static bool RegisterType(Type type)
-        {
-            if (type.IsAbstract || type.IsInterface || type.GetConstructor(Type.EmptyTypes) == null)
-                return false;
-
-            try
-            {
-                var dummy = Activator.CreateInstance(type)?.Cast<ISOSStatSection>();
-
-                if (dummy == null)
-                {
-                    LogWarning($"[SOS.API] Failed to instantiate dummy for type '{type.FullName}'.");
-                    return false;
-                }
-
-                string id = dummy.Id;
-                double order = dummy.Order;
-
-                _sectionFactories.Add(id, order, () => Activator.CreateInstance(type)?.Cast<ISOSStatSection>());
-
-                LogDebug($"Registered type: {type.FullName} [Order: {order}]", Color.Green);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                LogWarning($"[SOS.API] Failed to register type '{type.FullName}'. Type does not satisfy contract. \nException: {ex.Message}");
-                return false;
-            }
-        }
-
-        private static bool RegisterInstance(object obj)
-        {
-            try
-            {
-                var section = obj.Cast<ISOSStatSection>();
-                string id = section.Id;
-                double order = section.Order;
-
-                _sectionFactories.Add(section);
-                LogDebug($"Registered instance: {id} [Order: {order}]", Color.Green);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                LogWarning($"[SOS.API] Failed to register instance from type '{obj.GetType()}'. Instance does not satisfy contract. \nException: {ex.Message}");
-                return false;
-            }
-        }
+        #region Tabs
 
         #endregion
 
