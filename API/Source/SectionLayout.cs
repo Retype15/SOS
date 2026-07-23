@@ -332,6 +332,8 @@ namespace SOS
             _currentGroup = null;
             GC.SuppressFinalize(this);
         }
+
+        ~SectionLayout() => Dispose();
     }
 }
 

@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework;
 
 [assembly: IgnoresAccessChecksTo("Barotrauma")]
 [assembly: IgnoresAccessChecksTo("BarotraumaCore")]
+[assembly: InternalsVisibleTo("SOS")]
 
 namespace SOS
 {
@@ -165,7 +166,7 @@ namespace SOS
             }
         }
 
-        public static void Initialize(IPluginManagementService pluginManagementService)
+        internal static void Initialize(IPluginManagementService pluginManagementService)
         {
             if (_scanned) return;
 
@@ -180,7 +181,7 @@ namespace SOS
 
         public static bool RegisterSection(object obj) => _sectionFactories.Register(obj);
 
-        public static IEnumerable<ISOSStatSection> CreateSections() => _sectionFactories.Create();
+        internal static IEnumerable<ISOSStatSection> CreateSections() => _sectionFactories.Create();
 
         #endregion
 
@@ -188,11 +189,11 @@ namespace SOS
 
         public static bool RegisterTab(object obj) => _tabFactories.Register(obj);
 
-        public static IEnumerable<ISOSCenterTab> CreateTabs() => _tabFactories.Create();
+        internal static IEnumerable<ISOSCenterTab> CreateTabs() => _tabFactories.Create();
 
         #endregion
 
-        public static void Clear()
+        internal static void Clear()
         {
             _sectionFactories.Clear();
             _tabFactories.Clear();

@@ -10,20 +10,43 @@ using MoonSharp.Interpreter;
 
 namespace SOS
 {
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
-    public class FallbackMethodAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Method | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+    public abstract class DefaultClassAttributeBase : Attribute
     {
-        public Type HelperType { get; }
-        public string MethodName { get; }
+        internal abstract Type HelperType { get; }
 
-        public FallbackMethodAttribute(Type helperType, string methodName)
+        internal MethodInfo? GetMethod(MethodInfo interfaceMethod)
         {
-            HelperType = helperType ?? throw new ArgumentNullException(nameof(helperType));
-            MethodName = methodName ?? throw new ArgumentNullException(nameof(methodName));
+            ArgumentNullException.ThrowIfNull(interfaceMethod);
+
+            var parameterTypes = interfaceMethod.GetParameters()
+                .Select(p => p.ParameterType)
+                .ToArray();
+
+            return HelperType.GetMethod(
+                interfaceMethod.Name,
+                BindingFlags.Public | BindingFlags.Static,
+                null,
+                parameterTypes,
+                null
+            );
         }
     }
 
-    public class DuckProxy<T> : DispatchProxy where T : class
+    public sealed class DefaultClassAttribute : DefaultClassAttributeBase
+    {
+        internal override Type HelperType { get; }
+
+        internal DefaultClassAttribute(Type helperType)
+            => HelperType = helperType ?? throw new ArgumentNullException(nameof(helperType));
+    }
+
+    public sealed class DefaultClassAttribute<THelper> : DefaultClassAttributeBase where THelper : class
+    {
+        internal override Type HelperType => typeof(THelper);
+    }
+
+    internal class DuckProxy<T> : DispatchProxy where T : class
     {
         private readonly Dictionary<MethodInfo, Func<object?[], object?>> _handlerMap = [];
 
@@ -94,17 +117,7 @@ namespace SOS
                     continue;
                 }
 
-                _handlerMap[interfaceMethod] = args =>
-                {
-                    try
-                    {
-                        return targetMethod.Invoke(target, args);
-                    }
-                    catch (TargetInvocationException ex)
-                    {
-                        throw ex.InnerException ?? ex;
-                    }
-                };
+                _handlerMap[interfaceMethod] = args => targetMethod.Invoke(target, args);
             }
 
             if (errors.Count > 0)
@@ -193,35 +206,41 @@ namespace SOS
         private static bool TryResolveFallback(MethodInfo interfaceMethod, out Func<object?[], object?>? handler)
         {
             handler = null;
-            var fallbackAttr = interfaceMethod.GetCustomAttribute<FallbackMethodAttribute>();
+            var fallbackAttr = interfaceMethod.GetCustomAttribute<DefaultClassAttributeBase>();
 
             if (fallbackAttr == null)
-
             {
                 var declaringType = interfaceMethod.DeclaringType;
                 if (declaringType != null)
                 {
                     var property = declaringType.GetProperties()
                         .FirstOrDefault(p => p.GetMethod == interfaceMethod);
-                    fallbackAttr = property?.GetCustomAttribute<FallbackMethodAttribute>();
+                    fallbackAttr = property?.GetCustomAttribute<DefaultClassAttributeBase>();
+                }
+            }
+
+            if (fallbackAttr == null)
+            {
+                var declaringType = interfaceMethod.DeclaringType;
+                if (declaringType != null)
+                {
+                    fallbackAttr = declaringType.GetCustomAttribute<DefaultClassAttributeBase>(inherit: true);
                 }
             }
 
             if (fallbackAttr == null) return false;
 
-            var parameterTypes = interfaceMethod.GetParameters().Select(p => p.ParameterType).ToArray();
-            var staticFallbackMethod = fallbackAttr.HelperType.GetMethod(fallbackAttr.MethodName, parameterTypes);
-
-            if (staticFallbackMethod == null || !staticFallbackMethod.IsStatic) return false;
+            var staticFallbackMethod = fallbackAttr.GetMethod(interfaceMethod);
+            if (staticFallbackMethod == null) return false;
 
             handler = args => staticFallbackMethod.Invoke(null, args);
             return true;
         }
     }
 
-    public static class DuckExtensions
+    internal static class DuckExtensions
     {
-        public static T Cast<T>(this object target) where T : class
+        internal static T Cast<T>(this object target) where T : class
         {
             ArgumentNullException.ThrowIfNull(target);
 
@@ -232,7 +251,7 @@ namespace SOS
             return proxy;
         }
 
-        public static bool TryCast<T>(this object target, out T a) where T : class
+        internal static bool TryCast<T>(this object target, out T a) where T : class
         {
             try
             {
