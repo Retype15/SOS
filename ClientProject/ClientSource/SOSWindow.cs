@@ -479,7 +479,7 @@ namespace SOS
         {
             ClinicalSimulatorManager.Destroy();
 
-            centerTabWidget?.Clear();
+            centerTabWidget?.Dispose();
             centerTabWidget = null;
 
             activeDropdowns.Clear();
@@ -826,6 +826,10 @@ namespace SOS
                     var type = section.GetType();
                     RLogger.LogError($"[SOS.API] Exception has occurred on '{ex.TargetSite}' of type '{type.FullOrName()}'. Exception: {ex.Message}");
                     continue;
+                }
+                finally
+                {
+                    if (section is IDisposable d) d.Dispose();
                 }
             }
 

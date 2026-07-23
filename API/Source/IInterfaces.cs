@@ -36,9 +36,9 @@ namespace SOS
         [FallbackMethod(typeof(TabDefaults), nameof(TabDefaults.ToolTip))]
         string? ToolTip => null;
         bool CanHandle(Prefab item);
-        void Initialize(GUIComponent contentContainer);
-        void Activate(Prefab item, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
-        void Deactivate();
+        void Init(GUIComponent contentContainer);
+        void Show(Prefab item, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
+        void Hide();
 
         [FallbackMethod(typeof(TabDefaults), nameof(TabDefaults.CreateTabButton))]
         GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string? toolTip = null)

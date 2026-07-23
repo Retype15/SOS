@@ -11,11 +11,8 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
-    public class GeneralSection : ISOSStatSection
-
-    #region Sections
-
     // MARK: General
+    public class GeneralSection : ISOSStatSection
     {
         private Prefab? prefab;
         public double Order => 0;
@@ -1062,6 +1059,4 @@ namespace SOS
             l.RichText(RichString.Rich(text));
         }
     }
-
-    #endregion
 }

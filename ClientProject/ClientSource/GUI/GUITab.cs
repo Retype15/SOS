@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 namespace SOS.GUI
 {
 
-    public class GUITabWidget : GUIFrame
+    public class GUITabWidget : GUIFrame, IDisposable
     {
         private readonly GUILayoutGroup _verticalLayout;
         private readonly GUIListBox _buttonArea;
@@ -51,7 +51,7 @@ namespace SOS.GUI
         public void RegisterTab(ITab tab)
         {
             _tabs.Add(tab);
-            tab.Initialize(_contentArea);
+            tab.Init(_contentArea);
         }
 
         public void UpdateTabs(Prefab target, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
@@ -124,21 +124,24 @@ namespace SOS.GUI
             {
                 if (tab == _activeTab)
                 {
-                    tab.Activate(_currentTarget, _onPrimary, _onSecondary);
+                    tab.Show(_currentTarget, _onPrimary, _onSecondary);
                 }
                 else
                 {
-                    tab.Deactivate();
+                    tab.Hide();
                 }
             }
         }
 
-        public void Clear()
+        public void Dispose()
         {
-            _activeTab = null;
-            _currentTarget = null;
             _buttonArea.Content.ClearChildren();
-            foreach (var tab in _tabs) tab.Deactivate();
+            foreach (var tab in _tabs)
+                if (tab is IDisposable d) d.Dispose();
+            _tabs.Clear();
+            GC.SuppressFinalize(this);
         }
+
+        ~GUITabWidget() => Dispose();
     }
 }
