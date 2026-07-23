@@ -10,6 +10,17 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
+    #region AutoRegister
+
+    public interface IAutoRegister;
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class AutoRegisterAttribute : Attribute;
+
+    #endregion
+
+    #region Interfaces
+
     public interface IIdentifier
     {
         string Id => GetType().FullName ?? GetType().Name;
@@ -28,20 +39,18 @@ namespace SOS
         void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
     }
 
-    public interface ISOSStatSection : IIdentifierOrdenable, IBaseStatSection;
-
     public interface ITab : IIdentifierOrdenable
     {
         string TabName { get; }
         [FallbackMethod(typeof(TabDefaults), nameof(TabDefaults.ToolTip))]
-        string? ToolTip => null;
+        string ToolTip => "";
         bool CanHandle(Prefab item);
         void Init(GUIComponent contentContainer);
         void Show(Prefab item, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
         void Hide();
 
         [FallbackMethod(typeof(TabDefaults), nameof(TabDefaults.CreateTabButton))]
-        GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string? toolTip = null)
+        GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string toolTip = "")
         {
             Vector2 textSize = GUIStyle.SmallFont.MeasureString(tabName);
             int width = (int)textSize.X + 24;
@@ -50,15 +59,24 @@ namespace SOS
                 Selected = isActive,
                 OnClicked = (_, _) => { onClick(); return true; },
             };
-            if (toolTip != null && toolTip.Length > 0)
+            if (toolTip.IsNullOrEmpty())
                 tabBtn.ToolTip = toolTip;
             return tabBtn;
         }
     }
 
+    public interface ISOSStatSection : IIdentifierOrdenable, IBaseStatSection;
+
+
+    public interface ISOSCenterTab : ITab;
+
+    #endregion
+
+    #region DEFAULT PROXY CLASSES
+
     public static class TabDefaults
     {
-        public static string? ToolTip => null;
+        public static string ToolTip => "";
         public static GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string? toolTip = null)
         {
             Vector2 textSize = GUIStyle.SmallFont.MeasureString(tabName);
@@ -74,6 +92,6 @@ namespace SOS
         }
     }
 
-    public interface ISOSCenterTab : ITab;
+    #endregion
 }
 

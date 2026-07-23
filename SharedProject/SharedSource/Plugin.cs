@@ -68,7 +68,7 @@ namespace SOS
         }
     }
 
-    public static class TextSOS
+    internal static class TextSOS
     {
         private static readonly Dictionary<string, Dictionary<Identifier, string>> prefixCache = [];
         public static LocalizedString Get(string key, string fallback = "")
@@ -100,7 +100,7 @@ namespace SOS
         }
     }
 
-    public static class RLogger
+    internal static class RLogger
     {
         [Conditional("DEBUG")]
         public static void LogDebug(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.SkyBlue);

@@ -194,6 +194,19 @@ namespace SOS
         {
             handler = null;
             var fallbackAttr = interfaceMethod.GetCustomAttribute<FallbackMethodAttribute>();
+
+            if (fallbackAttr == null)
+
+            {
+                var declaringType = interfaceMethod.DeclaringType;
+                if (declaringType != null)
+                {
+                    var property = declaringType.GetProperties()
+                        .FirstOrDefault(p => p.GetMethod == interfaceMethod);
+                    fallbackAttr = property?.GetCustomAttribute<FallbackMethodAttribute>();
+                }
+            }
+
             if (fallbackAttr == null) return false;
 
             var parameterTypes = interfaceMethod.GetParameters().Select(p => p.ParameterType).ToArray();

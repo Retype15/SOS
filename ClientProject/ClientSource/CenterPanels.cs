@@ -10,9 +10,10 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
+    internal interface ISOSCenterTabAuto : ISOSCenterTab, IAutoRegister;
 
     // MARK: Item Recipes Tab
-    public class ItemCenterPanelTab : ISOSCenterTab, IDisposable
+    public class ItemCenterPanelTab : ISOSCenterTabAuto, IDisposable
     {
         public double Order => 0;
         public string TabName => TextSOS.Get("sos.tab.recipes", "RECIPES").Value;
@@ -128,6 +129,7 @@ namespace SOS
     }
 
     // MARK: - Clinic SIM
+    [AutoRegister]
     public class AfflictionCenterPanelTab : ISOSCenterTab, IDisposable
     {
         public const int MENU_WIDTH = 280;
@@ -135,7 +137,7 @@ namespace SOS
 
         public double Order => 10;
         public string TabName => TextSOS.Get("sos.tab.simulator", "SIMULATOR").Value;
-        public string? ToolTip => TextSOS.Get("sos.tab.simulator_tooltip").Value;
+        public string ToolTip => TextSOS.Get("sos.tab.simulator_tooltip").Value;
         private GUIFrame? _container;
         private static GUIComponent? activeAfflictionMenu;
         private static Prefab? CurrentPrefab;
@@ -456,7 +458,6 @@ namespace SOS
         public void Dispose()
         {
             _container?.Parent?.RemoveChild(_container);
-            ClinicalSimulatorManager.DiscardPatient();
             activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu);
             activeAfflictionMenu = null;
             GC.SuppressFinalize(this);

@@ -6,6 +6,7 @@
 #pragma warning disable IDE0290
 
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Barotrauma;
 using Barotrauma.LuaCs;
@@ -106,18 +107,21 @@ namespace SOS
                 }
             }
 
-            public bool AutoRegister(IPluginManagementService pluginManagementService)
+            public bool AutoRegister<TAuto>(IPluginManagementService pluginManagementService) where TAuto : T
             {
-                var result = pluginManagementService.GetImplementingTypes<T>();
+                var result = pluginManagementService.GetImplementingTypes<TAuto>();
 
                 bool anySuccess = false;
 
                 if (result.IsSuccess)
                     foreach (Type t in result.Value)
-                        anySuccess |= RegisterType(t);
+                        if (typeof(IAutoRegister).IsAssignableFrom(t) || t.GetCustomAttribute<AutoRegisterAttribute>() != null)
+                            anySuccess |= RegisterType(t);
 
                 return anySuccess;
             }
+
+            public bool AutoRegister(IPluginManagementService pluginManagementService) => AutoRegister<T>(pluginManagementService);
 
             public (string Id, double Order, Func<T?> Factory)[] GetSorted()
             {
