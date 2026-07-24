@@ -28,7 +28,7 @@ namespace SOS
                 if (!DebugConsole.commands.Exists(c => c.Names.Any(n => n.Value == "sos")))
                     DebugConsole.commands.Add(new DebugConsole.Command(
                         name: "sos",
-                        help: TextSOS.Get("sos.command.help", "Open/Close SOS.").Value,
+                        help: Texts.Get("sos.command.help", "Open/Close SOS.").Value,
                         onExecute: _ => controller?.ToggleUI(),
                         getValidArgs: null,
                         isCheat: false
@@ -45,11 +45,11 @@ namespace SOS
                     controller.HaveOldConfigFile = true;
                 }
 
-                RLogger.Log(TextSOS.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
+                Logger.Log(Texts.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
             }
             catch (Exception ex)
             {
-                RLogger.LogError($"[SOS] InitClient FAILED: {ex}");
+                Logger.LogError($"[SOS] InitClient FAILED: {ex}");
             }
         }
 

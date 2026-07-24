@@ -227,11 +227,11 @@ namespace SOS
             {
                 int tier = deathCount / 10;
                 if (tier == 0) tier = 1;
-                nameTemplate = TextSOS.Get($"sos.dummyname.rand.{tier}", $"Dummy Subject #[id]").Value;
+                nameTemplate = Texts.Get($"sos.dummyname.rand.{tier}", $"Dummy Subject #[id]").Value;
             }
             else
             {
-                var randomNames = TextSOS.GetTranslationsByPrefix("sos.dummyname.rand.").Values.ToImmutableArray();
+                var randomNames = Texts.GetTranslationsByPrefix("sos.dummyname.rand.").Values.ToImmutableArray();
                 if (randomNames.Length > 0)
                     nameTemplate = randomNames[Rand.Range(0, randomNames.Length)];
                 else
@@ -239,7 +239,7 @@ namespace SOS
             }
 
             string finalName = nameTemplate.Replace("[id]", deathCount.ToString());
-            RLogger.LogDebug("[SOS] Assigning Subject Identity: " + finalName);
+            Logger.LogDebug("[SOS] Assigning Subject Identity: " + finalName);
             info.Name = finalName;
             info.OriginalName = finalName;
         }
@@ -553,7 +553,7 @@ namespace SOS
                 }
                 catch (System.Exception e)
                 {
-                    RLogger.LogWarning($"[SOS] Safety warning during native window rescue: {e.Message}");
+                    Logger.LogWarning($"[SOS] Safety warning during native window rescue: {e.Message}");
                 }
                 finally
                 {

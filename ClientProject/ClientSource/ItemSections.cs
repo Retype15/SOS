@@ -44,8 +44,8 @@ namespace SOS
                         foreach (var child in item.ConfigElement.Descendants())
                         {
                             string n = child.Name.ToString().ToLowerInvariant();
-                            if (n == "fire") hazards.Add(TextSOS.Get("sos.item.causes_fire", "Causes Fire").Value);
-                            if (n == "statuseffect" && child.GetAttributeFloat("oxygen", 0f) < -100f) hazards.Add(TextSOS.Get("sos.item.drains_oxygen", "Drains Oxygen").Value);
+                            if (n == "fire") hazards.Add(Texts.Get("sos.item.causes_fire", "Causes Fire").Value);
+                            if (n == "statuseffect" && child.GetAttributeFloat("oxygen", 0f) < -100f) hazards.Add(Texts.Get("sos.item.drains_oxygen", "Drains Oxygen").Value);
                         }
                     }
                     break;
@@ -76,21 +76,21 @@ namespace SOS
             if (prefab == null) return;
 
             using var l = new SectionLayout(contentPanel);
-            l.Header(TextSOS.Get("sos.window.section_general", "GENERAL").Value, Color.Gold);
+            l.Header(Texts.Get("sos.window.section_general", "GENERAL").Value, Color.Gold);
 
-            l.BadgeRow(TextSOS.Get("sos.item.id", "ID:").Value, [prefab.Identifier.Value], filterPrefix: '!', onSearchFilter: SOSController.Instance.SetSearchFilter);
+            l.BadgeRow(Texts.Get("sos.item.id", "ID:").Value, [prefab.Identifier.Value], filterPrefix: '!', onSearchFilter: SOSController.Instance.SetSearchFilter);
 
             string modName = prefab.ContentPackage?.Name ?? "Vanilla";
             l.BadgeRow("Mod:", [modName], filterPrefix: '@', onSearchFilter: SOSController.Instance.SetSearchFilter);
 
             if (prefab is ItemPrefab item)
             {
-                if (!item.Aliases.IsEmpty) l.BadgeRow(TextSOS.Get("sos.item.aliases", "Aliases:").Value, item.Aliases, onSearchFilter: SOSController.Instance.SetSearchFilter);
-                l.BadgeRow(TextSOS.Get("sos.item.category", "Category:").Value, item.Category.ToString().Split(','), filterPrefix: '#', onSearchFilter: SOSController.Instance.SetSearchFilter);
-                if (!string.IsNullOrEmpty(cargoBox)) l.SelectorRow(TextSOS.Get("sos.item.cargo_box", "Cargo Box:").Value, [cargoBox], onPrimary: onPrimary, onSecondary: onSecondary, onSearchFilter: SOSController.Instance.SetSearchFilter);
-                l.Row(TextSOS.Get("sos.item.max_stack", "Max Stack:").Value, item.MaxStackSize.ToString(), Color.White);
-                if (hazards.Count > 0) l.BadgeRow(TextSOS.Get("sos.item.hazards", "Hazards:").Value, hazards, onSearchFilter: SOSController.Instance.SetSearchFilter);
-                l.BadgeRow(TextSOS.Get("sos.item.tags", "TAGS:").Value, item.Tags.Select(t => t.Value), filterPrefix: '$', onSearchFilter: SOSController.Instance.SetSearchFilter);
+                if (!item.Aliases.IsEmpty) l.BadgeRow(Texts.Get("sos.item.aliases", "Aliases:").Value, item.Aliases, onSearchFilter: SOSController.Instance.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.item.category", "Category:").Value, item.Category.ToString().Split(','), filterPrefix: '#', onSearchFilter: SOSController.Instance.SetSearchFilter);
+                if (!string.IsNullOrEmpty(cargoBox)) l.SelectorRow(Texts.Get("sos.item.cargo_box", "Cargo Box:").Value, [cargoBox], onPrimary: onPrimary, onSecondary: onSecondary, onSearchFilter: SOSController.Instance.SetSearchFilter);
+                l.Row(Texts.Get("sos.item.max_stack", "Max Stack:").Value, item.MaxStackSize.ToString(), Color.White);
+                if (hazards.Count > 0) l.BadgeRow(Texts.Get("sos.item.hazards", "Hazards:").Value, hazards, onSearchFilter: SOSController.Instance.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.item.tags", "TAGS:").Value, item.Tags.Select(t => t.Value), filterPrefix: '$', onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
             else if (prefab is AfflictionPrefab aff)
             {
@@ -148,25 +148,25 @@ namespace SOS
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             using var l = new SectionLayout(contentPanel);
-            l.Header(TextSOS.Get("sos.window.section_economy", "ECONOMY").Value, Color.Gold);
+            l.Header(Texts.Get("sos.window.section_economy", "ECONOMY").Value, Color.Gold);
 
-            l.Row(TextSOS.Get("sos.item.base_price", "Base Price:").Value, $"{price} mk", Color.Yellow);
+            l.Row(Texts.Get("sos.item.base_price", "Base Price:").Value, $"{price} mk", Color.Yellow);
 
-            string yes = TextSOS.Get("sos.gen.yes", "Yes").Value;
-            string no = TextSOS.Get("sos.gen.no", "No").Value;
+            string yes = Texts.Get("sos.gen.yes", "Yes").Value;
+            string no = Texts.Get("sos.gen.no", "No").Value;
 
-            l.Row(TextSOS.Get("sos.item.can_buy", "Can be Bought:").Value, canBuy ? yes : no,
+            l.Row(Texts.Get("sos.item.can_buy", "Can be Bought:").Value, canBuy ? yes : no,
                 canBuy ? Color.LightGreen : Color.Salmon);
 
-            l.Row(TextSOS.Get("sos.item.can_sell", "Can be Sold:").Value, canSell ? yes : no, canSell ? Color.LightGreen : Color.Salmon);
+            l.Row(Texts.Get("sos.item.can_sell", "Can be Sold:").Value, canSell ? yes : no, canSell ? Color.LightGreen : Color.Salmon);
 
             if (minDifficulty > 0)
-                l.Row(TextSOS.Get("sos.item.min_difficulty", "Min. Difficulty:").Value, minDifficulty.ToString(), Color.White);
+                l.Row(Texts.Get("sos.item.min_difficulty", "Min. Difficulty:").Value, minDifficulty.ToString(), Color.White);
 
             if (requiredFaction != Identifier.Empty)
             {
                 string factionName = TextManager.Get("FactionName." + requiredFaction).Fallback(requiredFaction.Value).Value;
-                l.BadgeRow(TextSOS.Get("sos.item.required_faction", "Required Faction:").Value, [factionName], onSearchFilter: SOSController.Instance.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.item.required_faction", "Required Faction:").Value, [factionName], onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
         }
     }
@@ -291,7 +291,7 @@ namespace SOS
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             using var l = new SectionLayout(contentPanel);
-            l.Header(TextSOS.Get("sos.window.section_weapon", "COMBAT STATS").Value, Color.Gold);
+            l.Header(Texts.Get("sos.window.section_weapon", "COMBAT STATS").Value, Color.Gold);
 
             if (reload > 0) l.Row(isAutomatic ? "Fire Rate:" : "Reload:", $"{reload}s", Color.Cyan);
             if (powerUse > 0) l.Row("Power Use:", $"{powerUse}kW", Color.Orange);
@@ -396,16 +396,16 @@ namespace SOS
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             using var l = new SectionLayout(contentPanel);
-            l.Header(TextSOS.Get("sos.window.section_equipment", "AS EQUIPMENT").Value, Color.Gold);
+            l.Header(Texts.Get("sos.window.section_equipment", "AS EQUIPMENT").Value, Color.Gold);
 
             if (durability > 0)
-                l.Row(TextSOS.Get("sos.equip.max_durability", "Max Durability:").Value, durability.ToString(), Color.White);
+                l.Row(Texts.Get("sos.equip.max_durability", "Max Durability:").Value, durability.ToString(), Color.White);
 
             if (maxPressure > 0)
-                l.Row(TextSOS.Get("sos.equip.pressure_protection", "Pressure Protection:").Value, maxPressure.ToMeters(), Color.DeepSkyBlue);
+                l.Row(Texts.Get("sos.equip.pressure_protection", "Pressure Protection:").Value, maxPressure.ToMeters(), Color.DeepSkyBlue);
 
             if (deflectsProjectiles)
-                l.Row(TextSOS.Get("sos.equip.armor_special", "Armor Special:").Value, TextSOS.Get("sos.equip.deflect_projectiles", "Deflects Projectiles").Value, Color.LightGray);
+                l.Row(Texts.Get("sos.equip.armor_special", "Armor Special:").Value, Texts.Get("sos.equip.deflect_projectiles", "Deflects Projectiles").Value, Color.LightGray);
 
             foreach (var mod in statModifiers.Distinct())
             {
@@ -425,7 +425,7 @@ namespace SOS
                     .SelectMany(s => s.Split([',', ' '], StringSplitOptions.RemoveEmptyEntries))
                     .Distinct();
 
-                l.BadgeRow(TextSOS.Get("sos.equip.equips_in", "Equips In:").Value, uniqueSlots, filterPrefix: '&', onSearchFilter: SOSController.Instance.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.equip.equips_in", "Equips In:").Value, uniqueSlots, filterPrefix: '&', onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
         }
     }
@@ -533,15 +533,15 @@ namespace SOS
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             using var l = new SectionLayout(contentPanel);
-            l.Header(TextSOS.Get("sos.window.section_medical", "MEDICAL").Value, Color.Gold);
+            l.Header(Texts.Get("sos.window.section_medical", "MEDICAL").Value, Color.Gold);
 
             if (medicalSkillReq > 0)
-                l.BadgeRow(TextSOS.Get("sos.med.skill_req", "Medical Skill Req:").Value, [medicalSkillReq.ToString()], ["medical " + medicalSkillReq.ToString()], linkColor: Color.Orange, onSearchFilter: SOSController.Instance.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.med.skill_req", "Medical Skill Req:").Value, [medicalSkillReq.ToString()], ["medical " + medicalSkillReq.ToString()], linkColor: Color.Orange, onSearchFilter: SOSController.Instance.SetSearchFilter);
 
             if (suitableTreatments.Count > 0)
             {
                 l.BadgeRow(
-                    TextSOS.Get("sos.med.suitable", "Recommended:").Value,
+                    Texts.Get("sos.med.suitable", "Recommended:").Value,
                     suitableTreatments.Select(t => t.Identifier),
                     suitableTreatments.Select(t => t.DisplayName),
                     linkColor: Color.LightSkyBlue,
@@ -559,14 +559,14 @@ namespace SOS
                 l.BadgeRow(label, ids, displayNames, linkColor: linkColor, onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
 
-            DrawHyperlinkEffect(TextSOS.Get("sos.med.always_heals", "Always Heals:").Value, alwaysHeals, Color.LightGreen);
-            DrawHyperlinkEffect(TextSOS.Get("sos.med.always_causes", "Always Applies:").Value, alwaysCauses, Color.Salmon);
+            DrawHyperlinkEffect(Texts.Get("sos.med.always_heals", "Always Heals:").Value, alwaysHeals, Color.LightGreen);
+            DrawHyperlinkEffect(Texts.Get("sos.med.always_causes", "Always Applies:").Value, alwaysCauses, Color.Salmon);
 
-            DrawHyperlinkEffect(TextSOS.Get("sos.med.success_heals", "On Success Heals:").Value, successHeals, Color.LightGreen);
-            DrawHyperlinkEffect(TextSOS.Get("sos.med.success_causes", "On Success Applies:").Value, successCauses, Color.Salmon);
+            DrawHyperlinkEffect(Texts.Get("sos.med.success_heals", "On Success Heals:").Value, successHeals, Color.LightGreen);
+            DrawHyperlinkEffect(Texts.Get("sos.med.success_causes", "On Success Applies:").Value, successCauses, Color.Salmon);
 
-            DrawHyperlinkEffect(TextSOS.Get("sos.med.failure_heals", "On Failure Heals:").Value, failureHeals, Color.DarkSeaGreen);
-            DrawHyperlinkEffect(TextSOS.Get("sos.med.failure_causes", "On Failure Applies:").Value, failureCauses, Color.Crimson);
+            DrawHyperlinkEffect(Texts.Get("sos.med.failure_heals", "On Failure Heals:").Value, failureHeals, Color.DarkSeaGreen);
+            DrawHyperlinkEffect(Texts.Get("sos.med.failure_causes", "On Failure Applies:").Value, failureCauses, Color.Crimson);
         }
     }
 
@@ -587,16 +587,16 @@ namespace SOS
                     string n = child.Name.ToString().ToLowerInvariant();
 
                     if (n == "wificomponent" && child.GetAttribute("range") != null)
-                        deviceProperties[TextSOS.Get("sos.util.radio_range", "Radio Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
+                        deviceProperties[Texts.Get("sos.util.radio_range", "Radio Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
 
                     if (n == "lightcomponent" && child.GetAttribute("range") != null)
-                        deviceProperties[TextSOS.Get("sos.util.light_range", "Light Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
+                        deviceProperties[Texts.Get("sos.util.light_range", "Light Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
 
                     if (n == "pump" && child.GetAttribute("maxflow") != null)
-                        deviceProperties[TextSOS.Get("sos.util.pump_flow", "Pump Max Flow").Value] = child.GetAttributeFloat("maxflow", 0).ToMeters();
+                        deviceProperties[Texts.Get("sos.util.pump_flow", "Pump Max Flow").Value] = child.GetAttributeFloat("maxflow", 0).ToMeters();
 
                     if (n == "sonar" && child.GetAttribute("range") != null)
-                        deviceProperties[TextSOS.Get("sos.util.sonar_range", "Sonar Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
+                        deviceProperties[Texts.Get("sos.util.sonar_range", "Sonar Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
                 }
             }
             return deviceProperties.Count > 0;
@@ -605,7 +605,7 @@ namespace SOS
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             using var l = new SectionLayout(contentPanel);
-            l.Header(TextSOS.Get("sos.window.section_utility", "UTILITY").Value, Color.Gold);
+            l.Header(Texts.Get("sos.window.section_utility", "UTILITY").Value, Color.Gold);
 
             foreach (var prop in deviceProperties)
                 l.Row(prop.Key + ":", prop.Value, Color.Cyan);
@@ -679,24 +679,24 @@ namespace SOS
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             using var l = new SectionLayout(contentPanel);
-            l.Header(TextSOS.Get("sos.window.section_container", "CONTAINERS").Value, Color.Gold);
+            l.Header(Texts.Get("sos.window.section_container", "CONTAINERS").Value, Color.Gold);
 
             if (!string.IsNullOrEmpty(capacity))
             {
-                l.Row(TextSOS.Get("sos.container.capacity", "Capacity:").Value,
-                    TextSOS.Get("sos.container.slots", "[amount] Slots").Replace("[amount]", capacity).Value, Color.White);
+                l.Row(Texts.Get("sos.container.capacity", "Capacity:").Value,
+                    Texts.Get("sos.container.slots", "[amount] Slots").Replace("[amount]", capacity).Value, Color.White);
             }
 
             if (compatibleItems.Count > 0)
             {
                 _ = new GUIDesplegableBox(contentPanel.Content, SOSController.Instance.SetSearchFilter,
-                    TextSOS.Get("sos.container.accepts", "Accepts:").Value,
+                    Texts.Get("sos.container.accepts", "Accepts:").Value,
                     acceptedTags, compatibleItems, onPrimary, onSecondary);
             }
 
             if (spawnLocations.Count > 0)
             {
-                l.BadgeRow(TextSOS.Get("sos.container.contained", "Contained_by:").Value, spawnLocations, onSearchFilter: SOSController.Instance.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.container.contained", "Contained_by:").Value, spawnLocations, onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
         }
     }
@@ -986,14 +986,14 @@ namespace SOS
             if (aff == null) return;
 
             using var l = new SectionLayout(contentPanel);
-            l.Header(TextSOS.Get("sos.window.section_treatments", "TREATMENTS & MEDICATION").Value, Color.SpringGreen);
+            l.Header(Texts.Get("sos.window.section_treatments", "TREATMENTS & MEDICATION").Value, Color.SpringGreen);
 
             if (blockers.Count > 0)
             {
                 var displayNames = blockers.Select(b =>
                     AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == b)?.Name.Value ?? b);
 
-                l.SelectorRow(TextSOS.Get("sos.affliction.blockedby", "Treatment Blocked By:").Value, blockers, displayNames,
+                l.SelectorRow(Texts.Get("sos.affliction.blockedby", "Treatment Blocked By:").Value, blockers, displayNames,
                     fallbackFilterPrefix: '!',
                     onPrimary: onPrimary,
                     onSecondary: onSecondary,
@@ -1015,14 +1015,14 @@ namespace SOS
                     onSearchFilter: SOSController.Instance.SetSearchFilter);
             }
 
-            DrawRow(TextSOS.Get("sos.affliction.highlyeffective", "Highly Effective:").Value, highEff);
-            DrawRow(TextSOS.Get("sos.affliction.effective", "Effective:").Value, medEff);
-            DrawRow(TextSOS.Get("sos.affliction.alternative", "Alternative / Weak:").Value, lowEff);
+            DrawRow(Texts.Get("sos.affliction.highlyeffective", "Highly Effective:").Value, highEff);
+            DrawRow(Texts.Get("sos.affliction.effective", "Effective:").Value, medEff);
+            DrawRow(Texts.Get("sos.affliction.alternative", "Alternative / Weak:").Value, lowEff);
 
             if (harmful.Count > 0)
             {
-                l.RichText(TextSOS.Get("sos.affliction.contraindicated_warn", "WARNING: The following items worsen the condition!").Value.SetColor(Color.Salmon));
-                DrawRow(TextSOS.Get("sos.affliction.contraindicated", "Contraindicated:").Value, harmful, labelColor: Color.Salmon);
+                l.RichText(Texts.Get("sos.affliction.contraindicated_warn", "WARNING: The following items worsen the condition!").Value.SetColor(Color.Salmon));
+                DrawRow(Texts.Get("sos.affliction.contraindicated", "Contraindicated:").Value, harmful, labelColor: Color.Salmon);
             }
         }
     }
@@ -1049,7 +1049,7 @@ namespace SOS
             if (text == null) return;
 
             using var l = new SectionLayout(contentPanel);
-            l.Header(TextSOS.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
+            l.Header(Texts.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
             l.RichText(RichString.Rich(text));
         }
     }

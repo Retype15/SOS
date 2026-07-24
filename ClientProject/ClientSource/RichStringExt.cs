@@ -148,7 +148,7 @@ namespace SOS
                 AfflictionPrefab affliction => affliction.Name.IsNullOrEmpty()
                                         ? ($"[{affliction.Identifier}]", Color.Red)
                                         : (affliction.Name.Value, defaultColor),
-                _ => (TextSOS.Get("sos.gen.unknown", "???").Value, defaultColor),
+                _ => (Texts.Get("sos.gen.unknown", "???").Value, defaultColor),
             };
         }
         public static string Name(this Prefab prefab)
@@ -676,7 +676,7 @@ namespace SOS
 
         private IEnumerable<CoroutineStatus> DoLogMsg(Color? color)
         {
-            RLogger.LogDebug($"Anim Sequence Progress on {Component.GetType().Name} ({(Component as GUITextBlock)?.Text ?? "NoText"})", color);
+            Logger.LogDebug($"Anim Sequence Progress on {Component.GetType().Name} ({(Component as GUITextBlock)?.Text ?? "NoText"})", color);
             yield return CoroutineStatus.Success;
         }
 

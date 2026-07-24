@@ -111,10 +111,8 @@ namespace SOS
                 }
             }
             // MARK: AAAA
-#if DEBUG
-            //System.Threading.Thread.Sleep(1000);
-            RLogger.LogDebug("[SOS] Dependency graph precomputed.");
-#endif
+
+            Logger.LogDebug("[SOS] Dependency graph precomputed.");
         }
     }
 }

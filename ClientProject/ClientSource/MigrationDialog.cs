@@ -41,14 +41,14 @@ namespace SOS
 
             var titleArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.30f), dialog.RectTransform), style: null);
             _ = new GUITextBlock(new RectTransform(Vector2.One, titleArea.RectTransform, Anchor.Center),
-                TextSOS.Get("sos.migration.title", "SOS — Migración de Configuración"),
+                Texts.Get("sos.migration.title", "SOS — Migración de Configuración"),
                 font: GUIStyle.LargeFont, textAlignment: Alignment.Center);
 
             // ─── Description ───
 
             var descArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.5f), dialog.RectTransform), style: null);
             _ = new GUITextBlock(new RectTransform(Vector2.One, descArea.RectTransform, Anchor.Center),
-                TextSOS.Get("sos.migration.description",
+                Texts.Get("sos.migration.description",
                     "Se encontró una configuración anterior de SOS.\n¿Deseas importar tus datos al nuevo sistema?"),
                 font: GUIStyle.SmallFont, textAlignment: Alignment.Center);
 
@@ -63,32 +63,32 @@ namespace SOS
 
             // Import button
             var importBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
-                TextSOS.Get("sos.migration.import", "Import"))
+                Texts.Get("sos.migration.import", "Import"))
             {
-                ToolTip = TextSOS.Get("sos.migration.import_tooltip",
+                ToolTip = Texts.Get("sos.migration.import_tooltip",
                     "Imports your old settings and renames \"Data/sossettings.xml\" to \"Data/sossettings_old.xml\".")
             };
             importBtn.OnClicked += ImportAction;
 
             // Discard button
             var discardBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
-                TextSOS.Get("sos.migration.discard", "Discard"))
+                Texts.Get("sos.migration.discard", "Discard"))
             {
-                ToolTip = TextSOS.Get("sos.migration.discard_tooltip",
+                ToolTip = Texts.Get("sos.migration.discard_tooltip",
                     "Discards the old settings and renames \"Data/sossettings.xml\" to \"Data/sossettings_old.xml\".")
             };
             discardBtn.OnClicked += DiscardAction;
 
             // Ignore button
             var ignoreBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
-                TextSOS.Get("sos.migration.ignore", "Ignore"))
+                Texts.Get("sos.migration.ignore", "Ignore"))
             {
-                ToolTip = TextSOS.Get("sos.migration.ignore_tooltip",
+                ToolTip = Texts.Get("sos.migration.ignore_tooltip",
                     "Closes without changes. The old file remains untouched; you will be prompted again on next launch.")
             };
             ignoreBtn.OnClicked += IgnoreAction;
 
-            RLogger.LogDebug("Showing MigrationDialog");
+            Logger.LogDebug("Showing MigrationDialog");
         }
 
         private static bool ImportAction(GUIButton button, object userdata)
@@ -211,11 +211,11 @@ namespace SOS
                 // Persist to new config system
                 controller.SaveSettings();
 
-                RLogger.Log(TextSOS.Get("sos.migration.success", "[SOS] Previous configuration imported successfully.").Value);
+                Logger.Log(Texts.Get("sos.migration.success", "[SOS] Previous configuration imported successfully.").Value);
             }
             catch (Exception e)
             {
-                RLogger.LogError(TextSOS.Get("sos.migration.error",
+                Logger.LogError(Texts.Get("sos.migration.error",
                     "[SOS] Error importing previous configuration: [error]")
                     .Replace("[error]", e.Message).Value);
             }
@@ -254,7 +254,7 @@ namespace SOS
             }
             catch (Exception e)
             {
-                RLogger.LogError($"[SOS] Failed to rename old settings file: {e.Message}");
+                Logger.LogError($"[SOS] Failed to rename old settings file: {e.Message}");
             }
         }
 

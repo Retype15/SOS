@@ -83,7 +83,7 @@ namespace SOS
         private static ContentPackage? LoadModPackage()
         {
             var modPackage = ContentPackageManager.EnabledPackages.All.FirstOrDefault(p => p.Name == "S.O.S - Standard Operations Schematics");
-            if (modPackage != null) RLogger.LogDebug("[SOS] ModPackage Loaded: " + modPackage.Name);
+            if (modPackage != null) Logger.LogDebug("[SOS] ModPackage Loaded: " + modPackage.Name);
             return modPackage;
         }
 
@@ -148,7 +148,7 @@ namespace SOS
             {
                 AbsoluteOffset = new Point(0, -30)
             },
-            TextSOS.Get("sos.window.loading", "Loading dependencies..."),
+            Texts.Get("sos.window.loading", "Loading dependencies..."),
             font: GUIStyle.LargeFont, textAlignment: Alignment.Center, wrap: true);
 
             //LoadingCompletedText.SetAlpha(0f);
@@ -164,7 +164,7 @@ namespace SOS
             topBar.RectTransform.MaxSize = new Point(int.MaxValue, HeaderHeight);
 
             _ = new GUITextBlock(new RectTransform(Vector2.One, topBar.RectTransform),
-                TextSOS.Get("sos.window.title", "SOS - Recipe Browser"),
+                Texts.Get("sos.window.title", "SOS - Recipe Browser"),
                 textAlignment: Alignment.Center, font: GUIStyle.LargeFont);
 
             var leftTools = new GUILayoutGroup(new RectTransform(new Vector2(0.32f, 0.8f), topBar.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true)
@@ -175,7 +175,7 @@ namespace SOS
 
             var btnLayouts = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform, isFixedSize: true), "", style: "GUIButtonSettings")
             {
-                ToolTip = TextSOS.Get("sos.window.settings", "Settings (WIP)"),
+                ToolTip = Texts.Get("sos.window.settings", "Settings (WIP)"),
                 OnClicked = (btn, _) => { ToggleLayoutMenu(btn); return true; }
             };
             btnBack = new GUIButton(new RectTransform(new Point(32, 32), leftTools.RectTransform, isFixedSize: true), "", style: "GUIButtonToggleLeft")
@@ -193,11 +193,11 @@ namespace SOS
             _ = new GUIButton(new RectTransform(new Point(32, 32), topButtons.RectTransform, isFixedSize: true), "", style: "GUICancelButton")
             {
                 OnClicked = (_, _) => { controller.ToggleUI(); return true; },
-                ToolTip = TextSOS.Get("sos.gen.close", "Close [Esc]")
+                ToolTip = Texts.Get("sos.gen.close", "Close [Esc]")
             };
             var manageGroup = new GUILayoutGroup(new RectTransform(new Vector2(0.65f, 1f), topButtons.RectTransform), isHorizontal: true)
             { RelativeSpacing = 0f, Stretch = false, ChildAnchor = Anchor.CenterRight };
-            var text = TextSOS.Get("sos.window.manage_hud", "MANAGE HUD");
+            var text = Texts.Get("sos.window.manage_hud", "MANAGE HUD");
             _ = new GUIButton(new RectTransform(new Point(text.Length * 12, 32), manageGroup.RectTransform, isFixedSize: true), text, style: "DeviceButton")
             {
                 OnClicked = (_, _) =>
@@ -205,16 +205,16 @@ namespace SOS
                     var options = controller.Tracker.GetManageHudContextMenuOptions();
                     GUIContextMenu.CreateContextMenu(
                         PlayerInput.MousePosition,
-                        TextSOS.Get("sos.window.remove_recipes", "Remove Recipes"),
+                        Texts.Get("sos.window.remove_recipes", "Remove Recipes"),
                         null, [.. options]);
                     return true;
                 },
-                ToolTip = TextSOS.Get("sos.window.manage_hud_tooltip", "Manage tracked recipes on the HUD")
+                ToolTip = Texts.Get("sos.window.manage_hud_tooltip", "Manage tracked recipes on the HUD")
             };
             _ = new GUIButton(new RectTransform(new Point(32, 32), manageGroup.RectTransform, isFixedSize: true), "o", style: "DeviceButton")
             {
                 OnClicked = (_, _) => { controller.Tracker.ToggleTracker(); return true; },
-                ToolTip = TextSOS.Get("sos.window.toggle_tracker_tooltip", "Toggle HUD tracker (Ctrl+[key])").Replace("[key]", controller.cfg.SOSOpenKey.Key.ToString())
+                ToolTip = Texts.Get("sos.window.toggle_tracker_tooltip", "Toggle HUD tracker (Ctrl+[key])").Replace("[key]", controller.cfg.SOSOpenKey.Key.ToString())
             };
 
             contentArea = new GUIFrame(new RectTransform(new Vector2(0.98f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter)
@@ -244,8 +244,8 @@ namespace SOS
             searchContainer.RectTransform.MinSize = new Point(0, 35);
             searchContainer.RectTransform.MaxSize = new Point(int.MaxValue, 35);
 
-            searchBox = BGUI.CreateTextBoxWithPlaceholder(new RectTransform(Vector2.One, searchContainer.RectTransform), controller.LastSearchQuery, TextSOS.Get("sos.window.search_placeholder", "Search item..."));
-            searchBox.ToolTip = TextSOS.Get("sos.window.search_tooltip",
+            searchBox = BGUI.CreateTextBoxWithPlaceholder(new RectTransform(Vector2.One, searchContainer.RectTransform), controller.LastSearchQuery, Texts.Get("sos.window.search_placeholder", "Search item..."));
+            searchBox.ToolTip = Texts.Get("sos.window.search_tooltip",
                 "Search by Name, ID, Category, Tags, ModName, ItemType, etc.\n" +
                 "Advanced Filters:\n" +
                 "  @Mod        (e.g., @Vanilla @Neuro)\n" +
@@ -288,7 +288,7 @@ namespace SOS
             foreach (var tab in API.CreateTabs())
             {
                 centerTabWidget.RegisterTab(tab);
-                //RLogger.LogDebug($"Drawed {tab.Id}", Color.LightYellow);
+                //Logger.LogDebug($"Drawed {tab.Id}", Color.LightYellow);
             }
 
             rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), contentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
@@ -310,10 +310,10 @@ namespace SOS
 
             var rightHeaderArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.045f), rightLayout.RectTransform), style: null);
             rightHeaderArea.RectTransform.MinSize = new Point(0, 32);
-            rawXmlTickBox = new GUITickBox(new RectTransform(new Vector2(1f, 0.45f), rightHeaderArea.RectTransform, Anchor.CenterLeft), TextSOS.Get("sos.window.raw_xml", "RAW XML"), font: GUIStyle.SmallFont)
+            rawXmlTickBox = new GUITickBox(new RectTransform(new Vector2(1f, 0.45f), rightHeaderArea.RectTransform, Anchor.CenterLeft), Texts.Get("sos.window.raw_xml", "RAW XML"), font: GUIStyle.SmallFont)
             {
                 Selected = controller.RawXmlMode,
-                ToolTip = TextSOS.Get("sos.window.raw_xml_tooltip", "Toggles between metadata view and raw XML view of the item.")
+                ToolTip = Texts.Get("sos.window.raw_xml_tooltip", "Toggles between metadata view and raw XML view of the item.")
             };
 
             var rightContentArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.955f), rightLayout.RectTransform), style: null);
@@ -358,25 +358,25 @@ namespace SOS
 
             UpdateLayout();
             mainFrame.ForceLayoutRecalculation();
-            RLogger.LogDebug("Main UI built");
+            Logger.LogDebug("Main UI built");
         }
 
         public void OnInitializationComplete()
         {
-            RLogger.LogDebug("[SOS] Initialization complete. Finalizing UI...");
+            Logger.LogDebug("[SOS] Initialization complete. Finalizing UI...");
 
             if (loadingFrame != null && mainFrame != null)
             {
 
                 LoadingCompletedText?
                     .Wait(0.5f)
-                    .Execute(() => LoadingCompletedText.SetRichText(TextSOS.Get("sos.window.loading.complete", "Loading complete!").SetColor(Color.LightGreen))).WaitFinish()
+                    .Execute(() => LoadingCompletedText.SetRichText(Texts.Get("sos.window.loading.complete", "Loading complete!").SetColor(Color.LightGreen))).WaitFinish()
                     .ExBlink(duration: 4.0f, minAlpha: 0.0f, maxAlpha: 0.6f, interval: 1.0f, alsoChildren: true).WaitFinish()
                     .ExFadeOut(0.5f)
                     .Execute(() =>
                         {
                             LoadingCompletedText = null;
-                            RLogger.LogDebug("[SOS] Loading completed text removed");
+                            Logger.LogDebug("[SOS] Loading completed text removed");
                         }
                     );
 
@@ -389,7 +389,7 @@ namespace SOS
                     .Execute(() =>
                         {
                             loadingFrame = null;
-                            RLogger.LogDebug("[SOS] Loading frame removed");
+                            Logger.LogDebug("[SOS] Loading frame removed");
                         }
                     );
 
@@ -455,7 +455,7 @@ namespace SOS
                     var prevItem = controller.HistoryBack.Peek();
 
                     var (navBackName, _) = prevItem.SafeName(Color.White);
-                    btnBack.OnDrawToolTip = component => component.ToolTip = RichString.Rich($"{TextSOS.Get("sos.window.back", "Back")}: {navBackName.SetColor(Color.BlueViolet)}\n{TextSOS.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}");
+                    btnBack.OnDrawToolTip = component => component.ToolTip = RichString.Rich($"{Texts.Get("sos.window.back", "Back")}: {navBackName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}");
                 }
             }
 
@@ -468,7 +468,7 @@ namespace SOS
 
                     var (navForwardName, _) = nextItem.SafeName(Color.White);
 
-                    btnForward.OnDrawToolTip = component => component.ToolTip = RichString.Rich($"{TextSOS.Get("sos.window.forward", "Forward")}: {navForwardName.SetColor(Color.BlueViolet)}\n{TextSOS.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}");
+                    btnForward.OnDrawToolTip = component => component.ToolTip = RichString.Rich($"{Texts.Get("sos.window.forward", "Forward")}: {navForwardName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}");
                 }
             }
         }
@@ -563,7 +563,7 @@ namespace SOS
                     {
                         Color = Color.White * 0.1f,
                         CanBeFocused = true,
-                        ToolTip = TextSOS.Get("sos.list.separator_tooltip", "Click to filter the list by this type of object."),
+                        ToolTip = Texts.Get("sos.list.separator_tooltip", "Click to filter the list by this type of object."),
                         OnClicked = (btn, _) =>
                         {
                             if (searchBox != null) searchBox.Text = $"%{type_name}";
@@ -572,7 +572,7 @@ namespace SOS
                     };
 
                     _ = new GUITextBlock(new RectTransform(Vector2.One, separatorFrame.RectTransform),
-                        TextSOS.Get($"sos.list.header.{type_name.ToLower()}", type_name.SpacedPascalCase()),
+                        Texts.Get($"sos.list.header.{type_name.ToLower()}", type_name.SpacedPascalCase()),
                         font: GUIStyle.SmallFont, textColor: Color.MediumPurple, textAlignment: Alignment.Center)
                     {
                         Wrap = true
@@ -818,13 +818,13 @@ namespace SOS
                     if (section.Analyze(targetItem))
                     {
                         section.Draw(metaPanel, OnPrimary, OnSecondary);
-                        RLogger.LogDebug($"Drawed {section.Id}", Color.YellowGreen);
+                        Logger.LogDebug($"Drawed {section.Id}", Color.YellowGreen);
                     }
                 }
                 catch (Exception ex)
                 {
                     var type = section.GetType();
-                    RLogger.LogError($"[SOS.API] Exception has occurred on '{ex.TargetSite}' of type '{type.FullOrName()}'. Exception: {ex.Message}");
+                    Logger.LogError($"[SOS.API] Exception has occurred on '{ex.TargetSite}' of type '{type.FullOrName()}'. Exception: {ex.Message}");
                     continue;
                 }
                 finally
@@ -931,7 +931,7 @@ namespace SOS
 
             _ = new GUIButton(new RectTransform(new Vector2(0.9f, 0.1f), layoutMenuFrame.RectTransform, Anchor.BottomCenter) { AbsoluteOffset = new Point(0, 10) }, "+ SAVE ACTUAL", style: "DeviceButton")
             {
-                ToolTip = TextSOS.Get("sos.layout.save_tooltip", "Saves the current panel layout as a new preset."),
+                ToolTip = Texts.Get("sos.layout.save_tooltip", "Saves the current panel layout as a new preset."),
                 OnClicked = (_, _) =>
                 {
                     string newName = $"Layout {controller.CustomLayouts.Count + 1}";
@@ -969,7 +969,7 @@ namespace SOS
 
             var btn = new GUIButton(new RectTransform(new Vector2(canDelete ? 0.82f : 1f, 1f), row.RectTransform), name, style: "ListBoxElement")
             {
-                ToolTip = TextSOS.Get("sos.layout.apply_tooltip", "Applies this panel layout preset."),
+                ToolTip = Texts.Get("sos.layout.apply_tooltip", "Applies this panel layout preset."),
                 OnClicked = (_, _) => { onApply(); ToggleLayoutMenu(anchor); return true; }
             };
 
@@ -977,7 +977,7 @@ namespace SOS
             {
                 _ = new GUIButton(new RectTransform(new Vector2(0.18f, 1f), row.RectTransform), "", style: "GUICancelButton", color: Color.IndianRed) // OLD: CategoryButton.All
                 {
-                    ToolTip = TextSOS.Get("sos.layout.delete_tooltip", "Deletes this layout preset."),
+                    ToolTip = Texts.Get("sos.layout.delete_tooltip", "Deletes this layout preset."),
                     OnClicked = (_, _) =>
                     {
                         controller.CustomLayouts.Remove(name);
@@ -993,14 +993,14 @@ namespace SOS
         {
             var options = new List<ContextMenuOption>
             {
-                new(TextSOS.Get("sos.xml.reset_zoom", "Reset Zoom"), isEnabled: true, onSelected: () =>
+                new(Texts.Get("sos.xml.reset_zoom", "Reset Zoom"), isEnabled: true, onSelected: () =>
                 {
                     viewer.TextScale = 0.8f;
                     viewer.scrollBarsNeedsRecalculation = true;
                     viewer.OnScaleChanged?.Invoke(viewer.TextScale);
                 }),
 
-                new(TextSOS.Get("sos.xml.copy", "Copy XML"), isEnabled: true, onSelected: () =>
+                new(Texts.Get("sos.xml.copy", "Copy XML"), isEnabled: true, onSelected: () =>
                 {
                     Clipboard.SetText(viewer.Text.ToString());
                 })

@@ -16,8 +16,8 @@ namespace SOS
     public class ItemCenterPanelTab : ISOSCenterTabAuto, IDisposable
     {
         public double Order => 0;
-        public string TabName => TextSOS.Get("sos.tab.recipes", "RECIPES").Value;
-        public string ToolTip => TextSOS.Get("sos.tab.recipes_tooltip").Value;
+        public string TabName => Texts.Get("sos.tab.recipes", "RECIPES").Value;
+        public string ToolTip => Texts.Get("sos.tab.recipes_tooltip").Value;
         private GUIFrame? _container;
         private GUIListBox? _colObtain;
         private GUIListBox? _colUsage;
@@ -36,12 +36,12 @@ namespace SOS
 
             // obtain
             var obtainContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), obtainContainer.RectTransform), TextSOS.Get("sos.window.obtain", "OBTAIN"), font: GUIStyle.SubHeadingFont, textColor: Color.LightGreen, textAlignment: Alignment.Center);
+            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), obtainContainer.RectTransform), Texts.Get("sos.window.obtain", "OBTAIN"), font: GUIStyle.SubHeadingFont, textColor: Color.LightGreen, textAlignment: Alignment.Center);
             _colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), obtainContainer.RectTransform), style: null) { Spacing = 5, Color = Color.Black * 0.2f };
 
             // usage
             var usageContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), usageContainer.RectTransform), TextSOS.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
+            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), usageContainer.RectTransform), Texts.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
             _colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: null) { Spacing = 5, Color = Color.Black * 0.2f };
         }
 
@@ -77,7 +77,7 @@ namespace SOS
             var obtainGroups = new Dictionary<string, CardBuilder.UIMachineGroup>();
             var controller = SOSController.Instance;
             foreach (var r in craft ?? [])
-                GetOrCreateMachineGroup(obtainGroups, r.SuitableFabricatorIdentifiers, TextSOS.Get("sos.recipe.hand", "Hand").Value)
+                GetOrCreateMachineGroup(obtainGroups, r.SuitableFabricatorIdentifiers, Texts.Get("sos.recipe.hand", "Hand").Value)
                     .AddCard(new CardBuilder.CraftRecipeCard(r, item, controller, onPrimary, onSecondary));
 
             var groupedSources = sources?.GroupBy(s => new { SourceId = s.Item.Identifier, MachineKey = string.Join(",", s.DeconstructItem.RequiredDeconstructor.Select(id => id.Value).OrderBy(x => x)), OtherItemsKey = string.Join(",", s.DeconstructItem.RequiredOtherItem.Select(id => id.Value).OrderBy(x => x)) })
@@ -108,7 +108,7 @@ namespace SOS
                 .SelectMany(mg => mg.GroupBy(u => u.Item.Identifier).Select(ig => new GroupedUsage { TargetItem = ig.First().Item, MachineIds = [.. ig.First().Recipe.SuitableFabricatorIdentifiers], AmountCreated = ig.First().Recipe.Amount, AmountRequired = ig.First().Recipe.RequiredItems.FirstOrDefault(ri => ri.ItemPrefabs.Any(p => p.Identifier == item.Identifier))?.Amount ?? 1 })).ToList();
 
             foreach (var usage in groupedUses ?? [])
-                GetOrCreateMachineGroup(usageDict, usage.MachineIds ?? [], TextSOS.Get("sos.recipe.hand", "Hand").Value)
+                GetOrCreateMachineGroup(usageDict, usage.MachineIds ?? [], Texts.Get("sos.recipe.hand", "Hand").Value)
                     .AddCard(new CardBuilder.UsageRecipeCard(usage, onPrimary, onSecondary));
 
             foreach (var group in usageDict.Values) group.Draw(_colUsage);
@@ -136,8 +136,8 @@ namespace SOS
         private const int MENU_HEIGHT = 220;
 
         public double Order => 10;
-        public string TabName => TextSOS.Get("sos.tab.simulator", "SIMULATOR").Value;
-        public string ToolTip => TextSOS.Get("sos.tab.simulator_tooltip").Value;
+        public string TabName => Texts.Get("sos.tab.simulator", "SIMULATOR").Value;
+        public string ToolTip => Texts.Get("sos.tab.simulator_tooltip").Value;
         private GUIFrame? _container;
         private static GUIComponent? activeAfflictionMenu;
         private static Prefab? CurrentPrefab;
@@ -233,7 +233,7 @@ namespace SOS
 
             var playBtn = new GUIButton(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), "START", style: "DeviceButton")
             {
-                OnDrawToolTip = component => component.ToolTip = TextSOS.Get(
+                OnDrawToolTip = component => component.ToolTip = Texts.Get(
                     ClinicalSimulatorManager.IsPlaying ? "sos.sim.pause_tooltip" : "sos.sim.play_tooltip",
                     ClinicalSimulatorManager.IsPlaying ? "Pauses the clinical simulation." : "Starts the clinical simulation."),
                 OnClicked = (_, _) => { ClinicalSimulatorManager.HasPlaying(!ClinicalSimulatorManager.IsPlaying); return true; }
@@ -245,7 +245,7 @@ namespace SOS
 
             var speedDropdown = new GUIDropDown(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), text: "Speed", elementCount: 4)
             {
-                ToolTip = TextSOS.Get("sos.aff.speedDropdown", "More than x1 are still in progress. \nIt's work fine in Singleplayer, but not at all in Multiplayer."),
+                ToolTip = Texts.Get("sos.aff.speedDropdown", "More than x1 are still in progress. \nIt's work fine in Singleplayer, but not at all in Multiplayer."),
                 OnSelected = (comp, obj) =>
                 {
                     string s = (string)obj;
@@ -258,7 +258,7 @@ namespace SOS
 
             var actionBtn = new GUIButton(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), "DROP", style: "DeviceButton")
             {
-                OnDrawToolTip = component => component.ToolTip = TextSOS.Get(
+                OnDrawToolTip = component => component.ToolTip = Texts.Get(
                     ClinicalSimulatorManager.HasStarted ? "sos.sim.drop_tooltip" : "sos.sim.reset_tooltip",
                     ClinicalSimulatorManager.HasStarted ? "Discards the current patient." : "Resets the patient's health to its initial state."),
                 OnClicked = (_, _) =>
@@ -403,7 +403,7 @@ namespace SOS
             {
                 _ = new GUIButton(new RectTransform(new Vector2(1f, 0.18f), menuLayout.RectTransform), "SET MAX (100%)", style: "GUIButtonSmall")
                 {
-                    ToolTip = TextSOS.Get("sos.sim.set_max_tooltip", "Sets this affliction's strength to maximum."),
+                    ToolTip = Texts.Get("sos.sim.set_max_tooltip", "Sets this affliction's strength to maximum."),
                     OnClicked = (_, _) => { ClinicalSimulatorManager.SetAfflictionStrength(affPrefab, affPrefab.MaxStrength, targetLimb); activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu); activeAfflictionMenu = null; return true; }
                 };
 
@@ -427,7 +427,7 @@ namespace SOS
 
                 _ = new GUIButton(new RectTransform(new Vector2(1f, 0.18f), menuLayout.RectTransform), "REMOVE", style: "GUIButtonSmall")
                 {
-                    ToolTip = TextSOS.Get("sos.sim.remove_tooltip", "Removes this affliction from the patient."),
+                    ToolTip = Texts.Get("sos.sim.remove_tooltip", "Removes this affliction from the patient."),
                     OnClicked = (_, _) => { ClinicalSimulatorManager.RemoveAffliction(affPrefab, targetLimb); activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu); activeAfflictionMenu = null; return true; }
                 };
             }
@@ -437,7 +437,7 @@ namespace SOS
 
                 _ = new GUIButton(new RectTransform(new Vector2(1f, 0.25f), menuLayout.RectTransform), "USE / APPLY", style: "GUIButton")
                 {
-                    ToolTip = TextSOS.Get("sos.sim.apply_item_tooltip", "Simulates using this item on the patient to see its effects."),
+                    ToolTip = Texts.Get("sos.sim.apply_item_tooltip", "Simulates using this item on the patient to see its effects."),
                     OnClicked = (_, _) =>
                     {
                         ClinicalSimulatorManager.ApplyMockItem(itemPrefab, targetLimb);
@@ -450,7 +450,7 @@ namespace SOS
 
             _ = new GUIButton(new RectTransform(new Vector2(1f, 0.18f), menuLayout.RectTransform), "CLOSE", style: "GUIButtonSmall")
             {
-                ToolTip = TextSOS.Get("sos.misc.close_button", "Closes this menu."),
+                ToolTip = Texts.Get("sos.misc.close_button", "Closes this menu."),
                 OnClicked = (_, _) => { activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu); activeAfflictionMenu = null; return true; }
             };
         }

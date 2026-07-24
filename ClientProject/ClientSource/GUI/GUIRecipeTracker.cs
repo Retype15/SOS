@@ -81,10 +81,10 @@ namespace SOS.GUI
             };
 
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), contentLayout.RectTransform) { MinSize = new Point(0, 22) },
-                TextSOS.Get("sos.hud.tracking", "TRACKING:").Value, font: GUIStyle.SubHeadingFont, textColor: Color.Gold)
+                Texts.Get("sos.hud.tracking", "TRACKING:").Value, font: GUIStyle.SubHeadingFont, textColor: Color.Gold)
             {
                 CanBeFocused = false,
-                ToolTip = TextSOS.Get("sos.hud.tracking_tooltip", "Active crafting tracker. Shows required ingredients and amounts.")
+                ToolTip = Texts.Get("sos.hud.tracking_tooltip", "Active crafting tracker. Shows required ingredients and amounts.")
             };
 
             emptyLabel = new GUITextBlock(
@@ -93,7 +93,7 @@ namespace SOS.GUI
                     AbsoluteOffset = new Point(8, 34),
                     MinSize = new Point(0, 22)
                 },
-                TextSOS.Get("sos.hud.nothing_tracked", "Nothing tracked here."),
+                Texts.Get("sos.hud.nothing_tracked", "Nothing tracked here."),
                 font: GUIStyle.SmallFont, textColor: Color.Gray)
             { CanBeFocused = false };
 
@@ -178,12 +178,12 @@ namespace SOS.GUI
         public bool AddOrRemoveRecipe(ItemPrefab itemPrefab, IConvertible? recipeHash = null) => AddOrRemoveRecipe(PrefabResolver.GetFabricationRecipe(itemPrefab, recipeHash));
         public bool AddOrRemoveRecipe(string itemString, IConvertible? recipeHash = null) => AddOrRemoveRecipe(PrefabResolver.GetFabricationRecipe(itemString, recipeHash));
 
-        public static LocalizedString GetTrackOrUntrackToHUD(bool state) => state ? TextSOS.Get("sos.context.track_to_hud", "Track to HUD") : TextSOS.Get("sos.context.untrack_from_hud", "Remove from HUD");
+        public static LocalizedString GetTrackOrUntrackToHUD(bool state) => state ? Texts.Get("sos.context.track_to_hud", "Track to HUD") : Texts.Get("sos.context.untrack_from_hud", "Remove from HUD");
 
         public LocalizedString GetStringTrackToHUD(FabricationRecipe? recipe) => GetTrackOrUntrackToHUD(!ContainsRecipe(recipe));
         public LocalizedString GetStringTrackToHUD(ItemPrefab? itemPrefab) => GetTrackOrUntrackToHUD(!ContainsAnyRecipes(itemPrefab));
 
-        public static LocalizedString GetTrackOrUntrack(bool state) => state ? TextSOS.Get("sos.context.track", "Track") : TextSOS.Get("sos.context.untrack", "Untrack");
+        public static LocalizedString GetTrackOrUntrack(bool state) => state ? Texts.Get("sos.context.track", "Track") : Texts.Get("sos.context.untrack", "Untrack");
 
         public void Clear() => RemoveRecipes();
 
@@ -200,7 +200,7 @@ namespace SOS.GUI
             var options = new List<ContextMenuOption>
             {
                 new(
-                TextSOS.Get("sos.window.remove_all", "Remove All"),
+                Texts.Get("sos.window.remove_all", "Remove All"),
                 isEnabled: trackedRecipes.Count > 0,
                 onSelected: Clear)
             };
@@ -316,7 +316,7 @@ namespace SOS.GUI
                     if (!hasEnough) allComplete = false;
 
                     string? value = req.FirstMatchingPrefab?.Name.Value;
-                    string name = value.IsNullOrEmpty() ? TextSOS.Get("sos.gen.unknown", "???").Value : value;
+                    string name = value.IsNullOrEmpty() ? Texts.Get("sos.gen.unknown", "???").Value : value;
                     ingUI.text.Text = $"{name}: {owned}/{req.Amount}";
                     ingUI.text.TextColor = hasEnough ? Color.LightGreen : Color.Salmon;
                 }

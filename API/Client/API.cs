@@ -5,12 +5,9 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
-using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Barotrauma;
 using Barotrauma.LuaCs;
-using Microsoft.Xna.Framework;
 
 [assembly: IgnoresAccessChecksTo("Barotrauma")]
 [assembly: IgnoresAccessChecksTo("BarotraumaCore")]
@@ -73,7 +70,7 @@ namespace SOS
 
                     if (dummy == null)
                     {
-                        LogWarning($"[SOS.API] Failed to instantiate dummy for type '{type.FullName}' as '{typeof(T).Name}'.");
+                        Logger.LogWarning($"[SOS.API] Failed to instantiate dummy for type '{type.FullName}' as '{typeof(T).Name}'.");
                         return false;
                     }
 
@@ -87,7 +84,7 @@ namespace SOS
                 }
                 catch (Exception ex)
                 {
-                    LogWarning($"[SOS.API] Failed to register type '{type.FullName}' as '{typeof(T).Name}'. Type does not satisfy contract. \nException: {ex.Message}");
+                    Logger.LogWarning($"[SOS.API] Failed to register type '{type.FullName}' as '{typeof(T).Name}'. Type does not satisfy contract. \nException: {ex.Message}");
                     return false;
                 }
             }
@@ -103,7 +100,7 @@ namespace SOS
                 }
                 catch (Exception ex)
                 {
-                    LogWarning($"[SOS.API] Failed to register instance from type '{obj.GetType()}' as '{typeof(T).Name}'. Instance does not satisfy contract. \nException: {ex.Message}");
+                    Logger.LogWarning($"[SOS.API] Failed to register instance from type '{obj.GetType()}' as '{typeof(T).Name}'. Instance does not satisfy contract. \nException: {ex.Message}");
                     return false;
                 }
             }
@@ -149,7 +146,7 @@ namespace SOS
                     }
                     catch (Exception ex)
                     {
-                        LogWarning($"[SOS.API] Failed to instantiate section '{typeof(T).Name}' of Id '{Id}'. \nException: {ex.Message}");
+                        Logger.LogWarning($"[SOS.API] Failed to instantiate section '{typeof(T).Name}' of Id '{Id}'. \nException: {ex.Message}");
                         continue;
                     }
 
@@ -170,7 +167,6 @@ namespace SOS
         {
             if (_scanned) return;
 
-            LogDebug("INICIANDO DESDE SOS!!!", Color.Gold);
             _sectionFactories.AutoRegister(pluginManagementService);
             _tabFactories.AutoRegister(pluginManagementService);
 
@@ -199,14 +195,5 @@ namespace SOS
             _tabFactories.Clear();
             _scanned = false;
         }
-
-        internal static void Log(string message, Color? color = null)
-            => LuaCsLogger.Log(message, color ?? Color.DeepSkyBlue);
-
-        internal static void LogWarning(string message) => Log(message, Color.Yellow);
-
-        [Conditional("DEBUG")]
-        internal static void LogDebug(string message, Color? color = null) => Log(message, color);
-
     }
 }

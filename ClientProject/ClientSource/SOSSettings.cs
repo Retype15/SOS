@@ -236,12 +236,12 @@ namespace SOS
         {
             if (!Plugin.Instance.ConfigService.TryGetConfig(Plugin.Instance.Package, name, out setting))
             {
-                RLogger.LogError($"Failed to find config named {name}!");
+                Logger.LogError($"Failed to find config named {name}!");
                 return false;
             }
             setting.OnValueChanged += MarkDirty;
 #if DEBUG
-            setting.OnValueChanged += setting => RLogger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue()}");
+            setting.OnValueChanged += setting => Logger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue()}");
 #endif
             return true;
         }

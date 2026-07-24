@@ -120,7 +120,7 @@ namespace SOS
                 {
                     MigrationDialog.Show();
                     HaveOldConfigFile = false;
-                    RLogger.LogDebug("Abriendo la ventana de migracion");
+                    Logger.LogDebug("Abriendo la ventana de migracion");
                     return;
                 }
 
@@ -318,7 +318,7 @@ namespace SOS
                 if (item.FabricationRecipes.Count == 1)
                 {
                     var single = PrefabResolver.GetFabricationRecipe(item);
-                    options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(single).Value, isEnabled: true, () => Tracker.AddOrRemoveRecipe(single)) { Tooltip = TextSOS.Get("sos.tracker.track-untrack.tooltip", "Track or Untrack all recipes from this item.") });
+                    options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(single).Value, isEnabled: true, () => Tracker.AddOrRemoveRecipe(single)) { Tooltip = Texts.Get("sos.tracker.track-untrack.tooltip", "Track or Untrack all recipes from this item.") });
                 }
                 else
                 {
@@ -326,8 +326,8 @@ namespace SOS
                     {
                         new(
                             Tracker.ContainsAnyRecipes(item)
-                                ? TextSOS.Get("sos.window.remove_all", "Remove All")
-                                : TextSOS.Get("sos.window.track_all", "Track All"),
+                                ? Texts.Get("sos.window.remove_all", "Remove All")
+                                : Texts.Get("sos.window.track_all", "Track All"),
                             isEnabled: true,
                             Tracker.ContainsAnyRecipes(item)
                                 ? () => Tracker.RemoveRecipes(item)
@@ -344,19 +344,19 @@ namespace SOS
                     }
 
                     options.Add(new ContextMenuOption(
-                        TextSOS.Get("sos.context.track_recipe", "Add to HUD").Value,
+                        Texts.Get("sos.context.track_recipe", "Add to HUD").Value,
                         isEnabled: true, [.. subs]));
                 }
             }
 
-            options.Add(new ContextMenuOption(TextSOS.Get("sos.context.view_recipes", "View Recipes"), isEnabled: true, onSelected: () =>
+            options.Add(new ContextMenuOption(Texts.Get("sos.context.view_recipes", "View Recipes"), isEnabled: true, onSelected: () =>
             {
                 OnTargetSelected(target);
             }));
 
             string targetId = target.Identifier.Value;
             bool isFav = FavoritedItems.Contains(targetId);
-            string favText = isFav ? TextSOS.Get("sos.context.remove_favorite", "Remove from Favorites").Value : TextSOS.Get("sos.context.add_favorite", "Add to Favorites").Value;
+            string favText = isFav ? Texts.Get("sos.context.remove_favorite", "Remove from Favorites").Value : Texts.Get("sos.context.add_favorite", "Add to Favorites").Value;
 
             options.Add(new ContextMenuOption(favText, isEnabled: true, onSelected: () =>
             {
@@ -382,7 +382,7 @@ namespace SOS
 
             //options.Add(new ContextMenuOption("Ver más info (WIP)", isEnabled: false));
 
-            _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, TextSOS.Get("sos.context.recipe_options", "Recipe Options"), null, [.. options]);
+            _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, Texts.Get("sos.context.recipe_options", "Recipe Options"), null, [.. options]);
         }
 
         public void OnRecipeSelected(ItemPrefab item, FabricationRecipe recipe)
