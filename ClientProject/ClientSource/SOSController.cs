@@ -33,7 +33,7 @@ namespace SOS
         }
 
         private GUIRecipeTracker? _tracker;
-        public GUIRecipeTracker Tracker => _tracker ??= GUIRecipeTracker.InstantiateWithDefault();
+        internal GUIRecipeTracker Tracker => _tracker ??= GUIRecipeTracker.InstantiateWithDefault();
 
         public ClientConfig cfg = ClientConfig.Instance;
 
@@ -95,7 +95,7 @@ namespace SOS
             TabHistory.Insert(0, uid);
         }
 
-        public Dictionary<string, SavedLayout> CustomLayouts { get; } = [];
+        internal Dictionary<string, SavedLayout> CustomLayouts { get; } = [];
 
         private static SOSController? _instance;
         public static SOSController Instance => _instance ??= new SOSController();

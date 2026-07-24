@@ -17,57 +17,57 @@ namespace SOS
     {
         public static RichString Rich(this string text) => RichString.Rich(text);
 
-        public static string SetHyperlink(this string text, Color? color = null)
+        internal static string SetHyperlink(this string text, Color? color = null)
             => text.SetColor(color ?? Color.LightSkyBlue);
 
-        public static LocalizedString SetHyperlink(this LocalizedString text, Color? color = null)
+        internal static LocalizedString SetHyperlink(this LocalizedString text, Color? color = null)
             => text.SetColor(color ?? Color.LightSkyBlue);
 
-        public static string SetColor(this string text, string colorName)
+        internal static string SetColor(this string text, string colorName)
         => $"‖color:{colorName}‖{text}‖end‖";
 
         public static string SetColor(this string text, Color color)
             => $"‖color:{color.R},{color.G},{color.B}‖{text}‖end‖";
 
-        public static string SetColorHex(this string text, string hexCode)
+        internal static string SetColorHex(this string text, string hexCode)
             => $"‖color:{hexCode}‖{text}‖end‖";
 
-        public static string SetBold(this string text)
+        internal static string SetBold(this string text)
             => $"‖bold‖{text}‖end‖";
 
-        public static string SetItalic(this string text)
+        internal static string SetItalic(this string text)
             => $"‖italic‖{text}‖end‖";
 
-        public static string SetUnderline(this string text)
+        internal static string SetUnderline(this string text)
             => $"‖underline‖{text}‖end‖";
 
-        public static string SetStrikethrough(this string text)
+        internal static string SetStrikethrough(this string text)
             => $"‖strikethrough‖{text}‖end‖";
 
-        public static LocalizedString SetColor(this LocalizedString text, string colorName)
+        internal static LocalizedString SetColor(this LocalizedString text, string colorName)
         => $"‖color:{colorName}‖{text}‖end‖";
 
-        public static LocalizedString SetColor(this LocalizedString text, Color color)
+        internal static LocalizedString SetColor(this LocalizedString text, Color color)
             => $"‖color:{color.R},{color.G},{color.B}‖{text}‖end‖";
 
-        public static LocalizedString SetColorHex(this LocalizedString text, string hexCode)
+        internal static LocalizedString SetColorHex(this LocalizedString text, string hexCode)
             => $"‖color:{hexCode}‖{text}‖end‖";
 
-        public static LocalizedString SetBold(this LocalizedString text)
+        internal static LocalizedString SetBold(this LocalizedString text)
             => $"‖bold‖{text}‖end‖";
 
-        public static LocalizedString SetItalic(this LocalizedString text)
+        internal static LocalizedString SetItalic(this LocalizedString text)
             => $"‖italic‖{text}‖end‖";
 
-        public static LocalizedString SetUnderline(this LocalizedString text)
+        internal static LocalizedString SetUnderline(this LocalizedString text)
             => $"‖underline‖{text}‖end‖";
 
-        public static LocalizedString SetStrikethrough(this LocalizedString text)
+        internal static LocalizedString SetStrikethrough(this LocalizedString text)
             => $"‖strikethrough‖{text}‖end‖";
 
     }
 
-    public static class HyperlinkExtensions
+    internal static class HyperlinkExtensions
     {
         public static RichString JoinToRichString<T>(
             this IEnumerable<T> items,
@@ -128,14 +128,14 @@ namespace SOS
         }
     }
 
-    public static class FloatExt
+    internal static class FloatExt
     {
-        public static string ToMeters(this float value) => (value / 10f).ToValue() + 'm';
-        public static string ToValue(this float value) => value.ToString("0.###");
-        public static string ToSignedValue(this float value) => ((value > 0) ? '+' : (value < 0) ? '-' : ' ') + value.ToValue();
+        internal static string ToMeters(this float value) => (value / 10f).ToValue() + 'm';
+        internal static string ToValue(this float value) => value.ToString("0.###");
+        internal static string ToSignedValue(this float value) => ((value > 0) ? '+' : (value < 0) ? '-' : ' ') + value.ToValue();
     }
 
-    public static class PrefabExt
+    internal static class PrefabExt
     {
 
         public static (string Name, Color TextColor) SafeName(this Prefab? prefab, Color defaultColor)
@@ -204,9 +204,9 @@ namespace SOS
         internal static string FullOrName(this Type type) => type.FullName ?? type.Name;
     }
 
-    public static class IEnumerableExt
+    internal static class IEnumerableExt
     {
-        internal static string ToCsv<T>(this T collection) where T : IEnumerable<string>
+        internal static string ToCsv(this IEnumerable<string> collection)
         {
             return string.Join(",", collection);
         }

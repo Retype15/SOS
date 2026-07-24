@@ -254,7 +254,7 @@ namespace SOS
 
     // ─── Layout DTO ───
 
-    public class SavedLayout
+    internal class SavedLayout
     {
         public Point WindowSize { get; set; }
         public int LeftPanelWidth { get; set; }

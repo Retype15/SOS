@@ -132,8 +132,8 @@ namespace SOS
     [AutoRegister]
     public class AfflictionCenterPanelTab : ISOSCenterTab, IDisposable
     {
-        public const int MENU_WIDTH = 280;
-        public const int MENU_HEIGHT = 220;
+        private const int MENU_WIDTH = 280;
+        private const int MENU_HEIGHT = 220;
 
         public double Order => 10;
         public string TabName => TextSOS.Get("sos.tab.simulator", "SIMULATOR").Value;

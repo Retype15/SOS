@@ -10,7 +10,7 @@ using Barotrauma;
 namespace SOS
 {
     // MARK: RecipeAnalyzer
-    public static class RecipeAnalyzer
+    internal static class RecipeAnalyzer
     {
         private static readonly Dictionary<Identifier, List<(ItemPrefab Item, FabricationRecipe Recipe)>> usesCache = [];
         private static readonly Dictionary<Identifier, List<(ItemPrefab Item, DeconstructItem DeconstructItem)>> sourcesCache = [];

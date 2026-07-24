@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
-    public static class ClinicalSimulatorManager
+    internal static class ClinicalSimulatorManager
     {
         public static DummySubject? ActiveDummy { get; private set; }
         public static Character? Patient => ActiveDummy?.Character;

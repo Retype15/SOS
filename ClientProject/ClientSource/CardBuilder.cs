@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
-    public static class CardBuilder
+    internal static class CardBuilder
     {
         private const int RowHeight = 32;
         private const int HeaderHeight = 20;

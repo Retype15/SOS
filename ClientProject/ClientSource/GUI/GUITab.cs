@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 namespace SOS.GUI
 {
 
-    public class GUITabWidget : GUIFrame, IDisposable
+    internal class GUITabWidget : GUIFrame, IDisposable
     {
         private readonly GUILayoutGroup _verticalLayout;
         private readonly GUIListBox _buttonArea;

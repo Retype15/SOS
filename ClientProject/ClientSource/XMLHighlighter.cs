@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
-    public static partial class XMLHighlighter
+    internal static partial class XMLHighlighter
     {
         // Syntax colors (IDE "Dark Theme" style palette)
         private static readonly string ColNode = Color.CornflowerBlue.ToStringHex();   // <Item>
@@ -18,7 +18,7 @@ namespace SOS
         private static readonly string ColComment = Color.DarkSeaGreen.ToStringHex();  // <!-- comment -->
         private static readonly string ColPunctuation = Color.LightGray.ToStringHex(); // < > / =
 
-        public static RichString Format(string rawXml)
+        internal static RichString FormatToXMLCode(this string rawXml)
         {
             if (string.IsNullOrWhiteSpace(rawXml)) return RichString.Rich("");
 

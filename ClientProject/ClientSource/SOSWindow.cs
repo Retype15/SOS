@@ -14,14 +14,14 @@ using BGUI = Barotrauma.GUI;
 
 namespace SOS
 {
-    public enum DisplayMode
+    internal enum DisplayMode
     {
         Normal,
         Compact,
         Hidden
     }
 
-    public sealed class SOSWindow
+    internal sealed class SOSWindow
     {
         private GUIFrame? loadingFrame;
         private readonly GUIResizableFrame? mainFrame;
@@ -835,7 +835,7 @@ namespace SOS
 
             if (xmlContentText != null)
             {
-                xmlContentText.Text = XMLHighlighter.Format(GetRawXMLSafe(targetItem));
+                xmlContentText.Text = GetRawXMLSafe(targetItem).FormatToXMLCode();
             }
         }
 
@@ -1016,7 +1016,7 @@ namespace SOS
         }
     }
 
-    public class GroupedSource
+    internal class GroupedSource
     {
         public ItemPrefab? SourceItem;
         public Identifier[]? MachineIds;
@@ -1026,7 +1026,7 @@ namespace SOS
         public bool IsRandom;
     }
 
-    public class GroupedUsage
+    internal class GroupedUsage
     {
         public ItemPrefab? TargetItem;
         public List<Identifier>? MachineIds;
@@ -1034,7 +1034,7 @@ namespace SOS
         public float AmountRequired;
     }
 
-    public class GUIDesplegableBox
+    internal class GUIDesplegableBox
     {
         public GUIDesplegableBox(GUIComponent parent, Action<string> onBadgeClick, string labelText, IEnumerable<string> tags, IEnumerable<Prefab> items, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
@@ -1073,7 +1073,7 @@ namespace SOS
         }
     }
 
-    public static class GUIBadgeList
+    internal static class GUIBadgeList
     {
         public static void AddBadge(GUIListBox list, Prefab item, Action<Prefab> onClick, RichString? displayName = null)
         {
@@ -1148,7 +1148,7 @@ namespace SOS
         }
     }
 
-    public static class GUIHyperlinkList
+    internal static class GUIHyperlinkList
     {
         public static GUITextBlock Create(RectTransform targetRect, IEnumerable<string> values, Action<string> onClick, IEnumerable<RichString>? displayNames = null, string separator = " | ", Color? linkColor = null)
         {
@@ -1222,7 +1222,7 @@ namespace SOS
         }
     }
 
-    public class SearchFilter
+    internal class SearchFilter
     {
         public List<string> General = [];
         public List<string> Mod = [];

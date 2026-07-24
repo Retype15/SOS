@@ -191,12 +191,12 @@ namespace SOS
 
         private readonly List<AfflictionData> afflictions = [];
 
-        public class AfflictionData
+        private class AfflictionData
         {
-            public string Identifier = "";
-            public string Name = "";
-            public float Strength;
-            public float Probability;
+            internal string Identifier = "";
+            internal string Name = "";
+            internal float Strength;
+            internal float Probability;
         }
 
         public double Order => 2;

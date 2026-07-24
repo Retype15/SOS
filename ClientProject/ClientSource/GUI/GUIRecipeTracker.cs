@@ -15,7 +15,7 @@ using BGUI = Barotrauma.GUI;
 
 namespace SOS.GUI
 {
-    public class GUIRecipeTracker : GUIFrame
+    internal class GUIRecipeTracker : GUIFrame
     {
         // CONSTS
         private const ushort TIMECACHERESET = 60;
@@ -71,7 +71,7 @@ namespace SOS.GUI
             }
         }
 
-        public GUIRecipeTracker(RectTransform rectT, string style = "", Color? color = null) : base(rectT, style, color)
+        internal GUIRecipeTracker(RectTransform rectT, string style = "", Color? color = null) : base(rectT, style, color)
         {
             contentLayout = new GUILayoutGroup(
                 new RectTransform(new Vector2(1f, 1f), RectTransform) { AbsoluteOffset = new Point(8, 8) })

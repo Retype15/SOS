@@ -11,7 +11,7 @@ using BGUI = Barotrauma.GUI;
 
 namespace SOS
 {
-    public static class MigrationDialog
+    internal static class MigrationDialog
     {
         private const string LegacyConfigPath = "Data/sossettings.xml";
 
