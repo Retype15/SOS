@@ -246,10 +246,10 @@ namespace SOS
             return true;
         }
 
-        public static void Destroy()
-        {
-            _instance = null;
-        }
+
+        public static void Destroy() => _instance = null;
+
+        ~ClientConfig() => Destroy();
     }
 
     // ─── Layout DTO ───
