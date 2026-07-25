@@ -7,34 +7,53 @@
 
 using System.Diagnostics;
 using Barotrauma;
+using Barotrauma.LuaCs;
 using Microsoft.Xna.Framework;
 
 namespace SOS
 {
     internal static class Logger
     {
-        [Conditional("DEBUG")]
-        public static void LogDebug(string message, Color? color = null) => Log(message, color);
+        internal static ILoggerService? LoggerService = null;
 
         [Conditional("DEBUG")]
-        public static void LogDebugError(string message) => LuaCsLogger.LogError(message);
+        public static void LogDebug(string message, Color? color = null, ILoggerService? logger = null) => Log(message, color, logger);
 
         [Conditional("DEBUG")]
-        public static void LogDebugWarning(string message, Color? color = null) => LogWarning(message, color);
+        public static void LogDebugError(string message, ILoggerService? logger = null) => LogError(message, logger);
+
+        [Conditional("DEBUG")]
+        public static void LogDebugWarning(string message, ILoggerService? logger = null) => LogWarning(message, logger);
 
         [Conditional("RELEASE")]
-        public static void LogRelease(string message, Color? color = null) => Log(message, color);
+        public static void LogRelease(string message, Color? color = null, ILoggerService? logger = null) => Log(message, color, logger);
 
         [Conditional("RELEASE")]
-        public static void LogReleaseError(string message) => LuaCsLogger.LogError(message);
+        public static void LogReleaseError(string message, ILoggerService? logger = null) => LogError(message, logger);
 
         [Conditional("RELEASE")]
-        public static void LogReleaseWarning(string message, Color? color = null) => LogWarning(message, color);
+        public static void LogReleaseWarning(string message, ILoggerService? logger = null) => LogWarning(message, logger);
 
-        public static void Log(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.SkyBlue);
+        public static void Log(string message, Color? color = null, ILoggerService? logger = null)
+        {
+            color ??= Color.SkyBlue;
+            if (logger != null) logger.Log(message, color);
+            else if (LoggerService != null) LoggerService.Log(message, color);
+            else LuaCsLogger.Log(message, color);
+        }
 
-        public static void LogError(string message) => LuaCsLogger.LogError(message);
+        public static void LogError(string message, ILoggerService? logger = null)
+        {
+            if (logger != null) logger.LogError(message);
+            else if (LoggerService != null) LoggerService.LogError(message);
+            else LuaCsLogger.LogError(message);
+        }
 
-        public static void LogWarning(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.Yellow);
+        public static void LogWarning(string message, ILoggerService? logger = null)
+        {
+            if (logger != null) logger.LogWarning(message);
+            else if (LoggerService != null) LoggerService.LogWarning(message);
+            else LuaCsLogger.Log(message, Color.Yellow);
+        }
     }
 }

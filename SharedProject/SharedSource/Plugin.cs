@@ -21,6 +21,7 @@ namespace SOS
 #pragma warning disable CS8618
         public IConfigService ConfigService { get; set; } = null!;
         public IPluginManagementService PluginManagementService { get; set; } = null!;
+        public ILoggerService LoggerService { get; set; } = null!;
         public IConsoleCommandsService ConsoleCommandsService { get; set; } = null!;
 #pragma warning restore CS8618
 
@@ -30,6 +31,8 @@ namespace SOS
 
         public void Initialize()
         {
+            Logger.LoggerService = LoggerService;
+
             if (!PluginManagementService.TryGetPackageForPlugin<Plugin>(out Package))
             {
                 Logger.LogError("Failed to find package!");
@@ -63,6 +66,7 @@ namespace SOS
             Package = null!;
             Instance = null!;
             Logger.LogDebug(Texts.Get("sos.shared.unloaded", "[SOS] Mod Unloaded.").Value);
+            Logger.LoggerService = null;
             GC.SuppressFinalize(this);
         }
     }
