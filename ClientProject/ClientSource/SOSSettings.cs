@@ -101,13 +101,22 @@ namespace SOS
                 DummySimulated = !ClinicalSimulatorManager.HasStarted;
             }
 
-            LastItemId = ctr.CurrentTarget?.Identifier.Value ?? "";
-            WindowSizeX = ctr.WindowSize?.X ?? -1;
-            WindowSizeY = ctr.WindowSize?.Y ?? -1;
-            WindowPositionX = ctr.WindowPosition?.X ?? -1;
-            WindowPositionY = ctr.WindowPosition?.Y ?? -1;
-            LeftPanelWidth = ctr.LeftPanelWidth ?? 0;
-            RightPanelWidth = ctr.RightPanelWidth ?? 0;
+            if (ctr.CurrentTarget != null) LastItemId = ctr.CurrentTarget.Identifier.Value;
+            if (ctr.WindowSize != null)
+            {
+                WindowSizeX = ctr.WindowSize.Value.X;
+                WindowSizeY = ctr.WindowSize.Value.Y;
+            }
+
+            if (ctr.WindowPosition != null)
+            {
+                WindowPositionX = ctr.WindowPosition.Value.X;
+                WindowPositionY = ctr.WindowPosition.Value.Y;
+            }
+
+            if (ctr.LeftPanelWidth != null) LeftPanelWidth = ctr.LeftPanelWidth.Value;
+            if (ctr.RightPanelWidth != null) RightPanelWidth = ctr.RightPanelWidth.Value;
+
             FavoritesRaw = ctr.FavoritedItems.ToCsv();
             TabHistoryRaw = ctr.TabHistory.ToCsv();
             CustomLayoutsRaw = LayoutsToXml(ctr.CustomLayouts);

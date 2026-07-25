@@ -54,7 +54,6 @@ namespace SOS
 
             public bool Register(object obj)
             {
-                //Logger.LogDebug($"Registering '{obj.GetType()}'", Microsoft.Xna.Framework.Color.LightGoldenrodYellow);
                 bool isSuccess = obj switch
                 {
                     null => false,
@@ -86,7 +85,6 @@ namespace SOS
 
                     Add(id, order, () => Activator.CreateInstance(type)?.Cast<T>());
 
-                    //LogDebug($"Registered type: {type.FullName} [Order: {order}]", Color.Green);
                     return true;
                 }
                 catch (Exception ex)
@@ -113,9 +111,7 @@ namespace SOS
                 try
                 {
                     var dummy = func().Cast<T>();
-                    //Logger.LogDebug($"REGISTER FUNC '{dummy.Id}'.", Microsoft.Xna.Framework.Color.Chartreuse);
                     Add(dummy.Id, dummy.Order, () => func().Cast<T>());
-                    //Logger.LogDebug(string.Join("\n", _dict), Microsoft.Xna.Framework.Color.AliceBlue);
                     return true;
                 }
                 catch (Exception ex)
@@ -131,7 +127,6 @@ namespace SOS
                 {
                     var section = obj.Cast<T>();
                     Add(section);
-                    //LogDebug($"Registered instance: {section.Id} [Order: {section.Order}]", Color.Green);
                     return true;
                 }
                 catch (Exception ex)
@@ -159,7 +154,6 @@ namespace SOS
 
             public (string Id, double Order, Func<T?> Factory)[] GetSorted()
             {
-                //Logger.LogDebug(string.Join("\n", _dict), Microsoft.Xna.Framework.Color.AliceBlue);
                 if (_isDirty)
                 {
                     _cache = [.. _dict
@@ -176,7 +170,6 @@ namespace SOS
             {
                 foreach (var (Id, _, factory) in GetSorted())
                 {
-                    //Logger.LogDebug($"obtained instance for '{Id}'", Microsoft.Xna.Framework.Color.Green);
                     T? instance;
                     try
                     {
@@ -189,10 +182,7 @@ namespace SOS
                     }
 
                     if (instance != null)
-                    {
-                        //Logger.LogDebug($"Created '{instance.Id}'", Microsoft.Xna.Framework.Color.LightGreen);
                         yield return instance;
-                    }
                 }
             }
 
