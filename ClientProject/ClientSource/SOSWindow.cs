@@ -818,7 +818,7 @@ namespace SOS
                     if (section.Analyze(targetItem))
                     {
                         section.Draw(metaPanel, OnPrimary, OnSecondary);
-                        Logger.LogDebug($"Drawed {section.Id}", Color.YellowGreen);
+                        //Logger.LogDebug($"Drawed {section.Id}", Color.YellowGreen);
                     }
                 }
                 catch (Exception ex)

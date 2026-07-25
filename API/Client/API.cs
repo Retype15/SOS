@@ -5,6 +5,7 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Barotrauma.LuaCs;
@@ -20,40 +21,46 @@ namespace SOS
 
         private static readonly SortedFactory<ISOSStatSection> _sectionFactories = new();
         private static readonly SortedFactory<ISOSCenterTab> _tabFactories = new();
+        private static readonly SortedFactory<ISOSConfig> _configFactories = new();
 
         private static bool _scanned = false;
 
         private sealed class SortedFactory<T> where T : class, IIdentifierOrdenable
         {
-            private readonly Dictionary<string, (double Order, Func<T?> Factory)> _dict = [];
+            private readonly ConcurrentDictionary<string, (double Order, Func<T?> Factory)> _dict = [];
             private (string Id, double Order, Func<T?> Factory)[] _cache = [];
             private bool _isDirty = false;
 
-            public void Add(string id, double order, Func<T?> Factory)
+            private void Add(T instance) => Add(instance.Id, instance.Order, () => instance);
+
+            private void Add(string id, double order, Func<T?> Factory)
             {
-                _dict[id] = (order, Factory);
-                _isDirty = true;
+                lock (_dict)
+                {
+                    _dict[id] = (order, Factory);
+                    _isDirty = true;
+                }
             }
 
-            public void Add(T instance)
+            private bool Remove(string key)
             {
-                _dict[instance.Id] = (instance.Order, () => instance);
-                _isDirty = true;
-            }
-
-            public bool Remove(string key)
-            {
-                var isSuccess = _dict.Remove(key);
-                if (isSuccess) _isDirty = true;
-                return isSuccess;
+                lock (_dict)
+                {
+                    var isSuccess = _dict.TryRemove(key, out _);
+                    if (isSuccess) _isDirty = true;
+                    return isSuccess;
+                }
             }
 
             public bool Register(object obj)
             {
+                //Logger.LogDebug($"Registering '{obj.GetType()}'", Microsoft.Xna.Framework.Color.LightGoldenrodYellow);
                 bool isSuccess = obj switch
                 {
                     null => false,
                     Type type => RegisterType(type),
+                    Func<T?> func => RegisterFunc(func),
+                    Func<object> func => RegisterFunc(func),
                     _ => RegisterInstance(obj)
                 };
                 return isSuccess;
@@ -85,6 +92,35 @@ namespace SOS
                 catch (Exception ex)
                 {
                     Logger.LogWarning($"[SOS.API] Failed to register type '{type.FullName}' as '{typeof(T).Name}'. Type does not satisfy contract. \nException: {ex.Message}");
+                    return false;
+                }
+            }
+
+            private bool RegisterFunc(Func<T?> func)
+            {
+                var dummy = func();
+                if (dummy == null)
+                {
+                    Logger.LogWarning($"[SOS.API] Failed to register method. Returned Type on register has been Null.");
+                    return false;
+                }
+                Add(dummy.Id, dummy.Order, func);
+                return true;
+            }
+
+            private bool RegisterFunc(Func<object> func)
+            {
+                try
+                {
+                    var dummy = func().Cast<T>();
+                    //Logger.LogDebug($"REGISTER FUNC '{dummy.Id}'.", Microsoft.Xna.Framework.Color.Chartreuse);
+                    Add(dummy.Id, dummy.Order, () => func().Cast<T>());
+                    //Logger.LogDebug(string.Join("\n", _dict), Microsoft.Xna.Framework.Color.AliceBlue);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning($"[SOS.API] Failed to register method. Returned Type does not satisfy contract. \nException: {ex.Message}");
                     return false;
                 }
             }
@@ -123,6 +159,7 @@ namespace SOS
 
             public (string Id, double Order, Func<T?> Factory)[] GetSorted()
             {
+                //Logger.LogDebug(string.Join("\n", _dict), Microsoft.Xna.Framework.Color.AliceBlue);
                 if (_isDirty)
                 {
                     _cache = [.. _dict
@@ -139,6 +176,7 @@ namespace SOS
             {
                 foreach (var (Id, _, factory) in GetSorted())
                 {
+                    //Logger.LogDebug($"obtained instance for '{Id}'", Microsoft.Xna.Framework.Color.Green);
                     T? instance;
                     try
                     {
@@ -151,7 +189,10 @@ namespace SOS
                     }
 
                     if (instance != null)
+                    {
+                        //Logger.LogDebug($"Created '{instance.Id}'", Microsoft.Xna.Framework.Color.LightGreen);
                         yield return instance;
+                    }
                 }
             }
 
@@ -189,10 +230,19 @@ namespace SOS
 
         #endregion
 
+        #region Configs
+
+        public static bool RegisterConfig(object obj) => _configFactories.Register(obj);
+
+        internal static IEnumerable<ISOSConfig> CreateConfigs() => _configFactories.Create();
+
+        #endregion
+
         internal static void Clear()
         {
             _sectionFactories.Clear();
             _tabFactories.Clear();
+            _configFactories.Clear();
             _scanned = false;
         }
     }

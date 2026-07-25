@@ -14,7 +14,7 @@ using BGUI = Barotrauma.GUI;
 
 namespace SOS
 {
-    public sealed class SOSController
+    public sealed class SOSController : IDisposable
     {
         private SOSWindow? mainWindow;
 
@@ -111,8 +111,7 @@ namespace SOS
         {
             if (mainWindow != null)
             {
-                SaveSettings();
-                this.Destroy();
+                Dispose();
             }
             else
             {
@@ -127,6 +126,7 @@ namespace SOS
                 if (Screen.Selected == null || IsSOSBlocked) return;
 
                 API.Initialize(Plugin.Instance.PluginManagementService);
+                LoadSettings();
 
                 mainWindow = new SOSWindow();
 
@@ -150,16 +150,6 @@ namespace SOS
             }
         }
 
-        public void Destroy()
-        {
-            GUIAnimSequence.ClearAll();
-
-            _favoritedItems = null;
-            mainWindow?.Destroy();
-            mainWindow = null;
-            ClientConfig.Destroy();
-        }
-
         public void OnTargetSelected(Prefab item, bool isHistoryNavigation = false)
         {
             if (item == null) return;
@@ -179,80 +169,14 @@ namespace SOS
 
         public void SaveSettings()
         {
-            if (ClinicalSimulatorManager.Patient != null)
-            {
-                this.DummyDeathCount = ClinicalSimulatorManager.DeathCount;
-                this.DummyCharacterXML = ClinicalSimulatorManager.ExportSaveData()?.ToString();
-                this.DummySimulated = !ClinicalSimulatorManager.HasStarted;
-            }
-
-            cfg.LastItemId = CurrentTarget?.Identifier.Value ?? "";
-            cfg.WindowSizeX = WindowSize?.X ?? -1;
-            cfg.WindowSizeY = WindowSize?.Y ?? -1;
-            cfg.WindowPositionX = WindowPosition?.X ?? -1;
-            cfg.WindowPositionY = WindowPosition?.Y ?? -1;
-            cfg.LeftPanelWidth = LeftPanelWidth ?? 0;
-            cfg.RightPanelWidth = RightPanelWidth ?? 0;
-            cfg.FavoritesRaw = FavoritedItems.ToCsv();
-            cfg.TabHistoryRaw = TabHistory.ToCsv();
-            cfg.CustomLayoutsRaw = ClientConfig.LayoutsToXml(CustomLayouts);
-            cfg.TrackedRecipesRaw = Tracker.ToCsv();
-            cfg.TrackerVisible = Tracker.Visible;
-
-            cfg.SaveAll();
+            foreach (var config in API.CreateConfigs())
+                config.Save();
         }
 
         public void LoadSettings()
         {
-            if (cfg == null) return;
-
-            // Simple fields (auto-persisted, read from cfg)
-            LastSearchQuery = cfg.LastSearchQuery;
-            RawXmlMode = cfg.RawXmlMode;
-            XmlFontScale = cfg.XmlFontScale;
-            DummyDeathCount = cfg.DummyDeathCount;
-            DummyCharacterXML = cfg.DummyCharacterXML;
-            DummySimulated = cfg.DummySimulated;
-
-            // Window geometry (batch)
-            int wx = cfg.WindowSizeX;
-            int wy = cfg.WindowSizeY;
-            WindowSize = (wx >= 0 && wy >= 0) ? new Point(wx, wy) : null;
-
-            int px = cfg.WindowPositionX;
-            int py = cfg.WindowPositionY;
-            WindowPosition = (px >= 0 && py >= 0) ? new Point(px, py) : null;
-
-            LeftPanelWidth = cfg.LeftPanelWidth > 0 ? cfg.LeftPanelWidth : null;
-            RightPanelWidth = cfg.RightPanelWidth > 0 ? cfg.RightPanelWidth : null;
-
-            // Complex fields (deserialize from store)
-            FavoritedItems.Clear();
-            foreach (var fav in ClientConfig.CsvToHashSet(cfg.FavoritesRaw))
-                FavoritedItems.Add(fav);
-            TabHistory.Clear();
-            TabHistory.AddRange(ClientConfig.CsvToList(cfg.TabHistoryRaw));
-
-            CustomLayouts.Clear();
-            var loaded = ClientConfig.XmlToLayouts(cfg.CustomLayoutsRaw);
-            foreach (var kvp in loaded) CustomLayouts[kvp.Key] = kvp.Value;
-
-            // Defaults
-            if (!WindowSize.HasValue) WindowSize = new Point(1250, 850);
-            if (!LeftPanelWidth.HasValue) LeftPanelWidth = 250;
-            if (!RightPanelWidth.HasValue) RightPanelWidth = 300;
-
-            // Restore last selection
-            string lastId = cfg.LastItemId;
-            if (!string.IsNullOrEmpty(lastId))
-            {
-                CurrentTarget = (Prefab?)ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == lastId)
-                             ?? (Prefab?)AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == lastId);
-            }
-
-            // Restore tracker
-            Tracker.FromCsv(cfg.TrackedRecipesRaw);
-            Tracker.Visible = cfg.TrackerVisible;
+            foreach (var config in API.CreateConfigs())
+                config.Load();
         }
 
         public void ApplyLayout(Point size, int leftW, int rightW)
@@ -508,5 +432,26 @@ namespace SOS
 
             return null;
         }
+
+        public void Dispose()
+        {
+            SaveSettings();
+
+            GUIAnimSequence.ClearAll();
+
+            _favoritedItems = null;
+            mainWindow?.Destroy();
+            mainWindow = null;
+
+            GC.SuppressFinalize(this);
+        }
+
+        public void Destroy()
+        {
+            Dispose();
+            _instance = null;
+        }
+
+        ~SOSController() => Dispose();
     }
 }

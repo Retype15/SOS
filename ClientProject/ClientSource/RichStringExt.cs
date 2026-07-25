@@ -8,7 +8,9 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using System.Diagnostics.CodeAnalysis;
 using Barotrauma;
+using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 
 namespace SOS
@@ -210,6 +212,15 @@ namespace SOS
         {
             return string.Join(",", collection);
         }
+    }
+
+    internal static class ISettingBaseExt
+    {
+        internal static bool SetIfNotEqual<T>([NotNullWhen(false)] this ISettingBase<T> setting, T value) where T : IEquatable<T>, IConvertible
+            => (!setting.Value?.Equals(value) ?? true) && setting.TrySetValue(value);
+
+        internal static bool SetIfNotEqual([NotNullWhen(false)] this ISettingControl setting, KeyOrMouse value)
+            => (!setting.Value?.Equals(value) ?? true) && setting.TrySetValue(value);
     }
 
     // AI Generated Code

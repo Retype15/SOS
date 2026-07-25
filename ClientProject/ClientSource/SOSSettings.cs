@@ -10,77 +10,167 @@ using System.Xml.Linq;
 using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
+using MonoMod.Utils;
 
 namespace SOS
 {
-    public sealed class ClientConfig
+    public sealed class ClientConfig : ISOSConfig, IDisposable
     {
+        public string Id => "SOS.Core";
+        public double Order => 0;
+
         private static ClientConfig? _instance;
         public static ClientConfig Instance => _instance ??= new ClientConfig();
 
         private readonly HashSet<ISettingBase> _dirtySettings = [];
 
-        private void MarkDirty(ISettingBase setting) => _dirtySettings.Add(setting);
+        private void MarkDirty(ISettingBase setting)
+            => _dirtySettings.Add(setting);
 
         public bool HasChanges => _dirtySettings.Count > 0;
 
-        public void SaveAll()
+        private bool _loaded = false;
+        public void Load()
         {
-            if (!HasChanges) return;
+            if (_loaded) return;
 
-            if (Plugin.Instance.ConfigService is Barotrauma.LuaCs.ConfigService cs)
+            var ctr = SOSController.Instance;
+
+            // Simple fields
+            ctr.LastSearchQuery = LastSearchQuery;
+            ctr.RawXmlMode = RawXmlMode;
+            ctr.XmlFontScale = XmlFontScale;
+            ctr.DummyDeathCount = DummyDeathCount;
+            ctr.DummyCharacterXML = DummyCharacterXML;
+            ctr.DummySimulated = DummySimulated;
+
+            // Window geometry
+            int wx = WindowSizeX;
+            int wy = WindowSizeY;
+            ctr.WindowSize = (wx >= 0 && wy >= 0) ? new Point(wx, wy) : null;
+
+            int px = WindowPositionX;
+            int py = WindowPositionY;
+            ctr.WindowPosition = (px >= 0 && py >= 0) ? new Point(px, py) : null;
+
+            ctr.LeftPanelWidth = LeftPanelWidth > 0 ? LeftPanelWidth : null;
+            ctr.RightPanelWidth = RightPanelWidth > 0 ? RightPanelWidth : null;
+
+            // Complex fields
+            ctr.FavoritedItems.Clear();
+            foreach (var fav in ClientConfig.CsvToHashSet(FavoritesRaw))
+                ctr.FavoritedItems.Add(fav);
+            ctr.TabHistory.Clear();
+            ctr.TabHistory.AddRange(ClientConfig.CsvToList(TabHistoryRaw));
+
+            ctr.CustomLayouts.Clear();
+            //var loaded = ClientConfig.XmlToLayouts(CustomLayoutsRaw);
+            ctr.CustomLayouts.AddRange(ClientConfig.XmlToLayouts(CustomLayoutsRaw));
+            //foreach (var kvp in loaded) ctr.CustomLayouts[kvp.Key] = kvp.Value;
+
+            // Defaults
+            if (!ctr.WindowSize.HasValue) ctr.WindowSize = new Point(1250, 850);
+            if (!ctr.LeftPanelWidth.HasValue) ctr.LeftPanelWidth = 250;
+            if (!ctr.RightPanelWidth.HasValue) ctr.RightPanelWidth = 300;
+
+            // Restore last selection
+            string lastId = LastItemId;
+            if (!string.IsNullOrEmpty(lastId))
             {
-                foreach (ISettingBase setting in _dirtySettings)
-                    cs.SaveConfigValue(setting);
+                ctr.CurrentTarget = (Prefab?)ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == lastId)
+                             ?? (Prefab?)AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == lastId)
+                             ?? (Prefab?)ItemPrefab.Prefabs.FirstOrDefault();
             }
-            _dirtySettings.Clear();
+
+            // Restore tracker
+            ctr.Tracker.FromCsv(TrackedRecipesRaw);
+            ctr.Tracker.Visible = TrackerVisible;
+
+            _loaded = true;
+
+            Logger.LogDebug($"[SOS] CONFIG LOADED...");
         }
 
-        private readonly ISettingControl _sosOpenKey = null!;
-        public KeyOrMouse SOSOpenKey { get => _sosOpenKey.Value; set => _sosOpenKey.TrySetValue(value); }
+        public void Save()
+        {
+            var ctr = SOSController.Instance;
+            if (ClinicalSimulatorManager.Patient != null)
+            {
+                DummyDeathCount = ClinicalSimulatorManager.DeathCount;
+                DummyCharacterXML = ClinicalSimulatorManager.ExportSaveData()?.ToString();
+                DummySimulated = !ClinicalSimulatorManager.HasStarted;
+            }
+
+            LastItemId = ctr.CurrentTarget?.Identifier.Value ?? "";
+            WindowSizeX = ctr.WindowSize?.X ?? -1;
+            WindowSizeY = ctr.WindowSize?.Y ?? -1;
+            WindowPositionX = ctr.WindowPosition?.X ?? -1;
+            WindowPositionY = ctr.WindowPosition?.Y ?? -1;
+            LeftPanelWidth = ctr.LeftPanelWidth ?? 0;
+            RightPanelWidth = ctr.RightPanelWidth ?? 0;
+            FavoritesRaw = ctr.FavoritedItems.ToCsv();
+            TabHistoryRaw = ctr.TabHistory.ToCsv();
+            CustomLayoutsRaw = LayoutsToXml(ctr.CustomLayouts);
+            TrackedRecipesRaw = ctr.Tracker.ToCsv();
+            TrackerVisible = ctr.Tracker.Visible;
+
+            if (!HasChanges) return;
+
+            foreach (ISettingBase setting in _dirtySettings)
+                Plugin.Instance.ConfigService.SaveConfigValue(setting);
+
+            _dirtySettings.Clear();
+
+            Logger.LogDebug($"[SOS] CONFIG SAVED..!");
+        }
+
+        public void Reset() { }
+
+        private readonly ISettingControl _sosOpenKey;
+        public KeyOrMouse SOSOpenKey { get => _sosOpenKey.Value; set => _sosOpenKey.SetIfNotEqual(value); }
         public bool SOSOpenKeyHit => _sosOpenKey.IsHit();
         public bool SOSOpenKeyDown => _sosOpenKey.IsDown();
 
-        private readonly ISettingBase<string> _lastSearchQuery = null!;
+        private readonly ISettingBase<string> _lastSearchQuery;
         public string LastSearchQuery
         {
             get => _lastSearchQuery.Value;
-            set { if (_lastSearchQuery.Value != value) _lastSearchQuery.TrySetValue(value); }
+            set => _lastSearchQuery.SetIfNotEqual(value);
         }
 
-        private readonly ISettingBase<string> _lastItemId = null!;
+        private readonly ISettingBase<string> _lastItemId;
         public string LastItemId
         {
             get => _lastItemId.Value;
-            set { if (_lastItemId.Value != value) _lastItemId.TrySetValue(value); }
+            set => _lastItemId.SetIfNotEqual(value);
         }
 
-        private readonly ISettingBase<bool> _rawXmlMode = null!;
+        private readonly ISettingBase<bool> _rawXmlMode;
         public bool RawXmlMode
         {
             get => _rawXmlMode.Value;
-            set { if (_rawXmlMode.Value != value) _rawXmlMode.TrySetValue(value); }
+            set => _rawXmlMode.SetIfNotEqual(value);
         }
 
-        private readonly ISettingBase<float> _xmlFontScale = null!;
+        private readonly ISettingBase<float> _xmlFontScale;
         public float XmlFontScale
         {
             get => _xmlFontScale.Value;
-            set { if (_xmlFontScale.Value != value) _xmlFontScale.TrySetValue(value); }
+            set => _xmlFontScale.SetIfNotEqual(value);
         }
 
-        private readonly ISettingBase<string> _trackedRecipesRaw = null!;
+        private readonly ISettingBase<string> _trackedRecipesRaw;
         public string TrackedRecipesRaw
         {
             get => _trackedRecipesRaw.Value;
-            set { if (_trackedRecipesRaw.Value != value) _trackedRecipesRaw.TrySetValue(value); }
+            set => _trackedRecipesRaw.SetIfNotEqual(value);
         }
 
-        private readonly ISettingBase<bool> _trackerVisible = null!;
+        private readonly ISettingBase<bool> _trackerVisible;
         public bool TrackerVisible
         {
             get => _trackerVisible.Value;
-            set { if (_trackerVisible.Value != value) _trackerVisible.TrySetValue(value); }
+            set => _trackerVisible.SetIfNotEqual(value);
         }
         public event Action<ISettingBase> OnTrackerVisibleValueChanged
         {
@@ -88,56 +178,52 @@ namespace SOS
             remove => _trackerVisible.OnValueChanged -= value;
         }
 
-        private readonly ISettingBase<int> _dummyDeathCount = null!;
+        private readonly ISettingBase<int> _dummyDeathCount;
         public int DummyDeathCount
         {
             get => _dummyDeathCount.Value;
-            set { if (_dummyDeathCount.Value != value) _dummyDeathCount.TrySetValue(value); }
+            set => _dummyDeathCount.SetIfNotEqual(value);
         }
 
-        private readonly ISettingBase<bool> _dummySimulated = null!;
+        private readonly ISettingBase<bool> _dummySimulated;
         public bool DummySimulated
         {
             get => _dummySimulated.Value;
-            set { if (_dummySimulated.Value != value) _dummySimulated.TrySetValue(value); }
+            set => _dummySimulated.SetIfNotEqual(value);
         }
 
-        private readonly ISettingBase<string> _dummyCharacterXML = null!;
+        private readonly ISettingBase<string> _dummyCharacterXML;
         public string? DummyCharacterXML
         {
             get => string.IsNullOrEmpty(_dummyCharacterXML.Value) ? null : _dummyCharacterXML.Value;
-            set
-            {
-                string normalized = value ?? "";
-                if (_dummyCharacterXML.Value != normalized) _dummyCharacterXML.TrySetValue(normalized);
-            }
+            set => _dummyCharacterXML.SetIfNotEqual(value ?? "");
         }
 
         // ─── Batch-save (window geometry) ───
 
-        private readonly ISettingBase<int> _windowSizeX = null!;
-        private readonly ISettingBase<int> _windowSizeY = null!;
-        private readonly ISettingBase<int> _windowPositionX = null!;
-        private readonly ISettingBase<int> _windowPositionY = null!;
-        private readonly ISettingBase<int> _leftPanelWidth = null!;
-        private readonly ISettingBase<int> _rightPanelWidth = null!;
+        private readonly ISettingBase<int> _windowSizeX;
+        private readonly ISettingBase<int> _windowSizeY;
+        private readonly ISettingBase<int> _windowPositionX;
+        private readonly ISettingBase<int> _windowPositionY;
+        private readonly ISettingBase<int> _leftPanelWidth;
+        private readonly ISettingBase<int> _rightPanelWidth;
 
-        internal int WindowSizeX { get => _windowSizeX.Value; set { if (_windowSizeX.Value != value) _windowSizeX.TrySetValue(value); } }
-        internal int WindowSizeY { get => _windowSizeY.Value; set { if (_windowSizeY.Value != value) _windowSizeY.TrySetValue(value); } }
-        internal int WindowPositionX { get => _windowPositionX.Value; set { if (_windowPositionX.Value != value) _windowPositionX.TrySetValue(value); } }
-        internal int WindowPositionY { get => _windowPositionY.Value; set { if (_windowPositionY.Value != value) _windowPositionY.TrySetValue(value); } }
-        internal int LeftPanelWidth { get => _leftPanelWidth.Value; set { if (_leftPanelWidth.Value != value) _leftPanelWidth.TrySetValue(value); } }
-        internal int RightPanelWidth { get => _rightPanelWidth.Value; set { if (_rightPanelWidth.Value != value) _rightPanelWidth.TrySetValue(value); } }
+        internal int WindowSizeX { get => _windowSizeX.Value; set => _windowSizeX.SetIfNotEqual(value); }
+        internal int WindowSizeY { get => _windowSizeY.Value; set => _windowSizeY.SetIfNotEqual(value); }
+        internal int WindowPositionX { get => _windowPositionX.Value; set => _windowPositionX.SetIfNotEqual(value); }
+        internal int WindowPositionY { get => _windowPositionY.Value; set => _windowPositionY.SetIfNotEqual(value); }
+        internal int LeftPanelWidth { get => _leftPanelWidth.Value; set => _leftPanelWidth.SetIfNotEqual(value); }
+        internal int RightPanelWidth { get => _rightPanelWidth.Value; set => _rightPanelWidth.SetIfNotEqual(value); }
 
         // ─── Batch-save (complex serialized) ───
 
-        private readonly ISettingBase<string> _favoritesRaw = null!;
-        private readonly ISettingBase<string> _tabHistoryRaw = null!;
-        private readonly ISettingBase<string> _customLayoutsRaw = null!;
+        private readonly ISettingBase<string> _favoritesRaw;
+        private readonly ISettingBase<string> _tabHistoryRaw;
+        private readonly ISettingBase<string> _customLayoutsRaw;
 
-        internal string FavoritesRaw { get => _favoritesRaw.Value; set { if (_favoritesRaw.Value != value) _favoritesRaw.TrySetValue(value); } }
-        internal string TabHistoryRaw { get => _tabHistoryRaw.Value; set { if (_tabHistoryRaw.Value != value) _tabHistoryRaw.TrySetValue(value); } }
-        internal string CustomLayoutsRaw { get => _customLayoutsRaw.Value; set { if (_customLayoutsRaw.Value != value) _customLayoutsRaw.TrySetValue(value); } }
+        internal string FavoritesRaw { get => _favoritesRaw.Value; set => _favoritesRaw.SetIfNotEqual(value); }
+        internal string TabHistoryRaw { get => _tabHistoryRaw.Value; set => _tabHistoryRaw.SetIfNotEqual(value); }
+        internal string CustomLayoutsRaw { get => _customLayoutsRaw.Value; set => _customLayoutsRaw.SetIfNotEqual(value); }
 
         // ─── CSV Serialization Helpers ───
 
@@ -153,7 +239,7 @@ namespace SOS
             return [.. csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
         }
 
-        // ─── XML Serialization Helpers (CustomLayouts) ───
+        // ─── XML Serialization Helpers ───
 
         internal static string LayoutsToXml(Dictionary<string, SavedLayout> layouts)
         {
@@ -241,15 +327,24 @@ namespace SOS
             }
             setting.OnValueChanged += MarkDirty;
 #if DEBUG
-            setting.OnValueChanged += setting => Logger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue()}");
+            //setting.OnValueChanged += setting => Logger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue()}");
 #endif
             return true;
         }
 
 
-        public static void Destroy() => _instance = null;
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+        }
 
-        ~ClientConfig() => Destroy();
+        public void Destroy()
+        {
+            Dispose();
+            _instance = null;
+        }
+
+        ~ClientConfig() => Dispose();
     }
 
     // ─── Layout DTO ───

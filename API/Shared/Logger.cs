@@ -14,22 +14,22 @@ namespace SOS
     internal static class Logger
     {
         [Conditional("DEBUG")]
-        public static void LogDebug(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.SkyBlue);
+        public static void LogDebug(string message, Color? color = null) => Log(message, color);
 
         [Conditional("DEBUG")]
         public static void LogDebugError(string message) => LuaCsLogger.LogError(message);
 
         [Conditional("DEBUG")]
-        public static void LogDebugWarning(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.Yellow);
+        public static void LogDebugWarning(string message, Color? color = null) => LogWarning(message, color);
 
         [Conditional("RELEASE")]
-        public static void LogRelease(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.SkyBlue);
+        public static void LogRelease(string message, Color? color = null) => Log(message, color);
 
         [Conditional("RELEASE")]
         public static void LogReleaseError(string message) => LuaCsLogger.LogError(message);
 
         [Conditional("RELEASE")]
-        public static void LogReleaseWarning(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.Yellow);
+        public static void LogReleaseWarning(string message, Color? color = null) => LogWarning(message, color);
 
         public static void Log(string message, Color? color = null) => LuaCsLogger.Log(message, color ?? Color.SkyBlue);
 

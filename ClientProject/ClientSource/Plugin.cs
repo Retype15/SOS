@@ -23,7 +23,7 @@ namespace SOS
             try
             {
                 controller = SOSController.Instance;
-                controller.LoadSettings();
+                API.RegisterConfig(() => ClientConfig.Instance);
 
                 if (!DebugConsole.commands.Exists(c => c.Names.Any(n => n.Value == "sos")))
                     DebugConsole.commands.Add(new DebugConsole.Command(
@@ -65,11 +65,11 @@ namespace SOS
 
             DebugConsole.commands.RemoveAll(c => c.Names.Contains("sos"));
 
-            controller?.SaveSettings();
-            controller?.Destroy();
             RecipeAnalyzer.Clear();
+            ClientConfig.Instance.Destroy();
+            controller = null!;
+            SOSController.Instance.Destroy();
             API.Clear();
-            controller = null;
         }
     }
 }

@@ -77,6 +77,13 @@ namespace SOS
 
     public interface ISOSCenterTab : ITab;
 
+    public interface ISOSConfig : IIdentifierOrdenable
+    {
+        void Save();
+        void Load();
+        void Reset();
+    }
+
     #endregion
 
     #region Default Proxy Classes
