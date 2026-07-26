@@ -46,6 +46,8 @@ namespace SOS
         private int itemsLoaded = 0;
         private const int ChunkSize = 50;
         private bool isUpdating = false;
+        private ISOSPrefab[]? prefabProviders;
+        private Dictionary<Type, string>? prefabHeaders;
 
         private readonly List<GUIDesplegableBox> activeDropdowns = [];
 
@@ -291,6 +293,9 @@ namespace SOS
                 //Logger.LogDebug($"Drawed {tab.Id}", Color.LightYellow);
             }
 
+            prefabProviders = [.. API.CreatePrefabProviders()];
+            prefabHeaders = prefabProviders.ToDictionary(p => p.PrefabType, p => p.Header);
+
             rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), contentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
             {
                 AllowedDirections = ResizeDirection.Left,
@@ -498,29 +503,34 @@ namespace SOS
 
         private void UpdateSearch(string query)
         {
-            if (itemList == null) return;
+            if (itemList == null || prefabProviders == null) return;
             var filter = new SearchFilter(query);
 
             allFilteredTargets.Clear();
             lastTypeInList = null;
 
-            var candidates = new List<Prefab>();
-            if (filter.AllowsItems) candidates.AddRange(ItemPrefab.Prefabs.Where(filter.Matches));
-            if (filter.AllowsAfflictions) candidates.AddRange(AfflictionPrefab.List.Where(filter.Matches));
+            var candidates = new List<(Prefab Prefab, double Order)>();
+
+            foreach (var provider in prefabProviders)
+            {
+                try
+                {
+                    if (!filter.AllowsType(provider.PrefabType.Name)) continue;
+
+                    foreach (var prefab in provider.GetAll(filter))
+                        candidates.Add((prefab, provider.Order));
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning($"[SOS] Provider '{provider.Id}' failed: {ex.Message}");
+                }
+            }
 
             allFilteredTargets = [.. candidates
-                .OrderByDescending(p => controller.FavoritedItems.Contains(p.Identifier.Value)) // 1. Fav
-                .ThenBy(                                                                        // 2. Type
-                p => p switch
-                    {
-                        ItemPrefab              => 1,
-                        AfflictionPrefabHusk    => 2.5f,
-                        AfflictionPrefab        => 2,
-                        TalentPrefab            => 3,
-                        _                       => 4
-                    }
-                )
-                .ThenBy(p => p.Name())];                                                        // 3. name
+                .OrderByDescending(c => controller.FavoritedItems.Contains(c.Prefab.Identifier.Value))
+                .ThenBy(c => c.Order)
+                .ThenBy(c => c.Prefab.Name())
+                .Select(c => c.Prefab)];
 
             itemsLoaded = 0;
             itemList.Content.ClearChildren();
@@ -571,8 +581,10 @@ namespace SOS
                         }
                     };
 
+                    string headerText = GetHeaderForType(currentType);
+
                     _ = new GUITextBlock(new RectTransform(Vector2.One, separatorFrame.RectTransform),
-                        Texts.Get($"sos.list.header.{type_name.ToLower()}", type_name.SpacedPascalCase()),
+                        headerText,
                         font: GUIStyle.SmallFont, textColor: Color.MediumPurple, textAlignment: Alignment.Center)
                     {
                         Wrap = true
@@ -1014,6 +1026,21 @@ namespace SOS
             if (searchBox != null) searchBox.Text = tag;
             UpdateSearch(tag);
         }
+
+        private string GetHeaderForType(Type type)
+        {
+            if (prefabHeaders == null) return type.Name.SpacedPascalCase();
+
+            Type? current = type;
+            while (current != null && current != typeof(Prefab))
+            {
+                if (prefabHeaders.TryGetValue(current, out var header))
+                    return header;
+                current = current.BaseType;
+            }
+
+            return type.Name.SpacedPascalCase();
+        }
     }
 
     internal class GroupedSource
@@ -1073,117 +1100,4 @@ namespace SOS
         }
     }
 
-    internal class SearchFilter
-    {
-        public List<string> General = [];
-        public List<string> Mod = [];
-        public List<string> Category = [];
-        public List<string> Tag = [];
-        public List<string> Slot = [];
-        public List<string> ID = [];
-        public List<string> PrefabType = [];
-
-        public bool AllowsItems => PrefabType.Count == 0 || PrefabType.Any(t =>
-            !t.Contains("Affliction", StringComparison.OrdinalIgnoreCase));
-
-        public bool AllowsAfflictions => PrefabType.Count == 0 || PrefabType.Any(t =>
-            !t.Contains("Item", StringComparison.OrdinalIgnoreCase));
-
-        public SearchFilter(string rawQuery)
-        {
-            if (string.IsNullOrWhiteSpace(rawQuery)) return;
-
-            char currentType = ' ';
-            int startIndex = 0;
-            string query = rawQuery + " ";
-
-            for (int i = 0; i < query.Length; i++)
-            {
-                char c = query[i];
-                if (c == '@' || c == '#' || c == '$' || c == '&' || c == '!' || c == '%' || i == query.Length - 1)
-                {
-                    string content = query[startIndex..i].Trim();
-                    if (!string.IsNullOrEmpty(content))
-                    {
-                        switch (currentType)
-                        {
-                            case ' ': General.Add(content); break;
-                            case '@': Mod.Add(content); break;
-                            case '#': Category.Add(content); break;
-                            case '$': Tag.Add(content); break;
-                            case '&': Slot.Add(content); break;
-                            case '!': ID.Add(content); break;
-                            case '%': PrefabType.Add(content); break;
-                        }
-                    }
-                    currentType = c;
-                    startIndex = i + 1;
-                }
-            }
-        }
-
-        public bool Matches(Prefab p)
-        {
-            if (PrefabType.Count > 0)
-            {
-                string typeName = p.GetType().Name;
-                if (!PrefabType.Any(t => typeName.Contains(t, StringComparison.OrdinalIgnoreCase))) return false;
-            }
-
-            return p switch
-            {
-                ItemPrefab item => MatchesItem(item),
-                AfflictionPrefab affliction => MatchesAffliction(affliction),
-                _ => false
-            };
-        }
-
-        private bool MatchesItem(ItemPrefab p)
-        {
-            if (!AllowsItems) return false;
-            if (Mod.Count > 0 && !Mod.Any(m => (p.ContentPackage?.Name ?? "Vanilla").Contains(m, StringComparison.OrdinalIgnoreCase))) return false;
-
-            if (Category.Count > 0 && !Category.Any(c => p.Category.ToString().Contains(c, StringComparison.OrdinalIgnoreCase))) return false;
-
-            if (ID.Count > 0 && !ID.Any(id => p.Identifier.Value.Contains(id, StringComparison.OrdinalIgnoreCase))) return false;
-
-            if (Slot.Count > 0 && !Slot.Any(s => SOSWindow.GetItemSlotsCached(p).Contains(s, StringComparison.OrdinalIgnoreCase))) return false;
-
-            foreach (var t in Tag) if (!p.Tags.Any(pt => pt.Value.Contains(t, StringComparison.OrdinalIgnoreCase))) return false;
-
-            return MatchesGeneral(p.Name.Value, p.Identifier.Value, p.Category.ToString(), p.ContentPackage?.Name, SOSWindow.GetItemSlotsCached(p), p.Tags.Select(t => t.Value));
-        }
-
-        private bool MatchesAffliction(AfflictionPrefab a)
-        {
-            if (!AllowsAfflictions) return false;
-
-            if (Slot.Count > 0 || Tag.Count > 0) return false;
-
-            if (Mod.Count > 0 && !Mod.Any(m => (a.ContentPackage?.Name ?? "Vanilla").Contains(m, StringComparison.OrdinalIgnoreCase))) return false;
-            if (Category.Count > 0 && !Category.Any(c => a.AfflictionType.Contains(c))) return false;
-            if (ID.Count > 0 && !ID.Any(id => a.Identifier.Value.Contains(id, StringComparison.OrdinalIgnoreCase))) return false;
-
-            return MatchesGeneral(a.Name.Value, a.Identifier.Value, a.AfflictionType, a.ContentPackage?.Name, "", []);
-        }
-
-        private bool MatchesGeneral(string name, string id, Identifier category, string? modName, string slots, IEnumerable<string> tags)
-        {
-            if (General.Count == 0) return true;
-            foreach (var term in General)
-            {
-                string lowerTerm = term.ToLowerInvariant();
-                bool match = name.Contains(term, StringComparison.OrdinalIgnoreCase) ||
-                             id.Contains(term, StringComparison.OrdinalIgnoreCase) ||
-                             category.Contains(term) ||
-                             (modName ?? "Vanilla").Contains(term, StringComparison.OrdinalIgnoreCase) ||
-                             slots.Contains(lowerTerm) ||
-                             tags.Any(t => t.Contains(term, StringComparison.OrdinalIgnoreCase));
-
-                if (!match) return false;
-            }
-
-            return true;
-        }
-    }
 }

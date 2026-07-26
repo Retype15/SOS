@@ -22,6 +22,7 @@ namespace SOS
         private static readonly SortedFactory<ISOSStatSection> _sectionFactories = new();
         private static readonly SortedFactory<ISOSCenterTab> _tabFactories = new();
         private static readonly SortedFactory<ISOSConfig> _configFactories = new();
+        private static readonly SortedFactory<ISOSPrefab> _prefabFactories = new();
 
         private static bool _scanned = false;
 
@@ -200,6 +201,8 @@ namespace SOS
 
             _sectionFactories.AutoRegister(pluginManagementService);
             _tabFactories.AutoRegister(pluginManagementService);
+            _configFactories.AutoRegister(pluginManagementService);
+            _prefabFactories.AutoRegister(pluginManagementService);
 
             _scanned = true;
         }
@@ -228,11 +231,20 @@ namespace SOS
 
         #endregion
 
+        #region Prefab Providers
+
+        public static bool RegisterPrefabProvider(object obj) => _prefabFactories.Register(obj);
+
+        internal static IEnumerable<ISOSPrefab> CreatePrefabProviders() => _prefabFactories.Create();
+
+        #endregion
+
         internal static void Clear()
         {
             _sectionFactories.Clear();
             _tabFactories.Clear();
             _configFactories.Clear();
+            _prefabFactories.Clear();
             _scanned = false;
         }
     }

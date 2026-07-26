@@ -84,6 +84,24 @@ namespace SOS
         void Reset();
     }
 
+    public interface ISOSPrefabFilter
+    {
+        List<string> General { get; }
+        List<string> Mod { get; }
+        List<string> Category { get; }
+        List<string> Tag { get; }
+        List<string> Slot { get; }
+        List<string> ID { get; }
+        List<string> PrefabType { get; }
+    }
+
+    public interface ISOSPrefab : IIdentifierOrdenable
+    {
+        Type PrefabType { get; }
+        string Header { get; }
+        IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter);
+    }
+
     #endregion
 
     #region Default Proxy Classes
