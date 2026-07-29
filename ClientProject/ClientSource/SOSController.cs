@@ -119,7 +119,7 @@ namespace SOS
                 {
                     MigrationDialog.Show();
                     HaveOldConfigFile = false;
-                    Logger.LogDebug("Abriendo la ventana de migracion");
+                    Logger.LogDebug("[SOS] Opening migration window.");
                     return;
                 }
 
@@ -150,7 +150,7 @@ namespace SOS
             }
         }
 
-        public void OnTargetSelected(Prefab item, bool isHistoryNavigation = false)
+        public void OnTargetSelected(Prefab? item, bool isHistoryNavigation = false)
         {
             if (item == null) return;
 
@@ -165,18 +165,6 @@ namespace SOS
                 CurrentTarget = item;
             }
             UpdateWindowDetails(item);
-        }
-
-        public void SaveSettings()
-        {
-            foreach (var config in API.CreateConfigs())
-                config.Save();
-        }
-
-        public void LoadSettings()
-        {
-            foreach (var config in API.CreateConfigs())
-                config.Load();
         }
 
         public void ApplyLayout(Point size, int leftW, int rightW)
@@ -380,6 +368,18 @@ namespace SOS
             if (!IsSOSBlocked && Screen.Selected == GameMain.GameScreen) Tracker.Update();
         }
 
+        public static void SaveSettings()
+        {
+            foreach (var config in API.CreateConfigs())
+                config.Save();
+        }
+
+        public static void LoadSettings()
+        {
+            foreach (var config in API.CreateConfigs())
+                config.Load();
+        }
+
         private static Prefab? GetPrefabUnderMouse()
         {
             // 1. World
@@ -407,11 +407,11 @@ namespace SOS
                     if (curr.UserData is Item item) return item.Prefab;
                     if (curr.UserData is Affliction affliction) return affliction.Prefab;
 
-                    // Shopp
+                    // Shop
                     if (curr.UserData is PurchasedItem purchasedItem) return purchasedItem.ItemPrefab;
                     if (curr.UserData is FabricationRecipe recipe) return recipe.TargetItem;
 
-                    // Shop Btns
+                    // Shop Buttons
                     if (curr.UserData as string == "addbutton" || curr.UserData as string == "removebutton")
                     {
                         GUIComponent? p = curr.Parent;

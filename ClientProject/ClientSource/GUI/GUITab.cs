@@ -50,8 +50,16 @@ namespace SOS.GUI
 
         public void RegisterTab(ITab tab)
         {
-            _tabs.Add(tab);
-            tab.Init(_contentArea);
+            try
+            {
+                tab.Init(_contentArea);
+                _tabs.Add(tab);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogReleaseError(ex.Message);
+                Logger.LogDebugError(ex.StackTrace ?? ex.Message);
+            }
         }
 
         public void UpdateTabs(Prefab target, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
@@ -85,10 +93,10 @@ namespace SOS.GUI
                 _buttonArea.RectTransform.MinSize = new Point(0, 32);
                 _buttonArea.RectTransform.MaxSize = new Point(int.MaxValue, 32);
                 _contentArea.RectTransform.RelativeSize = new Vector2(1f, 0.92f);
+
                 foreach (var tab in validTabs)
-                {
                     _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == _activeTab, () => SelectTab(tab), tab.ToolTip);
-                }
+
                 _buttonArea.RecalculateChildren();
             }
             else

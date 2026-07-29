@@ -45,8 +45,7 @@ namespace SOS
         void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
     }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DefaultClass<TabDefaults>]
+    [EditorBrowsable(EditorBrowsableState.Never), DefaultClass<TabDefaults>]
     public interface ITab : IIdentifierOrdenable
     {
         string TabName { get; }

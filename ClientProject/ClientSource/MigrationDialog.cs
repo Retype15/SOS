@@ -209,7 +209,7 @@ namespace SOS
                 }
 
                 // Persist to new config system
-                controller.SaveSettings();
+                SOSController.SaveSettings();
 
                 Logger.Log(Texts.Get("sos.migration.success", "[SOS] Previous configuration imported successfully.").Value);
             }
