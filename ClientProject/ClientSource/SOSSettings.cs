@@ -58,15 +58,13 @@ namespace SOS
 
             // Complex fields
             ctr.FavoritedItems.Clear();
-            foreach (var fav in ClientConfig.CsvToHashSet(FavoritesRaw))
+            foreach (var fav in ConfigHelper.CsvToHashSet(FavoritesRaw))
                 ctr.FavoritedItems.Add(fav);
             ctr.TabHistory.Clear();
-            ctr.TabHistory.AddRange(ClientConfig.CsvToList(TabHistoryRaw));
+            ctr.TabHistory.AddRange(ConfigHelper.CsvToList(TabHistoryRaw));
 
             ctr.CustomLayouts.Clear();
-            //var loaded = ClientConfig.XmlToLayouts(CustomLayoutsRaw);
-            ctr.CustomLayouts.AddRange(ClientConfig.XmlToLayouts(CustomLayoutsRaw));
-            //foreach (var kvp in loaded) ctr.CustomLayouts[kvp.Key] = kvp.Value;
+            ctr.CustomLayouts.AddRange(ConfigHelper.XmlToLayouts(CustomLayoutsRaw));
 
             // Defaults
             if (!ctr.WindowSize.HasValue) ctr.WindowSize = new Point(1250, 850);
@@ -119,7 +117,7 @@ namespace SOS
 
             FavoritesRaw = ctr.FavoritedItems.ToCsv();
             TabHistoryRaw = ctr.TabHistory.ToCsv();
-            CustomLayoutsRaw = LayoutsToXml(ctr.CustomLayouts);
+            CustomLayoutsRaw = ConfigHelper.LayoutsToXml(ctr.CustomLayouts);
             TrackedRecipesRaw = ctr.Tracker.ToCsv();
             TrackerVisible = ctr.Tracker.Visible;
 
@@ -234,15 +232,67 @@ namespace SOS
         internal string TabHistoryRaw { get => _tabHistoryRaw.Value; set => _tabHistoryRaw.SetIfNotEqual(value); }
         internal string CustomLayoutsRaw { get => _customLayoutsRaw.Value; set => _customLayoutsRaw.SetIfNotEqual(value); }
 
+        // ─── Constructor ───
+
+        private ClientConfig()
+        {
+            bool ownTryInitConfig<T>(string a, out T b) where T : ISettingBase => ConfigHelper.TryInitConfig<T>(a, out b, MarkDirty);
+
+            ownTryInitConfig("SOSOpenKey", out _sosOpenKey);
+            ownTryInitConfig("LastSearchQuery", out _lastSearchQuery);
+            ownTryInitConfig("LastItemId", out _lastItemId);
+            ownTryInitConfig("RawXmlMode", out _rawXmlMode);
+            ownTryInitConfig("XmlFontScale", out _xmlFontScale);
+            ownTryInitConfig("Favorites", out _favoritesRaw);
+            ownTryInitConfig("TabHistory", out _tabHistoryRaw);
+            ownTryInitConfig("CustomLayouts", out _customLayoutsRaw);
+            ownTryInitConfig("TrackedRecipes", out _trackedRecipesRaw);
+            ownTryInitConfig("TrackerVisible", out _trackerVisible);
+            ownTryInitConfig("WindowSizeX", out _windowSizeX);
+            ownTryInitConfig("WindowSizeY", out _windowSizeY);
+            ownTryInitConfig("WindowPositionX", out _windowPositionX);
+            ownTryInitConfig("WindowPositionY", out _windowPositionY);
+            ownTryInitConfig("LeftPanelWidth", out _leftPanelWidth);
+            ownTryInitConfig("RightPanelWidth", out _rightPanelWidth);
+            ownTryInitConfig("DummyDeathCount", out _dummyDeathCount);
+            ownTryInitConfig("DummySimulated", out _dummySimulated);
+            ownTryInitConfig("DummyCharacterXML", out _dummyCharacterXML);
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+        }
+
+        public void Destroy()
+        {
+            Dispose();
+            _instance = null;
+        }
+
+        ~ClientConfig() => Dispose();
+    }
+
+    // ─── Layout DTO ───
+
+    internal class SavedLayout
+    {
+        public Point WindowSize { get; set; }
+        public int LeftPanelWidth { get; set; }
+        public int RightPanelWidth { get; set; }
+    }
+
+    public abstract class ConfigHelper
+    {
         // ─── CSV Serialization Helpers ───
 
-        internal static HashSet<string> CsvToHashSet(string csv)
+        internal static HashSet<string> CsvToHashSet(string? csv)
         {
             if (string.IsNullOrEmpty(csv)) return [];
             return [.. csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
         }
 
-        internal static List<string> CsvToList(string csv)
+        internal static List<string> CsvToList(string? csv)
         {
             if (string.IsNullOrEmpty(csv)) return [];
             return [.. csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
@@ -250,9 +300,9 @@ namespace SOS
 
         // ─── XML Serialization Helpers ───
 
-        internal static string LayoutsToXml(Dictionary<string, SavedLayout> layouts)
+        internal static string LayoutsToXml(Dictionary<string, SavedLayout>? layouts)
         {
-            if (layouts.Count == 0) return "";
+            if (layouts == null || layouts.Count == 0) return "";
 
             var doc = new XDocument(
                 new XElement("Layouts",
@@ -271,7 +321,7 @@ namespace SOS
             return doc.ToString(SaveOptions.DisableFormatting);
         }
 
-        internal static Dictionary<string, SavedLayout> XmlToLayouts(string xml)
+        internal static Dictionary<string, SavedLayout> XmlToLayouts(string? xml)
         {
             var result = new Dictionary<string, SavedLayout>();
             if (string.IsNullOrEmpty(xml)) return result;
@@ -301,32 +351,9 @@ namespace SOS
             return result;
         }
 
-        // ─── Constructor ───
+        // TryInitConfig
 
-        private ClientConfig()
-        {
-            TryInitConfig("SOSOpenKey", out _sosOpenKey);
-            TryInitConfig("LastSearchQuery", out _lastSearchQuery);
-            TryInitConfig("LastItemId", out _lastItemId);
-            TryInitConfig("RawXmlMode", out _rawXmlMode);
-            TryInitConfig("XmlFontScale", out _xmlFontScale);
-            TryInitConfig("Favorites", out _favoritesRaw);
-            TryInitConfig("TabHistory", out _tabHistoryRaw);
-            TryInitConfig("CustomLayouts", out _customLayoutsRaw);
-            TryInitConfig("TrackedRecipes", out _trackedRecipesRaw);
-            TryInitConfig("TrackerVisible", out _trackerVisible);
-            TryInitConfig("WindowSizeX", out _windowSizeX);
-            TryInitConfig("WindowSizeY", out _windowSizeY);
-            TryInitConfig("WindowPositionX", out _windowPositionX);
-            TryInitConfig("WindowPositionY", out _windowPositionY);
-            TryInitConfig("LeftPanelWidth", out _leftPanelWidth);
-            TryInitConfig("RightPanelWidth", out _rightPanelWidth);
-            TryInitConfig("DummyDeathCount", out _dummyDeathCount);
-            TryInitConfig("DummySimulated", out _dummySimulated);
-            TryInitConfig("DummyCharacterXML", out _dummyCharacterXML);
-        }
-
-        private bool TryInitConfig<T>(string name, [NotNullWhen(true)] out T setting)
+        internal static bool TryInitConfig<T>(string name, [NotNullWhen(true)] out T setting, Action<ISettingBase>? onValueChanged = null)
                 where T : ISettingBase
         {
             if (!Plugin.Instance.ConfigService.TryGetConfig(Plugin.Instance.Package, name, out setting))
@@ -334,34 +361,11 @@ namespace SOS
                 Logger.LogError($"Failed to find config named {name}!");
                 return false;
             }
-            setting.OnValueChanged += MarkDirty;
+            if (onValueChanged != null) setting.OnValueChanged += onValueChanged;
 #if DEBUG
-            //setting.OnValueChanged += setting => Logger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue()}");
+            setting.OnValueChanged += setting => Logger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue(),128}");
 #endif
             return true;
         }
-
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public void Destroy()
-        {
-            Dispose();
-            _instance = null;
-        }
-
-        ~ClientConfig() => Dispose();
-    }
-
-    // ─── Layout DTO ───
-
-    internal class SavedLayout
-    {
-        public Point WindowSize { get; set; }
-        public int LeftPanelWidth { get; set; }
-        public int RightPanelWidth { get; set; }
     }
 }

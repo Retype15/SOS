@@ -27,7 +27,7 @@ namespace SOS
         {
             get
             {
-                _favoritedItems ??= ClientConfig.CsvToHashSet(cfg.FavoritesRaw ?? "");
+                _favoritedItems ??= ConfigHelper.CsvToHashSet(cfg.FavoritesRaw);
                 return _favoritedItems;
             }
         }
