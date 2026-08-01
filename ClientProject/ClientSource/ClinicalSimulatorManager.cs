@@ -145,49 +145,48 @@ namespace SOS
             }
         }
 
-        public static void Initialize(int savedDeathCount, string? savedXml, bool savedSimulated = false)
+        public static void Initialize()
         {
             MedicalReflector.Validate();
             if (ActiveDummy != null && ActiveDummy.Character != null && !ActiveDummy.Character.Removed) return;
             ActiveDummy?.Discard();
             ActiveDummy = null;
-            DeathCount = savedDeathCount;
+            var controller = SOSController.Instance;
+            DeathCount = controller.cfg.DummyDeathCount;
 
             bool loadedSuccessfully = false;
-            if (!string.IsNullOrEmpty(savedXml))
+
+            try
             {
-                try
+                XElement? element = controller.cfg.DummyCharacterXML;
+
+                var charNode = element.Name.ToString().Equals("Character", StringComparison.OrdinalIgnoreCase)
+                    ? element
+                    : element.Element("Character");
+
+                if (charNode != null)
                 {
-                    XElement element = XElement.Parse(savedXml);
+                    var contentX = new ContentXElement(null, charNode);
+                    CharacterInfo info = new(contentX);
 
-                    var charNode = element.Name.ToString().Equals("Character", StringComparison.OrdinalIgnoreCase)
-                        ? element
-                        : element.Element("Character");
+                    var character = Character.Create(info.SpeciesName, new Vector2(0, -10000), "SOS_DUMMY", info, isRemotePlayer: false, hasAi: false, createNetworkEvent: false, spawnInitialItems: false, id: GetFreshDummyID());
+                    ActiveDummy = new DummySubject(character, DeathCount);
+                    ActiveDummy.SetupDummyEntity();
 
-                    if (charNode != null)
+                    XElement? healthNode = element.Element("health");
+                    if (healthNode != null)
                     {
-                        var contentX = new ContentXElement(null, charNode);
-                        CharacterInfo info = new(contentX);
-
-                        var character = Character.Create(info.SpeciesName, new Vector2(0, -10000), "SOS_DUMMY", info, isRemotePlayer: false, hasAi: false, createNetworkEvent: false, spawnInitialItems: false, id: GetFreshDummyID());
-                        ActiveDummy = new DummySubject(character, DeathCount);
-                        ActiveDummy.SetupDummyEntity();
-
-                        XElement? healthNode = element.Element("health");
-                        if (healthNode != null)
-                        {
-                            CharacterInfo.ApplyHealthData(Patient, healthNode);
-                            MedicalReflector.HealthBiologicalUpdateMethod?.Invoke(Patient?.CharacterHealth, [0f]);
-                            Patient?.CharacterHealth.CalculateVitality();
-                        }
-
-                        loadedSuccessfully = true;
+                        CharacterInfo.ApplyHealthData(Patient, healthNode);
+                        MedicalReflector.HealthBiologicalUpdateMethod?.Invoke(Patient?.CharacterHealth, [0f]);
+                        Patient?.CharacterHealth.CalculateVitality();
                     }
+
+                    loadedSuccessfully = true;
                 }
-                catch (Exception e)
-                {
-                    LuaCsLogger.LogError($"[SOS] Failed to load saved Dummy XML: {e.Message}");
-                }
+            }
+            catch (Exception e)
+            {
+                LuaCsLogger.LogError($"[SOS] Failed to load saved Dummy XML: {e.Message}");
             }
 
             if (!loadedSuccessfully)
@@ -196,14 +195,14 @@ namespace SOS
             }
 
             IsPlaying = false;
-            if (loadedSuccessfully && savedSimulated)
+            if (loadedSuccessfully && controller.cfg.DummySimulated)
             {
                 HasStarted = false;
                 TakeSnapshot();
             }
             else
             {
-                HasStarted = true;
+                HasStarted = false;
                 snapshot = null;
             }
         }

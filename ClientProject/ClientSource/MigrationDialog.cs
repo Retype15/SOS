@@ -88,7 +88,7 @@ namespace SOS
             };
             ignoreBtn.OnClicked += IgnoreAction;
 
-            Logger.LogDebug("Showing MigrationDialog");
+            Logger.LogDebug("Showing MigrationDialog", level: LogLevel.Verbose);
         }
 
         private static bool ImportAction(GUIButton button, object userdata)
@@ -128,26 +128,26 @@ namespace SOS
                 if (state != null)
                 {
                     lastItemId = state.Attribute("lastItem")?.Value ?? "";
-                    controller.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
+                    controller.cfg.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
                     string historyStr = state.Attribute("tabHistory")?.Value ?? "";
                     if (!string.IsNullOrEmpty(historyStr))
                     {
                         controller.TabHistory.Clear();
                         controller.TabHistory.AddRange(historyStr.Split(',', StringSplitOptions.RemoveEmptyEntries));
                     }
-                    controller.RawXmlMode = ParseBool(state.Attribute("rawXml")?.Value);
-                    controller.XmlFontScale = ParseFloat(state.Attribute("xmlScale")?.Value, 0.9f);
+                    controller.cfg.RawXmlMode = ParseBool(state.Attribute("rawXml")?.Value);
+                    controller.cfg.XmlFontScale = ParseFloat(state.Attribute("xmlScale")?.Value, 0.9f);
                 }
 
                 // MedicalSim
                 var simulator = root.Element("MedicalSim");
                 if (simulator != null)
                 {
-                    controller.DummyDeathCount = ParseInt(simulator.Attribute("deathCount")?.Value);
-                    controller.DummySimulated = ParseBool(simulator.Attribute("simulated")?.Value);
+                    controller.cfg.DummyDeathCount = ParseInt(simulator.Attribute("deathCount")?.Value);
+                    controller.cfg.DummySimulated = ParseBool(simulator.Attribute("simulated")?.Value);
                     var dummyNode = simulator.Elements().FirstOrDefault();
                     if (dummyNode != null)
-                        controller.DummyCharacterXML = dummyNode.ToString();
+                        controller.cfg.DummyCharacterXML = dummyNode;
                 }
 
                 // Tracker
@@ -159,8 +159,8 @@ namespace SOS
                     controller.Tracker.AddRecipe(targetId, hash);
                 }
 
-                // Layout
-                var layout = root.Element("Layout");
+                //TODO: Layout [DEPRECATED]
+                /*var layout = root.Element("Layout");
                 if (layout != null)
                 {
                     int winX = ParseInt(layout.Attribute("winX")?.Value, -1);
@@ -197,7 +197,7 @@ namespace SOS
                             RightPanelWidth = ParseInt(l.Attribute("rightW")?.Value)
                         };
                     }
-                }
+                }*/
 
                 // Restore last selected item
                 if (!string.IsNullOrEmpty(lastItemId))
@@ -208,8 +208,8 @@ namespace SOS
                             .FirstOrDefault(a => a.Identifier.Value == lastItemId);
                 }
 
-                // Persist to new config system
-                SOSController.SaveSettings();
+                // save
+                controller.SaveSettings();
 
                 Logger.Log(Texts.Get("sos.migration.success", "[SOS] Previous configuration imported successfully.").Value);
             }

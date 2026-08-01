@@ -62,7 +62,7 @@
 	<sos.window.section_treatments>TRATAMIENTOS Y MEDICACIÓN</sos.window.section_treatments>
 	<sos.window.section_utility>UTILIDAD</sos.window.section_utility>
 	<sos.window.section_weapon>ARMA</sos.window.section_weapon>
-	<sos.window.settings>Configuración (WIP)</sos.window.settings>
+	<sos.window.settings>Configuración</sos.window.settings>
 	<sos.window.tag_tooltip>Buscar objetos con etiqueta: [tag]</sos.window.tag_tooltip>
 	<sos.window.title>SOS - Buscador de Recetas</sos.window.title>
 	<sos.window.usage>USOS</sos.window.usage>

@@ -9,25 +9,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
 using Barotrauma;
 using Barotrauma.LuaCs.Data;
-using Microsoft.Xna.Framework;
-using MonoMod.Utils;
 
 namespace SOS
 {
-    public sealed class ClientConfig : ISOSConfig, IDisposable
+    public sealed class ClientConfig : ConfigDirtySaver, ISOSConfig, IDisposable
     {
         public string Id => "SOS.Core";
         public double Order => 0;
 
         private static ClientConfig? _instance;
         public static ClientConfig Instance => _instance ??= new ClientConfig();
-
-        private readonly HashSet<ISettingBase> _dirtySettings = [];
-
-        private void MarkDirty(ISettingBase setting)
-            => _dirtySettings.Add(setting);
-
-        public bool HasChanges => _dirtySettings.Count > 0;
 
         private bool _loaded = false;
         public void Load()
@@ -36,40 +27,8 @@ namespace SOS
 
             var ctr = SOSController.Instance;
 
-            // Simple fields
-            ctr.LastSearchQuery = LastSearchQuery;
-            ctr.RawXmlMode = RawXmlMode;
-            ctr.XmlFontScale = XmlFontScale;
-            ctr.DummyDeathCount = DummyDeathCount;
-            ctr.DummyCharacterXML = DummyCharacterXML;
-            ctr.DummySimulated = DummySimulated;
-
-            // Window geometry
-            int wx = WindowSizeX;
-            int wy = WindowSizeY;
-            ctr.WindowSize = (wx >= 0 && wy >= 0) ? new Point(wx, wy) : null;
-
-            int px = WindowPositionX;
-            int py = WindowPositionY;
-            ctr.WindowPosition = (px >= 0 && py >= 0) ? new Point(px, py) : null;
-
-            ctr.LeftPanelWidth = LeftPanelWidth > 0 ? LeftPanelWidth : null;
-            ctr.RightPanelWidth = RightPanelWidth > 0 ? RightPanelWidth : null;
-
-            // Complex fields
-            ctr.FavoritedItems.Clear();
-            foreach (var fav in ConfigHelper.CsvToHashSet(FavoritesRaw))
-                ctr.FavoritedItems.Add(fav);
             ctr.TabHistory.Clear();
             ctr.TabHistory.AddRange(ConfigHelper.CsvToList(TabHistoryRaw));
-
-            ctr.CustomLayouts.Clear();
-            ctr.CustomLayouts.AddRange(ConfigHelper.XmlToLayouts(CustomLayoutsRaw));
-
-            // Defaults
-            if (!ctr.WindowSize.HasValue) ctr.WindowSize = new Point(1250, 850);
-            if (!ctr.LeftPanelWidth.HasValue) ctr.LeftPanelWidth = 250;
-            if (!ctr.RightPanelWidth.HasValue) ctr.RightPanelWidth = 300;
 
             // Restore last selection
             string lastId = LastItemId;
@@ -86,7 +45,7 @@ namespace SOS
 
             _loaded = true;
 
-            Logger.LogDebug($"[SOS] CONFIG LOADED...");
+            Logger.LogDebug($"[SOS] CONFIG LOADED..!");
         }
 
         public void Save()
@@ -95,38 +54,21 @@ namespace SOS
             if (ClinicalSimulatorManager.Patient != null)
             {
                 DummyDeathCount = ClinicalSimulatorManager.DeathCount;
-                DummyCharacterXML = ClinicalSimulatorManager.ExportSaveData()?.ToString();
+                var dummyCharacterXML = ClinicalSimulatorManager.ExportSaveData();
+                if (dummyCharacterXML != null) DummyCharacterXML = dummyCharacterXML;
                 DummySimulated = !ClinicalSimulatorManager.HasStarted;
             }
 
             if (ctr.CurrentTarget != null) LastItemId = ctr.CurrentTarget.Identifier.Value;
-            if (ctr.WindowSize != null)
-            {
-                WindowSizeX = ctr.WindowSize.Value.X;
-                WindowSizeY = ctr.WindowSize.Value.Y;
-            }
 
-            if (ctr.WindowPosition != null)
-            {
-                WindowPositionX = ctr.WindowPosition.Value.X;
-                WindowPositionY = ctr.WindowPosition.Value.Y;
-            }
-
-            if (ctr.LeftPanelWidth != null) LeftPanelWidth = ctr.LeftPanelWidth.Value;
-            if (ctr.RightPanelWidth != null) RightPanelWidth = ctr.RightPanelWidth.Value;
-
-            FavoritesRaw = ctr.FavoritedItems.ToCsv();
             TabHistoryRaw = ctr.TabHistory.ToCsv();
-            CustomLayoutsRaw = ConfigHelper.LayoutsToXml(ctr.CustomLayouts);
             TrackedRecipesRaw = ctr.Tracker.ToCsv();
             TrackerVisible = ctr.Tracker.Visible;
 
-            if (!HasChanges) return;
+            _favoritesRaw.SetIfNotEqual(FavoritedItems.ToCsv());
+            _dummyCharacterXMLRaw.SetIfNotEqual(DummyCharacterXML.ToString());
 
-            foreach (ISettingBase setting in _dirtySettings)
-                Plugin.Instance.ConfigService.SaveConfigValue(setting);
-
-            _dirtySettings.Clear();
+            SaveChanges();
 
             Logger.LogDebug($"[SOS] CONFIG SAVED..!");
         }
@@ -199,64 +141,44 @@ namespace SOS
             set => _dummySimulated.SetIfNotEqual(value);
         }
 
-        private readonly ISettingBase<string> _dummyCharacterXML;
-        public string? DummyCharacterXML
+        private readonly ISettingBase<string> _dummyCharacterXMLRaw;
+        private XElement? _dummyCharacterXML = null;
+        public XElement DummyCharacterXML
         {
-            get => string.IsNullOrEmpty(_dummyCharacterXML.Value) ? null : _dummyCharacterXML.Value;
-            set => _dummyCharacterXML.SetIfNotEqual(value ?? "");
+            get => _dummyCharacterXML ??= XElement.Parse(_dummyCharacterXMLRaw.Value);
+            set => _dummyCharacterXML = value;
         }
-
-        // ─── Batch-save (window geometry) ───
-
-        private readonly ISettingBase<int> _windowSizeX;
-        private readonly ISettingBase<int> _windowSizeY;
-        private readonly ISettingBase<int> _windowPositionX;
-        private readonly ISettingBase<int> _windowPositionY;
-        private readonly ISettingBase<int> _leftPanelWidth;
-        private readonly ISettingBase<int> _rightPanelWidth;
-
-        internal int WindowSizeX { get => _windowSizeX.Value; set => _windowSizeX.SetIfNotEqual(value); }
-        internal int WindowSizeY { get => _windowSizeY.Value; set => _windowSizeY.SetIfNotEqual(value); }
-        internal int WindowPositionX { get => _windowPositionX.Value; set => _windowPositionX.SetIfNotEqual(value); }
-        internal int WindowPositionY { get => _windowPositionY.Value; set => _windowPositionY.SetIfNotEqual(value); }
-        internal int LeftPanelWidth { get => _leftPanelWidth.Value; set => _leftPanelWidth.SetIfNotEqual(value); }
-        internal int RightPanelWidth { get => _rightPanelWidth.Value; set => _rightPanelWidth.SetIfNotEqual(value); }
 
         // ─── Batch-save (complex serialized) ───
 
         private readonly ISettingBase<string> _favoritesRaw;
         private readonly ISettingBase<string> _tabHistoryRaw;
-        private readonly ISettingBase<string> _customLayoutsRaw;
 
-        internal string FavoritesRaw { get => _favoritesRaw.Value; set => _favoritesRaw.SetIfNotEqual(value); }
+        private HashSet<string>? _favoritedItems;
+        internal HashSet<string> FavoritedItems
+        {
+            get => _favoritedItems ??= ConfigHelper.CsvToHashSet(_favoritesRaw.Value);
+            set => _favoritedItems = value;
+        }
+
         internal string TabHistoryRaw { get => _tabHistoryRaw.Value; set => _tabHistoryRaw.SetIfNotEqual(value); }
-        internal string CustomLayoutsRaw { get => _customLayoutsRaw.Value; set => _customLayoutsRaw.SetIfNotEqual(value); }
 
         // ─── Constructor ───
 
         private ClientConfig()
         {
-            bool ownTryInitConfig<T>(string a, out T b) where T : ISettingBase => ConfigHelper.TryInitConfig<T>(a, out b, MarkDirty);
-
-            ownTryInitConfig("SOSOpenKey", out _sosOpenKey);
-            ownTryInitConfig("LastSearchQuery", out _lastSearchQuery);
-            ownTryInitConfig("LastItemId", out _lastItemId);
-            ownTryInitConfig("RawXmlMode", out _rawXmlMode);
-            ownTryInitConfig("XmlFontScale", out _xmlFontScale);
-            ownTryInitConfig("Favorites", out _favoritesRaw);
-            ownTryInitConfig("TabHistory", out _tabHistoryRaw);
-            ownTryInitConfig("CustomLayouts", out _customLayoutsRaw);
-            ownTryInitConfig("TrackedRecipes", out _trackedRecipesRaw);
-            ownTryInitConfig("TrackerVisible", out _trackerVisible);
-            ownTryInitConfig("WindowSizeX", out _windowSizeX);
-            ownTryInitConfig("WindowSizeY", out _windowSizeY);
-            ownTryInitConfig("WindowPositionX", out _windowPositionX);
-            ownTryInitConfig("WindowPositionY", out _windowPositionY);
-            ownTryInitConfig("LeftPanelWidth", out _leftPanelWidth);
-            ownTryInitConfig("RightPanelWidth", out _rightPanelWidth);
-            ownTryInitConfig("DummyDeathCount", out _dummyDeathCount);
-            ownTryInitConfig("DummySimulated", out _dummySimulated);
-            ownTryInitConfig("DummyCharacterXML", out _dummyCharacterXML);
+            TryInitConfig("SOSOpenKey", out _sosOpenKey);
+            TryInitConfig("LastSearchQuery", out _lastSearchQuery);
+            TryInitConfig("LastItemId", out _lastItemId);
+            TryInitConfig("RawXmlMode", out _rawXmlMode);
+            TryInitConfig("XmlFontScale", out _xmlFontScale);
+            TryInitConfig("Favorites", out _favoritesRaw);
+            TryInitConfig("TabHistory", out _tabHistoryRaw);
+            TryInitConfig("TrackedRecipes", out _trackedRecipesRaw);
+            TryInitConfig("TrackerVisible", out _trackerVisible);
+            TryInitConfig("DummyDeathCount", out _dummyDeathCount);
+            TryInitConfig("DummySimulated", out _dummySimulated);
+            TryInitConfig("DummyCharacterXML", out _dummyCharacterXMLRaw);
         }
 
         public void Dispose()
@@ -273,16 +195,31 @@ namespace SOS
         ~ClientConfig() => Dispose();
     }
 
-    // ─── Layout DTO ───
-
-    internal class SavedLayout
+    public abstract class ConfigDirtySaver
     {
-        public Point WindowSize { get; set; }
-        public int LeftPanelWidth { get; set; }
-        public int RightPanelWidth { get; set; }
+
+        protected readonly HashSet<ISettingBase> _dirtySettings = [];
+
+        protected void MarkDirty(ISettingBase setting)
+            => _dirtySettings.Add(setting);
+
+        protected bool HasChanges => _dirtySettings.Count > 0;
+
+        protected void SaveChanges()
+        {
+            if (!HasChanges) return;
+
+            foreach (ISettingBase setting in _dirtySettings)
+                Plugin.Instance.ConfigService.SaveConfigValue(setting);
+
+            _dirtySettings.Clear();
+        }
+
+        protected bool TryInitConfig<T>(string name, out T setting) where T : ISettingBase
+            => ConfigHelper.TryInitConfig<T>(name, out setting, MarkDirty);
     }
 
-    public abstract class ConfigHelper
+    public static class ConfigHelper
     {
         // ─── CSV Serialization Helpers ───
 
@@ -298,59 +235,6 @@ namespace SOS
             return [.. csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
         }
 
-        // ─── XML Serialization Helpers ───
-
-        internal static string LayoutsToXml(Dictionary<string, SavedLayout>? layouts)
-        {
-            if (layouts == null || layouts.Count == 0) return "";
-
-            var doc = new XDocument(
-                new XElement("Layouts",
-                    layouts.Select(kvp =>
-                        new XElement("Preset",
-                            new XAttribute("name", kvp.Key),
-                            new XAttribute("winW", kvp.Value.WindowSize.X),
-                            new XAttribute("winH", kvp.Value.WindowSize.Y),
-                            new XAttribute("leftW", kvp.Value.LeftPanelWidth),
-                            new XAttribute("rightW", kvp.Value.RightPanelWidth)
-                        )
-                    )
-                )
-            );
-
-            return doc.ToString(SaveOptions.DisableFormatting);
-        }
-
-        internal static Dictionary<string, SavedLayout> XmlToLayouts(string? xml)
-        {
-            var result = new Dictionary<string, SavedLayout>();
-            if (string.IsNullOrEmpty(xml)) return result;
-
-            try
-            {
-                var doc = XDocument.Parse(xml);
-                XElement? root = doc.Root;
-                if (root == null || root.Name != "Layouts") return result;
-
-                foreach (var preset in root.Elements("Preset"))
-                {
-                    string name = preset.Attribute("name")?.Value ?? "Unnamed";
-                    result[name] = new SavedLayout
-                    {
-                        WindowSize = new Point(
-                            int.TryParse(preset.Attribute("winW")?.Value, out int winW) ? winW : 0,
-                            int.TryParse(preset.Attribute("winH")?.Value, out int winH) ? winH : 0
-                        ),
-                        LeftPanelWidth = int.TryParse(preset.Attribute("leftW")?.Value, out int leftW) ? leftW : 0,
-                        RightPanelWidth = int.TryParse(preset.Attribute("rightW")?.Value, out int rightW) ? rightW : 0
-                    };
-                }
-            }
-            catch { }
-
-            return result;
-        }
-
         // TryInitConfig
 
         internal static bool TryInitConfig<T>(string name, [NotNullWhen(true)] out T setting, Action<ISettingBase>? onValueChanged = null)
@@ -363,7 +247,7 @@ namespace SOS
             }
             if (onValueChanged != null) setting.OnValueChanged += onValueChanged;
 #if DEBUG
-            setting.OnValueChanged += setting => Logger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue(),128}");
+            setting.OnValueChanged += setting => Logger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue(),128}", level: LogLevel.Verbose);
 #endif
             return true;
         }

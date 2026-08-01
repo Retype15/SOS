@@ -13,7 +13,7 @@ namespace SOS
 
     // MARK: Item Recipes Tab
     [AutoRegister]
-    public class ItemCenterPanelTab : ISOSCenterTab, IDisposable
+    public class ItemPanelTab : ISOSTab, IDisposable
     {
         public double Order => 0;
         public string TabName => Texts.Get("sos.tab.recipes", "RECIPES").Value;
@@ -130,7 +130,7 @@ namespace SOS
 
     // MARK: - Clinic SIM
     [AutoRegister]
-    public class AfflictionCenterPanelTab : ISOSCenterTab, IDisposable
+    public class AfflictionPanelTab : ISOSTab, IDisposable
     {
         private const int MENU_WIDTH = 280;
         private const int MENU_HEIGHT = 220;
@@ -355,11 +355,9 @@ namespace SOS
             CurrentPrefab = prefab;
             _onPrimary = onPrimary;
 
-            var controller = SOSController.Instance;
-
             if (ClinicalSimulatorManager.Patient == null || ClinicalSimulatorManager.Patient.Removed)
             {
-                ClinicalSimulatorManager.Initialize(controller.DummyDeathCount, controller.DummyCharacterXML);
+                ClinicalSimulatorManager.Initialize();
             }
 
             _container.Visible = true;
@@ -466,7 +464,7 @@ namespace SOS
 
     // MARK: Preview Tab
     [AutoRegister]
-    public class PreviewCenterPanelTab : ISOSCenterTab, IDisposable
+    public class PreviewPanelTab : ISOSTab, IDisposable
     {
         public double Order => 100;
         public string TabName => Texts.Get("sos.tab.preview", "PREVIEW").Value;

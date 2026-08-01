@@ -74,13 +74,15 @@ namespace SOS
     public interface ISOSStatSection : IIdentifierOrdenable, IBaseStatSection;
 
 
-    public interface ISOSCenterTab : ITab;
+    public interface ISOSTab : ITab;
 
     public interface ISOSConfig : IIdentifierOrdenable
     {
-        void Save();
         void Load();
+        void Save();
         void Reset();
+        [DefaultClass<ConfigDefaults>]
+        void DrawSettings(GUIListBox container) { }
     }
 
     public interface ISOSPrefabFilter
@@ -99,6 +101,18 @@ namespace SOS
         Type PrefabType { get; }
         string Header { get; }
         IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter);
+    }
+
+    public interface ISOSWindowProfile : IIdentifierOrdenable
+    {
+        string DisplayName => Texts.Get($"{Id}.DisplayName", Id).Value;
+        string Description => Texts.Get($"{Id}.Description", "").Value;
+        Sprite? ProfileIcon => null;
+        ISOSConfig? ProfileConfig => null;
+        void Open();
+        void Update();
+        void Close();
+        void Destroy();
     }
 
     #endregion
@@ -130,6 +144,10 @@ namespace SOS
         }
     }
 
+    internal sealed class ConfigDefaults
+    {
+        public static void DrawSettings(GUIListBox _) { }
+    }
+
     #endregion
 }
-

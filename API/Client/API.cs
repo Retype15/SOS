@@ -8,6 +8,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Barotrauma.LuaCs;
 
 [assembly: IgnoresAccessChecksTo("Barotrauma")]
@@ -20,9 +21,10 @@ namespace SOS
     {
 
         private static readonly SortedFactory<ISOSStatSection> _sectionFactories = new();
-        private static readonly SortedFactory<ISOSCenterTab> _tabFactories = new();
+        private static readonly SortedFactory<ISOSTab> _tabFactories = new();
         private static readonly SortedFactory<ISOSConfig> _configFactories = new();
         private static readonly SortedFactory<ISOSPrefab> _prefabFactories = new();
+        private static readonly SortedFactory<ISOSWindowProfile> _profileFactories = new();
 
         private static bool _scanned = false;
 
@@ -187,6 +189,22 @@ namespace SOS
                 }
             }
 
+            public T? Get(string id)
+            {
+                if (_dict.TryGetValue(id, out var entry))
+                    return entry.Factory();
+                return null;
+            }
+
+            public T? First()
+            {
+                var sorted = GetSorted();
+                return sorted.Length > 0 ? sorted[0].Factory() : null;
+            }
+
+            public T? GetOrFirst(string? id) => (id != null) ? Get(id) ?? First() : First();
+            public T? GetOrFirst() => First();
+
             public void Clear()
             {
                 _dict.Clear();
@@ -203,6 +221,7 @@ namespace SOS
             _tabFactories.AutoRegister(pluginManagementService);
             _configFactories.AutoRegister(pluginManagementService);
             _prefabFactories.AutoRegister(pluginManagementService);
+            _profileFactories.AutoRegister(pluginManagementService);
 
             _scanned = true;
         }
@@ -219,7 +238,7 @@ namespace SOS
 
         public static bool RegisterTab(object obj) => _tabFactories.Register(obj);
 
-        internal static IEnumerable<ISOSCenterTab> CreateTabs() => _tabFactories.Create();
+        internal static IEnumerable<ISOSTab> CreateTabs() => _tabFactories.Create();
 
         #endregion
 
@@ -239,13 +258,174 @@ namespace SOS
 
         #endregion
 
+        #region Window Profiles
+
+        public static bool RegisterWindowProfile(object obj) => _profileFactories.Register(obj);
+
+        internal static IEnumerable<ISOSWindowProfile> CreateWindowProfiles() => _profileFactories.Create();
+
+        internal static ISOSWindowProfile? GetWindowProfile(string? id) => _profileFactories.GetOrFirst(id);
+
+        #endregion
+
+        #region Shared States.
+
+        private static readonly Dictionary<string, Delegate> _delegates = [];
+        private static readonly Dictionary<string, object?> _state = [];
+
+        public static void On<T>(string key, Action<T> handler)
+        {
+            lock (_delegates)
+            {
+                if (_delegates.TryGetValue(key, out var existing))
+                    _delegates[key] = Delegate.Combine(existing, handler);
+                else
+                    _delegates[key] = handler;
+            }
+
+            Logger.LogDebug($"ON CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Verbose);
+        }
+
+        public static void On(string key, Action handler)
+        {
+            lock (_delegates)
+            {
+                if (_delegates.TryGetValue(key, out var existing))
+                    _delegates[key] = Delegate.Combine(existing, handler);
+                else
+                    _delegates[key] = handler;
+            }
+
+            Logger.LogDebug($"ON CALLED '{key}'.", level: LogLevel.Verbose);
+        }
+
+        public static void Off<T>(string key, Action<T> handler)
+        {
+            lock (_delegates)
+            {
+                if (_delegates.TryGetValue(key, out var existing))
+                {
+                    var removed = Delegate.Remove(existing, handler);
+                    if (removed != null)
+                        _delegates[key] = removed;
+                    else
+                        _delegates.Remove(key);
+                }
+            }
+
+            Logger.LogDebug($"OFF CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Verbose);
+        }
+
+        public static void Off(string key, Action handler)
+        {
+            lock (_delegates)
+            {
+                if (_delegates.TryGetValue(key, out var existing))
+                {
+                    var removed = Delegate.Remove(existing, handler);
+                    if (removed != null)
+                        _delegates[key] = removed;
+                    else
+                        _delegates.Remove(key);
+                }
+            }
+
+            Logger.LogDebug($"OFF CALLED '{key}'.", level: LogLevel.Verbose);
+        }
+
+        public static void Emit<T>(string key, T value)
+        {
+            Delegate? d;
+            lock (_delegates)
+                _delegates.TryGetValue(key, out d);
+
+
+
+            if (d != null)
+                foreach (var handler in d.GetInvocationList())
+                {
+                    try
+                    {
+                        switch (handler)
+                        {
+                            case Action<T> h1: h1(value); break;
+                            case Action h2: h2(); break;
+                        }
+                    }
+                    catch (Exception ex) { Logger.LogError($"[SOS] Observer error in key:'{key}'  method:'{handler.Method.Name}' Exception: {ex.Message}"); }
+                }
+
+            Logger.LogDebug($"EMIT CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Verbose);
+        }
+
+        public static void Emit(string key)
+        {
+            Delegate? d;
+            lock (_delegates)
+                _delegates.TryGetValue(key, out d);
+
+            if (d != null)
+                foreach (var handler in d.GetInvocationList())
+                {
+                    try { if (handler is Action handler1) handler1(); }
+                    catch (Exception ex) { Logger.LogError($"[SOS] Observer error in key: '{key}'\nException: '{ex.Message}'"); }
+                }
+
+            Logger.LogDebug($"EMIT CALLED '{key}'.", level: LogLevel.Verbose);
+        }
+
+        public static void SetState<T>(string key, T value)
+        {
+            lock (_state)
+                _state[key] = value;
+            Logger.LogDebug($"SET_STATE CALLED '{key}' with type: {nameof(T)}.", level: LogLevel.Verbose);
+        }
+
+        public static T? GetState<T>(string key)
+        {
+            lock (_state)
+            {
+                if (_state.TryGetValue(key, out var value))
+                {
+                    if (value is T t)
+                    {
+                        Logger.LogDebug($"GET_STATE CALLED '{key}' with type: {nameof(T)}, returned {t}.", level: LogLevel.Verbose);
+                        return t;
+                    }
+                    else
+                    {
+                        throw new SafeArrayTypeMismatchException($"GetState called with diferent type signature: T:'{typeof(T)}' is not {value?.GetType()}");
+                    }
+                }
+                Logger.LogDebug($"GET_STATE CALLED '{key}' with type: {nameof(T)}, saved type is {value?.GetType().Name}, returned default.", level: LogLevel.Verbose);
+                return default;
+            }
+        }
+
+        #endregion
+
         internal static void Clear()
         {
             _sectionFactories.Clear();
             _tabFactories.Clear();
             _configFactories.Clear();
             _prefabFactories.Clear();
+            _profileFactories.Clear();
             _scanned = false;
+            lock (_delegates) _delegates.Clear();
+            lock (_state) _state.Clear();
         }
+    }
+
+    public static class CommKeys
+    {
+        public static string SelectTarget => "SelectTarget"; //TODO: Revisar si no se rompió nada al cambiar CurrentTargetChanged a 'SelectTarget'.
+        public static string ApplyLayout => "ApplyLayout";
+        public static string NavigateBack => "NavigateBack";
+        public static string NavigateForward => "NavigateForward";
+        public static string RefreshSearch => "RefreshSearch";
+        public static string OpenWindow => "OpenWindow";
+        public static string CloseWindow => "CloseWindow";
+        public static string SetSearchFilter => "SetSearchFilter";
     }
 }

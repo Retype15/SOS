@@ -4,32 +4,22 @@
     <Settings>
         <Setting Name="SOSOpenKey" Type="control" Value="j" ShowInMenus="true" />
 
-        <!-- Estado interno (sesión) -->
+        <!-- State -->
         <Setting Name="LastSearchQuery" Type="string" Value="" ShowInMenus="false" />
         <Setting Name="LastItemId" Type="string" Value="" ShowInMenus="false" />
+        <Setting Name="ActiveProfileId" Type="string" Value="" ShowInMenus="false" />
 
-        <!-- Preferencias de usuario (visibles en el menú nativo de LuaCs) -->
+        <!-- Preferences -->
         <Setting Name="RawXmlMode" Type="bool" Value="false" ShowInMenus="false" />
         <Setting Name="XmlFontScale" Type="rangeFloat" Value="1.0" Min="0.3" Max="3.0" Step="0.1" ShowInMenus="true" />
 
-        <!-- Colecciones serializadas como CSV (editables manualmente en el menú) -->
+        <!-- Misc -->
         <Setting Name="Favorites" Type="string" Value="" ShowInMenus="false" />
         <Setting Name="TabHistory" Type="string" Value="" ShowInMenus="false" />
-
-        <!-- Layouts serializados como XML interno -->
-        <Setting Name="CustomLayouts" Type="string" Value="" ShowInMenus="false" />
 
         <!-- Tracker -->
         <Setting Name="TrackedRecipes" Type="string" Value="" ShowInMenus="false" />
         <Setting Name="TrackerVisible" Type="bool" Value="false" ShowInMenus="true" />
-
-        <!-- Geometría de ventana (batch-write, no auto-persist) -->
-        <Setting Name="WindowSizeX" Type="int" Value="-1" ShowInMenus="true" />
-        <Setting Name="WindowSizeY" Type="int" Value="-1" ShowInMenus="true" />
-        <Setting Name="WindowPositionX" Type="int" Value="-1" ShowInMenus="false" />
-        <Setting Name="WindowPositionY" Type="int" Value="-1" ShowInMenus="false" />
-        <Setting Name="LeftPanelWidth" Type="int" Value="0" ShowInMenus="false" />
-        <Setting Name="RightPanelWidth" Type="int" Value="0" ShowInMenus="false" />
 
         <!-- Medical Sim -->
         <Setting Name="DummyDeathCount" Type="int" Value="0" ShowInMenus="false" />

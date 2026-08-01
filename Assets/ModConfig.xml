@@ -5,4 +5,5 @@
     <Assembly File="%ModDir%/bin/Client/OSX/SOS.dll" Target="Client" Platform="OSX" />
     <Assembly File="%ModDir%/bin/Client/Windows/SOS.dll" Target="Client" Platform="Windows" />
     <Config File="%ModDir%/Config/SettingsClient.xml" Target="Client" />
+    <Config File="%ModDir%/Config/SettingsTCPClient.xml" Target="Client" />
 </ModConfig>

@@ -11,21 +11,26 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
-    public class SectionLayout(GUIListBox listBox) : IDisposable
+    public class LayoutBuilder : IDisposable
     {
-        private readonly GUIListBox _listBox = listBox;
-        private GUILayoutGroup? _currentGroup;
-        private int _rowsCreated;
+        private readonly GUIListBox _listBox;
+        private readonly GUILayoutGroup _currentGroup;
+        private int _rowsCreated = 0;
 
-        public void Header(string title, Color color)
+        public LayoutBuilder(GUIListBox listBox)
         {
+            _listBox = listBox;
+
             _currentGroup = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), _listBox.Content.RectTransform, Anchor.TopCenter))
             {
                 AbsoluteSpacing = 2,
                 CanBeFocused = false,
                 Stretch = true
             };
+        }
 
+        public void Header(string title, Color color)
+        {
             var titleBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform), title, font: GUIStyle.SubHeadingFont, textColor: color, textAlignment: Alignment.Left)
             {
                 CanBeFocused = false
@@ -33,13 +38,11 @@ namespace SOS
             titleBlock.RectTransform.MinSize = new Point(0, 30);
             titleBlock.RectTransform.MaxSize = new Point(int.MaxValue, 30);
             titleBlock.Padding = new Vector4(10, 0, 0, 0);
-
-            _rowsCreated = 0;
         }
 
         public void Row(string label, string value, Color valueColor)
         {
-            if (string.IsNullOrEmpty(value) || _currentGroup == null) return;
+            if (string.IsNullOrEmpty(value)) return;
 
             var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform), style: null)
             {
@@ -81,7 +84,7 @@ namespace SOS
             Color? linkColor = null,
             Action<string>? onSearchFilter = null)
         {
-            if (values == null || !values.Any() || _currentGroup == null) return;
+            if (values == null || !values.Any()) return;
 
             var valList = values.ToList();
             var dispList = displayNames?.ToList();
@@ -156,7 +159,7 @@ namespace SOS
             Action<Prefab>? onSecondary = null,
             Action<string>? onSearchFilter = null)
         {
-            if (ids == null || !ids.Any() || _currentGroup == null) return;
+            if (ids == null || !ids.Any()) return;
 
             var idList = ids.ToList();
             var nameList = displayNames?.ToList();
@@ -257,7 +260,7 @@ namespace SOS
 
         public void RichText(RichString text)
         {
-            if (_currentGroup == null || text.IsNullOrEmpty()) return;
+            if (text.IsNullOrEmpty()) return;
 
             var block = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform), RichString.Rich(text), font: GUIStyle.SmallFont, wrap: true, textAlignment: Alignment.Left)
             {
@@ -275,6 +278,102 @@ namespace SOS
 
             _rowsCreated++;
         }
+
+        //TODO: Hecho por IA, aún no revisado.
+        #region Hecho por IA, aún no revisado.
+
+        public void Separator()
+        {
+            _ = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 2), MaxSize = new Point(int.MaxValue, 2) }, style: "GUIFrameBottom")
+            {
+                Color = Color.Gray * 0.4f,
+                CanBeFocused = false
+            };
+        }
+
+        public void Button(string text, Action onClick, string? tooltip = null, Color? color = null)
+        {
+            var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 28) }, text, style: "GUIButtonSmall")
+            {
+                CanBeFocused = true,
+                OnClicked = (_, _) => { onClick(); return true; }
+            };
+            if (tooltip != null) btn.ToolTip = tooltip;
+            if (color.HasValue) btn.Color = color.Value;
+            _rowsCreated++;
+        }
+
+        public void TextBox(string label, string initialValue, Action<string> onChange)
+        {
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+            _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+            var textBox = new GUITextBox(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), initialValue, font: GUIStyle.SmallFont);
+            textBox.OnTextChanged += (tb, text) => { onChange(text); return true; };
+            _rowsCreated++;
+        }
+
+        public void Dropdown(string label, IEnumerable<string> items, string? selected, Action<string> onSelect)
+        {
+            var itemList = items.ToList();
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+            _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+
+            var dropdown = new GUIDropDown(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), text: "", elementCount: itemList.Count) { CanBeFocused = true, Font = GUIStyle.SmallFont };
+            foreach (var item in itemList)
+            {
+                dropdown.AddItem(item, item);
+                if (item == selected) dropdown.SelectItem(item);
+            }
+            dropdown.OnSelected = (comp, obj) =>
+            {
+                if (obj is string s) onSelect(s);
+                return true;
+            };
+            _rowsCreated++;
+        }
+
+        public void TickBox(string label, bool selected, Action<bool> onToggle)
+        {
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 26) }, style: null) { CanBeFocused = false };
+            var tick = new GUITickBox(new RectTransform(new Vector2(1f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont)
+            {
+                Selected = selected,
+                CanBeFocused = true,
+                OnSelected = (tb) => { onToggle(tb.Selected); return true; }
+            };
+            _rowsCreated++;
+        }
+
+        public void Slider(string label, float min, float max, float value, Action<float> onChange)
+        {
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+            _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+
+            var slider = new GUIScrollBar(new RectTransform(new Vector2(0.55f, 0.6f), row.RectTransform, Anchor.CenterRight), barSize: 0.1f, style: "GUISlider", isHorizontal: true)
+            {
+                MinValue = min,
+                MaxValue = max,
+                BarScroll = (value - min) / (max - min),
+                OnMoved = (sb, val) =>
+                {
+                    float v = min + val * (max - min);
+                    onChange(v);
+                    return true;
+                }
+            };
+
+            var valText = new GUITextBlock(new RectTransform(new Vector2(0.1f, 1f), row.RectTransform, Anchor.CenterRight), value.FormatZeroDecimal(), font: GUIStyle.SmallFont, textAlignment: Alignment.CenterRight) { CanBeFocused = false };
+            slider.OnMoved = (sb, val) =>
+            {
+                float v = min + val * (max - min);
+                valText.Text = ((int)v).ToString();
+                onChange(v);
+                return true;
+            };
+            _rowsCreated++;
+        }
+
+        #endregion
 
         private static void BindHyperlinks<T>(
             GUITextBlock textBlock,
@@ -312,9 +411,7 @@ namespace SOS
 
         public void Dispose()
         {
-            if (_currentGroup == null) return;
-
-            if (_rowsCreated == 0 && _currentGroup.CountChildren <= 1)
+            if (_rowsCreated == 0)
             {
                 _listBox.Content.RemoveChild(_currentGroup);
             }
@@ -329,11 +426,10 @@ namespace SOS
                 _currentGroup.RectTransform.MaxSize = new Point(int.MaxValue, totalHeight + 10);
             }
 
-            _currentGroup = null;
             GC.SuppressFinalize(this);
         }
 
-        ~SectionLayout() => Dispose();
+        ~LayoutBuilder() => Dispose();
     }
 }
 

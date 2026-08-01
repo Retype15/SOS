@@ -62,7 +62,7 @@
 	<sos.window.section_treatments>ЛЕЧЕНИЕ И МЕДИКАМЕНТЫ</sos.window.section_treatments>
 	<sos.window.section_utility>УТИЛИТЫ</sos.window.section_utility>
 	<sos.window.section_weapon>ОРУЖИЕ</sos.window.section_weapon>
-	<sos.window.settings>Настройки (WIP)</sos.window.settings>
+	<sos.window.settings>Настройки</sos.window.settings>
 	<sos.window.tag_tooltip>Поиск предметов с тегом: [tag]</sos.window.tag_tooltip>
 	<sos.window.title>SOS - Просмотр рецептов</sos.window.title>
 	<sos.window.usage>ИСПОЛЬЗОВАНИЕ</sos.window.usage>

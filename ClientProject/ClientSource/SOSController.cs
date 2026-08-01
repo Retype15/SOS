@@ -6,7 +6,6 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using SOS.GUI;
 
@@ -16,21 +15,22 @@ namespace SOS
 {
     public sealed class SOSController : IDisposable
     {
-        private SOSWindow? mainWindow;
+        private static SOSController? _instance;
+        public static SOSController Instance => _instance ??= new();
+
+        internal ISOSWindowProfile? ActiveProfile = null;
+
+        private bool _isOpened;
+        public bool IsOpened => _isOpened;
 
         public bool HaveOldConfigFile = false;
 
         public bool DataInitialized { get; private set; } = false;
 
-        private HashSet<string>? _favoritedItems;
-        public HashSet<string> FavoritedItems
-        {
-            get
-            {
-                _favoritedItems ??= ConfigHelper.CsvToHashSet(cfg.FavoritesRaw);
-                return _favoritedItems;
-            }
-        }
+        internal List<ISOSConfig> CachedConfigs { get; set; } = [];
+
+        public HashSet<string> FavoritedItems => cfg.FavoritedItems;
+
 
         private GUIRecipeTracker? _tracker;
         internal GUIRecipeTracker Tracker => _tracker ??= GUIRecipeTracker.InstantiateWithDefault();
@@ -39,47 +39,18 @@ namespace SOS
 
         private Keys ToggleKey => cfg.SOSOpenKey.Key;
 
-        public string LastSearchQuery
-        {
-            get => cfg.LastSearchQuery ?? "";
-            set { cfg.LastSearchQuery = value; }
-        }
+        public string LastSearchQuery => cfg.LastSearchQuery;
+
         public Prefab? CurrentTarget { get; internal set; }
 
         public Stack<Prefab> HistoryBack { get; } = new Stack<Prefab>();
         public Stack<Prefab> HistoryForward { get; } = new Stack<Prefab>();
 
-        public Point? WindowSize { get; set; }
-        public Point? WindowPosition { get; set; }
-        public int? LeftPanelWidth { get; set; }
-        public int? RightPanelWidth { get; set; }
-        public bool RawXmlMode
-        {
-            get => cfg.RawXmlMode;
-            set { cfg.RawXmlMode = value; }
-        }
-        public float XmlFontScale
-        {
-            get => cfg.XmlFontScale;
-            set { cfg.XmlFontScale = value; }
-        }
+        public bool RawXmlMode => cfg.RawXmlMode;
 
-        public int DummyDeathCount
-        {
-            get => cfg.DummyDeathCount;
-            set { cfg.DummyDeathCount = value; }
-        }
-        public string? DummyCharacterXML
-        {
-            get => cfg.DummyCharacterXML;
-            set { cfg.DummyCharacterXML = value; }
-        }
+        public float XmlFontScale => cfg.XmlFontScale;
+
         public List<string> TabHistory { get; } = [];
-        public bool DummySimulated
-        {
-            get => cfg.DummySimulated;
-            set { cfg.DummySimulated = value; }
-        }
 
         private static bool migrationPending = false;
         public static bool MigrationPending { get => migrationPending; set => migrationPending = value; }
@@ -95,66 +66,30 @@ namespace SOS
             TabHistory.Insert(0, uid);
         }
 
-        internal Dictionary<string, SavedLayout> CustomLayouts { get; } = [];
-
-        private static SOSController? _instance;
-        public static SOSController Instance => _instance ??= new SOSController();
-
         private SOSController() { }
 
         public void AddFavorite(string id) { FavoritedItems.Add(id); }
         public void RemoveFavorite(string id) { FavoritedItems.Remove(id); }
 
-        public void SetSearchFilter(string tag) => mainWindow?.SetSearchFilter(tag);
-
-        public void ToggleUI()
+        private void Subscribe()
         {
-            if (mainWindow != null)
-            {
-                Dispose();
-            }
-            else
-            {
-                if (HaveOldConfigFile)
-                {
-                    MigrationDialog.Show();
-                    HaveOldConfigFile = false;
-                    Logger.LogDebug("[SOS] Opening migration window.");
-                    return;
-                }
-
-                if (Screen.Selected == null || IsSOSBlocked) return;
-
-                API.Initialize(Plugin.Instance.PluginManagementService);
-                LoadSettings();
-
-                mainWindow = new SOSWindow();
-
-                if (!DataInitialized)
-                {
-                    System.Threading.Tasks.Task.Run(() =>
-                    {
-                        RecipeAnalyzer.PrecomputeCaches();
-                        DataInitialized = true;
-
-                        CrossThread.RequestExecutionOnMainThread(() =>
-                        {
-                            mainWindow?.OnInitializationComplete();
-                        });
-                    });
-                }
-                else if (CurrentTarget != null)
-                {
-                    UpdateWindowDetails(CurrentTarget);
-                }
-            }
+            API.On(CommKeys.NavigateBack, NavigateBack);
+            API.On(CommKeys.NavigateForward, NavigateForward);
+            API.On(CommKeys.CloseWindow, ToggleUI);
         }
 
-        public void OnTargetSelected(Prefab? item, bool isHistoryNavigation = false)
+        private void Unsubscribe()
+        {
+            API.Off(CommKeys.NavigateBack, NavigateBack);
+            API.Off(CommKeys.NavigateForward, NavigateForward);
+            API.Off(CommKeys.CloseWindow, ToggleUI);
+        }
+
+        public void OnTargetSelected(Prefab? item)
         {
             if (item == null) return;
 
-            if (!isHistoryNavigation && CurrentTarget != null && CurrentTarget != item)
+            if (CurrentTarget != null && CurrentTarget != item)
             {
                 HistoryBack.Push(CurrentTarget);
                 HistoryForward.Clear();
@@ -163,42 +98,8 @@ namespace SOS
             if (CurrentTarget != item)
             {
                 CurrentTarget = item;
+                API.Emit(CommKeys.SelectTarget, item);
             }
-            UpdateWindowDetails(item);
-        }
-
-        public void ApplyLayout(Point size, int leftW, int rightW)
-        {
-            WindowSize = size;
-            LeftPanelWidth = leftW;
-            RightPanelWidth = rightW;
-            mainWindow?.ForceLayoutUpdate();
-        }
-
-        public void SaveCurrentLayout(string name)
-        {
-            if (mainWindow == null) return;
-
-            CustomLayouts[name] = new SavedLayout
-            {
-                WindowSize = mainWindow.GetCurrentSize(),
-                LeftPanelWidth = mainWindow.GetLeftWidth(),
-                RightPanelWidth = mainWindow.GetRightWidth()
-            };
-        }
-
-        public void DeleteLayout(string name)
-        {
-            CustomLayouts.Remove(name);
-        }
-
-        public void UpdateWindowDetails(Prefab target)
-        {
-            if (mainWindow == null) return;
-
-            mainWindow.UpdateDetailsPanel(target);
-
-            mainWindow?.UpdateNavigationButtons();
         }
 
         public void NavigateBack()
@@ -207,7 +108,7 @@ namespace SOS
             {
                 if (CurrentTarget != null) HistoryForward.Push(CurrentTarget);
                 CurrentTarget = HistoryBack.Pop();
-                UpdateWindowDetails(CurrentTarget);
+                API.Emit(CommKeys.SelectTarget, CurrentTarget);
             }
         }
 
@@ -217,90 +118,54 @@ namespace SOS
             {
                 if (CurrentTarget != null) HistoryBack.Push(CurrentTarget);
                 CurrentTarget = HistoryForward.Pop();
-                UpdateWindowDetails(CurrentTarget);
+                API.Emit(CommKeys.SelectTarget, CurrentTarget);
             }
         }
 
-        public void OpenContextMenu(Prefab target)
+        public void ToggleUI()
         {
-            if (target == null) return;
-            List<ContextMenuOption> options = [];
-            if (target is ItemPrefab item && item.FabricationRecipes is { Count: > 0 })
+            if (_isOpened)
             {
-                if (item.FabricationRecipes.Count == 1)
-                {
-                    var single = PrefabResolver.GetFabricationRecipe(item);
-                    options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(single).Value, isEnabled: true, () => Tracker.AddOrRemoveRecipe(single)) { Tooltip = Texts.Get("sos.tracker.track-untrack.tooltip", "Track or Untrack all recipes from this item.") });
-                }
-                else
-                {
-                    var subs = new List<ContextMenuOption>
-                    {
-                        new(
-                            Tracker.ContainsAnyRecipes(item)
-                                ? Texts.Get("sos.window.remove_all", "Remove All")
-                                : Texts.Get("sos.window.track_all", "Track All"),
-                            isEnabled: true,
-                            Tracker.ContainsAnyRecipes(item)
-                                ? () => Tracker.RemoveRecipes(item)
-                                : () => Tracker.AddRecipes(item))
-                    };
-
-                    foreach (var (id, recipe) in item.FabricationRecipes)
-                    {
-                        bool tracked = Tracker.ContainsRecipe(recipe);
-                        subs.Add(new ContextMenuOption(
-                            $"{GUIRecipeTracker.GetTrackOrUntrack(!tracked)} {recipe.DisplayName}",
-                            isEnabled: true, () => Tracker.AddOrRemoveRecipe(recipe))
-                        { Tooltip = recipe.GetRequirementsToString() });
-                    }
-
-                    options.Add(new ContextMenuOption(
-                        Texts.Get("sos.context.track_recipe", "Add to HUD").Value,
-                        isEnabled: true, [.. subs]));
-                }
+                SaveSettings();
+                Unsubscribe();
+                ActiveProfile?.Close();
+                CachedConfigs.Clear();
+                _isOpened = false;
+                return;
             }
 
-            options.Add(new ContextMenuOption(Texts.Get("sos.context.view_recipes", "View Recipes"), isEnabled: true, onSelected: () =>
+            if (HaveOldConfigFile)
             {
-                OnTargetSelected(target);
-            }));
+                MigrationDialog.Show();
+                HaveOldConfigFile = false;
+                Logger.LogDebug("[SOS] Opening migration window.");
+                return;
+            }
 
-            string targetId = target.Identifier.Value;
-            bool isFav = FavoritedItems.Contains(targetId);
-            string favText = isFav ? Texts.Get("sos.context.remove_favorite", "Remove from Favorites").Value : Texts.Get("sos.context.add_favorite", "Add to Favorites").Value;
+            if (Screen.Selected == null || IsSOSBlocked) return;
 
-            options.Add(new ContextMenuOption(favText, isEnabled: true, onSelected: () =>
+            API.Initialize(Plugin.Instance.PluginManagementService);
+            CachedConfigs = [.. API.CreateConfigs()];
+            ActiveProfile = API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
+
+            LoadSettings();
+
+            Subscribe();
+
+            ActiveProfile?.Open();
+            _isOpened = true;
+
+            if (CurrentTarget != null)
+                API.Emit(CommKeys.SelectTarget, CurrentTarget);
+
+            if (!DataInitialized)
             {
-                if (isFav) FavoritedItems.Remove(targetId);
-                else FavoritedItems.Add(targetId);
-
-                mainWindow?.RefreshSearch();
-            }));
-
-            RichString name = target.Name();
-
-            _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, name, null, [.. options]);
-        }
-
-        public void OpenRecipeContextMenu(Prefab target, FabricationRecipe recipe)
-        {
-            if (target == null || recipe == null) return;
-
-            var options = new List<ContextMenuOption>();
-
-            if (target is ItemPrefab)
-                options.Add(new ContextMenuOption(Tracker.GetStringTrackToHUD(recipe).Value, isEnabled: true, () => Tracker.AddOrRemoveRecipe(recipe)));
-
-            //options.Add(new ContextMenuOption("Ver más info (WIP)", isEnabled: false));
-
-            _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, Texts.Get("sos.context.recipe_options", "Recipe Options"), null, [.. options]);
-        }
-
-        public void OnRecipeSelected(ItemPrefab item, FabricationRecipe recipe)
-        {
-            Tracker.AddOrRemoveRecipe(recipe);
-            OnTargetSelected(item);
+                System.Threading.Tasks.Task.Run(() =>
+                {
+                    RecipeAnalyzer.PrecomputeCaches();
+                    DataInitialized = true;
+                });
+            }
         }
 
         public void Update()
@@ -325,7 +190,7 @@ namespace SOS
                             if (detected != null)
                             {
                                 OnTargetSelected(detected);
-                                if (mainWindow == null) ToggleUI();
+                                if (!_isOpened) ToggleUI();
                             }
                             else
                             {
@@ -336,13 +201,12 @@ namespace SOS
                 }
             }
 
-            if (mainWindow != null)
+            if (_isOpened)
             {
                 if (canHandleInputs)
                 {
                     if (PlayerInput.KeyHit(Keys.Escape))
                     {
-                        //mainWindow.SetSelected();
                         CrossThread.RequestExecutionOnMainThread(ToggleUI);
                         return;
                     }
@@ -362,21 +226,21 @@ namespace SOS
 
                 }
 
-                mainWindow.Update();
+                ActiveProfile?.Update();
             }
             if (migrationPending) MigrationDialog.Update();
             if (!IsSOSBlocked && Screen.Selected == GameMain.GameScreen) Tracker.Update();
         }
 
-        public static void SaveSettings()
+        public void SaveSettings()
         {
-            foreach (var config in API.CreateConfigs())
+            foreach (var config in CachedConfigs)
                 config.Save();
         }
 
-        public static void LoadSettings()
+        public void LoadSettings()
         {
-            foreach (var config in API.CreateConfigs())
+            foreach (var config in CachedConfigs)
                 config.Load();
         }
 
@@ -439,9 +303,12 @@ namespace SOS
 
             GUIAnimSequence.ClearAll();
 
-            _favoritedItems = null;
-            mainWindow?.Destroy();
-            mainWindow = null;
+            Unsubscribe();
+            ItemPrefabProvider.Destroy();
+            ActiveProfile?.Close();
+            ActiveProfile?.Destroy();
+            ActiveProfile = null;
+            _isOpened = false;
 
             GC.SuppressFinalize(this);
         }

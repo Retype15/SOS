@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Client-only settings -->
+<Configuration>
+    <Settings>
+        <!-- 3C Window Profile -->
+        <Setting Name="ThreeColumnWindowSizeX" Type="int" Value="1250" ShowInMenus="false" />
+        <Setting Name="ThreeColumnWindowSizeY" Type="int" Value="850" ShowInMenus="false" />
+        <Setting Name="ThreeColumnWindowPositionX" Type="int" Value="-1" ShowInMenus="false" />
+        <Setting Name="ThreeColumnWindowPositionY" Type="int" Value="-1" ShowInMenus="false" />
+        <Setting Name="ThreeColumnLeftPanelWidth" Type="int" Value="250" ShowInMenus="false" />
+        <Setting Name="ThreeColumnRightPanelWidth" Type="int" Value="300" ShowInMenus="false" />
+        <Setting Name="ThreeColumnCustomLayouts" Type="string" Value="" ShowInMenus="false" />
+    </Settings>
+</Configuration>

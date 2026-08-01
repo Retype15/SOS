@@ -11,6 +11,26 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
+    internal enum DisplayMode { Normal, Compact, Hidden }
+
+    internal class GroupedSource
+    {
+        public ItemPrefab? SourceItem;
+        public Identifier[]? MachineIds;
+        public List<Identifier>? RequiredOtherItems;
+        public float TotalCommonness;
+        public int Amount;
+        public bool IsRandom;
+    }
+
+    internal class GroupedUsage
+    {
+        public ItemPrefab? TargetItem;
+        public List<Identifier>? MachineIds;
+        public float AmountCreated;
+        public float AmountRequired;
+    }
+
     internal static class CardBuilder
     {
         private const int RowHeight = 32;
@@ -136,7 +156,7 @@ namespace SOS
                     Color = Color.Black * 0.4f,
                     OutlineColor = isTracked ? Color.Gold : Color.Transparent,
                     OnClicked = (_, _) => { OnPrimary?.Invoke(TargetItem); return true; },
-                    OnSecondaryClicked = (_, _) => { Controller.OpenRecipeContextMenu(TargetItem, Recipe); return true; }
+                    OnSecondaryClicked = (_, _) => { OpenRecipeContextMenu(TargetItem, Recipe); return true; }
                 };
 
                 var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2, CanBeFocused = false };
@@ -178,6 +198,21 @@ namespace SOS
                 }
 
                 foreach (var req in Recipe.RequiredItems) DrawCompactItemRow(layout, req.FirstMatchingPrefab, req.Amount, true, "", null, OnPrimary, OnSecondary);
+            }
+
+            public static void OpenRecipeContextMenu(Prefab target, FabricationRecipe recipe)
+            {
+                if (target == null || recipe == null) return;
+
+                var options = new List<ContextMenuOption>();
+
+                if (target is ItemPrefab)
+                {
+                    var tracker = SOSController.Instance.Tracker;
+                    options.Add(new ContextMenuOption(tracker.GetStringTrackToHUD(recipe).Value, isEnabled: true, () => tracker.AddOrRemoveRecipe(recipe)));
+                }
+
+                _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, Texts.Get("sos.context.recipe_options", "Recipe Options"), null, [.. options]);
             }
         }
 

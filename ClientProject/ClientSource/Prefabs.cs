@@ -18,6 +18,28 @@ namespace SOS
         public Type PrefabType => typeof(ItemPrefab);
         public string Header => Texts.Get("sos.list.header.itemprefab", "Item Prefab").Value;
 
+        private static readonly Dictionary<Identifier, string> _itemSlotCache = [];
+
+        public static string GetItemSlotsCached(ItemPrefab prefab)
+        {
+            if (_itemSlotCache.TryGetValue(prefab.Identifier, out var cached)) return cached;
+
+            if (prefab.ConfigElement == null) return _itemSlotCache[prefab.Identifier] = "";
+
+            var slots = new List<string>();
+            foreach (var element in prefab.ConfigElement.Descendants())
+            {
+                string n = element.Name.ToString().ToLowerInvariant();
+                if (n == "wearable" || n == "holdable")
+                {
+                    string s = element.GetAttributeString("slots", "");
+                    if (!string.IsNullOrEmpty(s)) slots.Add(s.Replace("+", " "));
+                }
+            }
+
+            return _itemSlotCache[prefab.Identifier] = string.Join(" ", slots).ToLowerInvariant();
+        }
+
         public IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter)
         {
             return ItemPrefab.Prefabs
@@ -39,7 +61,7 @@ namespace SOS
                 return false;
 
             if (filter.Slot.Count > 0 && !filter.Slot.Any(s =>
-                SOSWindow.GetItemSlotsCached(p).Contains(s, StringComparison.OrdinalIgnoreCase)))
+                GetItemSlotsCached(p).Contains(s, StringComparison.OrdinalIgnoreCase)))
                 return false;
 
             foreach (var t in filter.Tag)
@@ -63,12 +85,17 @@ namespace SOS
                              id.Contains(term, StringComparison.OrdinalIgnoreCase) ||
                              modName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
                              p.Category.ToString().Contains(term, StringComparison.OrdinalIgnoreCase) ||
-                             SOSWindow.GetItemSlotsCached(p).Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                             GetItemSlotsCached(p).Contains(term, StringComparison.OrdinalIgnoreCase) ||
                              p.Tags.Any(t => t.Value.Contains(term, StringComparison.OrdinalIgnoreCase));
                 if (!found) return false;
             }
 
             return true;
+        }
+
+        public static void Destroy()
+        {
+            _itemSlotCache.Clear();
         }
     }
 
