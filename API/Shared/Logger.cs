@@ -14,11 +14,15 @@ namespace SOS
 {
     internal enum LogLevel
     {
-        Deactivate,
+        Off,
         Critical,
         Standard,
         Extended,
         Verbose,
+    }
+    internal static class LogLevelStates
+    {
+        internal static string[] Strings = ["off", "critical", "standard", "extended", "verbose"];
     }
 
     internal static class Logger

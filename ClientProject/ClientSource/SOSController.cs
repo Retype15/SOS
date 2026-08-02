@@ -136,6 +136,19 @@ namespace SOS
             }
         }
 
+        public void ResolveCommand(string[] args)
+        {
+            if (args.Length == 0) { ToggleUI(); return; }
+            if (args.Length == 1) return;
+            if (args.Length == 2) switch (args[0].ToLowerInvariant())
+                {
+                    case "log": Logger.ActualLogLevel = (LogLevel)LogLevelStates.Strings.IndexOf(args[1].ToLowerInvariant()); return;
+                }
+
+            Logger.LogWarning($"Command 'sos {string.Join(' ', args)}' not recognized.");
+            return;
+        }
+
         public void ToggleUI()
         {
             if (_isOpened)

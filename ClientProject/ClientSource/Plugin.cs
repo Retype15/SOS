@@ -25,18 +25,12 @@ namespace SOS
                 controller = SOSController.Instance;
                 API.RegisterConfig(() => ClientConfig.Instance);
 
-                if (!DebugConsole.commands.Exists(c => c.Names.Any(n => n.Value == "sos")))
-                    DebugConsole.commands.Add(new DebugConsole.Command(
+                ConsoleCommandsService.RegisterCommand(
                         name: "sos",
-                        help: Texts.Get("sos.command.help", "Open/Close SOS.").Value,
-                        onExecute: _ => controller?.ToggleUI(),
-                        getValidArgs: null,
-                        isCheat: false
-                    )
-                    {
-                        RelayToServer = false,
-                        OnClientExecute = _ => controller?.ToggleUI()
-                    });
+                        help: Texts.Get("sos.command.help", "Open/Close SOS.\nSub-command availables:\n- log [{logCommands}]\nExample: 'sos log verbose'").Value.Replace("{logCommands}", string.Join(", ", LogLevelStates.Strings)),
+                        onExecute: args => controller?.ResolveCommand(args),
+                        getValidArgs: () => [["log", .. LogLevelStates.Strings]]
+                );
 
                 LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
 
@@ -63,7 +57,7 @@ namespace SOS
         {
             LuaCsSetup.Instance.EventService.Unsubscribe<IEventKeyUpdate>(this);
 
-            DebugConsole.commands.RemoveAll(c => c.Names.Contains("sos"));
+            ConsoleCommandsService.RemoveCommand("sos");
 
             RecipeAnalyzer.Clear();
             ClientConfig.Instance.Destroy();
