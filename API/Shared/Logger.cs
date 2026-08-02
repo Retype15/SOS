@@ -14,41 +14,47 @@ namespace SOS
 {
     internal enum LogLevel
     {
-        Off,
+        None,
         Critical,
-        Standard,
-        Extended,
-        Verbose,
+        Error,
+        Warning,
+        Information,
+        Debug,
+        Trace,
     }
     internal static class LogLevelStates
     {
-        internal static string[] Strings = ["off", "critical", "standard", "extended", "verbose"];
+        internal static string[] Strings = ["none", "critical", "error", "warning", "info", "debug", "trace"];
     }
 
     internal static class Logger
     {
         internal static ILoggerService? LoggerService = null;
-        internal static LogLevel ActualLogLevel = LogLevel.Standard;
+#if DEBUG
+        internal static LogLevel ActualLogLevel = LogLevel.Debug;
+#else
+        internal static LogLevel ActualLogLevel = LogLevel.Information;
+#endif
 
         [Conditional("DEBUG")]
-        public static void LogDebug(string? message, Color? color = null, ILoggerService? logger = null, LogLevel level = LogLevel.Standard) => Log(message, color, logger, level);
+        public static void LogDebug(string? message, Color? color = null, ILoggerService? logger = null, LogLevel level = LogLevel.Debug) => Log(message, color, logger, level);
 
         [Conditional("DEBUG")]
-        public static void LogDebugError(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Critical) => LogError(message, logger, level);
+        public static void LogDebugError(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Debug | LogLevel.Error) => LogError(message, logger, level);
 
         [Conditional("DEBUG")]
-        public static void LogDebugWarning(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Standard) => LogWarning(message, logger, level);
+        public static void LogDebugWarning(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Debug | LogLevel.Warning) => LogWarning(message, logger, level);
 
         [Conditional("RELEASE")]
-        public static void LogRelease(string? message, Color? color = null, ILoggerService? logger = null, LogLevel level = LogLevel.Standard) => Log(message, color, logger, level);
+        public static void LogRelease(string? message, Color? color = null, ILoggerService? logger = null, LogLevel level = LogLevel.Information) => Log(message, color, logger, level);
 
         [Conditional("RELEASE")]
-        public static void LogReleaseError(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Critical) => LogError(message, logger, level);
+        public static void LogReleaseError(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Error) => LogError(message, logger, level);
 
         [Conditional("RELEASE")]
-        public static void LogReleaseWarning(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Standard) => LogWarning(message, logger, level);
+        public static void LogReleaseWarning(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Warning) => LogWarning(message, logger, level);
 
-        public static void Log(string? message, Color? color = null, ILoggerService? logger = null, LogLevel level = LogLevel.Standard)
+        public static void Log(string? message, Color? color = null, ILoggerService? logger = null, LogLevel level = LogLevel.Information)
         {
             if (level > ActualLogLevel || string.IsNullOrEmpty(message)) return;
             color ??= Color.SkyBlue;
@@ -57,7 +63,7 @@ namespace SOS
             else LuaCsLogger.Log(message, color);
         }
 
-        public static void LogError(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Critical)
+        public static void LogError(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Error)
         {
             if (level > ActualLogLevel || string.IsNullOrEmpty(message)) return;
             if (logger != null) logger.LogError(message);
@@ -65,7 +71,7 @@ namespace SOS
             else LuaCsLogger.LogError(message);
         }
 
-        public static void LogWarning(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Standard)
+        public static void LogWarning(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Warning)
         {
             if (level > ActualLogLevel || string.IsNullOrEmpty(message)) return;
             if (logger != null) logger.LogWarning(message);
