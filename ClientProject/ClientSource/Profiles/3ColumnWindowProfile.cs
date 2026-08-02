@@ -17,7 +17,7 @@ using BGUI = Barotrauma.GUI;
 namespace SOS
 {
     [AutoRegister]
-    internal sealed class TreeColumnWindowProfile : WindowProfileBase, ISOSWindowProfile
+    internal sealed class ThreeColumnWindowProfile : WindowProfileBase, ISOSWindowProfile
     {
         public string Id => "SOS.Profile.Default3Column";
         public double Order => 0;
@@ -168,6 +168,7 @@ namespace SOS
 
         private void OnTargetChangedHandler(Prefab? target)
         {
+            if (target == null) return;
             _currentItem = target;
             if (mainFrame == null || detailsHeader == null || centerTabWidget == null || metaPanel == null) return;
 
@@ -296,9 +297,6 @@ namespace SOS
             topBar?.ExFadeIn(duration: 1.0f, alsoChildren: false);
             contentArea?.SetAlpha(0.0f);
             contentArea?.ExFadeIn(duration: 1.0f, targetFactor: 1.0f, alsoChildren: true);
-
-            if (_currentItem != null)
-                OnTargetChangedHandler(_currentItem);
         }
 
         private void ApplySavedSizeAndPosition()
@@ -504,10 +502,10 @@ namespace SOS
             };
 
             UpdateSearch(ctrl.LastSearchQuery);
-            UpdateNavigationButtonStates();
-
             UpdateLayout();
             mainFrame.ForceLayoutRecalculation();
+
+            OnTargetChangedHandler(API.GetState<Prefab?>(CommKeys.SelectTarget));
         }
 
         #endregion
@@ -893,13 +891,13 @@ namespace SOS
 
             public TCWPConfig()
             {
-                ConfigHelper.TryInitConfig("ThreeColumnWindowSizeX", out _windowSizeX);
-                ConfigHelper.TryInitConfig("ThreeColumnWindowSizeY", out _windowSizeY);
-                ConfigHelper.TryInitConfig("ThreeColumnWindowPositionX", out _windowPositionX);
-                ConfigHelper.TryInitConfig("ThreeColumnWindowPositionY", out _windowPositionY);
-                ConfigHelper.TryInitConfig("ThreeColumnLeftPanelWidth", out _leftPanelWidth);
-                ConfigHelper.TryInitConfig("ThreeColumnRightPanelWidth", out _rightPanelWidth);
-                ConfigHelper.TryInitConfig("ThreeColumnCustomLayouts", out _customLayoutsRaw);
+                TryInitConfig("ThreeColumnWindowSizeX", out _windowSizeX);
+                TryInitConfig("ThreeColumnWindowSizeY", out _windowSizeY);
+                TryInitConfig("ThreeColumnWindowPositionX", out _windowPositionX);
+                TryInitConfig("ThreeColumnWindowPositionY", out _windowPositionY);
+                TryInitConfig("ThreeColumnLeftPanelWidth", out _leftPanelWidth);
+                TryInitConfig("ThreeColumnRightPanelWidth", out _rightPanelWidth);
+                TryInitConfig("ThreeColumnCustomLayouts", out _customLayoutsRaw);
             }
         }
 

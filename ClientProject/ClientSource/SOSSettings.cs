@@ -30,18 +30,11 @@ namespace SOS
             ctr.TabHistory.Clear();
             ctr.TabHistory.AddRange(ConfigHelper.CsvToList(TabHistoryRaw));
 
-            // Restore last selection
-            string lastId = LastItemId;
-            if (!string.IsNullOrEmpty(lastId))
-            {
-                ctr.CurrentTarget = (Prefab?)ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == lastId)
-                             ?? (Prefab?)AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == lastId)
-                             ?? (Prefab?)ItemPrefab.Prefabs.FirstOrDefault();
-            }
-
             // Restore tracker
             ctr.Tracker.FromCsv(TrackedRecipesRaw);
             ctr.Tracker.Visible = TrackerVisible;
+
+            API.SetState<Prefab?>(CommKeys.SelectTarget, CurrentTarget);
 
             _loaded = true;
 
@@ -59,7 +52,7 @@ namespace SOS
                 DummySimulated = !ClinicalSimulatorManager.HasStarted;
             }
 
-            if (ctr.CurrentTarget != null) LastItemId = ctr.CurrentTarget.Identifier.Value;
+            if (CurrentTarget != null) _lastItemId.SetIfNotEqual(CurrentTarget.Identifier.Value);
 
             TabHistoryRaw = ctr.TabHistory.ToCsv();
             TrackedRecipesRaw = ctr.Tracker.ToCsv();
@@ -88,10 +81,13 @@ namespace SOS
         }
 
         private readonly ISettingBase<string> _lastItemId;
-        public string LastItemId
+        private Prefab? _currentTarget;
+        public Prefab? CurrentTarget
         {
-            get => _lastItemId.Value;
-            set => _lastItemId.SetIfNotEqual(value);
+            get => _currentTarget ??= (Prefab?)ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == _lastItemId.Value)
+                             ?? (Prefab?)AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == _lastItemId.Value)
+                             ?? (Prefab?)ItemPrefab.Prefabs.FirstOrDefault();
+            set => _currentTarget = value;
         }
 
         private readonly ISettingBase<bool> _rawXmlMode;

@@ -5,7 +5,6 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
-using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -28,9 +27,10 @@ namespace SOS
 
         private static bool _scanned = false;
 
+        //MARK: SortedFactory
         private sealed class SortedFactory<T> where T : class, IIdentifierOrdenable
         {
-            private readonly ConcurrentDictionary<string, (double Order, Func<T?> Factory)> _dict = [];
+            private readonly Dictionary<string, (double Order, Func<T?> Factory)> _dict = [];
             private (string Id, double Order, Func<T?> Factory)[] _cache = [];
             private bool _isDirty = false;
 
@@ -49,7 +49,7 @@ namespace SOS
             {
                 lock (_dict)
                 {
-                    var isSuccess = _dict.TryRemove(key, out _);
+                    var isSuccess = _dict.Remove(key);
                     if (isSuccess) _isDirty = true;
                     return isSuccess;
                 }
@@ -159,10 +159,11 @@ namespace SOS
             {
                 if (_isDirty)
                 {
-                    _cache = [.. _dict
-                    .OrderBy(kvp => kvp.Value.Order)
-                    .ThenBy(kvp => kvp.Key)
-                    .Select(kvp => (kvp.Key, kvp.Value.Order, kvp.Value.Factory))];
+                    lock (_dict)
+                        _cache = [.. _dict
+                        .OrderBy(kvp => kvp.Value.Order)
+                        .ThenBy(kvp => kvp.Key)
+                        .Select(kvp => (kvp.Key, kvp.Value.Order, kvp.Value.Factory))];
 
                     _isDirty = false;
                 }
@@ -191,8 +192,9 @@ namespace SOS
 
             public T? Get(string id)
             {
-                if (_dict.TryGetValue(id, out var entry))
-                    return entry.Factory();
+                lock (_dict)
+                    if (_dict.TryGetValue(id, out var entry))
+                        return entry.Factory();
                 return null;
             }
 
@@ -207,11 +209,14 @@ namespace SOS
 
             public void Clear()
             {
-                _dict.Clear();
+                lock (_dict)
+                    _dict.Clear();
                 _cache = [];
                 _isDirty = false;
             }
         }
+
+        #region Window Facade
 
         internal static void Initialize(IPluginManagementService pluginManagementService)
         {
@@ -264,7 +269,27 @@ namespace SOS
 
         internal static IEnumerable<ISOSWindowProfile> CreateWindowProfiles() => _profileFactories.Create();
 
-        internal static ISOSWindowProfile? GetWindowProfile(string? id) => _profileFactories.GetOrFirst(id);
+        internal static ISOSWindowProfile? GetWindowProfile(string? id)
+        {
+            ISOSWindowProfile? v;
+            if (string.IsNullOrEmpty(id)) v = _profileFactories.First();
+            else
+            {
+                v = _profileFactories.Get(id);
+                if (v == null)
+                {
+                    Logger.LogWarning("[SOS] Profile not encountered. Trying to use default profile.");
+                    v = _profileFactories.First();
+                }
+            }
+            if (v == null)
+            {
+                var color = Microsoft.Xna.Framework.Color.LightSkyBlue;
+                Logger.LogError($"[SOS] No one profile encountered. Try reinstall 'S.O.S - Standard Operation Schematics' Mod, report that in steam mod page or create an issue on Git project(‖color:{color.R},{color.G},{color.B}‖https://github.com/retype15/SOS‖end‖).");
+            }
+            return v;
+        }
+        #endregion
 
         #endregion
 
@@ -333,13 +358,13 @@ namespace SOS
             Logger.LogDebug($"OFF CALLED '{key}'.", level: LogLevel.Verbose);
         }
 
-        public static void Emit<T>(string key, T value)
+        public static void Emit<T>(string key, T value, bool setState = true)
         {
             Delegate? d;
             lock (_delegates)
                 _delegates.TryGetValue(key, out d);
 
-
+            if (setState) SetState(key, value, false);
 
             if (d != null)
                 foreach (var handler in d.GetInvocationList())
@@ -374,11 +399,24 @@ namespace SOS
             Logger.LogDebug($"EMIT CALLED '{key}'.", level: LogLevel.Verbose);
         }
 
-        public static void SetState<T>(string key, T value)
+        public static void SetState<T>(string key, T value, bool emit = false)
         {
             lock (_state)
                 _state[key] = value;
+
+            if (emit) Emit(key, value, false);
+
             Logger.LogDebug($"SET_STATE CALLED '{key}' with type: {nameof(T)}.", level: LogLevel.Verbose);
+        }
+
+        public static void SetState<T>(string key, Func<T> method, bool emit = false)
+        {
+            lock (_state)
+                _state[key] = method;
+
+            if (emit) Emit(key, method(), false);
+
+            Logger.LogDebug($"SET_STATE CALLED '{key}' with a delegate function: 'Func<{nameof(T)}>'.", level: LogLevel.Verbose);
         }
 
         public static T? GetState<T>(string key)
@@ -387,19 +425,25 @@ namespace SOS
             {
                 if (_state.TryGetValue(key, out var value))
                 {
-                    if (value is T t)
+                    var result = value switch
                     {
-                        Logger.LogDebug($"GET_STATE CALLED '{key}' with type: {nameof(T)}, returned {t}.", level: LogLevel.Verbose);
-                        return t;
-                    }
-                    else
-                    {
-                        throw new SafeArrayTypeMismatchException($"GetState called with diferent type signature: T:'{typeof(T)}' is not {value?.GetType()}");
-                    }
+                        T t => t,
+                        Func<T> ft => ft(),
+                        _ => throw new SafeArrayTypeMismatchException($"GetState called with diferent type signature: T:'{typeof(T)}' is not {value?.GetType()}"),
+                    };
+                    Logger.LogDebug($"GET_STATE CALLED '{key}' with type: {nameof(T)}, returned {result}.", level: LogLevel.Verbose);
+                    return result;
                 }
                 Logger.LogDebug($"GET_STATE CALLED '{key}' with type: {nameof(T)}, saved type is {value?.GetType().Name}, returned default.", level: LogLevel.Verbose);
-                return default;
             }
+
+            return default;
+        }
+
+        public static bool RemoveState(string key)
+        {
+            lock (_state)
+                return _state.Remove(key);
         }
 
         #endregion
@@ -419,7 +463,8 @@ namespace SOS
 
     public static class CommKeys
     {
-        public static string SelectTarget => "SelectTarget"; //TODO: Revisar si no se rompió nada al cambiar CurrentTargetChanged a 'SelectTarget'.
+        public static string SelectTarget => "SelectTarget";
+        public static string ChangeProfile => "ChangeProfile";
         public static string ApplyLayout => "ApplyLayout";
         public static string NavigateBack => "NavigateBack";
         public static string NavigateForward => "NavigateForward";

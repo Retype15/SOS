@@ -29,26 +29,13 @@ namespace SOS
 
         internal List<ISOSConfig> CachedConfigs { get; set; } = [];
 
-        public HashSet<string> FavoritedItems => cfg.FavoritedItems;
-
-
         private GUIRecipeTracker? _tracker;
         internal GUIRecipeTracker Tracker => _tracker ??= GUIRecipeTracker.InstantiateWithDefault();
 
         public ClientConfig cfg = ClientConfig.Instance;
 
-        private Keys ToggleKey => cfg.SOSOpenKey.Key;
-
-        public string LastSearchQuery => cfg.LastSearchQuery;
-
-        public Prefab? CurrentTarget { get; internal set; }
-
         public Stack<Prefab> HistoryBack { get; } = new Stack<Prefab>();
         public Stack<Prefab> HistoryForward { get; } = new Stack<Prefab>();
-
-        public bool RawXmlMode => cfg.RawXmlMode;
-
-        public float XmlFontScale => cfg.XmlFontScale;
 
         public List<string> TabHistory { get; } = [];
 
@@ -60,22 +47,37 @@ namespace SOS
             migrationPending ||
             CoroutineManager.IsCoroutineRunning("LevelTransition");
 
+        //MARK: Config delegates
+        public HashSet<string> FavoritedItems => cfg.FavoritedItems;
+
+        private Keys ToggleKey => cfg.SOSOpenKey.Key;
+
+        public string LastSearchQuery => cfg.LastSearchQuery;
+
+        public Prefab? CurrentTarget
+        {
+            get => cfg.CurrentTarget;
+            internal set => cfg.CurrentTarget = value;
+        }
+
+        public bool RawXmlMode => cfg.RawXmlMode;
+
+        public float XmlFontScale => cfg.XmlFontScale;
+
+        private SOSController() { }
+
         public void PushTabHistory(string uid)
         {
             TabHistory.Remove(uid);
             TabHistory.Insert(0, uid);
         }
 
-        private SOSController() { }
-
-        public void AddFavorite(string id) { FavoritedItems.Add(id); }
-        public void RemoveFavorite(string id) { FavoritedItems.Remove(id); }
-
         private void Subscribe()
         {
             API.On(CommKeys.NavigateBack, NavigateBack);
             API.On(CommKeys.NavigateForward, NavigateForward);
             API.On(CommKeys.CloseWindow, ToggleUI);
+            API.On<string>(CommKeys.ChangeProfile, ChangeProfile);
         }
 
         private void Unsubscribe()
@@ -83,20 +85,32 @@ namespace SOS
             API.Off(CommKeys.NavigateBack, NavigateBack);
             API.Off(CommKeys.NavigateForward, NavigateForward);
             API.Off(CommKeys.CloseWindow, ToggleUI);
+            API.Off<string>(CommKeys.ChangeProfile, ChangeProfile);
+        }
+
+        public void ChangeProfile(string profileId)
+        {
+            ActiveProfile?.Destroy();
+            ActiveProfile = API.GetWindowProfile(profileId);
+
+            if (ActiveProfile != null)
+            {
+                WindowProfileConfig.Instance.ActiveProfileId = profileId;
+                ActiveProfile.Open();
+            }
         }
 
         public void OnTargetSelected(Prefab? item)
         {
             if (item == null) return;
 
-            if (CurrentTarget != null && CurrentTarget != item)
-            {
-                HistoryBack.Push(CurrentTarget);
-                HistoryForward.Clear();
-            }
-
             if (CurrentTarget != item)
             {
+                if (CurrentTarget != null)
+                {
+                    HistoryBack.Push(CurrentTarget);
+                    HistoryForward.Clear();
+                }
                 CurrentTarget = item;
                 API.Emit(CommKeys.SelectTarget, item);
             }
@@ -146,7 +160,7 @@ namespace SOS
 
             API.Initialize(Plugin.Instance.PluginManagementService);
             CachedConfigs = [.. API.CreateConfigs()];
-            ActiveProfile = API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
+            ActiveProfile ??= API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
 
             LoadSettings();
 
@@ -154,9 +168,6 @@ namespace SOS
 
             ActiveProfile?.Open();
             _isOpened = true;
-
-            if (CurrentTarget != null)
-                API.Emit(CommKeys.SelectTarget, CurrentTarget);
 
             if (!DataInitialized)
             {

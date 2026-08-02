@@ -32,9 +32,9 @@ namespace SOS
 
         public void Save()
         {
-            SOSController.Instance.ActiveProfile?.ProfileConfig?.Save();
-
             SaveChanges();
+
+            SOSController.Instance.ActiveProfile?.ProfileConfig?.Save();
         }
 
         public void Reset() { }
@@ -53,10 +53,7 @@ namespace SOS
                 var targetProfile = profiles.FirstOrDefault(p => p.DisplayName == selectedName);
                 if (targetProfile != null && targetProfile.Id != ActiveProfileId)
                 {
-                    ActiveProfileId = targetProfile.Id;
-                    Save();
-                    API.Emit(CommKeys.CloseWindow);
-                    API.Emit(CommKeys.OpenWindow);
+                    API.Emit<string>(CommKeys.ChangeProfile, ActiveProfileId);
                 }
             });
 
@@ -76,7 +73,7 @@ namespace SOS
 
         public WindowProfileConfig()
         {
-            ConfigHelper.TryInitConfig("ActiveProfileId", out _activeProfileId);
+            TryInitConfig("ActiveProfileId", out _activeProfileId);
         }
     }
 }
