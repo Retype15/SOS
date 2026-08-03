@@ -65,7 +65,7 @@ namespace SOS
                 Selected = isActive,
                 OnClicked = (_, _) => { onClick(); return true; },
             };
-            if (toolTip.IsNullOrEmpty())
+            if (!toolTip.IsNullOrEmpty())
                 tabBtn.ToolTip = toolTip;
             return tabBtn;
         }
@@ -138,7 +138,7 @@ namespace SOS
                 Selected = isActive,
                 OnClicked = (_, _) => { onClick(); return true; },
             };
-            if (toolTip.IsNullOrEmpty())
+            if (!toolTip.IsNullOrEmpty())
                 tabBtn.ToolTip = toolTip;
             return tabBtn;
         }
