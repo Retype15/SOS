@@ -308,7 +308,7 @@ namespace SOS
                     _delegates[key] = handler;
             }
 
-            Logger.LogDebug($"ON CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Verbose);
+            Logger.LogDebug($"ON CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Trace);
         }
 
         public static void On(string key, Action handler)
@@ -321,7 +321,7 @@ namespace SOS
                     _delegates[key] = handler;
             }
 
-            Logger.LogDebug($"ON CALLED '{key}'.", level: LogLevel.Verbose);
+            Logger.LogDebug($"ON CALLED '{key}'.", level: LogLevel.Trace);
         }
 
         public static void Off<T>(string key, Action<T> handler)
@@ -338,7 +338,7 @@ namespace SOS
                 }
             }
 
-            Logger.LogDebug($"OFF CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Verbose);
+            Logger.LogDebug($"OFF CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Trace);
         }
 
         public static void Off(string key, Action handler)
@@ -355,7 +355,7 @@ namespace SOS
                 }
             }
 
-            Logger.LogDebug($"OFF CALLED '{key}'.", level: LogLevel.Verbose);
+            Logger.LogDebug($"OFF CALLED '{key}'.", level: LogLevel.Trace);
         }
 
         public static void Emit<T>(string key, T value, bool setState = true)
@@ -380,7 +380,7 @@ namespace SOS
                     catch (Exception ex) { Logger.LogError($"[SOS] Observer error in key:'{key}'  method:'{handler.Method.Name}' Exception: {ex.Message}"); }
                 }
 
-            Logger.LogDebug($"EMIT CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Verbose);
+            Logger.LogDebug($"EMIT CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Trace);
         }
 
         public static void Emit(string key)
@@ -396,7 +396,7 @@ namespace SOS
                     catch (Exception ex) { Logger.LogError($"[SOS] Observer error in key: '{key}'\nException: '{ex.Message}'"); }
                 }
 
-            Logger.LogDebug($"EMIT CALLED '{key}'.", level: LogLevel.Verbose);
+            Logger.LogDebug($"EMIT CALLED '{key}'.", level: LogLevel.Trace);
         }
 
         public static void SetState<T>(string key, T value, bool emit = false)
@@ -406,7 +406,7 @@ namespace SOS
 
             if (emit) Emit(key, value, false);
 
-            Logger.LogDebug($"SET_STATE CALLED '{key}' with type: {nameof(T)}.", level: LogLevel.Verbose);
+            Logger.LogDebug($"SET_STATE CALLED '{key}' with type: {nameof(T)}.", level: LogLevel.Trace);
         }
 
         public static void SetState<T>(string key, Func<T> method, bool emit = false)
@@ -416,7 +416,7 @@ namespace SOS
 
             if (emit) Emit(key, method(), false);
 
-            Logger.LogDebug($"SET_STATE CALLED '{key}' with a delegate function: 'Func<{nameof(T)}>'.", level: LogLevel.Verbose);
+            Logger.LogDebug($"SET_STATE CALLED '{key}' with a delegate function: 'Func<{nameof(T)}>'.", level: LogLevel.Trace);
         }
 
         public static T? GetState<T>(string key)
@@ -431,10 +431,10 @@ namespace SOS
                         Func<T> ft => ft(),
                         _ => throw new SafeArrayTypeMismatchException($"GetState called with diferent type signature: T:'{typeof(T)}' is not {value?.GetType()}"),
                     };
-                    Logger.LogDebug($"GET_STATE CALLED '{key}' with type: {nameof(T)}, returned {result}.", level: LogLevel.Verbose);
+                    Logger.LogDebug($"GET_STATE CALLED '{key}' with type: {nameof(T)}, returned {result}.", level: LogLevel.Trace);
                     return result;
                 }
-                Logger.LogDebug($"GET_STATE CALLED '{key}' with type: {nameof(T)}, saved type is {value?.GetType().Name}, returned default.", level: LogLevel.Verbose);
+                Logger.LogDebug($"GET_STATE CALLED '{key}' with type: {nameof(T)}, saved type is {value?.GetType().Name}, returned default.", level: LogLevel.Trace);
             }
 
             return default;

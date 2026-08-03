@@ -88,7 +88,7 @@ namespace SOS
             };
             ignoreBtn.OnClicked += IgnoreAction;
 
-            Logger.LogDebug("Showing MigrationDialog", level: LogLevel.Verbose);
+            Logger.LogDebug("Showing MigrationDialog", level: LogLevel.Trace);
         }
 
         private static bool ImportAction(GUIButton button, object userdata)

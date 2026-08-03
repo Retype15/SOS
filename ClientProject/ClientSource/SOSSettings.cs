@@ -243,7 +243,7 @@ namespace SOS
             }
             if (onValueChanged != null) setting.OnValueChanged += onValueChanged;
 #if DEBUG
-            setting.OnValueChanged += setting => Logger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue(),128}", level: LogLevel.Verbose);
+            setting.OnValueChanged += setting => Logger.LogDebug($"Changed: {setting.InternalName} To: {setting.GetStringValue(),128}", level: LogLevel.Trace);
 #endif
             return true;
         }

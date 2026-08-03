@@ -35,6 +35,7 @@ namespace SOS
 #else
         internal static LogLevel ActualLogLevel = LogLevel.Information;
 #endif
+        public static bool ComplainsLogLevel(LogLevel level) => level <= ActualLogLevel;
 
         [Conditional("DEBUG")]
         public static void LogDebug(string? message, Color? color = null, ILoggerService? logger = null, LogLevel level = LogLevel.Debug) => Log(message, color, logger, level);
