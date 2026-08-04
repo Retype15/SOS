@@ -13,16 +13,16 @@ using BGUI = Barotrauma.GUI;
 
 namespace SOS.Profiles
 {
-    internal abstract class WindowProfileBase
+    public static class ProfileHelper
     {
-        private GUIFrame? _configPopup = null;
+        private static GUIFrame? _configPopup = null;
 
-        protected void Update()
+        internal static void Update()
         {
-            _configPopup?.AddToGUIUpdateList(order: 2);
+            _configPopup?.AddToGUIUpdateList(order: 1);
         }
 
-        protected GUIButton CreateSettingsButton(RectTransform parent)
+        public static GUIButton CreateSettingsButton(RectTransform parent)
         {
             var btn = new GUIButton(new RectTransform(new Point(32, 32), parent, isFixedSize: true), "\u2699", style: "GUIButtonSettings")
             {
@@ -32,7 +32,7 @@ namespace SOS.Profiles
             return btn;
         }
 
-        protected void OpenSettingsPopup()
+        public static void OpenSettingsPopup()
         {
             var ctrl = SOSController.Instance;
             var configs = ctrl.CachedConfigs;
@@ -58,13 +58,20 @@ namespace SOS.Profiles
                 config.DrawSettings(list);
             }
 
-            _ = new GUIButton(new RectTransform(new Vector2(1f, 0.08f), _configPopup.RectTransform, Anchor.BottomCenter), Texts.Get("sos.gen.close", "Close [Esc]").Value, style: "GUIButtonLarge")
+            _ = new GUIButton(new RectTransform(new Vector2(0.9f, 0.04f), _configPopup.RectTransform, Anchor.BottomCenter), Texts.Get("sos.gen.close", "Close [Esc]").Value, style: "GUIButtonLarge")
             {
-                OnClicked = (_, _) => { _configPopup.Parent?.RemoveChild(_configPopup); _configPopup = null; return true; }
+                OnClicked = (_, _) => { CloseSettingsPopup(); return true; }
             };
         }
 
-        protected static (GUIButton back, GUIButton forward) CreateNavigationButtons(RectTransform parent)
+        public static void CloseSettingsPopup()
+        {
+            if (_configPopup == null) return;
+            _configPopup.Parent?.RemoveChild(_configPopup);
+            _configPopup = null;
+        }
+
+        public static (GUIButton back, GUIButton forward) CreateNavigationButtons(RectTransform parent)
         {
             var back = new GUIButton(new RectTransform(new Point(32, 32), parent, isFixedSize: true), "", style: "GUIButtonToggleLeft")
             {
@@ -82,7 +89,7 @@ namespace SOS.Profiles
             return (back, forward);
         }
 
-        protected static GUITabWidget CreateTabWidget(RectTransform parent)
+        public static GUITabWidget CreateTabWidget(RectTransform parent)
         {
             var widget = new GUITabWidget(parent);
             foreach (var tab in API.CreateTabs())
@@ -90,13 +97,13 @@ namespace SOS.Profiles
             return widget;
         }
 
-        protected static bool DataInitialized => SOSController.Instance.DataInitialized;
-        protected static bool CanNavigateBack => SOSController.Instance.HistoryBack.Count > 0;
-        protected static bool CanNavigateForward => SOSController.Instance.HistoryForward.Count > 0;
+        public static bool DataInitialized => SOSController.Instance.DataInitialized;
+        public static bool CanNavigateBack => SOSController.Instance.HistoryBack.Count > 0;
+        public static bool CanNavigateForward => SOSController.Instance.HistoryForward.Count > 0;
 
-        protected static void SelectTarget(Prefab target) => SOSController.Instance.OnTargetSelected(target);
+        public static void SelectTarget(Prefab target) => SOSController.Instance.OnTargetSelected(target);
 
-        protected static void OpenContextMenu(Prefab target)
+        public static void OpenContextMenu(Prefab target)
         {
             if (target == null) return;
             List<ContextMenuOption> options = [];
@@ -161,7 +168,7 @@ namespace SOS.Profiles
 
         #region XML
 
-        protected static string GetRawXMLSafe(Prefab item)
+        public static string GetRawXMLSafe(Prefab item)
         {
             var configElement = item.ConfigElement();
             if (configElement == null) return "<!-- No XML data found for this item -->";
@@ -181,7 +188,7 @@ namespace SOS.Profiles
             catch { return "<!-- Error parsing XML data -->"; }
         }
 
-        protected static void XmlContextMenu(GUITextViewer viewer)
+        public static void XmlContextMenu(GUITextViewer viewer)
         {
             var options = new List<ContextMenuOption>
             {
@@ -198,6 +205,6 @@ namespace SOS.Profiles
 
         #endregion
 
-        protected static void CloseWindow() => API.Emit(CommKeys.CloseWindow);
+        public static void CloseWindow() => API.Emit(CommKeys.CloseWindow);
     }
 }

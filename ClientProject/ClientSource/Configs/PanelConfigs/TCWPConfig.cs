@@ -94,7 +94,7 @@ namespace SOS.Configs.TCWP
         private static void ApplyPreset(TPLayout? layout)
         {
             if (layout == null) return;
-            API.Emit(CommKeys.ApplyLayout, layout);
+            API.Emit<TPLayout>(CommKeys.ApplyLayout, (TPLayout)layout);
         }
 
         //MARK: ISettingBases

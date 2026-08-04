@@ -9,6 +9,7 @@ using Barotrauma;
 using Microsoft.Xna.Framework.Input;
 using SOS.Configs;
 using SOS.GUI;
+using SOS.Profiles;
 
 using BGUI = Barotrauma.GUI;
 
@@ -93,13 +94,15 @@ namespace SOS
 
         public void ChangeProfile(string profileId)
         {
+            ActiveProfile?.ProfileConfig?.Save();
             ActiveProfile?.Destroy();
             ActiveProfile = API.GetWindowProfile(profileId);
 
             if (ActiveProfile != null)
             {
                 _windowProfileConfig.ActiveProfileId = profileId;
-                ActiveProfile.Open();
+                if (IsOpened) { ToggleUI(); ToggleUI(); }
+
             }
         }
 
@@ -254,6 +257,7 @@ namespace SOS
                 }
 
                 ActiveProfile?.Update();
+                ProfileHelper.Update();
             }
             if (migrationPending) MigrationDialog.Update();
             if (!IsSOSBlocked && Screen.Selected == GameMain.GameScreen) Tracker.Update();

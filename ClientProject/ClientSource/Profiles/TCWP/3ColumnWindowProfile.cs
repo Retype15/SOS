@@ -17,7 +17,7 @@ using BGUI = Barotrauma.GUI;
 namespace SOS.Profiles.TCWP
 {
     [AutoRegister]
-    internal sealed class ThreeColumnWindowProfile : WindowProfileBase, ISOSWindowProfile
+    internal sealed class ThreeColumnWindowProfile : ISOSWindowProfile
     {
         public string Id => "SOS.Profile.Default3Column";
         public double Order => 0;
@@ -97,15 +97,15 @@ namespace SOS.Profiles.TCWP
             API.On<TPLayout>(CommKeys.ApplyLayout, OnApplyLayout);
             API.On("RefreshSearch", RefreshSearch);
 
-            if (!DataInitialized)
+            if (!ProfileHelper.DataInitialized)
                 BuildLoadingUI();
             else
                 BuildMainUIAndShow();
         }
 
-        public new void Update()
+        public void Update()
         {
-            if (_state == ProfileState.Loading && DataInitialized)
+            if (_state == ProfileState.Loading && ProfileHelper.DataInitialized)
             {
                 TransitionToMainUI();
             }
@@ -134,8 +134,6 @@ namespace SOS.Profiles.TCWP
                     }
                 }
             }
-
-            base.Update();
         }
 
         public void Close()
@@ -214,7 +212,7 @@ namespace SOS.Profiles.TCWP
             }
 
             if (xmlContentText != null)
-                xmlContentText.Text = GetRawXMLSafe(target).FormatToXMLCode();
+                xmlContentText.Text = ProfileHelper.GetRawXMLSafe(target).FormatToXMLCode();
 
             UpdateNavigationButtonStates();
         }
@@ -227,8 +225,8 @@ namespace SOS.Profiles.TCWP
 
         private void OnApplyLayout(TPLayout layout) => ForceLayoutTo(layout);
 
-        private void OnPrimary(Prefab p) => SelectTarget(p);
-        private void OnSecondary(Prefab p) => OpenContextMenu(p);
+        private void OnPrimary(Prefab p) => ProfileHelper.SelectTarget(p);
+        private void OnSecondary(Prefab p) => ProfileHelper.OpenContextMenu(p);
 
         #region BuildUI
 
@@ -352,15 +350,15 @@ namespace SOS.Profiles.TCWP
                 Stretch = false
             };
 
-            btnSettings = CreateSettingsButton(leftTools.RectTransform);
-            (btnBack, btnForward) = WindowProfileBase.CreateNavigationButtons(leftTools.RectTransform);
+            btnSettings = ProfileHelper.CreateSettingsButton(leftTools.RectTransform);
+            (btnBack, btnForward) = ProfileHelper.CreateNavigationButtons(leftTools.RectTransform);
 
             var topButtons = new GUILayoutGroup(new RectTransform(new Vector2(0.2f, 0.8f), topBar.RectTransform, Anchor.CenterRight) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true)
             { Stretch = false, RelativeSpacing = 0.05f, ChildAnchor = Anchor.CenterRight };
 
             _ = new GUIButton(new RectTransform(new Point(32, 32), topButtons.RectTransform, isFixedSize: true), "", style: "GUICancelButton")
             {
-                OnClicked = (_, _) => { CloseWindow(); return true; },
+                OnClicked = (_, _) => { ProfileHelper.CloseWindow(); return true; },
                 ToolTip = Texts.Get("sos.gen.close", "Close [Esc]").Value
             };
 
@@ -442,7 +440,7 @@ namespace SOS.Profiles.TCWP
                 RectTransform = { MinSize = new Point(0, 65), MaxSize = new Point(int.MaxValue, 65) }
             };
 
-            centerTabWidget = WindowProfileBase.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform));
+            centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform));
 
             prefabProviders = [.. API.CreatePrefabProviders()];
             prefabHeaders = prefabProviders.ToDictionary(p => p.PrefabType, p => p.Header);
@@ -487,7 +485,7 @@ namespace SOS.Profiles.TCWP
                 Font = GUIStyle.SmallFont,
                 TextScale = ctrl.XmlFontScale,
                 OnScaleChanged = (scale) => ctrl.cfg.XmlFontScale = scale,
-                ContentMenu = XmlContextMenu
+                ContentMenu = ProfileHelper.XmlContextMenu
             };
 
             metaPanel.Visible = !ctrl.RawXmlMode;
@@ -672,7 +670,7 @@ namespace SOS.Profiles.TCWP
         {
             if (btnBack != null)
             {
-                btnBack.Enabled = CanNavigateBack;
+                btnBack.Enabled = ProfileHelper.CanNavigateBack;
                 if (btnBack.Enabled && SOSController.Instance.HistoryBack.Count > 0)
                 {
                     var prevItem = SOSController.Instance.HistoryBack.Peek();
@@ -683,7 +681,7 @@ namespace SOS.Profiles.TCWP
 
             if (btnForward != null)
             {
-                btnForward.Enabled = CanNavigateForward;
+                btnForward.Enabled = ProfileHelper.CanNavigateForward;
                 if (btnForward.Enabled && SOSController.Instance.HistoryForward.Count > 0)
                 {
                     var nextItem = SOSController.Instance.HistoryForward.Peek();
