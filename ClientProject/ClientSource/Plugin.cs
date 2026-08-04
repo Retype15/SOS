@@ -9,6 +9,7 @@ using System.Diagnostics;
 using Barotrauma;
 using Barotrauma.LuaCs;
 using Barotrauma.LuaCs.Events;
+using SOS.Configs;
 
 namespace SOS
 {
@@ -59,10 +60,10 @@ namespace SOS
 
             ConsoleCommandsService.RemoveCommand("sos");
 
-            RecipeAnalyzer.Clear();
-            ClientConfig.Instance.Destroy();
-            controller = null!;
+            ClientConfig.Destroy();
+            WindowProfileConfig.Destroy();
             SOSController.Instance.Destroy();
+            controller = null!;
             API.Clear();
         }
     }

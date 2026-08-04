@@ -97,7 +97,7 @@ namespace SOS.GUI
                 font: GUIStyle.SmallFont, textColor: Color.Gray)
             { CanBeFocused = false };
 
-            ClientConfig.Instance.OnTrackerVisibleValueChanged += RegisterIfChange;
+            SOSController.Instance.cfg.OnTrackerVisibleValueChanged += RegisterIfChange;
         }
 
         public bool AddRecipe(FabricationRecipe? recipe)
@@ -192,8 +192,8 @@ namespace SOS.GUI
             if (Visible) HideTracker();
             else ShowTracker();
         }
-        public static void ShowTracker() => ClientConfig.Instance.TrackerVisible = true;
-        public static void HideTracker() => ClientConfig.Instance.TrackerVisible = false;
+        public static void ShowTracker() => SOSController.Instance.cfg.TrackerVisible = true;
+        public static void HideTracker() => SOSController.Instance.cfg.TrackerVisible = false;
 
         public List<ContextMenuOption> GetManageHudContextMenuOptions()
         {
@@ -338,7 +338,7 @@ namespace SOS.GUI
             ;
         }
 
-        private void RegisterIfChange(ISettingBase trk) => Visible = ClientConfig.Instance.TrackerVisible;
+        private void RegisterIfChange(ISettingBase _) => Visible = SOSController.Instance.cfg.TrackerVisible;
 
         public void Destroy()
         {
@@ -346,7 +346,7 @@ namespace SOS.GUI
             emptyLabel.RectTransform.Parent = null;
             emptyLabel.RemoveFromGUIUpdateList();
             RemoveRecipes();
-            ClientConfig.Instance.OnTrackerVisibleValueChanged -= RegisterIfChange;
+            SOSController.Instance.cfg.OnTrackerVisibleValueChanged -= RegisterIfChange;
         }
 
         private static int GetPlayerCount(FabricationRecipe.RequiredItem req)

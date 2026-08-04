@@ -8,6 +8,7 @@
 using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using SOS.GUI;
 
 namespace SOS.StatSections
 {

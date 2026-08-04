@@ -7,9 +7,9 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
-using SOS.GUI;
+using SOS.Panels.ItemPanel;
 
-namespace SOS
+namespace SOS.GUI
 {
     //TODO: Generado por AI, sin revisar (WIP)
     internal class GUIDesplegableBox

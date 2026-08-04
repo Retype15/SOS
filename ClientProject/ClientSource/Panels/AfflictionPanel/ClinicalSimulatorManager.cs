@@ -12,7 +12,7 @@ using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
-namespace SOS
+namespace SOS.Panels.AfflictionPanel
 {
     internal static class ClinicalSimulatorManager
     {

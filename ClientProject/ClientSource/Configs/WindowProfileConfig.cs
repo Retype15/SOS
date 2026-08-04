@@ -9,7 +9,7 @@ using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 
-namespace SOS
+namespace SOS.Configs
 {
     [AutoRegister]
     internal sealed class WindowProfileConfig : ConfigDirtySaver, ISOSConfig
@@ -46,7 +46,7 @@ namespace SOS
 
             var profiles = API.CreateWindowProfiles().ToList();
             var profileNames = profiles.Select(p => p.DisplayName);
-            var currentProfile = profiles.FirstOrDefault(p => p.Id == ActiveProfileId)?.DisplayName ?? profiles.FirstOrDefault()?.DisplayName;
+            var currentProfile = profiles.FirstOrDefault(p => p.Id == ActiveProfileId)?.DisplayName ?? profiles.FirstOrDefault()?.DisplayName ?? throw new KeyNotFoundException($"Not match Profile ID: '{ActiveProfileId}'");
 
             l.Dropdown("Profile:", profileNames, currentProfile, selectedName =>
             {
@@ -74,6 +74,11 @@ namespace SOS
         public WindowProfileConfig()
         {
             TryInitConfig("ActiveProfileId", out _activeProfileId);
+        }
+
+        public static void Destroy()
+        {
+            _instance = null;
         }
     }
 }

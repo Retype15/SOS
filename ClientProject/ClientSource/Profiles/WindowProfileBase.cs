@@ -11,7 +11,7 @@ using SOS.GUI;
 
 using BGUI = Barotrauma.GUI;
 
-namespace SOS
+namespace SOS.Profiles
 {
     internal abstract class WindowProfileBase
     {

@@ -7,11 +7,10 @@
 
 using Barotrauma;
 
-namespace SOS
+namespace SOS.Prefabs.Item
 {
-    public interface ISOSPrefabAuto : ISOSPrefab, IAutoRegister;
-
-    public sealed class ItemPrefabProvider : ISOSPrefabAuto
+    [AutoRegister]
+    public sealed class ItemPrefabProvider : ISOSPrefab
     {
         public string Id => "ItemPrefab";
         public double Order => 1;
@@ -97,68 +96,5 @@ namespace SOS
         {
             _itemSlotCache.Clear();
         }
-    }
-
-    public sealed class AfflictionPrefabProvider : ISOSPrefabAuto
-    {
-        public string Id => "AfflictionPrefab";
-        public double Order => 2;
-        public Type PrefabType => typeof(AfflictionPrefab);
-        public string Header => Texts.Get("sos.list.header.afflictionprefab", "Affliction Prefab").Value;
-
-        public IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter)
-        {
-            return AfflictionPrefab.List
-                .Where(a => Matches(a, filter))
-                .OrderBy(a => a is AfflictionPrefabHusk ? 1 : 0);
-        }
-
-        private static bool Matches(AfflictionPrefab a, ISOSPrefabFilter filter)
-        {
-            if (filter.Slot.Count > 0 || filter.Tag.Count > 0) return false;
-
-            if (filter.Mod.Count > 0 && !filter.Mod.Any(m =>
-                (a.ContentPackage?.Name ?? "Vanilla").Contains(m, StringComparison.OrdinalIgnoreCase)))
-                return false;
-
-            if (filter.Category.Count > 0 && !filter.Category.Any(c =>
-                a.AfflictionType.Contains(c)))
-                return false;
-
-            if (filter.ID.Count > 0 && !filter.ID.Any(id =>
-                a.Identifier.Value.Contains(id, StringComparison.OrdinalIgnoreCase)))
-                return false;
-
-            return MatchesGeneral(a, filter);
-        }
-
-        private static bool MatchesGeneral(AfflictionPrefab a, ISOSPrefabFilter filter)
-        {
-            if (filter.General.Count == 0) return true;
-
-            string name = a.Name.Value;
-            string id = a.Identifier.Value;
-            string modName = a.ContentPackage?.Name ?? "Vanilla";
-
-            foreach (var term in filter.General)
-            {
-                bool found = name.Contains(term, StringComparison.OrdinalIgnoreCase) ||
-                             id.Contains(term, StringComparison.OrdinalIgnoreCase) ||
-                             modName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
-                             a.AfflictionType.Contains(term);
-                if (!found) return false;
-            }
-
-            return true;
-        }
-    }
-
-    public sealed class AfflictionPrefabHuskProvider : ISOSPrefabAuto
-    {
-        public string Id => "AfflictionPrefabHusk";
-        public double Order => 2.5;
-        public Type PrefabType => typeof(AfflictionPrefabHusk);
-        public string Header => Texts.Get("sos.list.header.afflictionprefabhusk", "Affliction Prefab Husk").Value;
-        public IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter) => [];
     }
 }

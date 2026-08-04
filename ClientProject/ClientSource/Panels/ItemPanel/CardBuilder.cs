@@ -8,8 +8,7 @@
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
-
-namespace SOS
+namespace SOS.Panels.ItemPanel
 {
     internal enum DisplayMode { Normal, Compact, Hidden }
 

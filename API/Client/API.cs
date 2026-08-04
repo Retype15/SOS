@@ -324,7 +324,7 @@ namespace SOS
             Logger.LogDebug($"ON CALLED '{key}'.", level: LogLevel.Trace);
         }
 
-        public static void Off<T>(string key, Action<T> handler)
+        public static void Off<T>(string key, Action<T> handler, bool removeState = false)
         {
             lock (_delegates)
             {
@@ -337,11 +337,13 @@ namespace SOS
                         _delegates.Remove(key);
                 }
             }
+
+            if (removeState) RemoveState(key);
 
             Logger.LogDebug($"OFF CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Trace);
         }
 
-        public static void Off(string key, Action handler)
+        public static void Off(string key, Action handler, bool removeState = false)
         {
             lock (_delegates)
             {
@@ -354,6 +356,8 @@ namespace SOS
                         _delegates.Remove(key);
                 }
             }
+
+            if (removeState) RemoveState(key);
 
             Logger.LogDebug($"OFF CALLED '{key}'.", level: LogLevel.Trace);
         }

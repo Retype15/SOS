@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
-namespace SOS
+namespace SOS.Profiles.Shared
 {
     internal static partial class XMLHighlighter
     {

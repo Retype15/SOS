@@ -7,6 +7,7 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework.Input;
+using SOS.Configs;
 using SOS.GUI;
 
 using BGUI = Barotrauma.GUI;
@@ -32,8 +33,6 @@ namespace SOS
         private GUIRecipeTracker? _tracker;
         internal GUIRecipeTracker Tracker => _tracker ??= GUIRecipeTracker.InstantiateWithDefault();
 
-        public ClientConfig cfg = ClientConfig.Instance;
-
         public Stack<Prefab> HistoryBack { get; } = new Stack<Prefab>();
         public Stack<Prefab> HistoryForward { get; } = new Stack<Prefab>();
 
@@ -48,6 +47,8 @@ namespace SOS
             CoroutineManager.IsCoroutineRunning("LevelTransition");
 
         //MARK: Config delegates
+        public ClientConfig cfg = ClientConfig.Instance;
+
         public HashSet<string> FavoritedItems => cfg.FavoritedItems;
 
         private Keys ToggleKey => cfg.SOSOpenKey.Key;
@@ -63,6 +64,8 @@ namespace SOS
         public bool RawXmlMode => cfg.RawXmlMode;
 
         public float XmlFontScale => cfg.XmlFontScale;
+
+        private WindowProfileConfig _windowProfileConfig = WindowProfileConfig.Instance;
 
         private SOSController() { }
 
@@ -95,7 +98,7 @@ namespace SOS
 
             if (ActiveProfile != null)
             {
-                WindowProfileConfig.Instance.ActiveProfileId = profileId;
+                _windowProfileConfig.ActiveProfileId = profileId;
                 ActiveProfile.Open();
             }
         }
@@ -328,7 +331,13 @@ namespace SOS
             GUIAnimSequence.ClearAll();
 
             Unsubscribe();
-            ItemPrefabProvider.Destroy();
+
+            ClientConfig.Destroy();
+            cfg = null!;
+            ClientConfig.Destroy();
+            _windowProfileConfig = null!;
+
+            SOS.Prefabs.Item.ItemPrefabProvider.Destroy();
             ActiveProfile?.Close();
             ActiveProfile?.Destroy();
             ActiveProfile = null;
@@ -340,6 +349,7 @@ namespace SOS
         public void Destroy()
         {
             Dispose();
+            RecipeAnalyzer.Clear();
             _instance = null;
         }
 
