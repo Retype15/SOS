@@ -95,15 +95,11 @@ namespace SOS
         public void ChangeProfile(string profileId)
         {
             ActiveProfile?.ProfileConfig?.Save();
+            ActiveProfile?.Close();
             ActiveProfile?.Destroy();
-            ActiveProfile = API.GetWindowProfile(profileId);
-
-            if (ActiveProfile != null)
-            {
-                _windowProfileConfig.ActiveProfileId = profileId;
-                if (IsOpened) { ToggleUI(); ToggleUI(); }
-
-            }
+            ActiveProfile = null;
+            _windowProfileConfig.ActiveProfileId = profileId;
+            if (IsOpened) { ToggleUI(); ToggleUI(); }
         }
 
         public void OnTargetSelected(Prefab? item)
@@ -178,12 +174,13 @@ namespace SOS
             if (Screen.Selected == null || IsSOSBlocked) return;
 
             API.Initialize(Plugin.Instance.PluginManagementService);
+
+            Subscribe();
+
             CachedConfigs = [.. API.CreateConfigs()];
             ActiveProfile ??= API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
 
             LoadSettings();
-
-            Subscribe();
 
             ActiveProfile?.Open();
             _isOpened = true;

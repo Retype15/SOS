@@ -11,7 +11,6 @@ using Microsoft.Xna.Framework;
 
 namespace SOS.Configs
 {
-    [AutoRegister]
     internal sealed class WindowProfileConfig : ConfigDirtySaver, ISOSConfig
     {
         public string Id => "SOS.WindowProfile";
@@ -53,7 +52,7 @@ namespace SOS.Configs
                 var targetProfile = profiles.FirstOrDefault(p => p.DisplayName == selectedName);
                 if (targetProfile != null && targetProfile.Id != ActiveProfileId)
                 {
-                    API.Emit<string>(CommKeys.ChangeProfile, ActiveProfileId);
+                    API.Emit<string>(CommKeys.ChangeProfile, targetProfile.Id);
                 }
             });
 

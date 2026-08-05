@@ -336,6 +336,16 @@ namespace SOS.Profiles.TCWP
         {
             if (mainFrame == null) return;
 
+            leftPanelMode = DisplayMode.Normal;
+            centerPanelMode = DisplayMode.Normal;
+            rightPanelMode = DisplayMode.Normal;
+            lastLeftWForReflow = 0;
+            lastCenterWForReflow = 0;
+            isUpdating = false;
+            pendingSearchQuery = null;
+            searchExecutionTime = 0;
+            layoutMenuFrame = null;
+
             topBar = new GUIFrame(new RectTransform(new Vector2(1.0f, 0.0f), mainFrame.RectTransform, Anchor.TopCenter), "GUIFrameBottom");
             topBar.RectTransform.MinSize = new Point(0, HeaderHeight);
             topBar.RectTransform.MaxSize = new Point(int.MaxValue, HeaderHeight);
