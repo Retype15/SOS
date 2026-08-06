@@ -42,11 +42,13 @@ namespace SOS.Panels.ItemPanel
             var usageContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), usageContainer.RectTransform), Texts.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
             _colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: null) { Spacing = 5, Color = Color.Black * 0.2f };
+
+
         }
 
         public void Show(Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            if (_container == null || _colObtain == null || _colUsage == null || prefab is not ItemPrefab item) return;
+            if (_container == null || !RecipeAnalyzer.DataInitialized || _colObtain == null || _colUsage == null || prefab is not ItemPrefab item) return;
             _container.Visible = true;
             _colObtain.Content.ClearChildren();
             _colUsage.Content.ClearChildren();

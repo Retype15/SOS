@@ -27,8 +27,6 @@ namespace SOS
 
         public bool HaveOldConfigFile = false;
 
-        public bool DataInitialized { get; private set; } = false;
-
         internal List<ISOSConfig> CachedConfigs { get; set; } = [];
 
         private GUIRecipeTracker? _tracker;
@@ -184,15 +182,6 @@ namespace SOS
 
             ActiveProfile?.Open();
             _isOpened = true;
-
-            if (!DataInitialized)
-            {
-                System.Threading.Tasks.Task.Run(() =>
-                {
-                    RecipeAnalyzer.PrecomputeCaches();
-                    DataInitialized = true;
-                });
-            }
         }
 
         public void Update()
@@ -350,7 +339,7 @@ namespace SOS
         public void Destroy()
         {
             Dispose();
-            RecipeAnalyzer.Clear();
+            SOS.Panels.ItemPanel.RecipeAnalyzer.Clear();
             _instance = null;
         }
 

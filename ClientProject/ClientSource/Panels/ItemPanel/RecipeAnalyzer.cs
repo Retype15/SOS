@@ -7,13 +7,26 @@
 
 using Barotrauma;
 
-namespace SOS
+namespace SOS.Panels.ItemPanel
 {
     // MARK: RecipeAnalyzer
     internal static class RecipeAnalyzer
     {
         private static readonly Dictionary<Identifier, List<(ItemPrefab Item, FabricationRecipe Recipe)>> usesCache = [];
         private static readonly Dictionary<Identifier, List<(ItemPrefab Item, DeconstructItem DeconstructItem)>> sourcesCache = [];
+        public static bool DataInitialized { get; private set; } = false;
+
+        public static void Initialize()
+        {
+            if (!DataInitialized)
+            {
+                System.Threading.Tasks.Task.Run(() =>
+                {
+                    RecipeAnalyzer.PrecomputeCaches();
+                    DataInitialized = true;
+                });
+            }
+        }
 
         public static void Clear()
         {

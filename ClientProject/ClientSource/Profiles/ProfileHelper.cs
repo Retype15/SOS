@@ -8,6 +8,7 @@
 using Barotrauma;
 using Microsoft.Xna.Framework;
 using SOS.GUI;
+using SOS.Panels.ItemPanel;
 
 using BGUI = Barotrauma.GUI;
 
@@ -97,7 +98,7 @@ namespace SOS.Profiles
             return widget;
         }
 
-        public static bool DataInitialized => SOSController.Instance.DataInitialized;
+        public static bool DataInitialized => RecipeAnalyzer.DataInitialized;
         public static bool CanNavigateBack => SOSController.Instance.HistoryBack.Count > 0;
         public static bool CanNavigateForward => SOSController.Instance.HistoryForward.Count > 0;
 

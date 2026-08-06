@@ -11,7 +11,6 @@ using Microsoft.Xna.Framework;
 using SOS.GUI;
 using SOS.Panels.AfflictionPanel;
 using SOS.Panels.ItemPanel;
-using SOS.Profiles.Shared;
 using BGUI = Barotrauma.GUI;
 
 namespace SOS.Profiles.TCWP
@@ -98,7 +97,10 @@ namespace SOS.Profiles.TCWP
             API.On("RefreshSearch", RefreshSearch);
 
             if (!ProfileHelper.DataInitialized)
+            {
+                RecipeAnalyzer.Initialize();
                 BuildLoadingUI();
+            }
             else
                 BuildMainUIAndShow();
         }

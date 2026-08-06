@@ -12,7 +12,7 @@ using SOS.Panels.ItemPanel;
 namespace SOS.GUI
 {
     //TODO: Generado por AI, sin revisar (WIP)
-    internal class GUIDesplegableBox
+    public class GUIDesplegableBox
     {
         public GUIDesplegableBox(GUIComponent parent, Action<string> onBadgeClick, string labelText, IEnumerable<string> tags, IEnumerable<Prefab> items, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
