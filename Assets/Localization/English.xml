@@ -245,6 +245,7 @@ Example: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.list.separator_tooltip>Click to filter the list by this type of object.</sos.list.separator_tooltip>
 
 	<!-- Layout -->
+	<sos.layout.save>Save ACTUAL</sos.layout.save>
 	<sos.layout.save_tooltip>Saves the current panel layout as a new preset.</sos.layout.save_tooltip>
 	<sos.layout.apply_tooltip>Applies this panel layout preset.</sos.layout.apply_tooltip>
 	<sos.layout.delete_tooltip>Deletes this layout preset.</sos.layout.delete_tooltip>

@@ -245,6 +245,7 @@
 	<sos.list.separator_tooltip>Нажмите, чтобы отфильтровать список по этому типу объекта.</sos.list.separator_tooltip>
 
 	<!-- Layout -->
+	<sos.layout.save>Сохранить ТЕКУЩУЮ</sos.layout.save>
 	<sos.layout.save_tooltip>Сохраняет текущую раскладку панелей как новый пресет.</sos.layout.save_tooltip>
 	<sos.layout.apply_tooltip>Применяет этот пресет раскладки панелей.</sos.layout.apply_tooltip>
 	<sos.layout.delete_tooltip>Удаляет этот пресет раскладки.</sos.layout.delete_tooltip>

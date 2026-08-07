@@ -245,6 +245,7 @@ Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.list.separator_tooltip>Cliquez pour filtrer la liste par ce type d'objet.</sos.list.separator_tooltip>
 
 	<!-- Layout -->
+	<sos.layout.save>Enregistrer l'ACTUEL</sos.layout.save>
 	<sos.layout.save_tooltip>Enregistre la disposition actuelle des panneaux comme nouveau préréglage.</sos.layout.save_tooltip>
 	<sos.layout.apply_tooltip>Applique ce préréglage de disposition des panneaux.</sos.layout.apply_tooltip>
 	<sos.layout.delete_tooltip>Supprime ce préréglage de disposition.</sos.layout.delete_tooltip>

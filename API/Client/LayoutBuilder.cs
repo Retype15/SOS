@@ -15,7 +15,8 @@ namespace SOS
     {
         private readonly GUIListBox _listBox;
         private readonly GUILayoutGroup _currentGroup;
-        private int _rowsCreated = 0;
+
+        public GUILayoutGroup CurrentGroup => _currentGroup;
 
         public LayoutBuilder(GUIListBox listBox)
         {
@@ -72,8 +73,6 @@ namespace SOS
             UpdateHeight();
             lblBlock.RectTransform.SizeChanged += UpdateHeight;
             valBlock.RectTransform.SizeChanged += UpdateHeight;
-
-            _rowsCreated++;
         }
 
         public void BadgeRow(
@@ -145,8 +144,6 @@ namespace SOS
                 row.HoverCursor = CursorState.Hand;
                 row.OnClicked = (comp, obj) => { onSearchFilter?.Invoke(single.Target); return true; };
             }
-
-            _rowsCreated++;
         }
 
         public void SelectorRow(
@@ -254,8 +251,6 @@ namespace SOS
                     return true;
                 };
             }
-
-            _rowsCreated++;
         }
 
         public void RichText(RichString text)
@@ -275,8 +270,6 @@ namespace SOS
             }
             UpdateHeight();
             block.RectTransform.SizeChanged += UpdateHeight;
-
-            _rowsCreated++;
         }
 
         //TODO: Hecho por IA, aún no revisado.
@@ -300,7 +293,6 @@ namespace SOS
             };
             if (tooltip != null) btn.ToolTip = tooltip;
             if (color.HasValue) btn.Color = color.Value;
-            _rowsCreated++;
         }
 
         public void TextBox(string label, string initialValue, Action<string> onChange)
@@ -309,7 +301,6 @@ namespace SOS
             _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
             var textBox = new GUITextBox(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), initialValue, font: GUIStyle.SmallFont);
             textBox.OnTextChanged += (tb, text) => { onChange(text); return true; };
-            _rowsCreated++;
         }
 
         public void Dropdown(string label, IEnumerable<string> items, string? selected, Action<string> onSelect)
@@ -329,7 +320,6 @@ namespace SOS
                 if (obj is string s) onSelect(s);
                 return true;
             };
-            _rowsCreated++;
         }
 
         public void TickBox(string label, bool selected, Action<bool> onToggle)
@@ -341,7 +331,6 @@ namespace SOS
                 CanBeFocused = true,
                 OnSelected = (tb) => { onToggle(tb.Selected); return true; }
             };
-            _rowsCreated++;
         }
 
         public void Slider(string label, float min, float max, float value, Action<float> onChange)
@@ -370,7 +359,6 @@ namespace SOS
                 onChange(v);
                 return true;
             };
-            _rowsCreated++;
         }
 
         #endregion
@@ -411,7 +399,7 @@ namespace SOS
 
         public void Dispose()
         {
-            if (_rowsCreated == 0)
+            if (!_currentGroup.GetAllChildren().Any())
             {
                 _listBox.Content.RemoveChild(_currentGroup);
             }

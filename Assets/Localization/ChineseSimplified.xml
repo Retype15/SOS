@@ -245,6 +245,7 @@
 	<sos.list.separator_tooltip>点击按此对象类型筛选列表。</sos.list.separator_tooltip>
 
 	<!-- Layout -->
+	<sos.layout.save>保存当前布局</sos.layout.save>
 	<sos.layout.save_tooltip>将当前面板布局保存为新预设。</sos.layout.save_tooltip>
 	<sos.layout.apply_tooltip>应用此面板布局预设。</sos.layout.apply_tooltip>
 	<sos.layout.delete_tooltip>删除此布局预设。</sos.layout.delete_tooltip>

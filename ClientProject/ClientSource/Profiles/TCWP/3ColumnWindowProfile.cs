@@ -8,6 +8,7 @@
 using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using MonoMod.Utils;
 using SOS.GUI;
 using SOS.Panels.AfflictionPanel;
 using SOS.Panels.ItemPanel;
@@ -183,7 +184,10 @@ namespace SOS.Profiles.TCWP
 
             if (icon != null)
             {
-                var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.15f, 0.9f), headerLayout.RectTransform, Anchor.CenterLeft), style: null);
+                var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.15f, 0.9f), headerLayout.RectTransform, Anchor.CenterLeft), style: null)
+                {
+                    OnDrawToolTip = component => component.ToolTip = CardBuilder.GetDetailedTooltip(target)
+                };
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = target.IconColor(), CanBeFocused = false };
             }
 
@@ -666,7 +670,7 @@ namespace SOS.Profiles.TCWP
 
         private string GetHeaderForType(Type type)
         {
-            if (prefabHeaders == null) return type.Name;
+            if (prefabHeaders == null) return type.Name.SpacedPascalCase();
 
             Type? current = type;
             while (current != null && current != typeof(Prefab))
@@ -675,7 +679,7 @@ namespace SOS.Profiles.TCWP
                     return header;
                 current = current.BaseType;
             }
-            return type.Name;
+            return type.Name.SpacedPascalCase();
         }
 
         #endregion
@@ -754,7 +758,7 @@ namespace SOS.Profiles.TCWP
 
             if (needsLeftRefresh) { leftPanelMode = newLeftMode; lastLeftWForReflow = leftW; if (leftContainer != null) leftContainer.Visible = leftPanelMode != DisplayMode.Hidden; RefreshSearch(); }
             if (needsCenterRefresh) { centerPanelMode = newCenterMode; lastCenterWForReflow = centerWidth; if (_currentItem != null) OnTargetChangedHandler(_currentItem); }
-            if (needsRightRefresh) { rightPanelMode = newRightMode; lastCenterWForReflow = centerWidth; if (rightContainer != null) rightContainer.Visible = rightPanelMode != DisplayMode.Hidden; if (_currentItem != null) OnTargetChangedHandler(_currentItem); }
+            if (needsRightRefresh) { rightPanelMode = newRightMode; if (rightContainer != null) rightContainer.Visible = rightPanelMode != DisplayMode.Hidden; if (_currentItem != null) OnTargetChangedHandler(_currentItem); }
 
             //TODO: Ver si optimizamos esto para no guardar cada frame.
             if (_config != null && mainFrame.RectTransform.NonScaledSize != Point.Zero)

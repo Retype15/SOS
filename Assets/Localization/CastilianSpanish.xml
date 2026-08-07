@@ -245,6 +245,7 @@ Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.list.separator_tooltip>Haz clic para filtrar la lista por este tipo de objeto.</sos.list.separator_tooltip>
 
 	<!-- Layout -->
+	<sos.layout.save>Guardar ACTUAL</sos.layout.save>
 	<sos.layout.save_tooltip>Guarda la distribución actual de paneles como un nuevo preset.</sos.layout.save_tooltip>
 	<sos.layout.apply_tooltip>Aplica este preset de distribución de paneles.</sos.layout.apply_tooltip>
 	<sos.layout.delete_tooltip>Elimina este preset de distribución.</sos.layout.delete_tooltip>

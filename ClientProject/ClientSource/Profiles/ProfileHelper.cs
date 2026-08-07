@@ -72,6 +72,12 @@ namespace SOS.Profiles
             _configPopup = null;
         }
 
+        public static void RefreshSettingsPopup()
+        {
+            CloseSettingsPopup();
+            OpenSettingsPopup();
+        }
+
         public static (GUIButton back, GUIButton forward) CreateNavigationButtons(RectTransform parent)
         {
             var back = new GUIButton(new RectTransform(new Point(32, 32), parent, isFixedSize: true), "", style: "GUIButtonToggleLeft")
