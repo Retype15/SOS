@@ -9,6 +9,7 @@ using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 using MonoMod.Utils;
+using SOS.Profiles;
 using static SOS.Profiles.TCWP.ThreeColumnWindowProfile;
 
 namespace SOS.Configs.TCWP
@@ -69,12 +70,42 @@ namespace SOS.Configs.TCWP
                 l.Header("MY PRESETS", Color.Gold);
                 foreach (var kvp in CustomLayouts.ToList())
                 {
-                    var saved = kvp.Value;
-                    l.Button(kvp.Key, () => ApplyPreset(saved.WindowSize, saved.LeftPanelWidth, saved.RightPanelWidth));
+                    l.Button(kvp.Key,
+                        () => ApplyPreset(kvp.Value.WindowSize, kvp.Value.LeftPanelWidth, kvp.Value.RightPanelWidth),
+                        Texts.Get("sos.layout.apply_tooltip", "Applies this panel layout preset.").Value,
+                        () => DeleteCustomLayout(kvp.Key),
+                        Texts.Get("sos.layout.delete_tooltip", "Deletes this layout preset.").Value);
                 }
             }
 
             l.Separator();
+
+            l.Button(Texts.Get("sos.layout.save", "Save ACTUAL").Value, SaveCurrentLayout, tooltip: Texts.Get("sos.layout.save_tooltip", "Saves the current panel layout as a new preset.").Value);
+
+            l.Separator();
+        }
+
+        internal void SaveCurrentLayout()
+        {
+            string newName = $"Layout {CustomLayouts.Count + 1}";
+            while (CustomLayouts.ContainsKey(newName))
+                newName = $"Layout {CustomLayouts.Count + 2}";
+
+            var layout = new TPLayout
+            {
+                WindowSize = WindowSize,
+                LeftPanelWidth = LeftPanelWidth,
+                RightPanelWidth = RightPanelWidth
+            };
+            CustomLayouts[newName] = layout;
+            Save();
+            ProfileHelper.RefreshSettingsPopup();
+        }
+
+        internal void DeleteCustomLayout(string name)
+        {
+            if (CustomLayouts.Remove(name)) Save();
+            ProfileHelper.RefreshSettingsPopup();
         }
 
         private void ApplyPreset(int? winW, int? winH, int? leftW, int? rightW)

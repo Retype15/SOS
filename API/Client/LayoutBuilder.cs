@@ -25,8 +25,7 @@ namespace SOS
             _currentGroup = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), _listBox.Content.RectTransform, Anchor.TopCenter))
             {
                 AbsoluteSpacing = 2,
-                CanBeFocused = false,
-                Stretch = true
+                CanBeFocused = false
             };
         }
 
@@ -293,6 +292,26 @@ namespace SOS
             };
             if (tooltip != null) btn.ToolTip = tooltip;
             if (color.HasValue) btn.Color = color.Value;
+        }
+
+        public void Button(string text, Action onClick, string applyTooltip, Action onDeleteClick, string deleteTooltip, Color? color = null)
+        {
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+
+            var apply = new GUIButton(new RectTransform(new Vector2(0.82f, 1f), row.RectTransform, Anchor.CenterLeft), text, style: "GUIButtonSmall")
+            {
+                ToolTip = applyTooltip,
+                CanBeFocused = true,
+                OnClicked = (_, _) => { onClick(); return true; }
+            };
+            if (color.HasValue) apply.Color = color.Value;
+
+            _ = new GUIButton(new RectTransform(new Vector2(0.18f, 1f), row.RectTransform, Anchor.CenterRight), "×", style: "GUICancelButton", color: Color.IndianRed)
+            {
+                ToolTip = deleteTooltip,
+                CanBeFocused = true,
+                OnClicked = (_, _) => { onDeleteClick(); return true; }
+            };
         }
 
         public void TextBox(string label, string initialValue, Action<string> onChange)
