@@ -117,6 +117,7 @@
 	<sos.item.locations>Места:</sos.item.locations>
 	<sos.item.max_stack>Макс. стек:</sos.item.max_stack>
 	<sos.item.min_difficulty>Мин. сложность:</sos.item.min_difficulty>
+	<sos.item.mod>Мод:</sos.item.mod>
 	<sos.item.price>Цена:</sos.item.price>
 	<sos.item.required_faction>Требуемая фракция:</sos.item.required_faction>
 	<sos.item.tags>ТЕГИ:</sos.item.tags>
@@ -127,11 +128,16 @@
 	<sos.weapon.base_spread>Базовый разброс:</sos.weapon.base_spread>
 	<sos.weapon.dismember_chance>Шанс расчленения:</sos.weapon.dismember_chance>
 	<sos.weapon.dmg_multiplier>Множ. урона:</sos.weapon.dmg_multiplier>
+	<sos.weapon.explosion_radius>Радиус взрыва:</sos.weapon.explosion_radius>
 	<sos.weapon.fire_rate>Скорострельность:</sos.weapon.fire_rate>
 	<sos.weapon.hull_damage>Урон корпусу:</sos.weapon.hull_damage>
+	<sos.weapon.item_damage>Урон предмету:</sos.weapon.item_damage>
+	<sos.weapon.max_targets>Макс. целей:</sos.weapon.max_targets>
 	<sos.weapon.power_use>Потребление энергии:</sos.weapon.power_use>
+	<sos.weapon.projectiles>Снаряды:</sos.weapon.projectiles>
 	<sos.weapon.range>Дистанция:</sos.weapon.range>
 	<sos.weapon.reload>Перезарядка:</sos.weapon.reload>
+	<sos.weapon.structure_damage>Урон конструкциям:</sos.weapon.structure_damage>
 	<sos.weapon.throwable>Метательное</sos.weapon.throwable>
 	<sos.weapon.type>Тип:</sos.weapon.type>
 
@@ -141,6 +147,7 @@
 	<sos.equip.equips_in>Экипируется в:</sos.equip.equips_in>
 	<sos.equip.max_durability>Макс. прочность:</sos.equip.max_durability>
 	<sos.equip.pressure_protection>Защита от давления:</sos.equip.pressure_protection>
+	<sos.equip.res_suffix>Сопр.:</sos.equip.res_suffix>
 
 	<!-- Medical -->
 	<sos.med.always_causes>Всегда Налагает:</sos.med.always_causes>
@@ -159,6 +166,38 @@
 	<sos.affliction.contraindicated_warn>ПРЕДУПРЕЖДЕНИЕ: Следующие предметы ухудшают состояние!</sos.affliction.contraindicated_warn>
 	<sos.affliction.effective>Эффективно:</sos.affliction.effective>
 	<sos.affliction.highlyeffective>Высокоэффективно:</sos.affliction.highlyeffective>
+	<sos.affliction.activation_threshold>Порог активации:</sos.affliction.activation_threshold>
+	<sos.affliction.buff>Буст</sos.affliction.buff>
+	<sos.affliction.classification>Классификация:</sos.affliction.classification>
+	<sos.affliction.convulsions>Судороги/Спазмы</sos.affliction.convulsions>
+	<sos.affliction.death_cause>Причина смерти:</sos.affliction.death_cause>
+	<sos.affliction.debuff>Дебафф</sos.affliction.debuff>
+	<sos.affliction.effects_header>ЭФФЕКТЫ ПО ФАЗЕ СИЛЫ</sos.affliction.effects_header>
+	<sos.affliction.event_animations>Вызывает анимации</sos.affliction.event_animations>
+	<sos.affliction.event_explosion>Вызывает взрыв</sos.affliction.event_explosion>
+	<sos.affliction.event_particles>Создает частицы</sos.affliction.event_particles>
+	<sos.affliction.event_sounds>Воспроизводит звуки/шумы</sos.affliction.event_sounds>
+	<sos.affliction.exp_gain>Прирост мед. опыта:</sos.affliction.exp_gain>
+	<sos.affliction.frequency>Частота:</sos.affliction.frequency>
+	<sos.affliction.heal_cost>Стоимость лечения:</sos.affliction.heal_cost>
+	<sos.affliction.icon_threshold>Иконка появляется при:</sos.affliction.icon_threshold>
+	<sos.affliction.indicator_limb>Индикаторная конечность:</sos.affliction.indicator_limb>
+	<sos.affliction.interval>Интервал:</sos.affliction.interval>
+	<sos.affliction.limb_specific>Для конечности:</sos.affliction.limb_specific>
+	<sos.affliction.max_hp_penalty>Штраф к макс. HP:</sos.affliction.max_hp_penalty>
+	<sos.affliction.max_strength>Макс. сила:</sos.affliction.max_strength>
+	<sos.affliction.natural_healing>Естественное лечение:</sos.affliction.natural_healing>
+	<sos.affliction.periodic_header>ПЕРИОДИЧЕСКИЕ СОБЫТИЯ</sos.affliction.periodic_header>
+	<sos.affliction.resistances>Сопротивления:</sos.affliction.resistances>
+	<sos.affliction.scanner_threshold>Сканер обнаруживает при:</sos.affliction.scanner_threshold>
+	<sos.affliction.speed>Скорость:</sos.affliction.speed>
+	<sos.affliction.str>Сила:</sos.affliction.str>
+	<sos.affliction.strength_range>Диапазон силы:</sos.affliction.strength_range>
+	<sos.affliction.treatment_threshold>ИИ лечит при:</sos.affliction.treatment_threshold>
+	<sos.affliction.triggers>Запускает:</sos.affliction.triggers>
+	<sos.affliction.type>Тип:</sos.affliction.type>
+	<sos.affliction.visual_distortions>Визуальные искажения</sos.affliction.visual_distortions>
+	<sos.affliction.worsens>Ухудшается:</sos.affliction.worsens>
 
 	<!-- Simulator -->
 	<sos.aff.speedDropdown>Более x1 все еще в разработке. \nРаботает в одиночной игре, но не в многопользовательской.</sos.aff.speedDropdown>

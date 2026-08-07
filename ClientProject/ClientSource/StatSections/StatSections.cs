@@ -82,7 +82,7 @@ namespace SOS.StatSections
             l.BadgeRow(Texts.Get("sos.item.id", "ID:").Value, [prefab.Identifier.Value], filterPrefix: '!', onSearchFilter: SectionHelper.SetSearchFilter);
 
             string modName = prefab.ContentPackage?.Name ?? "Vanilla";
-            l.BadgeRow("Mod:", [modName], filterPrefix: '@', onSearchFilter: SectionHelper.SetSearchFilter);
+            l.BadgeRow(Texts.Get("sos.item.mod", "Mod:").Value, [modName], filterPrefix: '@', onSearchFilter: SectionHelper.SetSearchFilter);
 
             if (prefab is ItemPrefab item)
             {
@@ -95,25 +95,25 @@ namespace SOS.StatSections
             }
             else if (prefab is AfflictionPrefab aff)
             {
-                l.Row("Classification:", isBuff ? "Buff (Positive)" : "Debuff (Negative)", isBuff ? Color.LightGreen : Color.Salmon);
-                l.BadgeRow("Type:", [aff.AfflictionType.ToString()], filterPrefix: '#', onSearchFilter: SectionHelper.SetSearchFilter);
-                l.Row("Max Strength:", aff.MaxStrength.ToValue(), Color.White);
+                l.Row(Texts.Get("sos.affliction.classification", "Classification:").Value, isBuff ? Texts.Get("sos.affliction.buff", "Buff").Value : Texts.Get("sos.affliction.debuff", "Debuff").Value, isBuff ? Color.LightGreen : Color.Salmon);
+                l.BadgeRow(Texts.Get("sos.affliction.type", "Type:").Value, [aff.AfflictionType.ToString()], filterPrefix: '#', onSearchFilter: SectionHelper.SetSearchFilter);
+                l.Row(Texts.Get("sos.affliction.max_strength", "Max Strength:").Value, aff.MaxStrength.ToValue(), Color.White);
 
-                if (activationThreshold > 0) l.Row("Activation Threshold:", activationThreshold.ToValue(), Color.Yellow);
-                if (iconThreshold > 0 && iconThreshold < 1000) l.Row("Icon Appears At:", iconThreshold.ToValue(), Color.Cyan);
-                if (scannerThreshold > 0 && scannerThreshold < 1000) l.Row("Scanner Detects At:", scannerThreshold.ToValue(), Color.Cyan);
-                if (treatmentThreshold > 0) l.Row("AI Treats At:", treatmentThreshold.ToValue(), Color.LightGreen);
+                if (activationThreshold > 0) l.Row(Texts.Get("sos.affliction.activation_threshold", "Activation Threshold:").Value, activationThreshold.ToValue(), Color.Yellow);
+                if (iconThreshold > 0 && iconThreshold < 1000) l.Row(Texts.Get("sos.affliction.icon_threshold", "Icon Appears At:").Value, iconThreshold.ToValue(), Color.Cyan);
+                if (scannerThreshold > 0 && scannerThreshold < 1000) l.Row(Texts.Get("sos.affliction.scanner_threshold", "Scanner Detects At:").Value, scannerThreshold.ToValue(), Color.Cyan);
+                if (treatmentThreshold > 0) l.Row(Texts.Get("sos.affliction.treatment_threshold", "AI Treats At:").Value, treatmentThreshold.ToValue(), Color.LightGreen);
 
                 float totalCost = baseHealCost * healMultiplier;
-                if (totalCost > 0) l.Row("Clinic Heal Cost:", $"~{(int)totalCost} mk", Color.Gold);
-                if (medSkillGain > 0) l.Row("Medical Exp Gain:", $"+{medSkillGain.ToValue()}", Color.MediumPurple);
+                if (totalCost > 0) l.Row(Texts.Get("sos.affliction.heal_cost", "Clinic Heal Cost:").Value, $"~{(int)totalCost} mk", Color.Gold);
+                if (medSkillGain > 0) l.Row(Texts.Get("sos.affliction.exp_gain", "Medical Exp Gain:").Value, $"+{medSkillGain.ToValue()}", Color.MediumPurple);
 
-                if (aff.LimbSpecific) l.Row("Limb Specific:", "Yes", Color.Gray);
+                if (aff.LimbSpecific) l.Row(Texts.Get("sos.affliction.limb_specific", "Limb Specific:").Value, Texts.Get("sos.gen.yes", "Yes").Value, Color.Gray);
                 if (!string.IsNullOrEmpty(aff.IndicatorLimb.ToString()) && aff.IndicatorLimb.ToString() != "None")
-                    l.Row("Indicator Limb:", aff.IndicatorLimb.ToString(), Color.Gray);
+                    l.Row(Texts.Get("sos.affliction.indicator_limb", "Indicator Limb:").Value, aff.IndicatorLimb.ToString(), Color.Gray);
 
                 if (!string.IsNullOrEmpty(causeOfDeath))
-                    l.RichText($"Death Cause: {causeOfDeath}".SetColor(Color.Crimson));
+                    l.RichText($"{Texts.Get("sos.affliction.death_cause", "Death Cause:").Value} {causeOfDeath}".SetColor(Color.Crimson));
             }
         }
     }
@@ -294,19 +294,19 @@ namespace SOS.StatSections
             using var l = new LayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_weapon", "AS WEAPON").Value, Color.Gold);
 
-            if (reload > 0) l.Row(isAutomatic ? "Fire Rate:" : "Reload:", $"{reload}s", Color.Cyan);
-            if (powerUse > 0) l.Row("Power Use:", $"{powerUse}kW", Color.Orange);
-            if (range > 0) l.Row("Range:", range.ToMeters(), Color.LightGray);
-            if (explosionRange > 0) l.Row("Explosion Radius:", explosionRange.ToMeters(), Color.Orange);
-            if (penetration > 0) l.Row("Armor Penetration:", $"{(int)(penetration * 100)}%", Color.Orange);
-            if (projectileCount > 1) l.Row("Projectiles:", $"x{projectileCount}", Color.LightGray);
-            if (maxTargets > 1) l.Row("Max Targets:", maxTargets.ToString(), Color.LightGray);
-            if (structureDamage > 0) l.Row("Structure Damage:", structureDamage.ToValue(), Color.Salmon);
-            if (itemDamage > 0) l.Row("Item Damage:", itemDamage.ToValue(), Color.Salmon);
-            if (severProb > 0) l.Row("Dismember Chance:", $"{(int)(severProb * 100)}%", Color.Crimson);
-            if (spread > 0) l.Row("Base Spread:", $"{spread:0.#}°", Color.LightGray);
-            if (dmgModifier != 1f) l.Row("Dmg. Multiplier:", $"x{dmgModifier:0.#}", Color.LightGreen);
-            if (isThrowable) l.Row("Type:", "Throwable", Color.White);
+            if (reload > 0) l.Row(isAutomatic ? Texts.Get("sos.weapon.fire_rate", "Fire Rate:").Value : Texts.Get("sos.weapon.reload", "Reload:").Value, $"{reload}s", Color.Cyan);
+            if (powerUse > 0) l.Row(Texts.Get("sos.weapon.power_use", "Power Use:").Value, $"{powerUse}kW", Color.Orange);
+            if (range > 0) l.Row(Texts.Get("sos.weapon.range", "Range:").Value, range.ToMeters(), Color.LightGray);
+            if (explosionRange > 0) l.Row(Texts.Get("sos.weapon.explosion_radius", "Explosion Radius:").Value, explosionRange.ToMeters(), Color.Orange);
+            if (penetration > 0) l.Row(Texts.Get("sos.weapon.armor_penetration", "Armor Penetration:").Value, $"{(int)(penetration * 100)}%", Color.Orange);
+            if (projectileCount > 1) l.Row(Texts.Get("sos.weapon.projectiles", "Projectiles:").Value, $"x{projectileCount}", Color.LightGray);
+            if (maxTargets > 1) l.Row(Texts.Get("sos.weapon.max_targets", "Max Targets:").Value, maxTargets.ToString(), Color.LightGray);
+            if (structureDamage > 0) l.Row(Texts.Get("sos.weapon.structure_damage", "Structure Damage:").Value, structureDamage.ToValue(), Color.Salmon);
+            if (itemDamage > 0) l.Row(Texts.Get("sos.weapon.item_damage", "Item Damage:").Value, itemDamage.ToValue(), Color.Salmon);
+            if (severProb > 0) l.Row(Texts.Get("sos.weapon.dismember_chance", "Dismember Chance:").Value, $"{(int)(severProb * 100)}%", Color.Crimson);
+            if (spread > 0) l.Row(Texts.Get("sos.weapon.base_spread", "Base Spread:").Value, $"{spread:0.#}°", Color.LightGray);
+            if (dmgModifier != 1f) l.Row(Texts.Get("sos.weapon.dmg_multiplier", "Dmg. Multiplier:").Value, $"x{dmgModifier:0.#}", Color.LightGreen);
+            if (isThrowable) l.Row(Texts.Get("sos.weapon.type", "Type:").Value, Texts.Get("sos.weapon.throwable", "Throwable").Value, Color.White);
 
             var grouped = afflictions.GroupBy(a => a.Identifier);
             foreach (var group in grouped)
@@ -417,7 +417,7 @@ namespace SOS.StatSections
 
             foreach (var res in aggregatedResistances)
             {
-                l.BadgeRow(res.Key + " Res:", [res.Key], [string.Join(", ", res.Value)], linkColor: Color.LightGreen, onSearchFilter: SectionHelper.SetSearchFilter);
+                l.BadgeRow($"{res.Key} {Texts.Get("sos.equip.res_suffix", "Res:").Value}", [res.Key], [string.Join(", ", res.Value)], linkColor: Color.LightGreen, onSearchFilter: SectionHelper.SetSearchFilter);
             }
 
             if (equipSlots.Count > 0)
@@ -743,7 +743,7 @@ namespace SOS.StatSections
                 {
                     string vitStr = vitMin == vitMax ? vitMax.ToValue() : $"{vitMin.ToValue()} to {vitMax.ToValue()}";
                     vitStr += isPercent ? "%" : " pts";
-                    phase.Stats.Add($"Max HP Penalty: -{vitStr.SetColor(Color.OrangeRed)}");
+                    phase.Stats.Add($"{Texts.Get("sos.affliction.max_hp_penalty", "Max HP Penalty:").Value} -{vitStr.SetColor(Color.OrangeRed)}");
                 }
 
                 // modf
@@ -752,7 +752,7 @@ namespace SOS.StatSections
                 if (speedMin != 1f || speedMax != 1f)
                 {
                     string speedStr = speedMin == speedMax ? speedMax.ToValue() : $"{speedMin.ToValue()} to {speedMax.ToValue()}";
-                    phase.Stats.Add($"Speed: x{speedStr.SetColor((speedMax >= 1f) ? Color.LimeGreen : Color.OrangeRed)}");
+                    phase.Stats.Add($"{Texts.Get("sos.affliction.speed", "Speed:").Value} x{speedStr.SetColor((speedMax >= 1f) ? Color.LimeGreen : Color.OrangeRed)}");
                 }
 
                 // effects
@@ -762,10 +762,10 @@ namespace SOS.StatSections
                 if (element.GetAttributeFloat("maxradialdistort", 0f) > 0) effectList.Add("radial");
                 if (element.GetAttributeFloat("maxchromaticaberration", 0f) > 0) effectList.Add("chroma");
                 if (effectList.Count > 0)
-                    phase.Stats.Add($"Visual Distortions ({string.Join(", ", effectList)})".SetColor(Color.Orange));
+                    phase.Stats.Add($"{Texts.Get("sos.affliction.visual_distortions", "Visual Distortions").Value} ({string.Join(", ", effectList)})".SetColor(Color.Orange));
 
                 float convulse = element.GetAttributeFloat("convulseamount", 0f);
-                if (convulse > 0) phase.Stats.Add($"Convulsions/Spasms ({convulse})".SetColor(Color.OrangeRed));
+                if (convulse > 0) phase.Stats.Add($"{Texts.Get("sos.affliction.convulsions", "Convulsions/Spasms").Value} ({convulse})".SetColor(Color.OrangeRed));
 
                 // res
                 string resList = element.GetAttributeString("resistancefor", "");
@@ -789,14 +789,14 @@ namespace SOS.StatSections
             {
                 var phase = new PhaseData
                 {
-                    Range = $"Interval: {element.GetAttributeFloat("mininterval", 1f).ToValue()}s - {element.GetAttributeFloat("maxinterval", 1f).ToValue()}s"
+                    Range = $"{Texts.Get("sos.affliction.interval", "Interval:").Value} {element.GetAttributeFloat("mininterval", 1f).ToValue()}s - {element.GetAttributeFloat("maxinterval", 1f).ToValue()}s"
                 };
 
                 float minStr = element.GetAttributeFloat("minstrength", 0f);
                 float maxStr = element.GetAttributeFloat("maxstrength", 0f);
                 if (minStr > 0 || maxStr > 0)
                 {
-                    phase.Range += $" (Str: {minStr.ToValue()} - {maxStr.ToValue()})";
+                    phase.Range += $" ({Texts.Get("sos.affliction.str", "Str:").Value} {minStr.ToValue()} - {maxStr.ToValue()})";
                 }
 
                 ParseStatusEffects(element, phase);
@@ -847,10 +847,10 @@ namespace SOS.StatSections
                 }
             }
 
-            if (hasSounds) phase.Events.Add("Triggers Sounds/Noises");
-            if (hasParticles) phase.Events.Add("Spawns Particles");
-            if (hasExplosion) phase.Events.Add("Causes Explosion");
-            if (hasAnimations) phase.Events.Add("Forces Animations");
+            if (hasSounds) phase.Events.Add(Texts.Get("sos.affliction.event_sounds", "Triggers Sounds/Noises").Value);
+            if (hasParticles) phase.Events.Add(Texts.Get("sos.affliction.event_particles", "Spawns Particles").Value);
+            if (hasExplosion) phase.Events.Add(Texts.Get("sos.affliction.event_explosion", "Causes Explosion").Value);
+            if (hasAnimations) phase.Events.Add(Texts.Get("sos.affliction.event_animations", "Forces Animations").Value);
         }
 
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
@@ -858,17 +858,17 @@ namespace SOS.StatSections
             if (phases.Count > 0)
             {
                 using var l = new LayoutBuilder(contentPanel);
-                l.Header("EFFECTS BY STRENGTH PHASE", Color.Gold);
+                l.Header(Texts.Get("sos.affliction.effects_header", "EFFECTS BY STRENGTH PHASE").Value, Color.Gold);
 
                 foreach (var phase in phases)
                 {
-                    l.RichText($"Strength Range: {phase.Range.SetColor(Color.Orange)}");
+                    l.RichText($"{Texts.Get("sos.affliction.strength_range", "Strength Range:").Value} {phase.Range.SetColor(Color.Orange)}");
 
                     if (phase.StrengthChange != 0)
                     {
                         string trend = phase.StrengthChange > 0
-                            ? $"Worsens: +{phase.StrengthChange}/s".SetColor(Color.Salmon)
-                            : $"Natural Healing: {phase.StrengthChange}/s".SetColor(Color.LightGreen);
+                            ? $"{Texts.Get("sos.affliction.worsens", "Worsens:").Value} +{phase.StrengthChange}/s".SetColor(Color.Salmon)
+                            : $"{Texts.Get("sos.affliction.natural_healing", "Natural Healing:").Value} {phase.StrengthChange}/s".SetColor(Color.LightGreen);
                         l.RichText($"  -> {trend}");
                     }
 
@@ -876,14 +876,14 @@ namespace SOS.StatSections
                         l.RichText($"  -> {string.Join(" | ", phase.Stats)}");
 
                     if (phase.Resistances.Count > 0)
-                        l.RichText($"  -> Resistances: {string.Join(" | ", phase.Resistances)}");
+                        l.RichText($"  -> {Texts.Get("sos.affliction.resistances", "Resistances:").Value} {string.Join(" | ", phase.Resistances)}");
 
                     if (phase.Events.Count > 0)
                         l.RichText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
 
                     if (phase.LinkedAfflictions.Count > 0)
                     {
-                        l.SelectorRow("  -> Triggers:",
+                        l.SelectorRow($"  -> {Texts.Get("sos.affliction.triggers", "Triggers:").Value}",
                             phase.LinkedAfflictions.Select(a => a.ID),
                             phase.LinkedAfflictions.Select(a => a.Name.SetColor(a.Theme)),
                             fallbackFilterPrefix: '!',
@@ -900,17 +900,17 @@ namespace SOS.StatSections
             if (periodicPhases.Count > 0)
             {
                 using var l = new LayoutBuilder(contentPanel);
-                l.Header("PERIODIC EVENTS", Color.MediumPurple);
+                l.Header(Texts.Get("sos.affliction.periodic_header", "PERIODIC EVENTS").Value, Color.MediumPurple);
                 foreach (var phase in periodicPhases)
                 {
-                    l.RichText($"Frequency: {phase.Range.SetColor(Color.Cyan)}");
+                    l.RichText($"{Texts.Get("sos.affliction.frequency", "Frequency:").Value} {phase.Range.SetColor(Color.Cyan)}");
 
                     if (phase.Events.Count > 0)
                         l.RichText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
 
                     if (phase.LinkedAfflictions.Count > 0)
                     {
-                        l.SelectorRow("  -> Triggers:",
+                        l.SelectorRow($"  -> {Texts.Get("sos.affliction.triggers", "Triggers:").Value}",
                             phase.LinkedAfflictions.Select(a => a.ID),
                             phase.LinkedAfflictions.Select(a => a.Name.SetColor(a.Theme)),
                             fallbackFilterPrefix: '!',

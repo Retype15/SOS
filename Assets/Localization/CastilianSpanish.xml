@@ -117,6 +117,7 @@ Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.item.locations>Ubicaciones:</sos.item.locations>
 	<sos.item.max_stack>Max Stack:</sos.item.max_stack>
 	<sos.item.min_difficulty>Min. Dificultad:</sos.item.min_difficulty>
+	<sos.item.mod>Mod:</sos.item.mod>
 	<sos.item.price>Precio:</sos.item.price>
 	<sos.item.required_faction>Facción Requerida:</sos.item.required_faction>
 	<sos.item.tags>TAGS:</sos.item.tags>
@@ -127,11 +128,16 @@ Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.weapon.base_spread>Dispersión Base:</sos.weapon.base_spread>
 	<sos.weapon.dismember_chance>Prob. de Desmembramiento:</sos.weapon.dismember_chance>
 	<sos.weapon.dmg_multiplier>Mult. de Daño:</sos.weapon.dmg_multiplier>
+	<sos.weapon.explosion_radius>Radio de Explosión:</sos.weapon.explosion_radius>
 	<sos.weapon.fire_rate>Cadencia de tiro:</sos.weapon.fire_rate>
 	<sos.weapon.hull_damage>Daño al Casco:</sos.weapon.hull_damage>
+	<sos.weapon.item_damage>Daño al Objeto:</sos.weapon.item_damage>
+	<sos.weapon.max_targets>Máx. de Objetivos:</sos.weapon.max_targets>
 	<sos.weapon.power_use>Uso de Energía:</sos.weapon.power_use>
+	<sos.weapon.projectiles>Proyectiles:</sos.weapon.projectiles>
 	<sos.weapon.range>Rango:</sos.weapon.range>
 	<sos.weapon.reload>Recarga:</sos.weapon.reload>
+	<sos.weapon.structure_damage>Daño Estructural:</sos.weapon.structure_damage>
 	<sos.weapon.throwable>Arrojadiza</sos.weapon.throwable>
 	<sos.weapon.type>Tipo:</sos.weapon.type>
 
@@ -141,6 +147,7 @@ Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.equip.equips_in>Equipa en:</sos.equip.equips_in>
 	<sos.equip.max_durability>Durabilidad Máx:</sos.equip.max_durability>
 	<sos.equip.pressure_protection>Protección de Presión:</sos.equip.pressure_protection>
+	<sos.equip.res_suffix>Res.:</sos.equip.res_suffix>
 
 	<!-- Medical -->
 	<sos.med.always_causes>Siempre Aplica:</sos.med.always_causes>
@@ -159,6 +166,38 @@ Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.affliction.contraindicated_warn>ADVERTENCIA: ¡Los siguientes objetos empeoran la condición!</sos.affliction.contraindicated_warn>
 	<sos.affliction.effective>Efectivo:</sos.affliction.effective>
 	<sos.affliction.highlyeffective>Altamente Efectivo:</sos.affliction.highlyeffective>
+	<sos.affliction.activation_threshold>Umbral de Activación:</sos.affliction.activation_threshold>
+	<sos.affliction.buff>Buff</sos.affliction.buff>
+	<sos.affliction.classification>Clasificación:</sos.affliction.classification>
+	<sos.affliction.convulsions>Convulsiones/Espasmos</sos.affliction.convulsions>
+	<sos.affliction.death_cause>Causa de Muerte:</sos.affliction.death_cause>
+	<sos.affliction.debuff>Debuff</sos.affliction.debuff>
+	<sos.affliction.effects_header>EFECTOS POR FASE DE FUERZA</sos.affliction.effects_header>
+	<sos.affliction.event_animations>Fuerza Animaciones</sos.affliction.event_animations>
+	<sos.affliction.event_explosion>Causa Explosión</sos.affliction.event_explosion>
+	<sos.affliction.event_particles>Genera Partículas</sos.affliction.event_particles>
+	<sos.affliction.event_sounds>Activa Sonidos/Ruidos</sos.affliction.event_sounds>
+	<sos.affliction.exp_gain>Ganancia de Exp. Médica:</sos.affliction.exp_gain>
+	<sos.affliction.frequency>Frecuencia:</sos.affliction.frequency>
+	<sos.affliction.heal_cost>Costo de Curación Clínica:</sos.affliction.heal_cost>
+	<sos.affliction.icon_threshold>El Ícono Aparece En:</sos.affliction.icon_threshold>
+	<sos.affliction.indicator_limb>Miembro Indicador:</sos.affliction.indicator_limb>
+	<sos.affliction.interval>Intervalo:</sos.affliction.interval>
+	<sos.affliction.limb_specific>Específico de Miembro:</sos.affliction.limb_specific>
+	<sos.affliction.max_hp_penalty>Penalización de PV Máx:</sos.affliction.max_hp_penalty>
+	<sos.affliction.max_strength>Fuerza Máx:</sos.affliction.max_strength>
+	<sos.affliction.natural_healing>Curación Natural:</sos.affliction.natural_healing>
+	<sos.affliction.periodic_header>EVENTOS PERIÓDICOS</sos.affliction.periodic_header>
+	<sos.affliction.resistances>Resistencias:</sos.affliction.resistances>
+	<sos.affliction.scanner_threshold>El Escáner Detecta En:</sos.affliction.scanner_threshold>
+	<sos.affliction.speed>Velocidad:</sos.affliction.speed>
+	<sos.affliction.str>Fuerza:</sos.affliction.str>
+	<sos.affliction.strength_range>Rango de Fuerza:</sos.affliction.strength_range>
+	<sos.affliction.treatment_threshold>La IA Trata En:</sos.affliction.treatment_threshold>
+	<sos.affliction.triggers>Desencadena:</sos.affliction.triggers>
+	<sos.affliction.type>Tipo:</sos.affliction.type>
+	<sos.affliction.visual_distortions>Distorsiones Visuales</sos.affliction.visual_distortions>
+	<sos.affliction.worsens>Empeora:</sos.affliction.worsens>
 
 	<!-- Simulator -->
 	<sos.aff.speedDropdown>Más de x1 aún están en progreso. \nFunciona bien en un jugador, pero no en multijugador.</sos.aff.speedDropdown>

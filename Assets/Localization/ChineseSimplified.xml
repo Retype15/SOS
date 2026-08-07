@@ -117,6 +117,7 @@
 	<sos.item.locations>位置：</sos.item.locations>
 	<sos.item.max_stack>最大堆叠:</sos.item.max_stack>
 	<sos.item.min_difficulty>最低难度：</sos.item.min_difficulty>
+	<sos.item.mod>模组：</sos.item.mod>
 	<sos.item.price>价格:</sos.item.price>
 	<sos.item.required_faction>所需派系：</sos.item.required_faction>
 	<sos.item.tags>标签：</sos.item.tags>
@@ -127,11 +128,16 @@
 	<sos.weapon.base_spread>基础散布：</sos.weapon.base_spread>
 	<sos.weapon.dismember_chance>肢解率：</sos.weapon.dismember_chance>
 	<sos.weapon.dmg_multiplier>伤害倍率：</sos.weapon.dmg_multiplier>
+	<sos.weapon.explosion_radius>爆炸范围：</sos.weapon.explosion_radius>
 	<sos.weapon.fire_rate>射速：</sos.weapon.fire_rate>
 	<sos.weapon.hull_damage>船体伤害：</sos.weapon.hull_damage>
+	<sos.weapon.item_damage>物品伤害：</sos.weapon.item_damage>
+	<sos.weapon.max_targets>最大目标数：</sos.weapon.max_targets>
 	<sos.weapon.power_use>能量消耗：</sos.weapon.power_use>
+	<sos.weapon.projectiles>弹丸数：</sos.weapon.projectiles>
 	<sos.weapon.range>范围：</sos.weapon.range>
 	<sos.weapon.reload>装填时间：</sos.weapon.reload>
+	<sos.weapon.structure_damage>结构伤害：</sos.weapon.structure_damage>
 	<sos.weapon.throwable>可投掷</sos.weapon.throwable>
 	<sos.weapon.type>类型：</sos.weapon.type>
 
@@ -141,6 +147,7 @@
 	<sos.equip.equips_in>装备槽位：</sos.equip.equips_in>
 	<sos.equip.max_durability>最大耐久：</sos.equip.max_durability>
 	<sos.equip.pressure_protection>水压保护：</sos.equip.pressure_protection>
+	<sos.equip.res_suffix>抗性：</sos.equip.res_suffix>
 
 	<!-- Medical -->
 	<sos.med.always_causes>总是施加：</sos.med.always_causes>
@@ -159,6 +166,38 @@
 	<sos.affliction.contraindicated_warn>警告：以下物品会加重病情！</sos.affliction.contraindicated_warn>
 	<sos.affliction.effective>有效：</sos.affliction.effective>
 	<sos.affliction.highlyeffective>非常有效：</sos.affliction.highlyeffective>
+	<sos.affliction.activation_threshold>激活阈值：</sos.affliction.activation_threshold>
+	<sos.affliction.buff>增益</sos.affliction.buff>
+	<sos.affliction.classification>分类：</sos.affliction.classification>
+	<sos.affliction.convulsions>抽搐/痉挛</sos.affliction.convulsions>
+	<sos.affliction.death_cause>死亡原因：</sos.affliction.death_cause>
+	<sos.affliction.debuff>减益</sos.affliction.debuff>
+	<sos.affliction.effects_header>按强度阶段的效果</sos.affliction.effects_header>
+	<sos.affliction.event_animations>强制动画</sos.affliction.event_animations>
+	<sos.affliction.event_explosion>引发爆炸</sos.affliction.event_explosion>
+	<sos.affliction.event_particles>生成粒子</sos.affliction.event_particles>
+	<sos.affliction.event_sounds>触发声音/噪音</sos.affliction.event_sounds>
+	<sos.affliction.exp_gain>医疗经验值：</sos.affliction.exp_gain>
+	<sos.affliction.frequency>频率：</sos.affliction.frequency>
+	<sos.affliction.heal_cost>诊所治疗费用：</sos.affliction.heal_cost>
+	<sos.affliction.icon_threshold>图标出现于：</sos.affliction.icon_threshold>
+	<sos.affliction.indicator_limb>指示肢体：</sos.affliction.indicator_limb>
+	<sos.affliction.interval>间隔：</sos.affliction.interval>
+	<sos.affliction.limb_specific>仅特定肢体：</sos.affliction.limb_specific>
+	<sos.affliction.max_hp_penalty>最大生命值惩罚：</sos.affliction.max_hp_penalty>
+	<sos.affliction.max_strength>最大强度：</sos.affliction.max_strength>
+	<sos.affliction.natural_healing>自然恢复：</sos.affliction.natural_healing>
+	<sos.affliction.periodic_header>周期性事件</sos.affliction.periodic_header>
+	<sos.affliction.resistances>抗性：</sos.affliction.resistances>
+	<sos.affliction.scanner_threshold>扫描仪检测于：</sos.affliction.scanner_threshold>
+	<sos.affliction.speed>速度：</sos.affliction.speed>
+	<sos.affliction.str>强度：</sos.affliction.str>
+	<sos.affliction.strength_range>强度范围：</sos.affliction.strength_range>
+	<sos.affliction.treatment_threshold>AI 治疗于：</sos.affliction.treatment_threshold>
+	<sos.affliction.triggers>触发：</sos.affliction.triggers>
+	<sos.affliction.type>类型：</sos.affliction.type>
+	<sos.affliction.visual_distortions>视觉扭曲</sos.affliction.visual_distortions>
+	<sos.affliction.worsens>恶化：</sos.affliction.worsens>
 
 	<!-- Simulator -->
 	<sos.aff.speedDropdown>x1 以上仍在开发中。\n在单人游戏中运行良好，但在多人游戏中完全不行。</sos.aff.speedDropdown>
