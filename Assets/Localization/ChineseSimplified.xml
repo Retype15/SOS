@@ -3,6 +3,7 @@
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] 客户端：已初始化。按 'J' 键打开。</sos.client.init>
 	<sos.command.help>打开/关闭 SOS。</sos.command.help>
+	<sos.command.help.log>- log [{logCommands}]\n示例：'sos log verbose'</sos.command.help.log>
 	<sos.command.name>sos</sos.command.name>
 	<sos.shared.debugmode>[SOS] 调试模式已启用。</sos.shared.debugmode>
 	<sos.shared.loaded>[SOS] 已成功加载。</sos.shared.loaded>
@@ -35,7 +36,10 @@
 	<!-- Window -->
 	<sos.window.additional_info>额外信息</sos.window.additional_info>
 	<sos.window.back>返回</sos.window.back>
-	<sos.window.back.shortcuts>快捷键：&#xA;- Alt + 左箭头&#xA;- 退格键&#xA;- 鼠标 4</sos.window.back.shortcuts>
+	<sos.window.back.shortcuts>快捷键：
+- Alt + 左箭头
+- 退格键
+- 鼠标 4</sos.window.back.shortcuts>
 	<sos.window.manage_hud>管理 HUD</sos.window.manage_hud>
 	<sos.window.manage_hud_tooltip>管理 HUD 上的追踪配方</sos.window.manage_hud_tooltip>
 	<sos.window.toggle_tracker_tooltip>切换 HUD 追踪器可见性 (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
@@ -45,17 +49,31 @@
 	<sos.window.remove_all>全部移除</sos.window.remove_all>
 	<sos.window.track_all>追踪全部</sos.window.track_all>
 	<sos.window.forward>前进</sos.window.forward>
-	<sos.window.forward.shortcuts>快捷键：&#xA;- Alt + 右箭头&#xA;- Shift + 退格键&#xA;- 鼠标 5</sos.window.forward.shortcuts>
+	<sos.window.forward.shortcuts>快捷键：
+- Alt + 右箭头
+- Shift + 退格键
+- 鼠标 5</sos.window.forward.shortcuts>
 	<sos.window.loading>正在加载依赖项...</sos.window.loading>
 	<sos.window.loading.complete>加载完成！</sos.window.loading.complete>
 	<sos.window.obtain>获取途径</sos.window.obtain>
 	<sos.window.raw_xml>原始 XML</sos.window.raw_xml>
 	<sos.window.raw_xml_tooltip>在元数据视图和物品原始XML视图之间切换。</sos.window.raw_xml_tooltip>
 	<sos.window.search_placeholder>搜索物品...</sos.window.search_placeholder>
-	<sos.window.search_tooltip>按名称、ID、类别、标签、ModName、ItemType、Prefab等搜索&#xA;高级过滤器：&#xA;  @模组        (例：@Vanilla @Neurotrauma)&#xA;  #类别        (例：#Medical #Weapon)&#xA;  $标签        (例：$smallitem $diving)&#xA;  &amp;槽位        (例：&amp;Head &amp;Inner)&#xA;  !ID          (例：!weldingtool)&#xA;  %Prefab         (例：%Affliction %Item)&#xA;示例：'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
-	<sos.window.section_container>作为容器</sos.window.section_container>
+	<sos.window.search_tooltip>按名称、ID、类别、标签、ModName、ItemType、Prefab等搜索
+  高级过滤器：
+  标识符     |  示例：
+———————————————————
+  @模组             |  @Vanilla @Neurotrauma
+  #类别           |  #Medical #Weapon
+  $标签             |  $smallitem $pill
+  &amp;槽位         |  &amp;Head &amp;Inner
+  !ID              |  !weldingtool
+  %Prefab        |  %Affliction %Item
+
+示例：'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
+	<sos.window.section_container>容器</sos.window.section_container>
 	<sos.window.section_economy>经济</sos.window.section_economy>
-	<sos.window.section_equipment>作为装备</sos.window.section_equipment>
+	<sos.window.section_equipment>装备</sos.window.section_equipment>
 	<sos.window.section_general>常规</sos.window.section_general>
 	<sos.window.section_medical>医疗</sos.window.section_medical>
 	<sos.window.section_spawning>获取位置</sos.window.section_spawning>
@@ -80,6 +98,8 @@
 	<sos.tab.recipes_tooltip>显示物品的制作配方、来源和用途。</sos.tab.recipes_tooltip>
 	<sos.tab.simulator>模拟器</sos.tab.simulator>
 	<sos.tab.simulator_tooltip>打开临床模拟器，在假人患者身上测试治疗和病症。</sos.tab.simulator_tooltip>
+	<sos.tab.preview>预览</sos.tab.preview>
+	<sos.tab.preview_tooltip>显示所选预制体的视觉精灵图。</sos.tab.preview_tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>别名：</sos.item.aliases>
@@ -89,7 +109,7 @@
 	<sos.item.cargo_box>货物箱：</sos.item.cargo_box>
 	<sos.item.category>类别：</sos.item.category>
 	<sos.item.causes_fire>导致火灾</sos.item.causes_fire>
-	<sos.item.description>描述：</sos.item.description>
+	<sos.item.description>描述</sos.item.description>
 	<sos.item.drains_oxygen>消耗氧气</sos.item.drains_oxygen>
 	<sos.item.hazards>危险性：</sos.item.hazards>
 	<sos.item.header_info>ID: [id] | 价格: [price] mk</sos.item.header_info>
@@ -179,7 +199,7 @@
 
 	<!-- List Headers -->
 	<sos.list.header.afflictionprefab>病症</sos.list.header.afflictionprefab>
-	<sos.list.header.afflictionprefabhusk> Husk 病症</sos.list.header.afflictionprefabhusk>
+	<sos.list.header.afflictionprefabhusk>Husk 病症</sos.list.header.afflictionprefabhusk>
 	<sos.list.header.itemprefab>物品</sos.list.header.itemprefab>
 
 	<!-- List -->
@@ -202,7 +222,8 @@
 
 	<!-- Migration -->
 	<sos.migration.title>SOS — 设置迁移</sos.migration.title>
-	<sos.migration.description>检测到旧版 SOS 设置。&#xA;是否要导入已有数据到新系统？</sos.migration.description>
+	<sos.migration.description>检测到旧版 SOS 设置。
+是否要导入已有数据到新系统？</sos.migration.description>
 	<sos.migration.import>导入</sos.migration.import>
 	<sos.migration.discard>丢弃</sos.migration.discard>
 	<sos.migration.ignore>忽略</sos.migration.ignore>

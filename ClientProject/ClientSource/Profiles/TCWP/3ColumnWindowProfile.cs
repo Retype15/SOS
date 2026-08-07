@@ -432,7 +432,7 @@ namespace SOS.Profiles.TCWP
                 "  !ID                    |  !weldingtool\n" +
                 "  %Prefab        |  %Affliction %Item\n" +
 
-                "\nExample: 'Brain @NT #Medical $surgery %Item'", true);
+                "\nExample: 'Brain @NT #Medical $surgery %Item'");
 
             searchBox.OnTextChanged += (_, text) =>
             {

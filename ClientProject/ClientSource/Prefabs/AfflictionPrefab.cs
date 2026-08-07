@@ -15,7 +15,7 @@ namespace SOS.Prefabs.Affliction
         public string Id => "AfflictionPrefab";
         public double Order => 2;
         public Type PrefabType => typeof(AfflictionPrefab);
-        public string Header => Texts.Get("sos.list.header.afflictionprefab", "Affliction Prefab").Value;
+        public string Header => Texts.Get("sos.list.header.afflictionprefab", "Afflictions").Value;
 
         public IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter)
         {
@@ -70,7 +70,7 @@ namespace SOS.Prefabs.Affliction
         public string Id => "AfflictionPrefabHusk";
         public double Order => 2.5;
         public Type PrefabType => typeof(AfflictionPrefabHusk);
-        public string Header => Texts.Get("sos.list.header.afflictionprefabhusk", "Affliction Prefab Husk").Value;
+        public string Header => Texts.Get("sos.list.header.afflictionprefabhusk", "Husk Afflictions").Value;
         public IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter) => [];
     }
 }

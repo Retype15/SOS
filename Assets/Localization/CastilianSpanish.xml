@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <infotexts language="Castilian Spanish" nowhitespace="false" translatedname="Castellano">
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] Client: Inicializado. Pulsa 'J' para abrir.</sos.client.init>
 	<sos.command.help>Abre/Cierra SOS.</sos.command.help>
+	<sos.command.help.log>- log [{logCommands}]\nEjemplo: 'sos log verbose'</sos.command.help.log>
 	<sos.command.name>sos</sos.command.name>
 	<sos.shared.debugmode>[SOS] Modo depuración activado.</sos.shared.debugmode>
 	<sos.shared.loaded>[SOS] Cargado correctamente.</sos.shared.loaded>
@@ -35,7 +36,10 @@
 	<!-- Window -->
 	<sos.window.additional_info>INFO ADICIONAL</sos.window.additional_info>
 	<sos.window.back>Atrás</sos.window.back>
-	<sos.window.back.shortcuts>Atajos:&#xA;- Alt + Flecha Izquierda&#xA;- Retroceso&#xA;- Ratón 4</sos.window.back.shortcuts>
+	<sos.window.back.shortcuts>Atajos:
+- Alt + Flecha Izquierda
+- Retroceso
+- Ratón 4</sos.window.back.shortcuts>
 	<sos.window.manage_hud>GESTIONAR HUD</sos.window.manage_hud>
 	<sos.window.manage_hud_tooltip>Gestiona las recetas rastreadas en el HUD</sos.window.manage_hud_tooltip>
 	<sos.window.toggle_tracker_tooltip>Alternar visibilidad del rastreador HUD (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
@@ -45,23 +49,37 @@
 	<sos.window.remove_all>Eliminar Todo</sos.window.remove_all>
 	<sos.window.track_all>Rastrear Todo</sos.window.track_all>
 	<sos.window.forward>Adelante</sos.window.forward>
-	<sos.window.forward.shortcuts>Atajos:&#xA;- Alt + Flecha Derecha&#xA;- Mayús + Retroceso&#xA;- Ratón 5</sos.window.forward.shortcuts>
+	<sos.window.forward.shortcuts>Atajos:
+- Alt + Flecha Derecha
+- Mayús + Retroceso
+- Ratón 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Cargando dependencias...</sos.window.loading>
 	<sos.window.loading.complete>¡Carga completa!</sos.window.loading.complete>
 	<sos.window.obtain>OBTENCIÓN</sos.window.obtain>
 	<sos.window.raw_xml>VER XML</sos.window.raw_xml>
 	<sos.window.raw_xml_tooltip>Alterna entre la vista de metadatos y el XML del objeto.</sos.window.raw_xml_tooltip>
 	<sos.window.search_placeholder>Buscar objeto...</sos.window.search_placeholder>
-	<sos.window.search_tooltip>Buscar por Nombre, ID, Categoría, Etiquetas, ModName, ItemType, Prefab, etc.&#xA;Filtros avanzados:&#xA;  @Mod        (ej., @Vanilla @Neurotrauma)&#xA;  #Categoría  (ej., #Medical #Weapon)&#xA;  $Etiqueta   (ej., $smallitem $diving)&#xA;  &amp;Ranura     (ej., &amp;Head &amp;Inner)&#xA;  !ID         (ej., !weldingtool)&#xA;  %Prefab         (ej., %Affliction %Item)&#xA;Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
+	<sos.window.search_tooltip>Buscar por Nombre, ID, Categoría, Etiquetas, ModName, ItemType, Prefab, etc.
+  Filtros avanzados:
+Identificadores     |  Ejemplos:
+———————————————————
+  @Mod                    |  @Vanilla @Neurotrauma
+  #Categoría          |  #Medical #Weapon
+  $Etiqueta             |  $smallitem $pill
+  &amp;Ranura               |  &amp;Head &amp;Inner
+  !ID                           |  !weldingtool
+  %Prefab               |  %Affliction %Item
+
+Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.window.section_container>CONTENEDOR</sos.window.section_container>
 	<sos.window.section_economy>ECONOMÍA</sos.window.section_economy>
-	<sos.window.section_equipment>EQUIPO</sos.window.section_equipment>
+	<sos.window.section_equipment>AL EQUIPAR</sos.window.section_equipment>
 	<sos.window.section_general>GENERAL</sos.window.section_general>
 	<sos.window.section_medical>MEDICINA</sos.window.section_medical>
 	<sos.window.section_spawning>SE ENCUENTRA EN</sos.window.section_spawning>
 	<sos.window.section_treatments>TRATAMIENTOS Y MEDICACIÓN</sos.window.section_treatments>
 	<sos.window.section_utility>UTILIDAD</sos.window.section_utility>
-	<sos.window.section_weapon>ARMA</sos.window.section_weapon>
+	<sos.window.section_weapon>COMO ARMA</sos.window.section_weapon>
 	<sos.window.settings>Configuración</sos.window.settings>
 	<sos.window.tag_tooltip>Buscar objetos con etiqueta: [tag]</sos.window.tag_tooltip>
 	<sos.window.title>SOS - Buscador de Recetas</sos.window.title>
@@ -80,6 +98,8 @@
 	<sos.tab.recipes_tooltip>Muestra recetas de fabricación, fuentes y usos del objeto.</sos.tab.recipes_tooltip>
 	<sos.tab.simulator>SIMULADOR</sos.tab.simulator>
 	<sos.tab.simulator_tooltip>Abre el simulador clínico para probar tratamientos y aflicciones en un paciente ficticio.</sos.tab.simulator_tooltip>
+	<sos.tab.preview>VISTA PREVIA</sos.tab.preview>
+	<sos.tab.preview_tooltip>Muestra el sprite visual del prefab seleccionado.</sos.tab.preview_tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>Alias:</sos.item.aliases>
@@ -89,7 +109,7 @@
 	<sos.item.cargo_box>Caja de Carga:</sos.item.cargo_box>
 	<sos.item.category>Categoría:</sos.item.category>
 	<sos.item.causes_fire>Causa Incendio</sos.item.causes_fire>
-	<sos.item.description>DESCRIPCIÓN:</sos.item.description>
+	<sos.item.description>DESCRIPCIÓN</sos.item.description>
 	<sos.item.drains_oxygen>Drena Oxígeno</sos.item.drains_oxygen>
 	<sos.item.hazards>Peligros:</sos.item.hazards>
 	<sos.item.header_info>ID: [id] | Precio: [price] mr</sos.item.header_info>
@@ -202,7 +222,8 @@
 
 	<!-- Migration -->
 	<sos.migration.title>SOS — Migración de Configuración</sos.migration.title>
-	<sos.migration.description>Se encontró una configuración anterior de SOS.&#xA;¿Deseas importar tus datos al nuevo sistema?</sos.migration.description>
+	<sos.migration.description>Se encontró una configuración anterior de SOS.
+¿Deseas importar tus datos al nuevo sistema?</sos.migration.description>
 	<sos.migration.import>Importar</sos.migration.import>
 	<sos.migration.discard>Descartar</sos.migration.discard>
 	<sos.migration.ignore>Ignorar</sos.migration.ignore>

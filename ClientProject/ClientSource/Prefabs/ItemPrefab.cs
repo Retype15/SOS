@@ -15,7 +15,7 @@ namespace SOS.Prefabs.Item
         public string Id => "ItemPrefab";
         public double Order => 1;
         public Type PrefabType => typeof(ItemPrefab);
-        public string Header => Texts.Get("sos.list.header.itemprefab", "Item Prefab").Value;
+        public string Header => Texts.Get("sos.list.header.itemprefab", "Items").Value;
 
         private static readonly Dictionary<Identifier, string> _itemSlotCache = [];
 

@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <infotexts language="French" nowhitespace="false" translatedname="Français">
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] Client : Initialisé. Appuyez sur 'J' pour ouvrir.</sos.client.init>
 	<sos.command.help>Ouvrir/Fermer SOS.</sos.command.help>
+	<sos.command.help.log>- log [{logCommands}]\nExemple : 'sos log verbose'</sos.command.help.log>
 	<sos.command.name>sos</sos.command.name>
 	<sos.shared.debugmode>[SOS] Le mode débogage est activé.</sos.shared.debugmode>
 	<sos.shared.loaded>[SOS] Chargé avec succès.</sos.shared.loaded>
@@ -35,7 +36,10 @@
 	<!-- Window -->
 	<sos.window.additional_info>INFO SUPPLÉMENTAIRE</sos.window.additional_info>
 	<sos.window.back>Retour</sos.window.back>
-	<sos.window.back.shortcuts>Raccourcis :&#xA;- Alt + Flèche Gauche&#xA;- Retour arrière&#xA;- Souris 4</sos.window.back.shortcuts>
+	<sos.window.back.shortcuts>Raccourcis :
+- Alt + Flèche Gauche
+- Retour arrière
+- Souris 4</sos.window.back.shortcuts>
 	<sos.window.manage_hud>GÉRER LE HUD</sos.window.manage_hud>
 	<sos.window.manage_hud_tooltip>Gérer les recettes suivies sur le HUD</sos.window.manage_hud_tooltip>
 	<sos.window.toggle_tracker_tooltip>Basculer la visibilité du traqueur HUD (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
@@ -45,17 +49,31 @@
 	<sos.window.remove_all>Tout Supprimer</sos.window.remove_all>
 	<sos.window.track_all>Tout Suivre</sos.window.track_all>
 	<sos.window.forward>Avancer</sos.window.forward>
-	<sos.window.forward.shortcuts>Raccourcis :&#xA;- Alt + Flèche Droite&#xA;- Maj + Retour arrière&#xA;- Souris 5</sos.window.forward.shortcuts>
+	<sos.window.forward.shortcuts>Raccourcis :
+- Alt + Flèche Droite
+- Maj + Retour arrière
+- Souris 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Chargement des dépendances...</sos.window.loading>
 	<sos.window.loading.complete>Chargement terminé !</sos.window.loading.complete>
 	<sos.window.obtain>OBTENTION</sos.window.obtain>
 	<sos.window.raw_xml>XML BRUT</sos.window.raw_xml>
 	<sos.window.raw_xml_tooltip>Bascule entre la vue métadonnées et la vue XML brute de l'objet.</sos.window.raw_xml_tooltip>
 	<sos.window.search_placeholder>Chercher un objet...</sos.window.search_placeholder>
-	<sos.window.search_tooltip>Rechercher par Nom, ID, Catégorie, Tags, ModName, ItemType, Prefab, etc.&#xA;Filtres avancés :&#xA;  @Mod        (ex., @Vanilla @Neurotrauma)&#xA;  #Catégorie  (ex., #Medical #Weapon)&#xA;  $Tag        (ex., $smallitem $diving)&#xA;  &amp;Emplac.    (ex., &amp;Head &amp;Inner)&#xA;  !ID         (ex., !weldingtool)&#xA;  %Prefab         (ex., %Affliction %Item)&#xA;Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
-	<sos.window.section_container>COMME CONTENEUR</sos.window.section_container>
+	<sos.window.search_tooltip>Chercher par Nom, ID, Catégorie, Tags, ModName, ItemType, Prefab, etc.
+  Filtres avancés :
+Identifiants     |  Exemples :
+———————————————————
+  @Mod             |  @Vanilla @Neurotrauma
+  #Catégorie        |  #Medical #Weapon
+  $Tag               |  $smallitem $pill
+  &amp;Emplacement              |  &amp;Head &amp;Inner
+  !ID                    |  !weldingtool
+  %Prefab              |  %Affliction %Item
+
+Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
+	<sos.window.section_container>CONTENEUR</sos.window.section_container>
 	<sos.window.section_economy>ÉCONOMIE</sos.window.section_economy>
-	<sos.window.section_equipment>COMME ÉQUIPEMENT</sos.window.section_equipment>
+	<sos.window.section_equipment>ÉQUIPEMENT</sos.window.section_equipment>
 	<sos.window.section_general>GÉNÉRAL</sos.window.section_general>
 	<sos.window.section_medical>MÉDICAL</sos.window.section_medical>
 	<sos.window.section_spawning>TROUVÉ DANS</sos.window.section_spawning>
@@ -80,6 +98,8 @@
 	<sos.tab.recipes_tooltip>Affiche les recettes de fabrication, les sources et l'utilisation de l'objet.</sos.tab.recipes_tooltip>
 	<sos.tab.simulator>SIMULATEUR</sos.tab.simulator>
 	<sos.tab.simulator_tooltip>Ouvre le simulateur clinique pour tester traitements et affections sur un patient factice.</sos.tab.simulator_tooltip>
+	<sos.tab.preview>APERÇU</sos.tab.preview>
+	<sos.tab.preview_tooltip>Affiche le sprite visuel du prefab sélectionné.</sos.tab.preview_tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>Alias :</sos.item.aliases>
@@ -89,7 +109,7 @@
 	<sos.item.cargo_box>Caisse de Cargaison :</sos.item.cargo_box>
 	<sos.item.category>Catégorie :</sos.item.category>
 	<sos.item.causes_fire>Cause des incendies</sos.item.causes_fire>
-	<sos.item.description>DESCRIPTION :</sos.item.description>
+	<sos.item.description>DESCRIPTION</sos.item.description>
 	<sos.item.drains_oxygen>Consomme l'oxygène</sos.item.drains_oxygen>
 	<sos.item.hazards>Dangers :</sos.item.hazards>
 	<sos.item.header_info>ID : [id] | Prix : [price] mk</sos.item.header_info>
@@ -202,7 +222,8 @@
 
 	<!-- Migration -->
 	<sos.migration.title>SOS — Migration de Configuration</sos.migration.title>
-	<sos.migration.description>Une ancienne configuration SOS a été trouvée.&#xA;Voulez-vous importer vos données vers le nouveau système ?</sos.migration.description>
+	<sos.migration.description>Une ancienne configuration SOS a été trouvée.
+	ulez-vous importer vos données vers le nouveau système ?</sos.migration.description>
 	<sos.migration.import>Importer</sos.migration.import>
 	<sos.migration.discard>Rejeter</sos.migration.discard>
 	<sos.migration.ignore>Ignorer</sos.migration.ignore>

@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <infotexts language="English" nowhitespace="false" translatedname="English">
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] Client: Initialized. Press 'J' to open.</sos.client.init>
-	<sos.command.help>Open/Close SOS.\nSub-command availables:\n- log [{logCommands}]\nExample: 'sos log verbose'.</sos.command.help>
+	<sos.command.help>Open/Close SOS.\nSub-command available:</sos.command.help>
+	<sos.command.help.log>- log [{logCommands}]\nExample: 'sos log verbose'</sos.command.help.log>
 	<sos.command.name>sos</sos.command.name>
 	<sos.shared.debugmode>[SOS] Debug Mode is enabled.</sos.shared.debugmode>
 	<sos.shared.loaded>[SOS] Loaded Successfully.</sos.shared.loaded>
@@ -35,28 +36,45 @@
 	<!-- Window -->
 	<sos.window.additional_info>ADDITIONAL INFO</sos.window.additional_info>
 	<sos.window.back>Back</sos.window.back>
-	<sos.window.back.shortcuts>Shortcuts:&#xA;- Alt + Left Arrow&#xA;- Backspace&#xA;- Mouse 4</sos.window.back.shortcuts>
+	<sos.window.back.shortcuts>Shortcuts:
+- Alt + Left Arrow
+- Backspace
+- Mouse 4</sos.window.back.shortcuts>
 	<sos.window.manage_hud>MANAGE HUD</sos.window.manage_hud>
 	<sos.window.manage_hud_tooltip>Manage tracked recipes on the HUD</sos.window.manage_hud_tooltip>
-	<sos.window.toggle_tracker_tooltip>Toggle HUD tracker visibility (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
+	<sos.window.toggle_tracker_tooltip>Toggle HUD tracker (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
 	<sos.window.toggle_tracker_visible>Hide Tracker</sos.window.toggle_tracker_visible>
 	<sos.window.toggle_tracker_hidden>Show Tracker</sos.window.toggle_tracker_hidden>
 	<sos.window.forward>Forward</sos.window.forward>
-	<sos.window.forward.shortcuts>Shortcuts:&#xA;- Alt + Right Arrow&#xA;- Shift + Backspace&#xA;- Mouse 5</sos.window.forward.shortcuts>
+	<sos.window.forward.shortcuts>Shortcuts:
+- Alt + Right Arrow
+- Shift + Backspace
+- Mouse 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Loading dependencies...</sos.window.loading>
 	<sos.window.loading.complete>Loading complete!</sos.window.loading.complete>
 	<sos.window.obtain>OBTAIN</sos.window.obtain>
 	<sos.window.raw_xml>RAW XML</sos.window.raw_xml>
 	<sos.window.raw_xml_tooltip>Toggles between metadata view and raw XML view of the item.</sos.window.raw_xml_tooltip>
 	<sos.window.search_placeholder>Search item...</sos.window.search_placeholder>
-	<sos.window.search_tooltip>Search by Name, ID, Category, Tags, ModName, ItemType, Prefab, etc.&#xA;Advanced Filters:&#xA;  @Mod        (e.g., @Vanilla @Neurotrauma)&#xA;  #Category   (e.g., #Medical #Weapon)&#xA;  $Tag        (e.g., $smallitem $diving)&#xA;  &amp;Slot       (e.g., &amp;Head &amp;Inner)&#xA;  !ID         (e.g., !weldingtool)&#xA;  %Prefab         (e.g., %Affliction %Item)&#xA;Example: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
-	<sos.window.section_container>AS CONTAINER</sos.window.section_container>
+	<sos.window.search_tooltip>Search by Name, ID, Category, Tags, ModName, ItemType, Prefab, etc.
+  Advanced Filters:
+  Identifiers     |  Examples:
+———————————————————
+  @Mod             |  @Vanilla @Neurotrauma
+  #Category    |  #Medical #Weapon
+  $Tag               |  $smallitem $pill
+  &amp;Slot              |  &amp;Head &amp;Inner
+  !ID                    |  !weldingtool
+  %Prefab        |  %Affliction %Item
+
+Example: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
+	<sos.window.section_container>CONTAINER</sos.window.section_container>
 	<sos.window.section_economy>ECONOMY</sos.window.section_economy>
-	<sos.window.section_equipment>AS EQUIPMENT</sos.window.section_equipment>
+	<sos.window.section_equipment>EQUIPMENT</sos.window.section_equipment>
 	<sos.window.section_general>GENERAL</sos.window.section_general>
 	<sos.window.section_medical>MEDICAL</sos.window.section_medical>
 	<sos.window.section_spawning>FOUND IN</sos.window.section_spawning>
-	<sos.window.section_treatments>TREATMENTS AND MEDICATION</sos.window.section_treatments>
+	<sos.window.section_treatments>TREATMENTS &amp; MEDICATION</sos.window.section_treatments>
 	<sos.window.section_utility>UTILITY</sos.window.section_utility>
 	<sos.window.section_weapon>AS WEAPON</sos.window.section_weapon>
 	<sos.window.settings>Settings</sos.window.settings>
@@ -80,6 +98,8 @@
 	<sos.tab.recipes_tooltip>Shows fabrication recipes, sources and usage of the item.</sos.tab.recipes_tooltip>
 	<sos.tab.simulator>SIMULATOR</sos.tab.simulator>
 	<sos.tab.simulator_tooltip>Opens the clinical simulator to test treatments and afflictions on a dummy patient.</sos.tab.simulator_tooltip>
+	<sos.tab.preview>PREVIEW</sos.tab.preview>
+	<sos.tab.preview_tooltip>Shows the visual sprite of the selected prefab.</sos.tab.preview_tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>Aliases:</sos.item.aliases>
@@ -89,7 +109,7 @@
 	<sos.item.cargo_box>Cargo Box:</sos.item.cargo_box>
 	<sos.item.category>Category:</sos.item.category>
 	<sos.item.causes_fire>Causes Fire</sos.item.causes_fire>
-	<sos.item.description>DESCRIPTION:</sos.item.description>
+	<sos.item.description>DESCRIPTION</sos.item.description>
 	<sos.item.drains_oxygen>Drains Oxygen</sos.item.drains_oxygen>
 	<sos.item.hazards>Hazards:</sos.item.hazards>
 	<sos.item.header_info>ID: [id] | Price: [price] mk</sos.item.header_info>
@@ -160,7 +180,7 @@
 	<!-- Container -->
 	<sos.container.accepts>Accepts:</sos.container.accepts>
 	<sos.container.capacity>Capacity:</sos.container.capacity>
-	<sos.container.contained>Contained_by:</sos.container.contained>
+	<sos.container.contained>Contained by:</sos.container.contained>
 	<sos.container.slots>[amount] Slots</sos.container.slots>
 
 	<!-- Recipe -->
@@ -202,7 +222,7 @@
 
 	<!-- Migration -->
 	<sos.migration.title>SOS — Configuration Migration</sos.migration.title>
-	<sos.migration.description>A previous SOS configuration was found.&#xA;Do you want to import your data to the new system?</sos.migration.description>
+	<sos.migration.description>A previous SOS configuration was found.\nDo you want to import your data to the new system?</sos.migration.description>
 	<sos.migration.import>Import</sos.migration.import>
 	<sos.migration.discard>Discard</sos.migration.discard>
 	<sos.migration.ignore>Ignore</sos.migration.ignore>

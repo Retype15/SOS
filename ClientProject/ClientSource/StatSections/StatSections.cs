@@ -292,7 +292,7 @@ namespace SOS.StatSections
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             using var l = new LayoutBuilder(contentPanel);
-            l.Header(Texts.Get("sos.window.section_weapon", "COMBAT STATS").Value, Color.Gold);
+            l.Header(Texts.Get("sos.window.section_weapon", "AS WEAPON").Value, Color.Gold);
 
             if (reload > 0) l.Row(isAutomatic ? "Fire Rate:" : "Reload:", $"{reload}s", Color.Cyan);
             if (powerUse > 0) l.Row("Power Use:", $"{powerUse}kW", Color.Orange);
@@ -397,7 +397,7 @@ namespace SOS.StatSections
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             using var l = new LayoutBuilder(contentPanel);
-            l.Header(Texts.Get("sos.window.section_equipment", "AS EQUIPMENT").Value, Color.Gold);
+            l.Header(Texts.Get("sos.window.section_equipment", "EQUIPMENT").Value, Color.Gold);
 
             if (durability > 0)
                 l.Row(Texts.Get("sos.equip.max_durability", "Max Durability:").Value, durability.ToString(), Color.White);
@@ -680,7 +680,7 @@ namespace SOS.StatSections
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             using var l = new LayoutBuilder(contentPanel);
-            l.Header(Texts.Get("sos.window.section_container", "CONTAINERS").Value, Color.Gold);
+            l.Header(Texts.Get("sos.window.section_container", "CONTAINER").Value, Color.Gold);
 
             if (!string.IsNullOrEmpty(capacity))
             {
