@@ -42,7 +42,7 @@ namespace SOS.Prefabs.Item
         public IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter)
         {
             return ItemPrefab.Prefabs
-                .Where(p => Matches(p, filter));
+                .Where(p => Matches(p, filter)).OrderBy(p => p.Name());
         }
 
         private static bool Matches(ItemPrefab p, ISOSPrefabFilter filter)

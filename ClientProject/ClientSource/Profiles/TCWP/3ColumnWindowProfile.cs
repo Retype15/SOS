@@ -421,10 +421,18 @@ namespace SOS.Profiles.TCWP
 
             searchBox = BGUI.CreateTextBoxWithPlaceholder(new RectTransform(Vector2.One, searchContainer.RectTransform), ctrl.LastSearchQuery, Texts.Get("sos.window.search_placeholder", "Search item..."));
             searchBox.ToolTip = Texts.Get("sos.window.search_tooltip",
-                "Search by Name, ID, Category, Tags, ModName, ItemType, etc.\n" +
-                "Advanced Filters:\n  @Mod (e.g., @Vanilla @Neuro)\n  #Category (e.g., #Medical #Weapon)\n" +
-                "  $Tag (e.g., $smallitem $pill)\n  &Slot (e.g., &Head &Inner)\n  !ID (e.g., !weldingtool)\n" +
-                "Example: 'Brain @NT #Medical $surgery'").Value;
+                "Search by Name, ID, Category, Tags, ModName, ItemType, Prefab, etc.\n" +
+                "  Advanced Filters:\n" +
+                "  Identifiers     |  Examples:\n" +
+                "———————————————————\n" +
+                "  @Mod             |  @Vanilla @Neurotrauma\n" +
+                "  #Category    |  #Medical #Weapon\n" +
+                "  $Tag               |  $smallitem $pill\n" +
+                "  &Slot              |  &Head &Inner\n" +
+                "  !ID                    |  !weldingtool\n" +
+                "  %Prefab        |  %Affliction %Item\n" +
+
+                "\nExample: 'Brain @NT #Medical $surgery %Item'", true);
 
             searchBox.OnTextChanged += (_, text) =>
             {
@@ -543,15 +551,14 @@ namespace SOS.Profiles.TCWP
             allFilteredTargets.Clear();
             lastTypeInList = null;
 
-            var candidates = new List<(Prefab Prefab, double Order)>();
+            var candidates = new List<Prefab>();
 
-            foreach (var provider in prefabProviders)
+            foreach (var provider in prefabProviders.OrderBy(p => p.Order))
             {
                 try
                 {
                     if (!filter.AllowsType(provider.PrefabType.Name)) continue;
-                    foreach (var prefab in provider.GetAll(filter))
-                        candidates.Add((prefab, provider.Order));
+                    candidates.AddRange(provider.GetAll(filter));
                 }
                 catch (Exception ex)
                 {
@@ -561,10 +568,7 @@ namespace SOS.Profiles.TCWP
 
             var ctrl = SOSController.Instance;
             allFilteredTargets = [.. candidates
-                .OrderByDescending(c => ctrl.FavoritedItems.Contains(c.Prefab.Identifier.Value))
-                .ThenBy(c => c.Order)
-                .ThenBy(c => c.Prefab.Name())
-                .Select(c => c.Prefab)];
+                .OrderByDescending(c => ctrl.FavoritedItems.Contains(c.Identifier.Value))];
 
             itemsLoaded = 0;
             itemList.Content.ClearChildren();

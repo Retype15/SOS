@@ -29,9 +29,9 @@ namespace SOS
 
                 ConsoleCommandsService.RegisterCommand(
                         name: "sos",
-                        help: Texts.Get("sos.command.help", "Open/Close SOS.\nSub-command availables:\n- log [{logCommands}]\nExample: 'sos log verbose'").Value.Replace("{logCommands}", string.Join(", ", LogLevelStates.Strings)),
+                        help: CommandHelp(),
                         onExecute: args => controller?.ResolveCommand(args),
-                        getValidArgs: () => [["log", .. LogLevelStates.Strings]]
+                        getValidArgs: () => [["log", .. LogLevelStates.Strings], ["help"]]
                 );
 
                 LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
@@ -66,6 +66,13 @@ namespace SOS
             SOSController.Instance.Destroy();
             controller = null!;
             API.Clear();
+        }
+
+        internal static string CommandHelp()
+        {
+            return
+                Texts.Get("sos.command.help", "Open/Close SOS.\nSub-command available:").Value +
+                string.Join("\n", Texts.GetTranslationsByPrefix("sos.command.help")).Replace("{logCommands}", string.Join(", ", LogLevelStates.Strings));
         }
     }
 }

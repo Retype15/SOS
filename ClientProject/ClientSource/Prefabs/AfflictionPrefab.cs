@@ -21,7 +21,7 @@ namespace SOS.Prefabs.Affliction
         {
             return AfflictionPrefab.List
                 .Where(a => Matches(a, filter))
-                .OrderBy(a => a is AfflictionPrefabHusk ? 1 : 0);
+                .OrderBy(a => a is AfflictionPrefabHusk ? 1 : 0).ThenBy(p => p.Name());
         }
 
         private static bool Matches(AfflictionPrefab a, ISOSPrefabFilter filter)

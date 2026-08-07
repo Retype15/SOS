@@ -41,7 +41,7 @@ namespace SOS
 
             var titleArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.30f), dialog.RectTransform), style: null);
             _ = new GUITextBlock(new RectTransform(Vector2.One, titleArea.RectTransform, Anchor.Center),
-                Texts.Get("sos.migration.title", "SOS — Migración de Configuración"),
+                Texts.Get("sos.migration.title", "SOS — Configuration Migration"),
                 font: GUIStyle.LargeFont, textAlignment: Alignment.Center);
 
             // ─── Description ───
@@ -49,7 +49,7 @@ namespace SOS
             var descArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.5f), dialog.RectTransform), style: null);
             _ = new GUITextBlock(new RectTransform(Vector2.One, descArea.RectTransform, Anchor.Center),
                 Texts.Get("sos.migration.description",
-                    "Se encontró una configuración anterior de SOS.\n¿Deseas importar tus datos al nuevo sistema?"),
+                    "A previous SOS configuration was found.\nDo you want to import your data to the new system?"),
                 font: GUIStyle.SmallFont, textAlignment: Alignment.Center);
 
             // ─── Buttons ───

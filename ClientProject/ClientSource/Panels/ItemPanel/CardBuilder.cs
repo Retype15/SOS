@@ -124,7 +124,7 @@ namespace SOS.Panels.ItemPanel
             {
                 var frame = new GUIFrame(new RectTransform(new Vector2(1f, 0f), list.Content.RectTransform) { MinSize = new Point(0, HeaderHeight) }, style: null);
                 string text = IsVendingMachine
-                    ? Texts.Get("sos.recipe.buyable", "Buyable at [Title] a [Price] mk").Replace("[Title]", Title).Replace("[Price]", Price).Value
+                    ? Texts.Get("sos.recipe.buyable", "Buyable at [Title] for [Price] mk").Replace("[Title]", Title).Replace("[Price]", Price).Value
                     : Title.ToUpper() + ":";
                 _ = new GUITextBlock(new RectTransform(Vector2.One, frame.RectTransform), text, font: GUIStyle.SmallFont, textColor: Color.Yellow, textAlignment: Alignment.CenterLeft);
             }

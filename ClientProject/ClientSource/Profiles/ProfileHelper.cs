@@ -46,7 +46,7 @@ namespace SOS.Profiles
             };
 
             var header = new GUITextBlock(new RectTransform(new Vector2(1f, 0.08f), _configPopup.RectTransform, Anchor.TopCenter),
-                Texts.Get("sos.settings.title", "Settings"), font: GUIStyle.LargeFont, textAlignment: Alignment.Center);
+                Texts.Get("sos.window.settings", "Settings"), font: GUIStyle.LargeFont, textAlignment: Alignment.Center);
 
             var list = new GUIListBox(new RectTransform(new Vector2(1f, 0.84f), _configPopup.RectTransform, Anchor.Center), style: null)
             {
@@ -114,7 +114,7 @@ namespace SOS.Profiles
                 if (item.FabricationRecipes.Count == 1)
                 {
                     var single = PrefabResolver.GetFabricationRecipe(item);
-                    options.Add(new ContextMenuOption(tracker.GetStringTrackToHUD(single).Value, isEnabled: true, () => tracker.AddOrRemoveRecipe(single)) { Tooltip = Texts.Get("sos.tracker.track-untrack.tooltip", "Track or Untrack all recipes from this item.") });
+                    options.Add(new ContextMenuOption(tracker.GetStringTrackToHUD(single).Value, isEnabled: true, () => tracker.AddOrRemoveRecipe(single)) { Tooltip = Texts.Get("sos.tracker.track-untrack.tooltip", "Track or untrack all recipes from this item.") });
                 }
                 else
                 {
