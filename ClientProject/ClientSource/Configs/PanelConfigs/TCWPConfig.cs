@@ -20,7 +20,7 @@ namespace SOS.Configs.TCWP
         public string Id => "SOS.Profile.Default3Column.Config";
         public double Order => 0;
 
-        internal Dictionary<string, TPLayout> CustomLayouts { get; } = [];
+        internal SortedDictionary<string, TPLayout> CustomLayouts { get; } = new(StringComparer.Ordinal);
 
         private bool _loaded = false;
 
@@ -87,9 +87,14 @@ namespace SOS.Configs.TCWP
 
         internal void SaveCurrentLayout()
         {
-            string newName = $"Layout {CustomLayouts.Count + 1}";
-            while (CustomLayouts.ContainsKey(newName))
-                newName = $"Layout {CustomLayouts.Count + 2}";
+            Logger.LogDebug("TCWPConfig.SaveCurrentLayout: start", level: LogLevel.Trace);
+
+            int layoutNumber = CustomLayouts.Count + 1;
+            while (CustomLayouts.ContainsKey($"Layout {layoutNumber}"))
+            {
+                layoutNumber++;
+            }
+            string newName = $"Layout {layoutNumber}";
 
             var layout = new TPLayout
             {
