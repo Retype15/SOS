@@ -58,7 +58,7 @@ namespace SOS.Configs.TCWP
             RightPanelWidth = _rightPanelWidth.DefaultValue;
         }
 
-        public void DrawSettings(GUIListBox container)
+        public bool DrawSettings(GUIListBox container)
         {
             using var l = new GUILayoutBuilder(container); // TODO: Convert to Accordion.
             l.Header("LAYOUT PRESETS", Color.Gold);
@@ -86,6 +86,7 @@ namespace SOS.Configs.TCWP
             l.Button(Texts.Get("sos.layout.save", "Save ACTUAL").Value, SaveCurrentLayout, tooltip: Texts.Get("sos.layout.save_tooltip", "Saves the current panel layout as a new preset.").Value);
 
             l.Separator();
+            return true;
         }
 
         internal void SaveCurrentLayout()
@@ -107,13 +108,16 @@ namespace SOS.Configs.TCWP
             };
             CustomLayouts[newName] = layout;
             Save();
-            ProfileHelper.RefreshSettingsPopup();
+            ProfileHelper.RefreshSettings();
+            Logger.LogDebug($"TCWPConfig.SaveCurrentLayout: ok '{newName}'", level: LogLevel.Trace);
         }
 
         internal void DeleteCustomLayout(string name)
         {
+            Logger.LogDebug($"TCWPConfig.DeleteCustomLayout: '{name}'", level: LogLevel.Trace);
+
             if (CustomLayouts.Remove(name)) Save();
-            ProfileHelper.RefreshSettingsPopup();
+            ProfileHelper.RefreshSettings();
         }
 
         private void ApplyPreset(int? winW, int? winH, int? leftW, int? rightW)

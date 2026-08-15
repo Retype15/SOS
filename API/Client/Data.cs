@@ -82,7 +82,7 @@ namespace SOS
         void Save();
         void Reset();
         [DefaultClass<ConfigDefaults>]
-        void DrawSettings(GUIListBox container) { }
+        bool DrawSettings(GUIListBox container) => false;
     }
 
     public interface ISOSPrefabFilter
@@ -146,7 +146,7 @@ namespace SOS
 
     internal sealed class ConfigDefaults
     {
-        public static void DrawSettings(GUIListBox _) { }
+        public static bool DrawSettings(GUIListBox _) => false;
     }
 
     #endregion

@@ -7,7 +7,6 @@
         <!-- State -->
         <Setting Name="LastSearchQuery" Type="string" Value="" ShowInMenus="false" />
         <Setting Name="LastItemId" Type="string" Value="" ShowInMenus="false" />
-        <Setting Name="ActiveProfileId" Type="string" Value="" ShowInMenus="false" />
 
         <!-- Preferences -->
         <Setting Name="RawXmlMode" Type="bool" Value="false" ShowInMenus="false" />

@@ -1,9 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModConfig>
+
+    <!-- Binaries -->
     <Assembly File="%ModDir%/bin/Shared/API.dll" Target="Client" LoadPriority="100" />
     <Assembly File="%ModDir%/bin/Client/Linux/SOS.dll" Target="Client" Platform="Linux" />
     <Assembly File="%ModDir%/bin/Client/OSX/SOS.dll" Target="Client" Platform="OSX" />
     <Assembly File="%ModDir%/bin/Client/Windows/SOS.dll" Target="Client" Platform="Windows" />
+
+    <!-- Internal Settings -->
     <Config File="%ModDir%/Config/SettingsClient.xml" Target="Client" />
+    <Config File="%ModDir%/Config/SettingsWindowConfigClient.xml" Target="Client" />
+
+    <!-- Profile Settings -->
     <Config File="%ModDir%/Config/SettingsTCPClient.xml" Target="Client" />
+    
 </ModConfig>

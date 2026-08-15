@@ -223,6 +223,12 @@ namespace SOS
                 {
                     if (PlayerInput.KeyHit(Keys.Escape))
                     {
+                        if (ProfileHelper.IsSettingsOpen)
+                        {
+                            CrossThread.RequestExecutionOnMainThread(ProfileHelper.CloseSettings);
+                            return;
+                        }
+
                         CrossThread.RequestExecutionOnMainThread(ToggleUI);
                         return;
                     }
@@ -238,15 +244,13 @@ namespace SOS
                         PlayerInput.KeyHit(Keys.Back) ||
                         PlayerInput.Mouse4ButtonClicked()
                     ) CrossThread.RequestExecutionOnMainThread(() => NavigateBack());
-
-
                 }
 
                 ActiveProfile?.Update();
-                ProfileHelper.Update();
             }
             if (migrationPending) MigrationDialog.Update();
             if (!IsSOSBlocked && Screen.Selected == GameMain.GameScreen) Tracker.Update();
+            ProfileHelper._settingsWindow?.AddToGUIUpdateList(order: 1);
         }
 
         public void SaveSettings()

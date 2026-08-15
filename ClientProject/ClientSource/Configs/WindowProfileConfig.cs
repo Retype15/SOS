@@ -32,6 +32,17 @@ namespace SOS.Configs
 
         public void Save()
         {
+            if (_settingsWindowSize.HasValue)
+            {
+                _settingsWindowSizeX.SetIfNotEqual(_settingsWindowSize.Value.X);
+                _settingsWindowSizeY.SetIfNotEqual(_settingsWindowSize.Value.Y);
+            }
+            if (_settingsWindowPosition.HasValue)
+            {
+                _settingsWindowPositionX.SetIfNotEqual(_settingsWindowPosition.Value.X);
+                _settingsWindowPositionY.SetIfNotEqual(_settingsWindowPosition.Value.Y);
+            }
+
             SaveChanges();
 
             SOSController.Instance.ActiveProfile?.ProfileConfig?.Save();
@@ -39,7 +50,7 @@ namespace SOS.Configs
 
         public void Reset() { }
 
-        public void DrawSettings(GUIListBox container)
+        public bool DrawSettings(GUIListBox container)
         {
             using var l = new GUILayoutBuilder(container);
             l.Header("ACTIVE VISUAL PROFILE", Color.Gold);
@@ -59,8 +70,8 @@ namespace SOS.Configs
 
             l.Separator();
 
-            // Dibujar el más allá...
             SOSController.Instance.ActiveProfile?.ProfileConfig?.DrawSettings(container);
+            return true;
         }
 
         private readonly ISettingBase<string> _activeProfileId;
@@ -71,9 +82,34 @@ namespace SOS.Configs
             set => _activeProfileId.SetIfNotEqual(value);
         }
 
+        //MARK: Settings Window Dimensions
+
+        private readonly ISettingBase<int> _settingsWindowSizeX;
+        private readonly ISettingBase<int> _settingsWindowSizeY;
+        private readonly ISettingBase<int> _settingsWindowPositionX;
+        private readonly ISettingBase<int> _settingsWindowPositionY;
+
+        private Point? _settingsWindowSize;
+        internal Point SettingsWindowSize
+        {
+            get => _settingsWindowSize ??= new(_settingsWindowSizeX.Value, _settingsWindowSizeY.Value);
+            set => _settingsWindowSize = value;
+        }
+
+        private Point? _settingsWindowPosition;
+        internal Point SettingsWindowPosition
+        {
+            get => _settingsWindowPosition ??= new(_settingsWindowPositionX.Value, _settingsWindowPositionY.Value);
+            set => _settingsWindowPosition = value;
+        }
+
         public WindowProfileConfig()
         {
             TryInitConfig("ActiveProfileId", out _activeProfileId);
+            TryInitConfig("SettingsWindowSizeX", out _settingsWindowSizeX);
+            TryInitConfig("SettingsWindowSizeY", out _settingsWindowSizeY);
+            TryInitConfig("SettingsWindowPositionX", out _settingsWindowPositionX);
+            TryInitConfig("SettingsWindowPositionY", out _settingsWindowPositionY);
         }
 
         public static void Destroy()
