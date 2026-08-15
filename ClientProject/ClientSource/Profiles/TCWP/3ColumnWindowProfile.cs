@@ -817,7 +817,7 @@ namespace SOS.Profiles.TCWP
         {
             // ─── XML Serialization Helpers ───
 
-            internal static string LayoutsToXml(Dictionary<string, TPLayout>? layouts)
+            internal static string LayoutsToXml(IDictionary<string, TPLayout>? layouts)
             {
                 if (layouts == null || layouts.Count == 0) return "";
 

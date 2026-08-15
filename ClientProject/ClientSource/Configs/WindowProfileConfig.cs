@@ -8,6 +8,7 @@
 using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
+using SOS.GUI;
 
 namespace SOS.Configs
 {
@@ -40,7 +41,7 @@ namespace SOS.Configs
 
         public void DrawSettings(GUIListBox container)
         {
-            using var l = new LayoutBuilder(container);
+            using var l = new GUILayoutBuilder(container);
             l.Header("ACTIVE VISUAL PROFILE", Color.Gold);
 
             var profiles = API.CreateWindowProfiles().ToList();

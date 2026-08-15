@@ -9,47 +9,39 @@ using System.Text;
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
-namespace SOS
+namespace SOS.GUI
 {
-    public class LayoutBuilder : IDisposable
+    public class GUILayoutBuilder : GUILayoutGroupAuto, IDisposable
     {
-        private readonly GUIListBox _listBox;
-        private readonly GUILayoutGroup _currentGroup;
-
-        public GUILayoutGroup CurrentGroup => _currentGroup;
-
-        public LayoutBuilder(GUIListBox listBox)
+        public GUILayoutBuilder(GUIListBox listBox)
+            : base(new RectTransform(new Vector2(1f, 0f), listBox.Content.RectTransform, Anchor.TopCenter))
         {
-            _listBox = listBox;
-
-            _currentGroup = new GUILayoutGroup(new RectTransform(new Vector2(1f, 0f), _listBox.Content.RectTransform, Anchor.TopCenter))
-            {
-                AbsoluteSpacing = 2,
-                CanBeFocused = false
-            };
         }
 
-        public void Header(string title, Color color)
+        internal GUILayoutBuilder(RectTransform rectT) : base(rectT) { }
+
+        public GUITextBlock Header(string title, Color color)
         {
-            var titleBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform), title, font: GUIStyle.SubHeadingFont, textColor: color, textAlignment: Alignment.Left)
+            var titleBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), RectTransform), title, font: GUIStyle.SubHeadingFont, textColor: color, textAlignment: Alignment.Left)
             {
                 CanBeFocused = false
             };
             titleBlock.RectTransform.MinSize = new Point(0, 30);
             titleBlock.RectTransform.MaxSize = new Point(int.MaxValue, 30);
             titleBlock.Padding = new Vector4(10, 0, 0, 0);
+            return titleBlock;
         }
 
-        public void Row(string label, string value, Color valueColor)
+        public GUIButton? Row(string label, string value, Color valueColor)
         {
-            if (string.IsNullOrEmpty(value)) return;
+            if (string.IsNullOrEmpty(value)) return null;
 
-            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform), style: null)
+            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), RectTransform), style: null)
             {
                 CanBeFocused = false
             };
 
-            float rowWidth = _currentGroup.Rect.Width > 0 ? _currentGroup.Rect.Width : 400f;
+            float rowWidth = Rect.Width > 0 ? Rect.Width : 400f;
             float labelW = GUIStyle.SmallFont.MeasureString(label).X + 8f;
             float labelRatio = Math.Min(labelW / rowWidth, 0.70f);
 
@@ -72,9 +64,11 @@ namespace SOS
             UpdateHeight();
             lblBlock.RectTransform.SizeChanged += UpdateHeight;
             valBlock.RectTransform.SizeChanged += UpdateHeight;
+
+            return row;
         }
 
-        public void BadgeRow(
+        public GUIButton? BadgeRow(
             string label,
             IEnumerable<string> values,
             IEnumerable<string>? displayNames = null,
@@ -82,7 +76,7 @@ namespace SOS
             Color? linkColor = null,
             Action<string>? onSearchFilter = null)
         {
-            if (values == null || !values.Any()) return;
+            if (values == null || !values.Any()) return null;
 
             var valList = values.ToList();
             var dispList = displayNames?.ToList();
@@ -93,7 +87,7 @@ namespace SOS
                 Display = dispList != null && i < dispList.Count ? dispList[i] : val
             }).ToList();
 
-            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform), style: null)
+            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), RectTransform), style: null)
             {
                 CanBeFocused = false
             };
@@ -143,9 +137,11 @@ namespace SOS
                 row.HoverCursor = CursorState.Hand;
                 row.OnClicked = (comp, obj) => { onSearchFilter?.Invoke(single.Target); return true; };
             }
+
+            return row;
         }
 
-        public void SelectorRow(
+        public GUIButton? SelectorRow(
             string label,
             IEnumerable<string> ids,
             IEnumerable<string>? displayNames = null,
@@ -155,7 +151,7 @@ namespace SOS
             Action<Prefab>? onSecondary = null,
             Action<string>? onSearchFilter = null)
         {
-            if (ids == null || !ids.Any()) return;
+            if (ids == null || !ids.Any()) return null;
 
             var idList = ids.ToList();
             var nameList = displayNames?.ToList();
@@ -185,7 +181,7 @@ namespace SOS
                 return Color.LightSkyBlue;
             }
 
-            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform), style: null)
+            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), RectTransform), style: null)
             {
                 CanBeFocused = false
             };
@@ -250,13 +246,15 @@ namespace SOS
                     return true;
                 };
             }
+
+            return row;
         }
 
-        public void RichText(RichString text)
+        public GUITextBlock? RichText(RichString text) //TODO: Eliminar en favor de TextBox.    
         {
-            if (text.IsNullOrEmpty()) return;
+            if (text.IsNullOrEmpty()) return null;
 
-            var block = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform), RichString.Rich(text), font: GUIStyle.SmallFont, wrap: true, textAlignment: Alignment.Left)
+            var block = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), RectTransform), RichString.Rich(text), font: GUIStyle.SmallFont, wrap: true, textAlignment: Alignment.Left)
             {
                 CanBeFocused = false
             };
@@ -269,36 +267,39 @@ namespace SOS
             }
             UpdateHeight();
             block.RectTransform.SizeChanged += UpdateHeight;
+
+            return block;
         }
 
         //TODO: Hecho por IA, aún no revisado.
         #region Hecho por IA, aún no revisado.
 
-        public void Separator()
+        public GUIFrame Separator()
         {
-            _ = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 2), MaxSize = new Point(int.MaxValue, 2) }, style: "GUIFrameBottom")
+            return new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 2), MaxSize = new Point(int.MaxValue, 2) }, style: "GUIFrameBottom")
             {
                 Color = Color.Gray * 0.4f,
                 CanBeFocused = false
             };
         }
 
-        public void Button(string text, Action onClick, string? tooltip = null, Color? color = null)
+        public GUIButton Button(string text, Action onClick, string? tooltip = null, Color? color = null, string style = "GUIButtonSmall")
         {
-            var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 28) }, text, style: "GUIButtonSmall")
+            var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, text, style: style)
             {
                 CanBeFocused = true,
                 OnClicked = (_, _) => { onClick(); return true; }
             };
             if (tooltip != null) btn.ToolTip = tooltip;
             if (color.HasValue) btn.Color = color.Value;
+            return btn;
         }
 
-        public void Button(string text, Action onClick, string applyTooltip, Action onDeleteClick, string deleteTooltip, Color? color = null)
+        public GUIButton Button(string text, Action onClick, string applyTooltip, Action onDeleteClick, string deleteTooltip, Color? color = null, string style = "GUIButtonSmall")
         {
-            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
 
-            var apply = new GUIButton(new RectTransform(new Vector2(0.82f, 1f), row.RectTransform, Anchor.CenterLeft), text, style: "GUIButtonSmall")
+            var apply = new GUIButton(new RectTransform(new Vector2(0.9f, 1f), row.RectTransform, Anchor.CenterLeft), text, style: style)
             {
                 ToolTip = applyTooltip,
                 CanBeFocused = true,
@@ -306,26 +307,29 @@ namespace SOS
             };
             if (color.HasValue) apply.Color = color.Value;
 
-            _ = new GUIButton(new RectTransform(new Vector2(0.18f, 1f), row.RectTransform, Anchor.CenterRight), "×", style: "GUICancelButton", color: Color.IndianRed)
+            _ = new GUIButton(new RectTransform(new Point(28, 28), row.RectTransform, Anchor.CenterRight), "x", style: "GUICancelButton", color: Color.IndianRed)
             {
                 ToolTip = deleteTooltip,
                 CanBeFocused = true,
                 OnClicked = (_, _) => { onDeleteClick(); return true; }
             };
+
+            return apply;
         }
 
-        public void TextBox(string label, string initialValue, Action<string> onChange)
+        public GUITextBox TextBox(string label, string initialValue, Action<string> onChange)
         {
-            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
             _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
             var textBox = new GUITextBox(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), initialValue, font: GUIStyle.SmallFont);
             textBox.OnTextChanged += (tb, text) => { onChange(text); return true; };
+            return textBox;
         }
 
-        public void Dropdown(string label, IEnumerable<string> items, string? selected, Action<string> onSelect)
+        public GUIDropDown Dropdown(string label, IEnumerable<string> items, string? selected, Action<string> onSelect)
         {
             var itemList = items.ToList();
-            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
             _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
 
             var dropdown = new GUIDropDown(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), text: "", elementCount: itemList.Count) { CanBeFocused = true, Font = GUIStyle.SmallFont };
@@ -339,22 +343,24 @@ namespace SOS
                 if (obj is string s) onSelect(s);
                 return true;
             };
+            return dropdown;
         }
 
-        public void TickBox(string label, bool selected, Action<bool> onToggle)
+        public GUITickBox TickBox(string label, bool selected, Action<bool> onToggle)
         {
-            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 26) }, style: null) { CanBeFocused = false };
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 26) }, style: null) { CanBeFocused = false };
             var tick = new GUITickBox(new RectTransform(new Vector2(1f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont)
             {
                 Selected = selected,
                 CanBeFocused = true,
                 OnSelected = (tb) => { onToggle(tb.Selected); return true; }
             };
+            return tick;
         }
 
-        public void Slider(string label, float min, float max, float value, Action<float> onChange)
+        public GUIScrollBar Slider(string label, float min, float max, float value, Action<float> onChange)
         {
-            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), _currentGroup.RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
             _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
 
             var slider = new GUIScrollBar(new RectTransform(new Vector2(0.55f, 0.6f), row.RectTransform, Anchor.CenterRight), barSize: 0.1f, style: "GUISlider", isHorizontal: true)
@@ -378,6 +384,7 @@ namespace SOS
                 onChange(v);
                 return true;
             };
+            return slider;
         }
 
         #endregion
@@ -416,27 +423,28 @@ namespace SOS
             textBlock.RectTransform.SizeChanged += ApplyLinks;
         }
 
+        public GUILayoutBuilder Accordion(string title, string? tooltip = null, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
+        {
+            var accordion = new GUIAccordion(title, RectTransform, tooltip, collapsed, onToggle, iconAnchor);
+            return accordion.Content;
+        }
+
+        public GUILayoutBuilder Accordion(GUIComponent header, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
+        {
+            var accordion = new GUIAccordion(header, RectTransform, collapsed, onToggle, iconAnchor);
+            return accordion.Content;
+        }
+
         public void Dispose()
         {
-            if (!_currentGroup.GetAllChildren().Any())
-            {
-                _listBox.Content.RemoveChild(_currentGroup);
-            }
+            if (!Children.Any())
+                Parent?.RemoveChild(this);
             else
-            {
-                int totalHeight = 0;
-                foreach (var child in _currentGroup.Children)
-                {
-                    totalHeight += child.Rect.Height + _currentGroup.AbsoluteSpacing;
-                }
-                _currentGroup.RectTransform.MinSize = new Point(0, totalHeight + 10);
-                _currentGroup.RectTransform.MaxSize = new Point(int.MaxValue, totalHeight + 10);
-            }
+                Recalculate();
 
             GC.SuppressFinalize(this);
         }
 
-        ~LayoutBuilder() => Dispose();
+        ~GUILayoutBuilder() => Dispose();
     }
 }
-

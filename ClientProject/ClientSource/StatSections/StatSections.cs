@@ -76,7 +76,7 @@ namespace SOS.StatSections
         {
             if (prefab == null) return;
 
-            using var l = new LayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_general", "GENERAL").Value, Color.Gold);
 
             l.BadgeRow(Texts.Get("sos.item.id", "ID:").Value, [prefab.Identifier.Value], filterPrefix: '!', onSearchFilter: SectionHelper.SetSearchFilter);
@@ -148,7 +148,7 @@ namespace SOS.StatSections
 
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            using var l = new LayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_economy", "ECONOMY").Value, Color.Gold);
 
             l.Row(Texts.Get("sos.item.base_price", "Base Price:").Value, $"{price} mk", Color.Yellow);
@@ -291,7 +291,7 @@ namespace SOS.StatSections
 
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            using var l = new LayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_weapon", "AS WEAPON").Value, Color.Gold);
 
             if (reload > 0) l.Row(isAutomatic ? Texts.Get("sos.weapon.fire_rate", "Fire Rate:").Value : Texts.Get("sos.weapon.reload", "Reload:").Value, $"{reload}s", Color.Cyan);
@@ -396,7 +396,7 @@ namespace SOS.StatSections
 
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            using var l = new LayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_equipment", "EQUIPMENT").Value, Color.Gold);
 
             if (durability > 0)
@@ -533,7 +533,7 @@ namespace SOS.StatSections
 
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            using var l = new LayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_medical", "MEDICAL").Value, Color.Gold);
 
             if (medicalSkillReq > 0)
@@ -605,7 +605,7 @@ namespace SOS.StatSections
 
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            using var l = new LayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_utility", "UTILITY").Value, Color.Gold);
 
             foreach (var prop in deviceProperties)
@@ -679,7 +679,7 @@ namespace SOS.StatSections
 
         public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            using var l = new LayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_container", "CONTAINER").Value, Color.Gold);
 
             if (!string.IsNullOrEmpty(capacity))
@@ -857,7 +857,7 @@ namespace SOS.StatSections
         {
             if (phases.Count > 0)
             {
-                using var l = new LayoutBuilder(contentPanel);
+                using var l = new GUILayoutBuilder(contentPanel);
                 l.Header(Texts.Get("sos.affliction.effects_header", "EFFECTS BY STRENGTH PHASE").Value, Color.Gold);
 
                 foreach (var phase in phases)
@@ -899,7 +899,7 @@ namespace SOS.StatSections
 
             if (periodicPhases.Count > 0)
             {
-                using var l = new LayoutBuilder(contentPanel);
+                using var l = new GUILayoutBuilder(contentPanel);
                 l.Header(Texts.Get("sos.affliction.periodic_header", "PERIODIC EVENTS").Value, Color.MediumPurple);
                 foreach (var phase in periodicPhases)
                 {
@@ -986,7 +986,7 @@ namespace SOS.StatSections
         {
             if (aff == null) return;
 
-            using var l = new LayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_treatments", "TREATMENTS & MEDICATION").Value, Color.SpringGreen);
 
             if (blockers.Count > 0)
@@ -1049,7 +1049,7 @@ namespace SOS.StatSections
         {
             if (text == null) return;
 
-            using var l = new LayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
             l.RichText(RichString.Rich(text));
         }

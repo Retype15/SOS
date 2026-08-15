@@ -28,13 +28,24 @@ namespace SOS.Profiles
             var btn = new GUIButton(new RectTransform(new Point(32, 32), parent, isFixedSize: true), "\u2699", style: "GUIButtonSettings")
             {
                 ToolTip = Texts.Get("sos.window.settings", "Settings").Value,
-                OnClicked = (_, _) => { OpenSettingsPopup(); return true; }
+                OnClicked = (_, _) => { SwitchSettingsPopup(); return true; }
             };
             return btn;
         }
 
+        public static void SwitchSettingsPopup()
+        {
+            if (_configPopup == null)
+                OpenSettingsPopup();
+            else
+                CloseSettingsPopup();
+        }
+
+
         public static void OpenSettingsPopup()
         {
+            Logger.LogDebug("ProfileHelper.OpenSettingsPopup: start", level: LogLevel.Trace);
+
             var ctrl = SOSController.Instance;
             var configs = ctrl.CachedConfigs;
             if (configs.Count == 0) return;
@@ -63,11 +74,15 @@ namespace SOS.Profiles
             {
                 OnClicked = (_, _) => { CloseSettingsPopup(); return true; }
             };
+
+            Logger.LogDebug("ProfileHelper.OpenSettingsPopup: end", level: LogLevel.Trace);
         }
 
         public static void CloseSettingsPopup()
         {
             if (_configPopup == null) return;
+            Logger.LogDebug("ProfileHelper.CloseSettingsPopup: removing popup", level: LogLevel.Trace);
+            _configPopup.RemoveFromGUIUpdateList();
             _configPopup.Parent?.RemoveChild(_configPopup);
             _configPopup = null;
         }

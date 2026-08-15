@@ -9,6 +9,7 @@ using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 using MonoMod.Utils;
+using SOS.GUI;
 using SOS.Profiles;
 using static SOS.Profiles.TCWP.ThreeColumnWindowProfile;
 
@@ -22,6 +23,8 @@ namespace SOS.Configs.TCWP
 
         internal SortedDictionary<string, TPLayout> CustomLayouts { get; } = new(StringComparer.Ordinal);
 
+        private bool _presetsCollapsed = true; //TODO: Convertir a una opción de guardado oficial(Quizás?)
+
         private bool _loaded = false;
 
         public void Load()
@@ -32,7 +35,7 @@ namespace SOS.Configs.TCWP
             LeftPanelWidth = _leftPanelWidth.Value;
             RightPanelWidth = _rightPanelWidth.Value;
             CustomLayouts.Clear();
-            CustomLayouts.AddRange(WindowConfigHelper.XmlToLayouts(_customLayoutsRaw.Value));
+            CustomLayouts.AddRange<string, TPLayout>(WindowConfigHelper.XmlToLayouts(_customLayoutsRaw.Value));
             _loaded = true;
         }
 
@@ -57,7 +60,7 @@ namespace SOS.Configs.TCWP
 
         public void DrawSettings(GUIListBox container)
         {
-            using var l = new LayoutBuilder(container);
+            using var l = new GUILayoutBuilder(container); // TODO: Convert to Accordion.
             l.Header("LAYOUT PRESETS", Color.Gold);
             l.Button("Minimal", () => ApplyPreset(500, 600, 0, 0));
             l.Button("Medium-List", () => ApplyPreset(850, 650, 220, 0));
@@ -67,13 +70,13 @@ namespace SOS.Configs.TCWP
             if (CustomLayouts.Count > 0)
             {
                 l.Separator();
-                l.Header("MY PRESETS", Color.Gold);
-                foreach (var kvp in CustomLayouts.ToList())
+                using var acc = l.Accordion(l.Header("MY PRESETS", Color.Gold), collapsed: _presetsCollapsed, onToggle: (c) => _presetsCollapsed = c);
+                foreach (var (k, v) in CustomLayouts)
                 {
-                    l.Button(kvp.Key,
-                        () => ApplyPreset(kvp.Value.WindowSize, kvp.Value.LeftPanelWidth, kvp.Value.RightPanelWidth),
+                    acc.Button(k,
+                        () => ApplyPreset(v.WindowSize, v.LeftPanelWidth, v.RightPanelWidth),
                         Texts.Get("sos.layout.apply_tooltip", "Applies this panel layout preset.").Value,
-                        () => DeleteCustomLayout(kvp.Key),
+                        () => DeleteCustomLayout(k),
                         Texts.Get("sos.layout.delete_tooltip", "Deletes this layout preset.").Value);
                 }
             }
