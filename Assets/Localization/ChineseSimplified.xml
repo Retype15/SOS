@@ -81,6 +81,11 @@
 	<sos.window.section_utility>功能</sos.window.section_utility>
 	<sos.window.section_weapon>作为武器</sos.window.section_weapon>
 	<sos.window.settings>设置</sos.window.settings>
+	<sos.window.minimize>最小化</sos.window.minimize>
+	<sos.window.maximize>最大化</sos.window.maximize>
+	<sos.window.restore>还原</sos.window.restore>
+	<sos.window.maximize_btn>M</sos.window.maximize_btn>
+	<sos.window.restore_btn>R</sos.window.restore_btn>
 	<sos.window.tag_tooltip>搜索带有标签的物品：[tag]</sos.window.tag_tooltip>
 	<sos.window.title>SOS - 配方浏览器</sos.window.title>
 	<sos.window.usage>用途</sos.window.usage>

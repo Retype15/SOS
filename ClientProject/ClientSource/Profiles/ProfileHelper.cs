@@ -19,7 +19,7 @@ namespace SOS.Profiles
     {
         private const float MinColumnWidth = 450f;
 
-        internal static GUIResizableFrame? _settingsWindow;
+        internal static GUIWindow? _settingsWindow;
         private static GUIComponent? _contentContainer;
         private static List<GUIListBox>? _contentLists;
         private static int _currentColumnCount = 0;
@@ -45,55 +45,53 @@ namespace SOS.Profiles
         {
             Logger.LogDebug("ProfileHelper.OpenSettings: start", level: LogLevel.Trace);
 
-            if (IsSettingsOpen)
+            try
             {
-                CloseSettings();
+                if (IsSettingsOpen)
+                {
+                    CloseSettings();
+                }
+
+                if (host != null)
+                {
+                    _contentContainer = host;
+                    _contentLists = null;
+                }
+                else
+                {
+                    var cfg = WindowProfileConfig.Instance;
+                    Point initialSize = cfg.SettingsWindowSize.X > 0 && cfg.SettingsWindowSize.Y > 0
+                        ? cfg.SettingsWindowSize
+                        : new Point(550, 600);
+
+                    _settingsWindow = new GUIWindow(
+                        new RectTransform(initialSize, BGUI.Canvas, Anchor.Center),
+                        Texts.Get("sos.window.settings", "Settings"),
+                        style: "InnerFrame",
+                        color: Color.Black * 0.95f,
+                        buttons: WindowButtons.Close)
+                    {
+                        RectTransform = { MinSize = new Point(450, 400) },
+                        ClampToParentBounds = true,
+                        AllowedDirections = ResizeDirection.All
+                    };
+
+                    if (cfg.SettingsWindowPosition.X >= 0 && cfg.SettingsWindowPosition.Y >= 0)
+                        _settingsWindow.RectTransform.AbsoluteOffset = cfg.SettingsWindowPosition;
+
+                    _settingsWindow.OnClose += CloseSettings;
+                    _settingsWindow.RectTransform.SizeChanged += OnSettingsWindowResized;
+
+                    _contentContainer = _settingsWindow.ContentArea;
+                }
+
+                RefreshSettings();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebugError($"[SOS] ProfileHelper.OpenSettings failed\n{ex}", level: LogLevel.Error);
             }
 
-            if (host != null)
-            {
-                _contentContainer = host;
-                _contentLists = null;
-            }
-            else
-            {
-                var cfg = WindowProfileConfig.Instance;
-                Point initialSize = cfg.SettingsWindowSize.X > 0 && cfg.SettingsWindowSize.Y > 0
-                    ? cfg.SettingsWindowSize
-                    : new Point(550, 600);
-
-                _settingsWindow = new GUIResizableFrame(new RectTransform(initialSize, BGUI.Canvas, Anchor.Center), style: "InnerFrame")
-                {
-                    Color = Color.Black * 0.95f,
-                    CanBeFocused = true,
-                    AllowedDirections = ResizeDirection.All,
-                    ClampToParentBounds = true,
-                    RectTransform = { MinSize = new Point(450, 400) }
-                };
-
-                if (cfg.SettingsWindowPosition.X >= 0 && cfg.SettingsWindowPosition.Y >= 0)
-                    _settingsWindow.RectTransform.AbsoluteOffset = cfg.SettingsWindowPosition;
-
-                var topBar = new GUIFrame(new RectTransform(new Vector2(1f, 0.08f), _settingsWindow.RectTransform, Anchor.TopCenter), style: null)
-                {
-                    RectTransform = { MinSize = new Point(0, 36), MaxSize = new Point(int.MaxValue, 36) }
-                };
-
-                _ = new GUITextBlock(new RectTransform(new Vector2(0.8f, 1f), topBar.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) },
-                    Texts.Get("sos.window.settings", "Settings"), font: GUIStyle.LargeFont, textAlignment: Alignment.CenterLeft);
-
-                _ = new GUIButton(new RectTransform(new Point(28, 28), topBar.RectTransform, Anchor.CenterRight) { AbsoluteOffset = new Point(-6, 0), IsFixedSize = true }, "", style: "GUICancelButton")
-                {
-                    ToolTip = Texts.Get("sos.gen.close", "Close [Esc]").Value,
-                    OnClicked = (_, _) => { CloseSettings(); return true; }
-                };
-
-                _contentContainer = new GUIFrame(new RectTransform(new Vector2(1f, 0.92f), _settingsWindow.RectTransform, Anchor.BottomCenter), style: null);
-
-                _settingsWindow.RectTransform.SizeChanged += OnSettingsWindowResized;
-            }
-
-            RefreshSettings();
             Logger.LogDebug("ProfileHelper.OpenSettings: end", level: LogLevel.Trace);
         }
 
@@ -101,17 +99,24 @@ namespace SOS.Profiles
         {
             if (_settingsWindow == null || _contentContainer == null) return;
 
-            var cfg = WindowProfileConfig.Instance;
-            cfg.SettingsWindowSize = _settingsWindow.RectTransform.NonScaledSize;
-            cfg.SettingsWindowPosition = _settingsWindow.RectTransform.AbsoluteOffset;
-
-            var configs = SOSController.Instance.CachedConfigs;
-            if (configs.Count == 0) configs = [.. API.CreateConfigs()];
-
-            int targetColumns = CalculateColumnCount(_contentContainer.Rect.Width, configs.Count, MinColumnWidth);
-            if (targetColumns != _currentColumnCount)
+            try
             {
-                RefreshSettings();
+                var cfg = WindowProfileConfig.Instance;
+                cfg.SettingsWindowSize = _settingsWindow.NormalSize;
+                cfg.SettingsWindowPosition = _settingsWindow.NormalOffset;
+
+                var configs = SOSController.Instance.CachedConfigs;
+                if (configs.Count == 0) configs = [.. API.CreateConfigs()];
+
+                int targetColumns = CalculateColumnCount(_contentContainer.Rect.Width, configs.Count, MinColumnWidth);
+                if (targetColumns != _currentColumnCount)
+                {
+                    RefreshSettings();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebugError($"[SOS] ProfileHelper.OnSettingsWindowResized failed\n{ex}", level: LogLevel.Error);
             }
         }
 
@@ -120,20 +125,29 @@ namespace SOS.Profiles
             if (!IsSettingsOpen) return;
             Logger.LogDebug("ProfileHelper.CloseSettings: closing settings", level: LogLevel.Trace);
 
-            if (_settingsWindow != null)
+            try
             {
-                var cfg = WindowProfileConfig.Instance;
-                cfg.SettingsWindowSize = _settingsWindow.RectTransform.NonScaledSize;
-                cfg.SettingsWindowPosition = _settingsWindow.RectTransform.AbsoluteOffset;
+                if (_settingsWindow != null)
+                {
+                    var cfg = WindowProfileConfig.Instance;
+                    cfg.SettingsWindowSize = _settingsWindow.NormalSize;
+                    cfg.SettingsWindowPosition = _settingsWindow.NormalOffset;
 
-                _settingsWindow.RemoveFromGUIUpdateList();
-                _settingsWindow.Parent?.RemoveChild(_settingsWindow);
-                _settingsWindow = null;
+                    _settingsWindow.OnClose -= CloseSettings;
+                    _settingsWindow.RectTransform.SizeChanged -= OnSettingsWindowResized;
+                    _settingsWindow.RemoveFromGUIUpdateList();
+                    _settingsWindow.Parent?.RemoveChild(_settingsWindow);
+                    _settingsWindow = null;
+                }
+
+                _contentContainer = null;
+                _contentLists = null;
+                _currentColumnCount = 0;
             }
-
-            _contentContainer = null;
-            _contentLists = null;
-            _currentColumnCount = 0;
+            catch (Exception ex)
+            {
+                Logger.LogDebugError($"[SOS] ProfileHelper.CloseSettings failed\n{ex}", level: LogLevel.Error);
+            }
 
             SOSController.Instance.SaveSettings();
         }
@@ -142,21 +156,28 @@ namespace SOS.Profiles
         {
             Logger.LogDebug("ProfileHelper.RefreshSettings: start in-place refresh", level: LogLevel.Trace);
 
-            var configs = SOSController.Instance.CachedConfigs;
-            if (configs.Count == 0) configs = [.. API.CreateConfigs()];
+            try
+            {
+                var configs = SOSController.Instance.CachedConfigs;
+                if (configs.Count == 0) configs = [.. API.CreateConfigs()];
 
-            if (_contentContainer != null)
-            {
-                _contentContainer.ClearChildren();
-                DrawSettings(_contentContainer, configs, MinColumnWidth);
-            }
-            else if (_contentLists != null)
-            {
-                foreach (var list in _contentLists)
+                if (_contentContainer != null)
                 {
-                    list.Content.ClearChildren();
+                    _contentContainer.ClearChildren();
+                    DrawSettings(_contentContainer, configs, MinColumnWidth);
                 }
-                DrawSettings(_contentLists, configs);
+                else if (_contentLists != null)
+                {
+                    foreach (var list in _contentLists)
+                    {
+                        list.Content.ClearChildren();
+                    }
+                    DrawSettings(_contentLists, configs);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebugError($"[SOS] ProfileHelper.RefreshSettings failed\n{ex}", level: LogLevel.Error);
             }
 
             Logger.LogDebug("ProfileHelper.RefreshSettings: end in-place refresh", level: LogLevel.Trace);
@@ -166,51 +187,58 @@ namespace SOS.Profiles
         {
             if (container == null || configs == null || configs.Count == 0) return;
 
-            int colCount = CalculateColumnCount(container.Rect.Width, configs.Count, minColumnWidth);
-            _currentColumnCount = colCount;
-
-            var layoutGroup = new GUILayoutGroup(new RectTransform(Vector2.One, container.RectTransform), isHorizontal: true)
+            try
             {
-                Stretch = true,
-                RelativeSpacing = 0.01f,
-                CanBeFocused = false
-            };
+                int colCount = CalculateColumnCount(container.Rect.Width, configs.Count, minColumnWidth);
+                _currentColumnCount = colCount;
 
-            float relWidth = 1.0f / colCount;
-            var createdLists = new List<GUIListBox>(colCount);
-
-            for (int i = 0; i < colCount; i++)
-            {
-                var list = new GUIListBox(new RectTransform(new Vector2(relWidth, 1f), layoutGroup.RectTransform), style: null)
+                var layoutGroup = new GUILayoutGroup(new RectTransform(Vector2.One, container.RectTransform), isHorizontal: true)
                 {
-                    Spacing = 4,
-                    Padding = new Vector4(8, 8, 8, 8),
-                    CanBeFocused = true
+                    Stretch = true,
+                    RelativeSpacing = 0.01f,
+                    CanBeFocused = false
                 };
-                createdLists.Add(list);
-            }
 
-            DrawSettings(createdLists, configs);
+                float relWidth = 1.0f / colCount;
+                var createdLists = new List<GUIListBox>(colCount);
 
-            var activeLists = createdLists.Where(l => l.Content.Children.Any()).ToList();
-
-            if (activeLists.Count < createdLists.Count)
-            {
-                foreach (var emptyList in createdLists.Where(l => !l.Content.Children.Any()))
+                for (int i = 0; i < colCount; i++)
                 {
-                    emptyList.RemoveFromGUIUpdateList();
-                    layoutGroup.RemoveChild(emptyList);
-                }
-
-                if (activeLists.Count > 0)
-                {
-                    float adjustedWidth = 1.0f / activeLists.Count;
-                    foreach (var list in activeLists)
+                    var list = new GUIListBox(new RectTransform(new Vector2(relWidth, 1f), layoutGroup.RectTransform), style: null)
                     {
-                        list.RectTransform.RelativeSize = new Vector2(adjustedWidth, 1f);
-                    }
+                        Spacing = 4,
+                        Padding = new Vector4(8, 8, 8, 8),
+                        CanBeFocused = true
+                    };
+                    createdLists.Add(list);
                 }
-                layoutGroup.Recalculate();
+
+                DrawSettings(createdLists, configs);
+
+                var activeLists = createdLists.Where(l => l.Content.Children.Any()).ToList();
+
+                if (activeLists.Count < createdLists.Count)
+                {
+                    foreach (var emptyList in createdLists.Where(l => !l.Content.Children.Any()))
+                    {
+                        emptyList.RemoveFromGUIUpdateList();
+                        layoutGroup.RemoveChild(emptyList);
+                    }
+
+                    if (activeLists.Count > 0)
+                    {
+                        float adjustedWidth = 1.0f / activeLists.Count;
+                        foreach (var list in activeLists)
+                        {
+                            list.RectTransform.RelativeSize = new Vector2(adjustedWidth, 1f);
+                        }
+                    }
+                    layoutGroup.Recalculate();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebugError($"[SOS] ProfileHelper.DrawSettings(container) failed\n{ex}", level: LogLevel.Error);
             }
         }
 
@@ -224,23 +252,30 @@ namespace SOS.Profiles
             var lists = targetLists as IList<GUIListBox> ?? [.. targetLists];
             if (lists.Count == 0 || configs.Count == 0) return;
 
-            int listCount = lists.Count;
-            int totalConfigs = configs.Count;
-            int chunkSize = (int)Math.Ceiling((double)totalConfigs / listCount);
-
-            for (int listIndex = 0; listIndex < listCount; listIndex++)
+            try
             {
-                int startIndex = listIndex * chunkSize;
-                int count = Math.Min(chunkSize, totalConfigs - startIndex);
+                int listCount = lists.Count;
+                int totalConfigs = configs.Count;
+                int chunkSize = (int)Math.Ceiling((double)totalConfigs / listCount);
 
-                if (count <= 0) break;
-
-                var targetList = lists[listIndex];
-                for (int i = 0; i < count; i++)
+                for (int listIndex = 0; listIndex < listCount; listIndex++)
                 {
-                    var config = configs[startIndex + i];
-                    config.DrawSettings(targetList);
+                    int startIndex = listIndex * chunkSize;
+                    int count = Math.Min(chunkSize, totalConfigs - startIndex);
+
+                    if (count <= 0) break;
+
+                    var targetList = lists[listIndex];
+                    for (int i = 0; i < count; i++)
+                    {
+                        var config = configs[startIndex + i];
+                        config.DrawSettings(targetList);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebugError($"[SOS] ProfileHelper.DrawSettings(lists) failed\n{ex}", level: LogLevel.Error);
             }
         }
 
@@ -386,5 +421,6 @@ namespace SOS.Profiles
         #endregion
 
         public static void CloseWindow() => API.Emit(CommKeys.CloseWindow);
+        public static void OpenWindow() => API.Emit(CommKeys.OpenWindow);
     }
 }

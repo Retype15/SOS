@@ -78,6 +78,11 @@ Example: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.window.section_utility>UTILITY</sos.window.section_utility>
 	<sos.window.section_weapon>AS WEAPON</sos.window.section_weapon>
 	<sos.window.settings>Settings</sos.window.settings>
+	<sos.window.minimize>Minimize</sos.window.minimize>
+	<sos.window.maximize>Maximize</sos.window.maximize>
+	<sos.window.restore>Restore</sos.window.restore>
+	<sos.window.maximize_btn>M</sos.window.maximize_btn>
+	<sos.window.restore_btn>R</sos.window.restore_btn>
 	<sos.window.tag_tooltip>Search items with tag: [tag]</sos.window.tag_tooltip>
 	<sos.window.title>SOS - Recipe Browser</sos.window.title>
 	<sos.window.remove_recipes>Remove Recipes</sos.window.remove_recipes>

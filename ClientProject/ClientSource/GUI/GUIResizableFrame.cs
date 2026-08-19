@@ -30,6 +30,11 @@ namespace SOS.GUI
         public bool IsFixed { get; set; } = false;
         public int ResizeMargin { get; set; } = 12;
 
+        public virtual bool CanMove => true;
+
+        //TODO: Temporal, dee ser cambiado por los botones invisibles a futuro.
+        protected virtual int DragAreaHeight => 50;
+
         private bool isDragging;
         private bool isMoving;
         private ResizeDirection currentDragDir;
@@ -58,7 +63,7 @@ namespace SOS.GUI
             {
                 currentDragDir = GetHoverDirection(mousePos, Rect) & AllowedDirections;
 
-                bool inTitleArea = !IsFixed && Rect.Contains(mousePos) && mousePos.Y < Rect.Y + 50;
+                bool inTitleArea = CanMove && !IsFixed && Rect.Contains(mousePos) && mousePos.Y < Rect.Y + DragAreaHeight;
 
                 if (currentDragDir != ResizeDirection.None)
                 {

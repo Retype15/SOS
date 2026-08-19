@@ -81,6 +81,11 @@
 	<sos.window.section_utility>УТИЛИТЫ</sos.window.section_utility>
 	<sos.window.section_weapon>КАК ОРУЖИЕ</sos.window.section_weapon>
 	<sos.window.settings>Настройки</sos.window.settings>
+	<sos.window.minimize>Свернуть</sos.window.minimize>
+	<sos.window.maximize>Развернуть</sos.window.maximize>
+	<sos.window.restore>Восстановить</sos.window.restore>
+	<sos.window.maximize_btn>M</sos.window.maximize_btn>
+	<sos.window.restore_btn>R</sos.window.restore_btn>
 	<sos.window.tag_tooltip>Поиск предметов с тегом: [tag]</sos.window.tag_tooltip>
 	<sos.window.title>SOS - Просмотр рецептов</sos.window.title>
 	<sos.window.usage>ИСПОЛЬЗОВАНИЕ</sos.window.usage>
