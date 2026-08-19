@@ -104,7 +104,7 @@ namespace SOS.GUI
                 RightArea = new GUILayoutGroup(new RectTransform(new Vector2(0.2f, 0.8f), TopBar.RectTransform, Anchor.CenterRight) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true)
                 {
                     Stretch = false,
-                    RelativeSpacing = 0.05f,
+                    AbsoluteSpacing = 5,
                     ChildAnchor = Anchor.CenterRight,
                     CanBeFocused = false
                 };
@@ -112,14 +112,14 @@ namespace SOS.GUI
                 SystemBox = new GUILayoutGroup(new RectTransform(new Vector2(0.4f, 1f), RightArea.RectTransform), isHorizontal: true, childAnchor: Anchor.CenterRight)
                 {
                     Stretch = false,
-                    RelativeSpacing = 0.05f,
+                    AbsoluteSpacing = 4,
                     CanBeFocused = false
                 };
 
                 ControlBox = new GUILayoutGroup(new RectTransform(new Vector2(0.6f, 1f), RightArea.RectTransform), isHorizontal: true, childAnchor: Anchor.CenterRight)
                 {
                     Stretch = false,
-                    RelativeSpacing = 0f,
+                    AbsoluteSpacing = 5,
                     CanBeFocused = false
                 };
 
@@ -137,6 +137,8 @@ namespace SOS.GUI
                 {
                     MinimizeButton = CreateSystemButton("-", "DeviceButton", "sos.window.minimize", "Minimize", Minimize);
                 }
+
+                UpdateSystemBoxSize();
 
                 ContentArea = new GUIFrame(new RectTransform(new Point(0, 0), RectTransform, Anchor.TopLeft, isFixedSize: true)
                 {
@@ -179,6 +181,38 @@ namespace SOS.GUI
                 Logger.LogDebugError($"[SOS] GUIWindow.CreateSystemButton failed\n{ex}", level: LogLevel.Error);
                 return null!;
             }
+        }
+
+        private void UpdateSystemBoxSize()
+        {
+            int count = SystemBox.Children.Count();
+            if (count == 0) return;
+
+            int width = SystemBox.Children.Sum(c => c.Rect.Width) + SystemBox.AbsoluteSpacing * (count - 1);
+            SystemBox.RectTransform.IsFixedSize = true;
+            SystemBox.RectTransform.NonScaledSize = new Point(width, SystemBox.Rect.Height);
+            RefreshRightAreaSize();
+        }
+
+        internal void SetControlBoxContentWidth()
+        {
+            int count = ControlBox.Children.Count();
+            if (count == 0) return;
+
+            int width = ControlBox.Children.Sum(c => c.Rect.Width) + ControlBox.AbsoluteSpacing * (count - 1);
+            ControlBox.RectTransform.IsFixedSize = true;
+            ControlBox.RectTransform.NonScaledSize = new Point(width, ControlBox.Rect.Height);
+            RefreshRightAreaSize();
+        }
+
+        internal void RefreshRightAreaSize()
+        {
+            int width = SystemBox.Rect.Width;
+            if (ControlBox.Children.Any())
+                width += ControlBox.Rect.Width + RightArea.AbsoluteSpacing;
+
+            RightArea.RectTransform.IsFixedSize = true;
+            RightArea.RectTransform.NonScaledSize = new Point(width, RightArea.Rect.Height);
         }
 
         public void Open(WindowState forceState = WindowState.Normal)

@@ -419,6 +419,8 @@ namespace SOS.Profiles.TCWP
                 ToolTip = Texts.Get("sos.window.toggle_tracker_tooltip", "Toggle HUD tracker (Ctrl+[key])").Value.Replace("[key]", ctrl.cfg.SOSOpenKey.Key.ToString())
             };
 
+            mainFrame.SetControlBoxContentWidth();
+
             mainFrame.OnClose += ProfileHelper.CloseWindow;
 
             contentArea = mainFrame.ContentArea;
