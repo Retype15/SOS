@@ -66,6 +66,9 @@ namespace SOS
         private SOSController()
         {
             API.On(CommKeys.CloseWindow, CloseSOS);
+            API.On(CommKeys.NavigateBack, NavigateBack);
+            API.On(CommKeys.NavigateForward, NavigateForward);
+            API.On<string>(CommKeys.ChangeProfile, ChangeProfile);
         }
 
         public void PushTabHistory(string uid)
@@ -74,23 +77,8 @@ namespace SOS
             TabHistory.Insert(0, uid);
         }
 
-        private void Subscribe()
-        {
-            API.On(CommKeys.NavigateBack, NavigateBack);
-            API.On(CommKeys.NavigateForward, NavigateForward);
-            API.On<string>(CommKeys.ChangeProfile, ChangeProfile);
-        }
-
-        private void Unsubscribe()
-        {
-            API.Off(CommKeys.NavigateBack, NavigateBack);
-            API.Off(CommKeys.NavigateForward, NavigateForward);
-            API.Off<string>(CommKeys.ChangeProfile, ChangeProfile);
-        }
-
         public void ChangeProfile(string profileId)
         {
-            Unsubscribe();
             ActiveProfile?.ProfileConfig?.Save();
             ActiveProfile?.Close();
             ActiveProfile?.Destroy();
@@ -176,8 +164,6 @@ namespace SOS
 
             API.Initialize(Plugin.Instance.PluginManagementService);
 
-            Subscribe();
-
             CachedConfigs = [.. API.CreateConfigs()];
             ActiveProfile = API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
 
@@ -189,7 +175,6 @@ namespace SOS
             if (ActiveProfile == null) return;
 
             SaveSettings();
-            Unsubscribe();
             ActiveProfile.Close();
             ActiveProfile.Destroy();
             ActiveProfile = null;
@@ -344,8 +329,9 @@ namespace SOS
 
             GUIAnimSequence.ClearAll();
 
-            Unsubscribe();
-
+            API.Off(CommKeys.NavigateBack, NavigateBack);
+            API.Off(CommKeys.NavigateForward, NavigateForward);
+            API.Off<string>(CommKeys.ChangeProfile, ChangeProfile);
             API.Off(CommKeys.CloseWindow, CloseSOS);
 
             ClientConfig.Destroy();
