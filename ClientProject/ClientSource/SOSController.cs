@@ -22,9 +22,6 @@ namespace SOS
 
         internal ISOSWindowProfile? ActiveProfile = null;
 
-        private bool _isOpened;
-        public bool IsOpened => _isOpened;
-
         public bool HaveOldConfigFile = false;
 
         internal List<ISOSConfig> CachedConfigs { get; set; } = [];
@@ -66,7 +63,10 @@ namespace SOS
 
         private WindowProfileConfig _windowProfileConfig = WindowProfileConfig.Instance;
 
-        private SOSController() { }
+        private SOSController()
+        {
+            API.On(CommKeys.CloseWindow, CloseSOS);
+        }
 
         public void PushTabHistory(string uid)
         {
@@ -78,7 +78,6 @@ namespace SOS
         {
             API.On(CommKeys.NavigateBack, NavigateBack);
             API.On(CommKeys.NavigateForward, NavigateForward);
-            API.On(CommKeys.CloseWindow, ToggleUI);
             API.On<string>(CommKeys.ChangeProfile, ChangeProfile);
         }
 
@@ -86,18 +85,18 @@ namespace SOS
         {
             API.Off(CommKeys.NavigateBack, NavigateBack);
             API.Off(CommKeys.NavigateForward, NavigateForward);
-            API.Off(CommKeys.CloseWindow, ToggleUI);
             API.Off<string>(CommKeys.ChangeProfile, ChangeProfile);
         }
 
         public void ChangeProfile(string profileId)
         {
+            Unsubscribe();
             ActiveProfile?.ProfileConfig?.Save();
             ActiveProfile?.Close();
             ActiveProfile?.Destroy();
             ActiveProfile = null;
             _windowProfileConfig.ActiveProfileId = profileId;
-            if (IsOpened) { ToggleUI(); ToggleUI(); }
+            ToggleUI();
         }
 
         public void OnTargetSelected(Prefab? item)
@@ -151,15 +150,19 @@ namespace SOS
 
         public void ToggleUI()
         {
-            if (_isOpened)
+            if (ActiveProfile == null)
             {
-                SaveSettings();
-                Unsubscribe();
-                ActiveProfile?.Close();
-                CachedConfigs.Clear();
-                _isOpened = false;
+                EnsureProfileCreated();
+                ActiveProfile?.Open();
                 return;
             }
+
+            ProfileHelper.ToggleWindow();
+        }
+
+        private void EnsureProfileCreated()
+        {
+            if (ActiveProfile != null) return;
 
             if (HaveOldConfigFile)
             {
@@ -176,12 +179,21 @@ namespace SOS
             Subscribe();
 
             CachedConfigs = [.. API.CreateConfigs()];
-            ActiveProfile ??= API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
+            ActiveProfile = API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
 
             LoadSettings();
+        }
 
-            ActiveProfile?.Open();
-            _isOpened = true;
+        private void CloseSOS()
+        {
+            if (ActiveProfile == null) return;
+
+            SaveSettings();
+            Unsubscribe();
+            ActiveProfile.Close();
+            ActiveProfile.Destroy();
+            ActiveProfile = null;
+            CachedConfigs.Clear();
         }
 
         public void Update()
@@ -206,7 +218,15 @@ namespace SOS
                             if (detected != null)
                             {
                                 OnTargetSelected(detected);
-                                if (!_isOpened) ToggleUI();
+                                if (ActiveProfile == null)
+                                {
+                                    EnsureProfileCreated();
+                                    ActiveProfile?.Open();
+                                }
+                                else
+                                {
+                                    ProfileHelper.OpenWindow();
+                                }
                             }
                             else
                             {
@@ -217,7 +237,7 @@ namespace SOS
                 }
             }
 
-            if (_isOpened)
+            if (ActiveProfile != null)
             {
                 if (canHandleInputs)
                 {
@@ -229,7 +249,7 @@ namespace SOS
                             return;
                         }
 
-                        CrossThread.RequestExecutionOnMainThread(ToggleUI);
+                        CrossThread.RequestExecutionOnMainThread(() => API.Emit(CommKeys.CloseWindow));
                         return;
                     }
                     else if
@@ -326,6 +346,8 @@ namespace SOS
 
             Unsubscribe();
 
+            API.Off(CommKeys.CloseWindow, CloseSOS);
+
             ClientConfig.Destroy();
             cfg = null!;
             ClientConfig.Destroy();
@@ -335,7 +357,6 @@ namespace SOS
             ActiveProfile?.Close();
             ActiveProfile?.Destroy();
             ActiveProfile = null;
-            _isOpened = false;
 
             GC.SuppressFinalize(this);
         }

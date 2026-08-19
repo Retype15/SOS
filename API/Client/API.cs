@@ -473,6 +473,7 @@ namespace SOS
         public static string NavigateBack => "NavigateBack";
         public static string NavigateForward => "NavigateForward";
         public static string RefreshSearch => "RefreshSearch";
+        public static string ToggleWindow => "ToggleWindow";
         public static string OpenWindow => "OpenWindow";
         public static string CloseWindow => "CloseWindow";
         public static string SetSearchFilter => "SetSearchFilter";

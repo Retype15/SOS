@@ -25,6 +25,8 @@ namespace SOS.Profiles.TCWP
         private Configs.TCWP.TCWPConfig? _config;
         public ISOSConfig? ProfileConfig => _config ??= new();
 
+        private bool _windowEventsRegistered;
+
         private enum ProfileState { Loading, Ready }
         private ProfileState _state = ProfileState.Loading;
 
@@ -90,10 +92,19 @@ namespace SOS.Profiles.TCWP
 
         public void Open()
         {
+            if (mainFrame != null) return;
+
+            if (!_windowEventsRegistered)
+            {
+                API.On(CommKeys.ToggleWindow, OnToggleWindow);
+                API.On(CommKeys.OpenWindow, OnOpenWindow);
+                _windowEventsRegistered = true;
+            }
+
             API.On<Prefab?>(CommKeys.SelectTarget, OnTargetChangedHandler);
             API.On<string>(CommKeys.SetSearchFilter, OnSetSearchFilter);
             API.On<TPLayout>(CommKeys.ApplyLayout, OnApplyLayout);
-            API.On("RefreshSearch", RefreshSearch);
+            API.On(CommKeys.RefreshSearch, RefreshSearch);
 
             if (!ProfileHelper.DataInitialized)
             {
@@ -102,6 +113,27 @@ namespace SOS.Profiles.TCWP
             }
             else
                 BuildMainUIAndShow();
+        }
+
+        private void OnToggleWindow()
+        {
+            if (mainFrame == null) return;
+
+            if (mainFrame.State == WindowState.Minimized)
+            {
+                mainFrame.State = WindowState.Normal;
+                return;
+            }
+
+            ProfileHelper.CloseWindow();
+        }
+
+        private void OnOpenWindow()
+        {
+            if (mainFrame == null) return;
+
+            if (mainFrame.State == WindowState.Minimized)
+                mainFrame.State = WindowState.Normal;
         }
 
         public void Update()
@@ -139,6 +171,10 @@ namespace SOS.Profiles.TCWP
 
         public void Close()
         {
+            API.Off(CommKeys.ToggleWindow, OnToggleWindow);
+            API.Off(CommKeys.OpenWindow, OnOpenWindow);
+            _windowEventsRegistered = false;
+
             API.Off<Prefab?>(CommKeys.SelectTarget, OnTargetChangedHandler);
             API.Off<string>(CommKeys.SetSearchFilter, OnSetSearchFilter);
             API.Off<TPLayout>(CommKeys.ApplyLayout, OnApplyLayout);

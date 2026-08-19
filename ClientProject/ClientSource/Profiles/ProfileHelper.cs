@@ -420,7 +420,8 @@ namespace SOS.Profiles
 
         #endregion
 
-        public static void CloseWindow() => API.Emit(CommKeys.CloseWindow);
+        public static void ToggleWindow() => API.Emit(CommKeys.ToggleWindow);
         public static void OpenWindow() => API.Emit(CommKeys.OpenWindow);
+        public static void CloseWindow() => API.Emit(CommKeys.CloseWindow);
     }
 }
