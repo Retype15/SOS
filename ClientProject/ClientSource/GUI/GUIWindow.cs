@@ -130,12 +130,12 @@ namespace SOS.GUI
 
                 if (buttons.HasFlag(WindowButtons.Maximize))
                 {
-                    MaximizeButton = CreateSystemButton("M", "GUIButtonSmall", "sos.window.maximize", "Maximize", ToggleMaximize);
+                    MaximizeButton = CreateSystemButton("M", "GUIButton", "sos.window.maximize", "Maximize", ToggleMaximize);
                 }
 
                 if (buttons.HasFlag(WindowButtons.Minimize))
                 {
-                    MinimizeButton = CreateSystemButton("-", "GUIButtonSmall", "sos.window.minimize", "Minimize", Minimize);
+                    MinimizeButton = CreateSystemButton("-", "GUIButton", "sos.window.minimize", "Minimize", Minimize);
                 }
 
                 ContentArea = new GUIFrame(new RectTransform(new Point(0, 0), RectTransform, Anchor.TopLeft, isFixedSize: true)
