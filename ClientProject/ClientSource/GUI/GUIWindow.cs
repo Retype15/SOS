@@ -23,7 +23,7 @@ namespace SOS.GUI
         All = Minimize | Maximize | Close
     }
 
-    public enum WindowState
+    public enum WState
     {
         Normal,
         Maximized,
@@ -60,12 +60,12 @@ namespace SOS.GUI
         public event Action? OnRestore;
         public event Action? OnClose;
 
-        private WindowState _windowState = WindowState.Normal;
+        private WState _windowState = WState.Normal;
         private ResizeDirection _normalResizeDirections = ResizeDirection.All;
 
-        public override bool CanMove => State != WindowState.Maximized;
+        public override bool CanMove => WindowState != WState.Maximized;
 
-        public new WindowState State
+        public WState WindowState
         {
             get => _windowState;
             set => SetState(value);
@@ -215,19 +215,19 @@ namespace SOS.GUI
             RightArea.RectTransform.NonScaledSize = new Point(width, RightArea.Rect.Height);
         }
 
-        public void Open(WindowState forceState = WindowState.Normal)
+        public void Open(WState forceState = WState.Normal)
         {
             Visible = true;
-            State = forceState;
+            WindowState = forceState;
         }
 
-        public void Minimize() => State = WindowState.Minimized;
+        public void Minimize() => WindowState = WState.Minimized;
 
-        public void Maximize() => State = WindowState.Maximized;
+        public void Maximize() => WindowState = WState.Maximized;
 
-        public void Restore() => State = WindowState.Normal;
+        public void Restore() => WindowState = WState.Normal;
 
-        public void ToggleMaximize() => State = State == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+        public void ToggleMaximize() => WindowState = WindowState == WState.Maximized ? WState.Normal : WState.Maximized;
 
         public void Close()
         {
@@ -240,7 +240,7 @@ namespace SOS.GUI
             try
             {
                 base.Update(deltaTime);
-                if (!Visible || State == WindowState.Maximized) return;
+                if (!Visible || WindowState == WState.Maximized) return;
 
                 NormalSize = RectTransform.NonScaledSize;
                 NormalOffset = RectTransform.AbsoluteOffset;
@@ -251,13 +251,13 @@ namespace SOS.GUI
             }
         }
 
-        private void SetState(WindowState newState)
+        private void SetState(WState newState)
         {
             if (_windowState == newState) return;
 
             try
             {
-                if (_windowState == WindowState.Maximized && newState != WindowState.Maximized)
+                if (_windowState == WState.Maximized && newState != WState.Maximized)
                 {
                     ExitMaximized();
                 }
@@ -266,17 +266,17 @@ namespace SOS.GUI
 
                 switch (_windowState)
                 {
-                    case WindowState.Minimized:
+                    case WState.Minimized:
                         Visible = false;
                         UpdateSystemButtons();
                         OnMinimize?.Invoke();
                         break;
-                    case WindowState.Maximized:
+                    case WState.Maximized:
                         EnterMaximized();
                         UpdateSystemButtons();
                         OnMaximize?.Invoke();
                         break;
-                    case WindowState.Normal:
+                    case WState.Normal:
                         Visible = true;
                         UpdateSystemButtons();
                         OnRestore?.Invoke();
@@ -311,7 +311,7 @@ namespace SOS.GUI
         {
             if (MaximizeButton == null) return;
 
-            bool isMaximized = State == WindowState.Maximized;
+            bool isMaximized = WindowState == WState.Maximized;
             MaximizeButton.Text = Texts.Get(isMaximized ? "sos.window.restore_btn" : "sos.window.maximize_btn", isMaximized ? "R" : "M");
             MaximizeButton.ToolTip = Texts.Get(isMaximized ? "sos.window.restore" : "sos.window.maximize", isMaximized ? "Restore" : "Maximize").Value;
         }

@@ -37,8 +37,6 @@ namespace SOS.Configs
             API.SetState<Prefab?>(CommKeys.SelectTarget, CurrentTarget);
 
             _loaded = true;
-
-            Logger.LogDebug($"[SOS] CONFIG LOADED..!");
         }
 
         public void Save()
@@ -51,6 +49,7 @@ namespace SOS.Configs
                 var dummyCharacterXML = ClinicalSimulatorManager.ExportSaveData();
                 if (dummyCharacterXML != null) DummyCharacterXML = dummyCharacterXML;
                 DummySimulated = !ClinicalSimulatorManager.HasStarted;
+                _dummyCharacterXMLRaw.SetIfNotEqual(DummyCharacterXML.ToString());
             }
 
             if (CurrentTarget != null) _lastItemId.SetIfNotEqual(CurrentTarget.Identifier.Value);
@@ -60,11 +59,8 @@ namespace SOS.Configs
             TrackerVisible = ctr.Tracker.Visible;
 
             _favoritesRaw.SetIfNotEqual(FavoritedItems.ToCsv());
-            _dummyCharacterXMLRaw.SetIfNotEqual(DummyCharacterXML.ToString());
 
             SaveChanges();
-
-            Logger.LogDebug($"[SOS] CONFIG SAVED..!");
         }
 
         public void Reset() { }
@@ -124,6 +120,7 @@ namespace SOS.Configs
             remove => _trackerVisible.OnValueChanged -= value;
         }
 
+        // TODO: Pendient to move into another mod.
         private readonly ISettingBase<int> _dummyDeathCount;
         public int DummyDeathCount
         {
@@ -145,6 +142,7 @@ namespace SOS.Configs
             get => _dummyCharacterXML ??= XElement.Parse(_dummyCharacterXMLRaw.Value);
             set => _dummyCharacterXML = value;
         }
+        //END: Pendient to move into another mod.
 
         // ─── Batch-save (complex serialized) ───
 

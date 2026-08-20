@@ -16,7 +16,7 @@ namespace SOS
     // Client-specific code
     public partial class Plugin : IAssemblyPlugin, IEventKeyUpdate
     {
-        private SOSController? controller;
+        public SOSController? controller;
 
         [Conditional("CLIENT")]
         public void InitClient()

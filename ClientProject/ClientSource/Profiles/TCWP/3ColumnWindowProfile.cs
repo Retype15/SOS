@@ -119,9 +119,9 @@ namespace SOS.Profiles.TCWP
         {
             if (mainFrame == null) return;
 
-            if (mainFrame.State == WindowState.Minimized)
+            if (mainFrame.WindowState == WState.Minimized)
             {
-                mainFrame.State = WindowState.Normal;
+                mainFrame.WindowState = WState.Normal;
                 return;
             }
 
@@ -132,8 +132,8 @@ namespace SOS.Profiles.TCWP
         {
             if (mainFrame == null) return;
 
-            if (mainFrame.State == WindowState.Minimized)
-                mainFrame.State = WindowState.Normal;
+            if (mainFrame.WindowState == WState.Minimized)
+                mainFrame.WindowState = WState.Normal;
         }
 
         public void Update()

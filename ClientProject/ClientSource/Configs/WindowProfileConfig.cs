@@ -48,8 +48,6 @@ namespace SOS.Configs
             SOSController.Instance.ActiveProfile?.ProfileConfig?.Save();
         }
 
-        public void Reset() { }
-
         public bool DrawSettings(GUIListBox container)
         {
             using var l = new GUILayoutBuilder(container);

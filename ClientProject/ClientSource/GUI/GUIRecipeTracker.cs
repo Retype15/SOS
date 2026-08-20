@@ -328,16 +328,6 @@ namespace SOS.GUI
             if (layoutDirty) RecalculateSize();
         }
 
-        public static GUIRecipeTracker InstantiateWithDefault()
-        {
-            return new(new RectTransform(new Point(280, 180), BGUI.Canvas, Anchor.TopRight) { AbsoluteOffset = new Point(20, 150) }, style: "InnerFrame")
-            {
-                CanBeFocused = false,
-                Color = Color.Black * 0.6f
-            }
-            ;
-        }
-
         private void RegisterIfChange(ISettingBase _) => Visible = SOSController.Instance.cfg.TrackerVisible;
 
         public void Destroy()
@@ -347,14 +337,6 @@ namespace SOS.GUI
             emptyLabel.RemoveFromGUIUpdateList();
             RemoveRecipes();
             SOSController.Instance.cfg.OnTrackerVisibleValueChanged -= RegisterIfChange;
-        }
-
-        private static int GetPlayerCount(FabricationRecipe.RequiredItem req)
-        {
-            if (Character.Controlled?.Inventory == null) return 0;
-
-            return Character.Controlled.Inventory.AllItems
-                .Count(item => req.ItemPrefabs.Any(p => p.Identifier == item.Prefab.Identifier));
         }
 
         private void RecalculateSize()
@@ -392,6 +374,24 @@ namespace SOS.GUI
                     AddRecipe(parts[0], hash);
                 else if (parts.Length == 1) AddRecipe(parts[0]);
             }
+        }
+
+        private static int GetPlayerCount(FabricationRecipe.RequiredItem req)
+        {
+            if (Character.Controlled?.Inventory == null) return 0;
+
+            return Character.Controlled.Inventory.AllItems
+                .Count(item => req.ItemPrefabs.Any(p => p.Identifier == item.Prefab.Identifier));
+        }
+
+        public static GUIRecipeTracker InstantiateWithDefault()
+        {
+            return new(new RectTransform(new Point(280, 180), BGUI.Canvas, Anchor.TopRight) { AbsoluteOffset = new Point(20, 150) }, style: "InnerFrame")
+            {
+                CanBeFocused = false,
+                Color = Color.Black * 0.6f
+            }
+            ;
         }
     }
 

@@ -76,12 +76,12 @@ namespace SOS
 
     public interface ISOSTab : ITab;
 
+    [DefaultClass<ConfigDefaults>]
     public interface ISOSConfig : IIdentifierOrdenable
     {
         void Load();
         void Save();
-        void Reset();
-        [DefaultClass<ConfigDefaults>]
+        void Reset() { }
         bool DrawSettings(GUIListBox container) => false;
     }
 
@@ -146,6 +146,7 @@ namespace SOS
 
     internal sealed class ConfigDefaults
     {
+        public static void Reset() { }
         public static bool DrawSettings(GUIListBox _) => false;
     }
 

@@ -189,34 +189,17 @@ namespace SOS
             {
                 if (cfg.SOSOpenKeyHit)
                 {
-                    if (PlayerInput.IsCtrlDown())
+                    if (PlayerInput.IsCtrlDown() && !IsSOSBlocked)
                     {
                         CrossThread.RequestExecutionOnMainThread(() => Tracker.ToggleTracker());
                     }
                     else
                     {
-                        Prefab? detected = GetPrefabUnderMouse();
-
                         CrossThread.RequestExecutionOnMainThread(() =>
                         {
-
-                            if (detected != null)
-                            {
-                                OnTargetSelected(detected);
-                                if (ActiveProfile == null)
-                                {
-                                    EnsureProfileCreated();
-                                    ActiveProfile?.Open();
-                                }
-                                else
-                                {
-                                    ProfileHelper.OpenWindow();
-                                }
-                            }
-                            else
-                            {
-                                ToggleUI();
-                            }
+                            Prefab? detected = GetPrefabUnderMouse();
+                            OnTargetSelected(detected);
+                            ToggleUI();
                         });
                     }
                 }
