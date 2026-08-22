@@ -318,67 +318,20 @@ namespace SOS.Profiles
 
         public static void SelectTarget(Prefab target) => SOSController.Instance.OnTargetSelected(target);
 
-        public static void OpenContextMenu(Prefab target)
+        public static void OpenContextMenu(Prefab target, Vector2? position = null)
         {
             if (target == null) return;
-            List<ContextMenuOption> options = [];
-            if (target is ItemPrefab item && item.FabricationRecipes is { Count: > 0 })
-            {
-                var tracker = SOSController.Instance.Tracker;
-                if (item.FabricationRecipes.Count == 1)
-                {
-                    var single = PrefabResolver.GetFabricationRecipe(item);
-                    options.Add(new ContextMenuOption(tracker.GetStringTrackToHUD(single).Value, isEnabled: true, () => tracker.AddOrRemoveRecipe(single)) { Tooltip = Texts.Get("sos.tracker.track-untrack.tooltip", "Track or untrack all recipes from this item.") });
-                }
-                else
-                {
-                    var subs = new List<ContextMenuOption>
-                    {
-                        new(
-                            tracker.ContainsAnyRecipes(item)
-                                ? Texts.Get("sos.window.remove_all", "Remove All")
-                                : Texts.Get("sos.window.track_all", "Track All"),
-                            isEnabled: true,
-                            tracker.ContainsAnyRecipes(item)
-                                ? () => tracker.RemoveRecipes(item)
-                                : () => tracker.AddRecipes(item))
-                    };
 
-                    foreach (var (id, recipe) in item.FabricationRecipes)
-                    {
-                        bool tracked = tracker.ContainsRecipe(recipe);
-                        subs.Add(new ContextMenuOption(
-                            $"{GUIRecipeTracker.GetTrackOrUntrack(!tracked)} {recipe.DisplayName}",
-                            isEnabled: true, () => tracker.AddOrRemoveRecipe(recipe))
-                        { Tooltip = recipe.GetRequirementsToString() });
-                    }
+            var options = SOSController.Instance.CachedPrefabProviders
+                .Where(p => p.PrefabType.IsAssignableFrom(target.GetType()))
+                .SelectMany(p => p.BuildContextOptions(target))
+                .ToList();
 
-                    options.Add(new ContextMenuOption(
-                        Texts.Get("sos.context.track_recipe", "Add to HUD").Value,
-                        isEnabled: true, [.. subs]));
-                }
-            }
-
-            options.Add(new ContextMenuOption(Texts.Get("sos.context.view_recipes", "View Recipes"), isEnabled: true, onSelected: () =>
-            {
-                SelectTarget(target);
-            }));
-            var favoritedItems = SOSController.Instance.FavoritedItems;
-            string targetId = target.Identifier.Value;
-            bool isFav = favoritedItems.Contains(targetId);
-            string favText = isFav ? Texts.Get("sos.context.remove_favorite", "Remove from Favorites").Value : Texts.Get("sos.context.add_favorite", "Add to Favorites").Value;
-
-            options.Add(new ContextMenuOption(favText, isEnabled: true, onSelected: () =>
-            {
-                if (isFav) favoritedItems.Remove(targetId);
-                else favoritedItems.Add(targetId);
-
-                API.Emit(CommKeys.RefreshSearch);
-            }));
+            if (options.Count == 0) return;
 
             RichString name = target.Name();
 
-            _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, name, null, [.. options]);
+            _ = GUIContextMenu.CreateContextMenu(position ?? PlayerInput.MousePosition, name, null, [.. options]);
         }
 
         #region XML

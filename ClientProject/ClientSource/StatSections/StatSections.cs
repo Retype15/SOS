@@ -62,10 +62,7 @@ namespace SOS.StatSections
                     {
                         activationThreshold = affliction.configElement.GetAttributeFloat("activationthreshold", 0f);
                         treatmentThreshold = affliction.configElement.GetAttributeFloat("treatmentthreshold", 0f);
-
-                        string codRaw = affliction.configElement.GetAttributeString("causeofdeathdescription", "");
-                        if (!string.IsNullOrEmpty(codRaw))
-                            causeOfDeath = TextManager.Get(codRaw).Fallback(codRaw).Value;
+                        causeOfDeath = affliction.configElement.GetAttributeString("causeofdeathdescription", "");
                     }
                     break;
             }

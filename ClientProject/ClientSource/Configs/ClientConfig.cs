@@ -12,7 +12,7 @@ using SOS.Panels.AfflictionPanel;
 
 namespace SOS.Configs
 {
-    public sealed class ClientConfig : ConfigDirtySaver, ISOSConfig
+    public sealed class ClientConfig : ConfigDirtySaver, ISOSConfig, IHaveFavoritedItems
     {
         public string Id => "SOS.Core";
         public double Order => 0;
@@ -150,13 +150,13 @@ namespace SOS.Configs
         private readonly ISettingBase<string> _tabHistoryRaw;
 
         private HashSet<string>? _favoritedItems;
-        internal HashSet<string> FavoritedItems
+        public HashSet<string> FavoritedItems
         {
             get => _favoritedItems ??= ConfigHelper.CsvToHashSet(_favoritesRaw.Value);
             set => _favoritedItems = value;
         }
 
-        internal string TabHistoryRaw { get => _tabHistoryRaw.Value; set => _tabHistoryRaw.SetIfNotEqual(value); }
+        public string TabHistoryRaw { get => _tabHistoryRaw.Value; set => _tabHistoryRaw.SetIfNotEqual(value); }
 
         // ─── Constructor ───
 

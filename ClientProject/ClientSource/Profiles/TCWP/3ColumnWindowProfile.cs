@@ -90,7 +90,7 @@ namespace SOS.Profiles.TCWP
 
         #endregion
 
-        public void Open()
+        public void Init()
         {
             if (mainFrame != null) return;
 
@@ -169,7 +169,7 @@ namespace SOS.Profiles.TCWP
             }
         }
 
-        public void Close()
+        public void Dispose()
         {
             API.Off(CommKeys.ToggleWindow, OnToggleWindow);
             API.Off(CommKeys.OpenWindow, OnOpenWindow);
@@ -192,13 +192,8 @@ namespace SOS.Profiles.TCWP
             itemList = null;
             searchBox = null;
             metaPanel = null;
-            _state = ProfileState.Loading;
-        }
-
-        public void Destroy()
-        {
-            Close();
             _config = null;
+            _state = ProfileState.Loading;
         }
 
         private void OnTargetChangedHandler(Prefab? target)
@@ -222,7 +217,12 @@ namespace SOS.Profiles.TCWP
                 {
                     OnDrawToolTip = component => component.ToolTip = CardBuilder.GetDetailedTooltip(target)
                 };
-                _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = target.IconColor(), CanBeFocused = false };
+                _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true)
+                {
+                    Color = target.IconColor(),
+                    CanBeFocused = true,
+                    OnSecondaryClicked = (_, _) => { ProfileHelper.OpenContextMenu(target); return true; }
+                };
             }
 
             var (headerName, headerColor) = target.SafeName(Color.White);
@@ -230,7 +230,12 @@ namespace SOS.Profiles.TCWP
                 new RectTransform(new Vector2(0.8f, 1f), headerLayout.RectTransform),
                 headerName,
                 font: GUIStyle.LargeFont, textColor: headerColor, textAlignment: Alignment.CenterLeft)
-            { Wrap = false, AutoScaleHorizontal = true, CanBeFocused = false };
+            {
+                Wrap = false,
+                AutoScaleHorizontal = true,
+                CanBeFocused = true,
+                OnSecondaryClicked = (_, _) => { ProfileHelper.OpenContextMenu(target); return true; }
+            };
 
 
             if (centerTabWidget is GUITabWidget tw)
@@ -306,7 +311,8 @@ namespace SOS.Profiles.TCWP
             loadingText = new GUITextBlock(new RectTransform(new Vector2(0.9f, 0.2f), loadingFrame.RectTransform, Anchor.BottomCenter)
             { AbsoluteOffset = new Point(0, -30) },
             Texts.Get("sos.window.loading", "Loading dependencies..."),
-            font: GUIStyle.LargeFont, textAlignment: Alignment.Center, wrap: true) { CanBeFocused = false };
+            font: GUIStyle.LargeFont, textAlignment: Alignment.Center, wrap: true)
+            { CanBeFocused = false };
 
             loadingText.Wait(0.5f).ExFadeIn(duration: 0.5f);
             _state = ProfileState.Loading;
@@ -493,7 +499,7 @@ namespace SOS.Profiles.TCWP
 
             centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform));
 
-            prefabProviders = [.. API.CreatePrefabProviders()];
+            prefabProviders = [.. SOSController.Instance.CachedPrefabProviders];
             prefabHeaders = prefabProviders.ToDictionary(p => p.PrefabType, p => p.Header);
 
             // Right panel

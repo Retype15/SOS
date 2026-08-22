@@ -57,18 +57,7 @@ namespace SOS
         void Hide();
 
         GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string toolTip = "")
-        {
-            Vector2 textSize = GUIStyle.SmallFont.MeasureString(tabName);
-            int width = (int)textSize.X + 24;
-            var tabBtn = new GUIButton(new RectTransform(new Point(width, 32), parent) { IsFixedSize = true }, tabName, style: "MainMenuNotificationButton")
-            {
-                Selected = isActive,
-                OnClicked = (_, _) => { onClick(); return true; },
-            };
-            if (!toolTip.IsNullOrEmpty())
-                tabBtn.ToolTip = toolTip;
-            return tabBtn;
-        }
+            => TabDefaults.CreateTabButton(tabName, parent, isActive, onClick, toolTip);
     }
 
     public interface ISOSStatSection : IIdentifierOrdenable, IBaseStatSection;
@@ -101,18 +90,19 @@ namespace SOS
         Type PrefabType { get; }
         string Header { get; }
         IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter);
+
+        [DefaultClass<PrefabDefaults>]
+        List<ContextMenuOption> BuildContextOptions(Prefab prefab) => PrefabDefaults.BuildContextOptions(prefab);
     }
 
-    public interface ISOSWindowProfile : IIdentifierOrdenable
+    public interface ISOSWindowProfile : IIdentifierOrdenable, IDisposable
     {
         string DisplayName => Texts.Get($"{Id}.DisplayName", Id).Value;
         string Description => Texts.Get($"{Id}.Description", "").Value;
         Sprite? ProfileIcon => null;
         ISOSConfig? ProfileConfig => null;
-        void Open();
+        void Init();
         void Update();
-        void Close();
-        void Destroy();
     }
 
     #endregion
@@ -148,6 +138,46 @@ namespace SOS
     {
         public static void Reset() { }
         public static bool DrawSettings(GUIListBox _) => false;
+    }
+
+    internal sealed class PrefabDefaults
+    {
+        public static List<ContextMenuOption> BuildContextOptions(Prefab prefab)
+        {
+            var options = new List<ContextMenuOption>
+            {
+                new(Texts.Get("sos.context.view_recipes", "View Recipes").Value, isEnabled: true, onSelected: () => API.Emit(CommKeys.SelectTarget, prefab))
+            };
+
+            if (API.GetConfig("SOS.Core") is IHaveFavoritedItems config)
+            {
+
+                var favoritedItems = config.FavoritedItems;
+                string targetId = prefab.Identifier.Value;
+                bool isFav = favoritedItems.Contains(targetId);
+                string favText = isFav ? Texts.Get("sos.context.remove_favorite", "Remove from Favorites").Value : Texts.Get("sos.context.add_favorite", "Add to Favorites").Value;
+
+                options.Add(new ContextMenuOption(favText, true, () =>
+                {
+                    if (isFav) favoritedItems.Remove(targetId);
+                    else favoritedItems.Add(targetId);
+
+                    API.Emit(CommKeys.RefreshSearch);
+                }));
+            }
+
+            return options;
+        }
+    }
+
+    #endregion
+
+    #region balls
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public interface IHaveFavoritedItems
+    {
+        HashSet<string> FavoritedItems { get; }
     }
 
     #endregion

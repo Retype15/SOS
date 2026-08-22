@@ -6,6 +6,7 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
+using SOS.GUI;
 
 namespace SOS.Prefabs.Item
 {
@@ -16,6 +17,51 @@ namespace SOS.Prefabs.Item
         public double Order => 1;
         public Type PrefabType => typeof(ItemPrefab);
         public string Header => Texts.Get("sos.list.header.itemprefab", "Items").Value;
+
+        public List<ContextMenuOption> BuildContextOptions(Prefab prefab)
+        {
+            if (prefab is not ItemPrefab item || item.FabricationRecipes is not { Count: > 0 })
+                return PrefabDefaults.BuildContextOptions(prefab);
+
+            var tracker = SOSController.Instance.Tracker;
+            var options = new List<ContextMenuOption>();
+
+            if (item.FabricationRecipes.Count == 1)
+            {
+                var single = PrefabResolver.GetFabricationRecipe(item);
+                options.Add(new ContextMenuOption(tracker.GetStringTrackToHUD(single).Value, isEnabled: true, () => tracker.AddOrRemoveRecipe(single)) { Tooltip = Texts.Get("sos.tracker.track-untrack.tooltip", "Track or untrack all recipes from this item.") });
+            }
+            else
+            {
+                var subs = new List<ContextMenuOption>
+                {
+                    new(
+                        tracker.ContainsAnyRecipes(item)
+                            ? Texts.Get("sos.window.remove_all", "Remove All")
+                            : Texts.Get("sos.window.track_all", "Track All"),
+                        isEnabled: true,
+                        tracker.ContainsAnyRecipes(item)
+                            ? () => tracker.RemoveRecipes(item)
+                            : () => tracker.AddRecipes(item))
+                };
+
+                foreach (var (id, recipe) in item.FabricationRecipes)
+                {
+                    bool tracked = tracker.ContainsRecipe(recipe);
+                    subs.Add(new ContextMenuOption(
+                        $"{GUIRecipeTracker.GetTrackOrUntrack(!tracked)} {recipe.DisplayName}",
+                        isEnabled: true, () => tracker.AddOrRemoveRecipe(recipe))
+                    { Tooltip = recipe.GetRequirementsToString() });
+                }
+
+                options.Add(new ContextMenuOption(
+                    Texts.Get("sos.context.track_recipe", "Add to HUD").Value,
+                    isEnabled: true, [.. subs]));
+            }
+
+            options.AddRange(PrefabDefaults.BuildContextOptions(prefab));
+            return options;
+        }
 
         private static readonly Dictionary<Identifier, string> _itemSlotCache = [];
 

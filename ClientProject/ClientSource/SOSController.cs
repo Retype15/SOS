@@ -25,6 +25,7 @@ namespace SOS
         public bool HaveOldConfigFile = false;
 
         internal List<ISOSConfig> CachedConfigs { get; set; } = [];
+        internal List<ISOSPrefab> CachedPrefabProviders { get; set; } = [];
 
         private GUIRecipeTracker? _tracker;
         internal GUIRecipeTracker Tracker => _tracker ??= GUIRecipeTracker.InstantiateWithDefault();
@@ -79,10 +80,7 @@ namespace SOS
 
         public void ChangeProfile(string profileId)
         {
-            ActiveProfile?.ProfileConfig?.Save();
-            ActiveProfile?.Close();
-            ActiveProfile?.Destroy();
-            ActiveProfile = null;
+            ProfileHelper.CloseWindow();
             _windowProfileConfig.ActiveProfileId = profileId;
             ToggleUI();
         }
@@ -136,16 +134,19 @@ namespace SOS
             return;
         }
 
-        public void ToggleUI()
+        public void ToggleUI(Prefab? prefab = null)
         {
+            OnTargetSelected(prefab);
+
             if (ActiveProfile == null)
             {
                 EnsureProfileCreated();
-                ActiveProfile?.Open();
+                ActiveProfile?.Init();
                 return;
             }
 
-            ProfileHelper.ToggleWindow();
+            if (prefab != null) ProfileHelper.OpenWindow();
+            else ProfileHelper.ToggleWindow();
         }
 
         private void EnsureProfileCreated()
@@ -165,6 +166,7 @@ namespace SOS
             API.Initialize(Plugin.Instance.PluginManagementService);
 
             CachedConfigs = [.. API.CreateConfigs()];
+            CachedPrefabProviders = [.. API.CreatePrefabProviders()];
             ActiveProfile = API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
 
             LoadSettings();
@@ -173,12 +175,12 @@ namespace SOS
         private void CloseSOS()
         {
             if (ActiveProfile == null) return;
-
             SaveSettings();
-            ActiveProfile.Close();
-            ActiveProfile.Destroy();
+            ActiveProfile.ProfileConfig?.Save();
+            ActiveProfile.Dispose();
             ActiveProfile = null;
             CachedConfigs.Clear();
+            CachedPrefabProviders.Clear();
         }
 
         public void Update()
@@ -198,8 +200,7 @@ namespace SOS
                         CrossThread.RequestExecutionOnMainThread(() =>
                         {
                             Prefab? detected = GetPrefabUnderMouse();
-                            OnTargetSelected(detected);
-                            ToggleUI();
+                            ToggleUI(detected);
                         });
                     }
                 }
@@ -276,10 +277,6 @@ namespace SOS
                     // Any direct
                     if (curr.UserData is Prefab prefab) return prefab;
 
-                    // Specific
-                    if (curr.UserData is Item item) return item.Prefab;
-                    if (curr.UserData is Affliction affliction) return affliction.Prefab;
-
                     // Shop
                     if (curr.UserData is PurchasedItem purchasedItem) return purchasedItem.ItemPrefab;
                     if (curr.UserData is FabricationRecipe recipe) return recipe.TargetItem;
@@ -323,8 +320,8 @@ namespace SOS
             _windowProfileConfig = null!;
 
             SOS.Prefabs.Item.ItemPrefabProvider.Destroy();
-            ActiveProfile?.Close();
-            ActiveProfile?.Destroy();
+            ProfileHelper.CloseWindow();
+            ActiveProfile?.Dispose();
             ActiveProfile = null;
 
             GC.SuppressFinalize(this);

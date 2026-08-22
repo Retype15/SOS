@@ -253,6 +253,8 @@ namespace SOS
 
         internal static IEnumerable<ISOSConfig> CreateConfigs() => _configFactories.Create();
 
+        public static ISOSConfig? GetConfig(string id) => _configFactories.Get(id);
+
         #endregion
 
         #region Prefab Providers
