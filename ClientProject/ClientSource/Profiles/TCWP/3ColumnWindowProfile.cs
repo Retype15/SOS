@@ -288,20 +288,25 @@ namespace SOS.Profiles.TCWP
             mainFrame.TopBar.Visible = false;
             ApplySavedSizeAndPosition();
 
-            loadingFrame = new GUIFrame(new RectTransform(Vector2.One, mainFrame.RectTransform, Anchor.Center), style: "InnerFrame") { Color = Color.Black * 0.5f };
+            loadingFrame = new GUIFrame(new RectTransform(Vector2.One, mainFrame.RectTransform, Anchor.Center), style: "InnerFrame")
+            {
+                Color = Color.Black * 0.5f,
+                CanBeFocused = false
+            };
 
             var imgPath = $"{Plugin.Instance.Package.Dir}/Content/SOS_LOGO_TEXT.png";
             if (File.Exists(imgPath) && LuaCsFile.CanReadFromPath(imgPath))
             {
                 var sprite = new Sprite(imgPath, Vector2.One);
-                logoImage = new GUIImage(new RectTransform(new Vector2(0.8f, 0.6f), loadingFrame.RectTransform, Anchor.Center), sprite: sprite, scaleToFit: true);
+                logoImage = new GUIImage(new RectTransform(new Vector2(0.8f, 0.6f), loadingFrame.RectTransform, Anchor.Center), sprite: sprite, scaleToFit: true)
+                { CanBeFocused = false };
                 logoImage.ExFadeIn(duration: 0.5f, targetFactor: 0.8f, alsoChildren: true);
             }
 
             loadingText = new GUITextBlock(new RectTransform(new Vector2(0.9f, 0.2f), loadingFrame.RectTransform, Anchor.BottomCenter)
             { AbsoluteOffset = new Point(0, -30) },
             Texts.Get("sos.window.loading", "Loading dependencies..."),
-            font: GUIStyle.LargeFont, textAlignment: Alignment.Center, wrap: true);
+            font: GUIStyle.LargeFont, textAlignment: Alignment.Center, wrap: true) { CanBeFocused = false };
 
             loadingText.Wait(0.5f).ExFadeIn(duration: 0.5f);
             _state = ProfileState.Loading;
