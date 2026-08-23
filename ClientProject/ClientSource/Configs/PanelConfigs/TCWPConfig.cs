@@ -16,7 +16,7 @@ using static SOS.Profiles.TCWP.ThreeColumnWindowProfile;
 namespace SOS.Configs.TCWP
 {
     //MARK: TCWPConfig
-    internal sealed class TCWPConfig : Configs.ConfigDirtySaver, ISOSConfig
+    internal sealed class TCWPConfig : ConfigDirtySaver, ISOSConfig
     {
         public string Id => "SOS.Profile.Default3Column.Config";
         public double Order => 0;
@@ -34,6 +34,7 @@ namespace SOS.Configs.TCWP
             WindowPosition = new(_windowPositionX.Value, _windowPositionY.Value);
             LeftPanelWidth = _leftPanelWidth.Value;
             RightPanelWidth = _rightPanelWidth.Value;
+            IsMaximized = _isMaximized.Value;
             CustomLayouts.Clear();
             CustomLayouts.AddRange<string, TPLayout>(WindowConfigHelper.XmlToLayouts(_customLayoutsRaw.Value));
             _loaded = true;
@@ -45,6 +46,7 @@ namespace SOS.Configs.TCWP
             _windowSizeY.SetIfNotEqual(WindowSize.Y);
             _windowPositionX.SetIfNotEqual(WindowPosition.X);
             _windowPositionY.SetIfNotEqual(WindowPosition.Y);
+            _isMaximized.SetIfNotEqual(IsMaximized);
             _customLayoutsRaw.SetIfNotEqual(WindowConfigHelper.LayoutsToXml(CustomLayouts));
 
             SaveChanges();
@@ -54,8 +56,15 @@ namespace SOS.Configs.TCWP
         {
             _windowSize = null;
             _windowPosition = null;
-            LeftPanelWidth = _leftPanelWidth.DefaultValue;
-            RightPanelWidth = _rightPanelWidth.DefaultValue;
+            _windowSizeX.SetIfNotEqual(_windowSizeX.DefaultValue);
+            _windowSizeY.SetIfNotEqual(_windowSizeY.DefaultValue);
+            _windowPositionX.SetIfNotEqual(_windowPositionX.DefaultValue);
+            _windowPositionY.SetIfNotEqual(_windowPositionY.DefaultValue);
+            _leftPanelWidth.SetIfNotEqual(_leftPanelWidth.DefaultValue);
+            _rightPanelWidth.SetIfNotEqual(_rightPanelWidth.DefaultValue);
+            _isMaximized.SetIfNotEqual(_isMaximized.DefaultValue);
+            _customLayoutsRaw.SetIfNotEqual(_customLayoutsRaw.DefaultValue);
+            CustomLayouts.Clear();
         }
 
         public bool DrawSettings(GUIListBox container)
@@ -86,6 +95,8 @@ namespace SOS.Configs.TCWP
             l.Button(Texts.Get("sos.layout.save", "Save ACTUAL").Value, SaveCurrentLayout, tooltip: Texts.Get("sos.layout.save_tooltip", "Saves the current panel layout as a new preset.").Value);
 
             l.Separator();
+            l.ButtonToResetSection(this);
+
             return true;
         }
 
@@ -148,6 +159,7 @@ namespace SOS.Configs.TCWP
         private readonly ISettingBase<int> _windowPositionY;
         private readonly ISettingBase<int> _leftPanelWidth;
         private readonly ISettingBase<int> _rightPanelWidth;
+        private readonly ISettingBase<bool> _isMaximized;
         private readonly ISettingBase<string> _customLayoutsRaw;
 
         private Point? _windowSize;
@@ -158,6 +170,7 @@ namespace SOS.Configs.TCWP
 
         internal int LeftPanelWidth { get => _leftPanelWidth.Value; set => _leftPanelWidth.SetIfNotEqual(value); }
         internal int RightPanelWidth { get => _rightPanelWidth.Value; set => _rightPanelWidth.SetIfNotEqual(value); }
+        internal bool IsMaximized { get => _isMaximized.Value; set => _isMaximized.SetIfNotEqual(value); }
 
         public TCWPConfig()
         {
@@ -167,6 +180,7 @@ namespace SOS.Configs.TCWP
             TryInitConfig("ThreeColumnWindowPositionY", out _windowPositionY);
             TryInitConfig("ThreeColumnLeftPanelWidth", out _leftPanelWidth);
             TryInitConfig("ThreeColumnRightPanelWidth", out _rightPanelWidth);
+            TryInitConfig("ThreeColumnIsMaximized", out _isMaximized);
             TryInitConfig("ThreeColumnCustomLayouts", out _customLayoutsRaw);
         }
     }

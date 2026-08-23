@@ -24,8 +24,7 @@ namespace SOS
 
         public bool HaveOldConfigFile = false;
 
-        internal List<ISOSConfig> CachedConfigs { get; set; } = [];
-        internal List<ISOSPrefab> CachedPrefabProviders { get; set; } = [];
+
 
         private GUIRecipeTracker? _tracker;
         internal GUIRecipeTracker Tracker => _tracker ??= GUIRecipeTracker.InstantiateWithDefault();
@@ -165,8 +164,6 @@ namespace SOS
 
             API.Initialize(Plugin.Instance.PluginManagementService);
 
-            CachedConfigs = [.. API.CreateConfigs()];
-            CachedPrefabProviders = [.. API.CreatePrefabProviders()];
             ActiveProfile = API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
 
             LoadSettings();
@@ -179,8 +176,7 @@ namespace SOS
             ActiveProfile.ProfileConfig?.Save();
             ActiveProfile.Dispose();
             ActiveProfile = null;
-            CachedConfigs.Clear();
-            CachedPrefabProviders.Clear();
+            API.ClearCache();
         }
 
         public void Update()
@@ -242,15 +238,15 @@ namespace SOS
             ProfileHelper._settingsWindow?.AddToGUIUpdateList(order: 1);
         }
 
-        public void SaveSettings()
+        public static void SaveSettings()
         {
-            foreach (var config in CachedConfigs)
+            foreach (var config in API.GetAllConfigs())
                 config.Save();
         }
 
-        public void LoadSettings()
+        public static void LoadSettings()
         {
-            foreach (var config in CachedConfigs)
+            foreach (var config in API.GetAllConfigs())
                 config.Load();
         }
 

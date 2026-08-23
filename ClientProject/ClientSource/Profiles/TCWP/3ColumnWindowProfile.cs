@@ -17,29 +17,19 @@ using BGUI = Barotrauma.GUI;
 namespace SOS.Profiles.TCWP
 {
     [AutoRegister]
-    internal sealed class ThreeColumnWindowProfile : ISOSWindowProfile
+    internal sealed class ThreeColumnWindowProfile : GUIWindow, ISOSWindowProfile
     {
         public string Id => "SOS.Profile.Default3Column";
         public double Order => 0;
 
-        private Configs.TCWP.TCWPConfig? _config;
-        public ISOSConfig? ProfileConfig => _config ??= new();
+        private Configs.TCWP.TCWPConfig? config;
+        public ISOSConfig ProfileConfig => config ??= new();
 
         private bool _windowEventsRegistered;
-
-        private enum ProfileState { Loading, Ready }
-        private ProfileState _state = ProfileState.Loading;
 
         #region Vars
 
         // Root
-        private GUIWindow? mainFrame;
-        private GUIFrame? contentArea;
-        private GUIFrame? loadingFrame;
-        private GUIImage? logoImage;
-        private GUITextBlock? loadingText;
-
-        // Left panel
         private GUIResizableFrame? leftPanel;
         private GUIFrame? leftContainer;
         private GUIListBox? itemList;
@@ -87,41 +77,53 @@ namespace SOS.Profiles.TCWP
         // Misc
         private GUIFrame? layoutMenuFrame;
         private Prefab? _currentItem;
+        private static bool needsShowLogo = true;
 
         #endregion
 
+        public ThreeColumnWindowProfile() : base(
+            new RectTransform(new Vector2(0.95f, 0.9f), BGUI.Canvas, Anchor.TopLeft),
+            Texts.Get("sos.window.title", "SOS - Recipe Browser"),
+            style: "CircuitBoxFrame",
+            color: Color.Black * 0.85f,
+            buttons: WindowButtons.All)
+        {
+            RectTransform.MinSize = new Point(400, 200);
+            AllowedDirections = ResizeDirection.All;
+        }
+
         public void Init()
         {
-            if (mainFrame != null) return;
-
             if (!_windowEventsRegistered)
             {
                 API.On(CommKeys.ToggleWindow, OnToggleWindow);
                 API.On(CommKeys.OpenWindow, OnOpenWindow);
+                API.On<Prefab?>(CommKeys.SelectTarget, OnTargetChangedHandler);
+                API.On<string>(CommKeys.SetSearchFilter, OnSetSearchFilter);
+                API.On<TPLayout>(CommKeys.ApplyLayout, OnApplyLayout);
+                API.On(CommKeys.RefreshSearch, RefreshSearch);
+
                 _windowEventsRegistered = true;
             }
 
-            API.On<Prefab?>(CommKeys.SelectTarget, OnTargetChangedHandler);
-            API.On<string>(CommKeys.SetSearchFilter, OnSetSearchFilter);
-            API.On<TPLayout>(CommKeys.ApplyLayout, OnApplyLayout);
-            API.On(CommKeys.RefreshSearch, RefreshSearch);
+            ProfileConfig.Load();
+            ApplySavedSizeAndPosition();
+            BuildMainUI();
 
-            if (!ProfileHelper.DataInitialized)
+            if (needsShowLogo)
             {
-                RecipeAnalyzer.Initialize();
                 BuildLoadingUI();
+                needsShowLogo = false;
             }
-            else
-                BuildMainUIAndShow();
+
+            Mode = config!.IsMaximized ? WindowMode.Fullscreen : WindowMode.Windowed;
         }
 
         private void OnToggleWindow()
         {
-            if (mainFrame == null) return;
-
-            if (mainFrame.WindowState == WState.Minimized)
+            if (!Visible)
             {
-                mainFrame.WindowState = WState.Normal;
+                Visible = true;
                 return;
             }
 
@@ -130,41 +132,31 @@ namespace SOS.Profiles.TCWP
 
         private void OnOpenWindow()
         {
-            if (mainFrame == null) return;
-
-            if (mainFrame.WindowState == WState.Minimized)
-                mainFrame.WindowState = WState.Normal;
+            if (!Visible)
+                Visible = true;
         }
 
         public void Update()
         {
-            if (_state == ProfileState.Loading && ProfileHelper.DataInitialized)
+            if (!Visible) return;
+
+            UpdateLayout();
+            HandleSearchDebounce();
+
+            if (itemList != null && itemsLoaded < allFilteredTargets.Count && !isUpdating)
             {
-                TransitionToMainUI();
+                int total = allFilteredTargets.Count;
+                int currentIndex = (int)(itemList.ScrollBar.BarScroll * (total - 1));
+                if (currentIndex >= total - 5) LoadNextChunk();
             }
 
-            if (mainFrame == null) return;
-
-            if (_state == ProfileState.Ready)
+            if (layoutMenuFrame != null && PlayerInput.PrimaryMouseButtonClicked())
             {
-                UpdateLayout();
-                HandleSearchDebounce();
-
-                if (itemList != null && itemsLoaded < allFilteredTargets.Count && !isUpdating)
+                bool overButton = BGUI.MouseOn is GUIButton;
+                if (!layoutMenuFrame.IsParentOf(BGUI.MouseOn) && BGUI.MouseOn != layoutMenuFrame && !overButton)
                 {
-                    int total = allFilteredTargets.Count;
-                    int currentIndex = (int)(itemList.ScrollBar.BarScroll * (total - 1));
-                    if (currentIndex >= total - 5) LoadNextChunk();
-                }
-
-                if (layoutMenuFrame != null && PlayerInput.PrimaryMouseButtonClicked())
-                {
-                    bool overButton = BGUI.MouseOn is GUIButton;
-                    if (!layoutMenuFrame.IsParentOf(BGUI.MouseOn) && BGUI.MouseOn != layoutMenuFrame && !overButton)
-                    {
-                        mainFrame.RemoveChild(layoutMenuFrame);
-                        layoutMenuFrame = null;
-                    }
+                    RemoveChild(layoutMenuFrame);
+                    layoutMenuFrame = null;
                 }
             }
         }
@@ -185,22 +177,20 @@ namespace SOS.Profiles.TCWP
             if (centerTabWidget is IDisposable d) d.Dispose();
             centerTabWidget = null;
 
-            if (mainFrame?.RectTransform != null)
-                mainFrame.RectTransform.Parent = null;
+            if (RectTransform != null)
+                RectTransform.Parent = null;
 
-            mainFrame = null;
             itemList = null;
             searchBox = null;
             metaPanel = null;
-            _config = null;
-            _state = ProfileState.Loading;
+            config = null;
         }
 
         private void OnTargetChangedHandler(Prefab? target)
         {
             if (target == null) return;
             _currentItem = target;
-            if (mainFrame == null || detailsHeader == null || centerTabWidget == null || metaPanel == null) return;
+            if (detailsHeader == null || centerTabWidget == null || metaPanel == null) return;
 
             metaPanel.Content.ClearChildren();
             detailsHeader.ClearChildren();
@@ -277,28 +267,12 @@ namespace SOS.Profiles.TCWP
 
         private void BuildLoadingUI()
         {
-            if (mainFrame != null) return;
-
-            mainFrame = new GUIWindow(
-                new RectTransform(new Vector2(0.95f, 0.9f), BGUI.Canvas, Anchor.TopLeft),
-                Texts.Get("sos.window.title", "SOS - Recipe Browser"),
-                style: "CircuitBoxFrame",
-                color: Color.Black * 0.85f,
-                buttons: WindowButtons.All)
-            {
-                RectTransform = { MinSize = new Point(400, 200) },
-                AllowedDirections = ResizeDirection.All
-            };
-
-            mainFrame.TopBar.Visible = false;
-            ApplySavedSizeAndPosition();
-
-            loadingFrame = new GUIFrame(new RectTransform(Vector2.One, mainFrame.RectTransform, Anchor.Center), style: "InnerFrame")
+            var loadingFrame = new GUIFrame(new RectTransform(Vector2.One, RectTransform, Anchor.Center), style: "InnerFrame")
             {
                 Color = Color.Black * 0.5f,
                 CanBeFocused = false
             };
-
+            GUIImage? logoImage = null;
             var imgPath = $"{Plugin.Instance.Package.Dir}/Content/SOS_LOGO_TEXT.png";
             if (File.Exists(imgPath) && LuaCsFile.CanReadFromPath(imgPath))
             {
@@ -308,96 +282,51 @@ namespace SOS.Profiles.TCWP
                 logoImage.ExFadeIn(duration: 0.5f, targetFactor: 0.8f, alsoChildren: true);
             }
 
-            loadingText = new GUITextBlock(new RectTransform(new Vector2(0.9f, 0.2f), loadingFrame.RectTransform, Anchor.BottomCenter)
-            { AbsoluteOffset = new Point(0, -30) },
-            Texts.Get("sos.window.loading", "Loading dependencies..."),
-            font: GUIStyle.LargeFont, textAlignment: Alignment.Center, wrap: true)
-            { CanBeFocused = false };
-
-            loadingText.Wait(0.5f).ExFadeIn(duration: 0.5f);
-            _state = ProfileState.Loading;
-        }
-
-        private void TransitionToMainUI()
-        {
-            if (mainFrame == null) return;
-
-            loadingText?.Wait(0.5f)
-                .Execute(() => loadingText?.SetRichText(Texts.Get("sos.window.loading.complete", "Loading complete!").SetColor(Color.LightGreen)))
-                .WaitFinish()
-                .ExBlink(duration: 4.0f, minAlpha: 0.0f, maxAlpha: 0.6f, interval: 1.0f, alsoChildren: true).WaitFinish()
-                .ExFadeOut(0.5f)
-                .Execute(() => loadingText = null);
-
-            var logo = logoImage;
-            logoImage = null;
-
-            loadingFrame?
+            loadingFrame
                 .Wait(0.5f)
                 .ExFadeOut(duration: 0.5f, targetFactor: 0.6f, alsoChildren: true)
-                .Wait(4.0f)
-                .ExFadeOut(duration: 1.0f, alsoChildren: true)
+                .Wait(2.0f)
+                .ExFadeOut(duration: 0.5f, alsoChildren: true)
                 .WaitFinish()
                 .Execute(() =>
                 {
                     if (loadingFrame != null)
                     {
-                        logo?.Parent?.RemoveChild(logo);
-                        mainFrame?.RemoveChild(loadingFrame);
+                        logoImage?.Parent?.RemoveChild(logoImage);
+                        RemoveChild(loadingFrame);
                         loadingFrame = null;
+                        logoImage = null;
                     }
                 });
 
-            BuildMainUI();
-            _state = ProfileState.Ready;
-
-            mainFrame.TopBar.Visible = true;
-            mainFrame.TopBar.ExFadeIn(duration: 1.0f, alsoChildren: false);
-            contentArea?.SetAlpha(0.0f);
-            contentArea?.ExFadeIn(duration: 1.0f, targetFactor: 1.0f, alsoChildren: true);
+            var duration = 1.2f;
+            this.ExFadeIn(duration, alsoChildren: false);
+            TopBar.ExFadeIn(duration, alsoChildren: true);
+            ContentArea.ExFadeIn(duration, alsoChildren: true);
+            //leftPanel?.ExFadeIn(duration, alsoChildren: true);
+            //rightPanel?.ExFadeIn(duration, alsoChildren: true);
+            //centerPanel?.ExFadeIn(duration, alsoChildren: true);
         }
 
         private void ApplySavedSizeAndPosition()
         {
-            if (mainFrame == null) return;
-            var cfg = _config;
-            if (cfg == null) return;
+            if (config == null) return;
 
-            mainFrame.RectTransform.NonScaledSize = cfg.WindowSize;
+            RectTransform.NonScaledSize = config.WindowSize;
 
-            var wp = cfg.WindowPosition;
+            var wp = config.WindowPosition;
             if (wp.X >= 0 && wp.Y >= 0)
-                mainFrame.RectTransform.AbsoluteOffset = wp;
+                RectTransform.AbsoluteOffset = wp;
             else
             {
-                int cx = (GameMain.GraphicsWidth / 2) - (mainFrame.Rect.Width / 2);
-                int cy = (GameMain.GraphicsHeight / 2) - (mainFrame.Rect.Height / 2);
-                mainFrame.RectTransform.AbsoluteOffset = new Point(cx, cy);
+                int cx = (GameMain.GraphicsWidth / 2) - (Rect.Width / 2);
+                int cy = (GameMain.GraphicsHeight / 2) - (Rect.Height / 2);
+                RectTransform.AbsoluteOffset = new Point(cx, cy);
             }
-        }
-
-        private void BuildMainUIAndShow()
-        {
-            mainFrame = new GUIWindow(
-                new RectTransform(new Vector2(0.95f, 0.9f), BGUI.Canvas, Anchor.TopLeft),
-                Texts.Get("sos.window.title", "SOS - Recipe Browser"),
-                style: "CircuitBoxFrame",
-                color: Color.Black * 0.85f,
-                buttons: WindowButtons.All)
-            {
-                RectTransform = { MinSize = new Point(400, 200) },
-                AllowedDirections = ResizeDirection.All
-            };
-
-            ApplySavedSizeAndPosition();
-            BuildMainUI();
-            _state = ProfileState.Ready;
         }
 
         private void BuildMainUI()
         {
-            if (mainFrame == null) return;
-
             leftPanelMode = DisplayMode.Normal;
             centerPanelMode = DisplayMode.Normal;
             rightPanelMode = DisplayMode.Normal;
@@ -408,12 +337,12 @@ namespace SOS.Profiles.TCWP
             searchExecutionTime = 0;
             layoutMenuFrame = null;
 
-            btnSettings = ProfileHelper.CreateSettingsButton(mainFrame.ToolBox.RectTransform);
-            (btnBack, btnForward) = ProfileHelper.CreateNavigationButtons(mainFrame.ToolBox.RectTransform);
+            btnSettings = ProfileHelper.CreateSettingsButton(ToolBox.RectTransform);
+            (btnBack, btnForward) = ProfileHelper.CreateNavigationButtons(ToolBox.RectTransform);
 
             var ctrl = SOSController.Instance;
             var text = Texts.Get("sos.window.manage_hud", "MANAGE HUD");
-            _ = new GUIButton(new RectTransform(new Point(text.Length * 12, 32), mainFrame.ControlBox.RectTransform, isFixedSize: true), text, style: "DeviceButton")
+            _ = new GUIButton(new RectTransform(new Point(text.Length * 12, 32), ControlBox.RectTransform, isFixedSize: true), text, style: "DeviceButton")
             {
                 OnClicked = (_, _) =>
                 {
@@ -424,20 +353,18 @@ namespace SOS.Profiles.TCWP
                 ToolTip = Texts.Get("sos.window.manage_hud_tooltip", "Manage tracked recipes on the HUD").Value
             };
 
-            _ = new GUIButton(new RectTransform(new Point(32, 32), mainFrame.ControlBox.RectTransform, isFixedSize: true), "o", style: "DeviceButton")
+            _ = new GUIButton(new RectTransform(new Point(32, 32), ControlBox.RectTransform, isFixedSize: true), "o", style: "DeviceButton")
             {
                 OnClicked = (_, _) => { ctrl.Tracker.ToggleTracker(); return true; },
                 ToolTip = Texts.Get("sos.window.toggle_tracker_tooltip", "Toggle HUD tracker (Ctrl+[key])").Value.Replace("[key]", ctrl.cfg.SOSOpenKey.Key.ToString())
             };
 
-            mainFrame.SetControlBoxContentWidth();
+            SetControlBoxContentWidth();
 
-            mainFrame.OnClose += ProfileHelper.CloseWindow;
-
-            contentArea = mainFrame.ContentArea;
+            OnClose += ProfileHelper.CloseWindow;
 
             // Left panel
-            leftPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.20f, 1f), contentArea.RectTransform, Anchor.TopLeft), style: "InnerFrame")
+            leftPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.20f, 1f), ContentArea.RectTransform, Anchor.TopLeft), style: "InnerFrame")
             {
                 AllowedDirections = ResizeDirection.Right,
                 IsFixed = true,
@@ -445,8 +372,8 @@ namespace SOS.Profiles.TCWP
                 RectTransform = { MinSize = new Point(20, 50), MaxSize = new Point(500, 2000) }
             };
 
-            if (_config != null && _config.LeftPanelWidth > 0)
-                leftPanel.RectTransform.NonScaledSize = new Point(_config.LeftPanelWidth, 0);
+            if (config != null && config.LeftPanelWidth > 0)
+                leftPanel.RectTransform.NonScaledSize = new Point(config.LeftPanelWidth, 0);
 
             leftContainer = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.98f), leftPanel.RectTransform, Anchor.Center), style: null);
             var leftLayout = new GUILayoutGroup(new RectTransform(Vector2.One, leftContainer.RectTransform)) { Stretch = true, RelativeSpacing = 0.01f };
@@ -486,7 +413,7 @@ namespace SOS.Profiles.TCWP
             };
 
             // Center panel
-            centerPanel = new GUIFrame(new RectTransform(new Vector2(0.52f, 1f), contentArea.RectTransform, Anchor.TopLeft), style: null)
+            centerPanel = new GUIFrame(new RectTransform(new Vector2(0.52f, 1f), ContentArea.RectTransform, Anchor.TopLeft), style: null)
             { RectTransform = { MinSize = new Point(200, 50) } };
 
             var centerLayout = new GUILayoutGroup(new RectTransform(Vector2.One, centerPanel.RectTransform)) { Stretch = true, RelativeSpacing = 0.01f };
@@ -499,11 +426,11 @@ namespace SOS.Profiles.TCWP
 
             centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform));
 
-            prefabProviders = [.. SOSController.Instance.CachedPrefabProviders];
+            prefabProviders = [.. API.GetAllPrefabProviders()];
             prefabHeaders = prefabProviders.ToDictionary(p => p.PrefabType, p => p.Header);
 
             // Right panel
-            rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), contentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
+            rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), ContentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
             {
                 AllowedDirections = ResizeDirection.Left,
                 IsFixed = true,
@@ -511,8 +438,8 @@ namespace SOS.Profiles.TCWP
                 RectTransform = { MinSize = new Point(20, 50), MaxSize = new Point(1000, 2000) }
             };
 
-            if (_config != null && _config.RightPanelWidth > 0)
-                rightPanel.RectTransform.NonScaledSize = new Point(_config.RightPanelWidth, 0);
+            if (config != null && config.RightPanelWidth > 0)
+                rightPanel.RectTransform.NonScaledSize = new Point(config.RightPanelWidth, 0);
 
             rightContainer = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.98f), rightPanel.RectTransform, Anchor.Center), style: null);
             var rightLayout = new GUILayoutGroup(new RectTransform(Vector2.One, rightContainer.RectTransform)) { Stretch = true };
@@ -747,9 +674,9 @@ namespace SOS.Profiles.TCWP
 
         private void UpdateLayout()
         {
-            if (mainFrame == null || contentArea == null || leftPanel == null || rightPanel == null || centerPanel == null) return;
+            if (leftPanel == null || rightPanel == null || centerPanel == null) return;
 
-            Rectangle areaRect = contentArea.Rect;
+            Rectangle areaRect = ContentArea.Rect;
             if (areaRect.Width <= 0) return;
 
             int spacing = (int)(areaRect.Width * 0.015f);
@@ -790,15 +717,16 @@ namespace SOS.Profiles.TCWP
             if (needsRightRefresh) { rightPanelMode = newRightMode; if (rightContainer != null) rightContainer.Visible = rightPanelMode != DisplayMode.Hidden; if (_currentItem != null) OnTargetChangedHandler(_currentItem); }
 
             //TODO: Ver si optimizamos esto para no guardar cada frame.
-            if (_config != null && mainFrame.NormalSize != Point.Zero)
+            if (config != null && NormalSize != Point.Zero)
             {
-                _config.WindowSize = mainFrame.NormalSize;
-                _config.WindowPosition = mainFrame.NormalOffset;
-                _config.LeftPanelWidth = leftPanel.Rect.Width;
-                _config.RightPanelWidth = rightPanel.Rect.Width;
+                config.WindowSize = NormalSize;
+                config.WindowPosition = NormalOffset;
+                config.IsMaximized = Mode == WindowMode.Fullscreen;
+                config.LeftPanelWidth = leftPanel.Rect.Width;
+                config.RightPanelWidth = rightPanel.Rect.Width;
             }
 
-            mainFrame.AddToGUIUpdateList(order: 1);
+            AddToGUIUpdateList(order: 1);
         }
 
         private static DisplayMode GetModeForWidth(int width, int hiddenThreshold, int compactThreshold)
@@ -810,21 +738,20 @@ namespace SOS.Profiles.TCWP
 
         public void ForceLayoutUpdate()
         {
-            if (mainFrame == null || leftPanel == null || rightPanel == null) return;
-            if (_config == null) return;
+            if (leftPanel == null || rightPanel == null) return;
+            if (config == null) return;
 
-            mainFrame.RectTransform.NonScaledSize = _config.WindowSize;
-            if (_config.WindowPosition.X >= 0 && _config.WindowPosition.Y >= 0)
-                mainFrame.RectTransform.AbsoluteOffset = _config.WindowPosition;
-            if (_config.LeftPanelWidth > 0) leftPanel.RectTransform.NonScaledSize = new Point(_config.LeftPanelWidth, leftPanel.Rect.Height);
-            if (_config.RightPanelWidth > 0) rightPanel.RectTransform.NonScaledSize = new Point(_config.RightPanelWidth, rightPanel.Rect.Height);
+            RectTransform.NonScaledSize = config.WindowSize;
+            if (config.WindowPosition.X >= 0 && config.WindowPosition.Y >= 0)
+                RectTransform.AbsoluteOffset = config.WindowPosition;
+            if (config.LeftPanelWidth > 0) leftPanel.RectTransform.NonScaledSize = new Point(config.LeftPanelWidth, leftPanel.Rect.Height);
+            if (config.RightPanelWidth > 0) rightPanel.RectTransform.NonScaledSize = new Point(config.RightPanelWidth, rightPanel.Rect.Height);
             UpdateLayout();
         }
 
         private void ForceLayoutTo(Point? windowSize, int? leftW, int? rightW)
         {
-            if (mainFrame == null) return;
-            if (windowSize != null) mainFrame.RectTransform.NonScaledSize = (Point)windowSize;
+            if (windowSize != null) RectTransform.NonScaledSize = (Point)windowSize;
             if (leftPanel != null && leftW != null && leftW >= 0) leftPanel.RectTransform.NonScaledSize = new Point((int)leftW, leftPanel.Rect.Height);
             if (rightPanel != null && rightW != null && rightW >= 0) rightPanel.RectTransform.NonScaledSize = new Point((int)rightW, rightPanel.Rect.Height);
             UpdateLayout();

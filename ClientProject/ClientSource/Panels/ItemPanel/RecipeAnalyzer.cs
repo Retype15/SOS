@@ -16,7 +16,7 @@ namespace SOS.Panels.ItemPanel
         private static readonly Dictionary<Identifier, List<(ItemPrefab Item, DeconstructItem DeconstructItem)>> sourcesCache = [];
         public static bool DataInitialized { get; private set; } = false;
 
-        public static void Initialize()
+        public static void Initialize(Action? onComplete = null)
         {
             if (!DataInitialized)
             {
@@ -24,7 +24,12 @@ namespace SOS.Panels.ItemPanel
                 {
                     RecipeAnalyzer.PrecomputeCaches();
                     DataInitialized = true;
+                    onComplete?.Invoke();
                 });
+            }
+            else
+            {
+                onComplete?.Invoke();
             }
         }
 

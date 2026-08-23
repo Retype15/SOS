@@ -8,6 +8,7 @@
 using System.Xml.Linq;
 using Barotrauma;
 using Barotrauma.LuaCs.Data;
+using Microsoft.Xna.Framework.Input;
 using SOS.Panels.AfflictionPanel;
 
 namespace SOS.Configs
@@ -63,7 +64,48 @@ namespace SOS.Configs
             SaveChanges();
         }
 
-        public void Reset() { }
+        public void Reset()
+        {
+            SOSOpenKey = new KeyOrMouse(Keys.J);
+            LastSearchQuery = "";
+            _lastItemId.SetIfNotEqual("");
+            RawXmlMode = false;
+            XmlFontScale = 1.0f;
+            TrackedRecipesRaw = "";
+            TrackerVisible = true;
+            DummyDeathCount = 0;
+            DummySimulated = false;
+            DummyCharacterXML = XElement.Parse("<Character />");
+            FavoritedItems.Clear();
+            TabHistoryRaw = "";
+
+            _currentTarget = null;
+            _dummyCharacterXML = null;
+            _favoritedItems = null;
+
+            var ctr = SOSController.Instance;
+            ctr.TabHistory.Clear();
+            ctr.Tracker.Clear();
+            ctr.Tracker.Visible = TrackerVisible;
+        }
+
+        public bool DrawSettings(GUIListBox container)
+        {
+            using var l = new SOS.GUI.GUILayoutBuilder(container);
+            l.Header("CORE SETTINGS", Microsoft.Xna.Framework.Color.Gold);
+            l.Separator();
+            l.Button(
+                Texts.Get("sos.config.reset_section", "Reset Section Defaults").Value,
+                onClick: () =>
+                {
+                    Reset();
+                    Save();
+                    Profiles.ProfileHelper.RefreshSettings();
+                },
+                style: "GUIButtonSmall",
+                color: Microsoft.Xna.Framework.Color.IndianRed * 0.8f);
+            return true;
+        }
 
         private readonly ISettingControl _sosOpenKey;
         public KeyOrMouse SOSOpenKey { get => _sosOpenKey.Value; set => _sosOpenKey.SetIfNotEqual(value); }

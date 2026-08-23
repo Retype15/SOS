@@ -10,5 +10,6 @@
         <Setting Name="ThreeColumnLeftPanelWidth" Type="int" Value="250" ShowInMenus="false" />
         <Setting Name="ThreeColumnRightPanelWidth" Type="int" Value="300" ShowInMenus="false" />
         <Setting Name="ThreeColumnCustomLayouts" Type="string" Value="" ShowInMenus="false" />
+        <Setting Name="ThreeColumnIsMaximized" Type="bool" Value="false" ShowInMenus="false" />
     </Settings>
 </Configuration>

@@ -15,6 +15,9 @@
 	<sos.config.migrating>[SOS] Перенос настроек из старого пути...</sos.config.migrating>
 	<sos.config.save_error>[SOS] Не удалось сохранить настройки: [error]</sos.config.save_error>
 	<sos.config.saved>[SOS] Настройки сохранены (v[version]).</sos.config.saved>
+	<sos.config.reset_section>Сброс настроек раздела</sos.config.reset_section>
+	<sos.config.reset_all>СБРОСИТЬ ВСЕ</sos.config.reset_all>
+	<sos.config.reset_all_tooltip>Сбрасывает все конфигурации S.O.S. к значениям по умолчанию.</sos.config.reset_all_tooltip>
 
 	<!-- General -->
 	<sos.gen.close>Закрыть [Esc]</sos.gen.close>
@@ -101,6 +104,7 @@
 	<!-- Tabs -->
 	<sos.tab.recipes>РЕЦЕПТЫ</sos.tab.recipes>
 	<sos.tab.recipes_tooltip>Показывает рецепты создания, источники и использование предмета.</sos.tab.recipes_tooltip>
+	<sos.tab.recipes.analyzing>Анализ зависимой граф рецептов...</sos.tab.recipes.analyzing>
 	<sos.tab.simulator>СИМУЛЯТОР</sos.tab.simulator>
 	<sos.tab.simulator_tooltip>Открывает клинический симулятор для тестирования лечения и недугов на манекене.</sos.tab.simulator_tooltip>
 	<sos.tab.preview>ПРЕДПРОСМОТР</sos.tab.preview>

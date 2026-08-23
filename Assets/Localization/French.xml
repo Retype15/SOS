@@ -15,6 +15,9 @@
 	<sos.config.migrating>[SOS] Migration des paramètres depuis l'ancien chemin...</sos.config.migrating>
 	<sos.config.save_error>[SOS] Échec de la sauvegarde des paramètres : [error]</sos.config.save_error>
 	<sos.config.saved>[SOS] Paramètres sauvegardés (v[version]).</sos.config.saved>
+	<sos.config.reset_section>Réinitialiser la section par défaut</sos.config.reset_section>
+	<sos.config.reset_all>RÉINITIALISER TOUT</sos.config.reset_all>
+	<sos.config.reset_all_tooltip>Réinitialise toutes les configurations S.O.S. à leurs valeurs par défaut.</sos.config.reset_all_tooltip>
 
 	<!-- General -->
 	<sos.gen.close>Fermer [Esc]</sos.gen.close>
@@ -101,6 +104,7 @@ Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<!-- Tabs -->
 	<sos.tab.recipes>RECETTES</sos.tab.recipes>
 	<sos.tab.recipes_tooltip>Affiche les recettes de fabrication, les sources et l'utilisation de l'objet.</sos.tab.recipes_tooltip>
+	<sos.tab.recipes.analyzing>Analyse du graphique de dépendance des recettes...</sos.tab.recipes.analyzing>
 	<sos.tab.simulator>SIMULATEUR</sos.tab.simulator>
 	<sos.tab.simulator_tooltip>Ouvre le simulateur clinique pour tester traitements et affections sur un patient factice.</sos.tab.simulator_tooltip>
 	<sos.tab.preview>APERÇU</sos.tab.preview>

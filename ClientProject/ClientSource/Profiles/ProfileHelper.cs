@@ -82,6 +82,26 @@ namespace SOS.Profiles
                     _settingsWindow.OnClose += CloseSettings;
                     _settingsWindow.RectTransform.SizeChanged += OnSettingsWindowResized;
 
+                    var resetAllBtn = new GUIButton(
+                        new RectTransform(new Point(120, 32), _settingsWindow.ControlBox.RectTransform, isFixedSize: true), // TODO: Añadir medida automática por cantidad de caracteres.
+                        Texts.Get("sos.config.reset_all", "RESET ALL"),
+                        style: "DeviceButton")
+                    {
+                        Color = Color.IndianRed * 0.9f,
+                        ToolTip = Texts.Get("sos.config.reset_all_tooltip", "Resets all S.O.S. configurations to factory defaults.").Value,
+                        OnClicked = (_, _) =>
+                        {
+                            foreach (var config in API.GetAllConfigs())
+                            {
+                                config.Reset();
+                                config.Save();
+                            }
+                            ProfileHelper.RefreshSettings();
+                            return true;
+                        }
+                    };
+                    _settingsWindow.SetControlBoxContentWidth();
+
                     _contentContainer = _settingsWindow.ContentArea;
                 }
 
@@ -105,10 +125,9 @@ namespace SOS.Profiles
                 cfg.SettingsWindowSize = _settingsWindow.NormalSize;
                 cfg.SettingsWindowPosition = _settingsWindow.NormalOffset;
 
-                var configs = SOSController.Instance.CachedConfigs;
-                if (configs.Count == 0) configs = [.. API.CreateConfigs()];
+                var configs = API.GetAllConfigs();
 
-                int targetColumns = CalculateColumnCount(_contentContainer.Rect.Width, configs.Count, MinColumnWidth);
+                int targetColumns = CalculateColumnCount(_contentContainer.Rect.Width, configs.Count(), MinColumnWidth);
                 if (targetColumns != _currentColumnCount)
                 {
                     RefreshSettings();
@@ -149,7 +168,7 @@ namespace SOS.Profiles
                 Logger.LogDebugError($"[SOS] ProfileHelper.CloseSettings failed\n{ex}", level: LogLevel.Error);
             }
 
-            SOSController.Instance.SaveSettings();
+            SOSController.SaveSettings();
         }
 
         public static void RefreshSettings()
@@ -158,8 +177,7 @@ namespace SOS.Profiles
 
             try
             {
-                var configs = SOSController.Instance.CachedConfigs;
-                if (configs.Count == 0) configs = [.. API.CreateConfigs()];
+                var configs = API.GetAllConfigs();
 
                 if (_contentContainer != null)
                 {
@@ -183,13 +201,13 @@ namespace SOS.Profiles
             Logger.LogDebug("ProfileHelper.RefreshSettings: end in-place refresh", level: LogLevel.Trace);
         }
 
-        public static void DrawSettings(GUIComponent container, IReadOnlyList<ISOSConfig> configs, float minColumnWidth = MinColumnWidth)
+        public static void DrawSettings(GUIComponent container, IEnumerable<ISOSConfig> configs, float minColumnWidth = MinColumnWidth)
         {
-            if (container == null || configs == null || configs.Count == 0) return;
+            if (container == null || configs.Any()) return;
 
             try
             {
-                int colCount = CalculateColumnCount(container.Rect.Width, configs.Count, minColumnWidth);
+                int colCount = CalculateColumnCount(container.Rect.Width, configs.Count(), minColumnWidth);
                 _currentColumnCount = colCount;
 
                 var layoutGroup = new GUILayoutGroup(new RectTransform(Vector2.One, container.RectTransform), isHorizontal: true)
@@ -213,6 +231,7 @@ namespace SOS.Profiles
                     createdLists.Add(list);
                 }
 
+                _contentLists = createdLists;
                 DrawSettings(createdLists, configs);
 
                 var activeLists = createdLists.Where(l => l.Content.Children.Any()).ToList();
@@ -247,15 +266,16 @@ namespace SOS.Profiles
             DrawSettings([targetList], configs);
         }
 
-        public static void DrawSettings(IEnumerable<GUIListBox> targetLists, IReadOnlyList<ISOSConfig> configs)
+        public static void DrawSettings(IEnumerable<GUIListBox> targetLists, IEnumerable<ISOSConfig> configs)
         {
             var lists = targetLists as IList<GUIListBox> ?? [.. targetLists];
-            if (lists.Count == 0 || configs.Count == 0) return;
+            var configList = configs.ToList();
+            if (lists.Count == 0 || configList.Count == 0) return;
 
             try
             {
                 int listCount = lists.Count;
-                int totalConfigs = configs.Count;
+                int totalConfigs = configList.Count;
                 int chunkSize = (int)Math.Ceiling((double)totalConfigs / listCount);
 
                 for (int listIndex = 0; listIndex < listCount; listIndex++)
@@ -265,10 +285,10 @@ namespace SOS.Profiles
 
                     if (count <= 0) break;
 
-                    var targetList = lists[listIndex];
+                    var targetList = lists[listIndex]; // fallback or direct cast
                     for (int i = 0; i < count; i++)
                     {
-                        var config = configs[startIndex + i];
+                        var config = configList[startIndex + i];
                         config.DrawSettings(targetList);
                     }
                 }
@@ -322,7 +342,7 @@ namespace SOS.Profiles
         {
             if (target == null) return;
 
-            var options = SOSController.Instance.CachedPrefabProviders
+            var options = API.GetAllPrefabProviders()
                 .Where(p => p.PrefabType.IsAssignableFrom(target.GetType()))
                 .SelectMany(p => p.BuildContextOptions(target))
                 .ToList();

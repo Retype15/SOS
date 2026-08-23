@@ -19,11 +19,16 @@ namespace SOS
     public static class API
     {
 
+        // Factories  
         private static readonly SortedFactory<ISOSStatSection> _sectionFactories = new();
         private static readonly SortedFactory<ISOSTab> _tabFactories = new();
         private static readonly SortedFactory<ISOSConfig> _configFactories = new();
         private static readonly SortedFactory<ISOSPrefab> _prefabFactories = new();
         private static readonly SortedFactory<ISOSWindowProfile> _profileFactories = new();
+
+        // Cached Instances
+        private static readonly Dictionary<string, ISOSConfig> _cachedConfigs = [];
+        private static readonly Dictionary<string, ISOSPrefab> _cachedPrefabProviders = [];
 
         private static bool _scanned = false;
 
@@ -253,7 +258,33 @@ namespace SOS
 
         internal static IEnumerable<ISOSConfig> CreateConfigs() => _configFactories.Create();
 
-        public static ISOSConfig? GetConfig(string id) => _configFactories.Get(id);
+        public static IEnumerable<ISOSConfig> GetAllConfigs(bool refresh = false)
+        {
+            lock (_cachedConfigs)
+            {
+                if (refresh || _cachedConfigs.Count == 0)
+                {
+                    _cachedConfigs.Clear();
+                    foreach (var config in CreateConfigs())
+                        _cachedConfigs[config.Id] = config;
+                }
+                return [.. _cachedConfigs.Values];
+            }
+        }
+
+        public static ISOSConfig? GetConfig(string id, bool refresh = false)
+        {
+            lock (_cachedConfigs)
+            {
+                if (refresh || !_cachedConfigs.TryGetValue(id, out var config))
+                {
+                    config = _configFactories.Get(id);
+                    if (config != null)
+                        _cachedConfigs[id] = config;
+                }
+                return config;
+            }
+        }
 
         #endregion
 
@@ -262,6 +293,34 @@ namespace SOS
         public static bool RegisterPrefabProvider(object obj) => _prefabFactories.Register(obj);
 
         internal static IEnumerable<ISOSPrefab> CreatePrefabProviders() => _prefabFactories.Create();
+
+        public static IEnumerable<ISOSPrefab> GetAllPrefabProviders(bool refresh = false)
+        {
+            lock (_cachedPrefabProviders)
+            {
+                if (refresh || _cachedPrefabProviders.Count == 0)
+                {
+                    _cachedPrefabProviders.Clear();
+                    foreach (var prefab in CreatePrefabProviders())
+                        _cachedPrefabProviders[prefab.Id] = prefab;
+                }
+                return [.. _cachedPrefabProviders.Values];
+            }
+        }
+
+        public static ISOSPrefab? GetPrefabProvider(string id, bool refresh = false)
+        {
+            lock (_cachedPrefabProviders)
+            {
+                if (refresh || !_cachedPrefabProviders.TryGetValue(id, out var prefab))
+                {
+                    prefab = _prefabFactories.Get(id);
+                    if (prefab != null)
+                        _cachedPrefabProviders[id] = prefab;
+                }
+                return prefab;
+            }
+        }
 
         #endregion
 
@@ -454,6 +513,12 @@ namespace SOS
 
         #endregion
 
+        public static void ClearCache()
+        {
+            lock (_cachedConfigs) _cachedConfigs.Clear();
+            lock (_cachedPrefabProviders) _cachedPrefabProviders.Clear();
+        }
+
         internal static void Clear()
         {
             _sectionFactories.Clear();
@@ -462,6 +527,7 @@ namespace SOS
             _prefabFactories.Clear();
             _profileFactories.Clear();
             _scanned = false;
+            ClearCache();
             lock (_delegates) _delegates.Clear();
             lock (_state) _state.Clear();
         }

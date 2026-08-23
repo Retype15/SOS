@@ -15,6 +15,9 @@
 	<sos.config.migrating>[SOS] 正在从旧路径迁移设置...</sos.config.migrating>
 	<sos.config.save_error>[SOS] 无法保存设置：[error]</sos.config.save_error>
 	<sos.config.saved>[SOS] 设置已保存 (v[version])。</sos.config.saved>
+	<sos.config.reset_section>重置节点默认值</sos.config.reset_section>
+	<sos.config.reset_all>重置全部</sos.config.reset_all>
+	<sos.config.reset_all_tooltip>重置所有 S.O.S. 配置到默认值</sos.config.reset_all_tooltip>
 
 	<!-- General -->
 	<sos.gen.close>关闭 [Esc]</sos.gen.close>
@@ -101,6 +104,7 @@
 	<!-- Tabs -->
 	<sos.tab.recipes>配方</sos.tab.recipes>
 	<sos.tab.recipes_tooltip>显示物品的制作配方、来源和用途。</sos.tab.recipes_tooltip>
+	<sos.tab.recipes.analyzing>正在分析配方依赖图...</sos.tab.recipes.analyzing>
 	<sos.tab.simulator>模拟器</sos.tab.simulator>
 	<sos.tab.simulator_tooltip>打开临床模拟器，在假人患者身上测试治疗和病症。</sos.tab.simulator_tooltip>
 	<sos.tab.preview>预览</sos.tab.preview>

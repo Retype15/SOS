@@ -7,6 +7,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Barotrauma.LuaCs.Data;
+using Microsoft.Xna.Framework;
+using SOS.GUI;
 
 namespace SOS.Configs
 {
@@ -36,15 +38,36 @@ namespace SOS.Configs
 
     public static class ConfigHelper
     {
+        // 
+
+        public static void ButtonToResetSection(this GUILayoutBuilder l, ISOSConfig cfg, string? text = null, Action? onClick = null, string? tooltip = null, Color? color = null, string? style = null)
+        {
+            Action onClickFinal;
+            if (onClick != null) onClickFinal = onClick;
+            else onClickFinal = () =>
+            {
+                cfg.Reset();
+                cfg.Save();
+                Profiles.ProfileHelper.RefreshSettings(); //TODO: Revisar para hacer esta llamada más limpia.
+            };
+            l.Button(
+                text: text ?? Texts.Get("sos.config.reset_section", "Reset Section Defaults").Value,
+                onClick: onClickFinal,
+                tooltip: tooltip,
+                color: color ?? (Color.IndianRed * 0.8f),
+                style: style ?? "GUIButtonSmall"
+            );
+        }
+
         // ─── CSV Serialization Helpers ───
 
-        internal static HashSet<string> CsvToHashSet(string? csv)
+        public static HashSet<string> CsvToHashSet(string? csv)
         {
             if (string.IsNullOrEmpty(csv)) return [];
             return [.. csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
         }
 
-        internal static List<string> CsvToList(string? csv)
+        public static List<string> CsvToList(string? csv)
         {
             if (string.IsNullOrEmpty(csv)) return [];
             return [.. csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
@@ -52,7 +75,7 @@ namespace SOS.Configs
 
         // TryInitConfig
 
-        internal static bool TryInitConfig<T>(string name, [NotNullWhen(true)] out T setting, Action<ISettingBase>? onValueChanged = null)
+        public static bool TryInitConfig<T>(string name, [NotNullWhen(true)] out T setting, Action<ISettingBase>? onValueChanged = null)
                 where T : ISettingBase
         {
             if (!Plugin.Instance.ConfigService.TryGetConfig(Plugin.Instance.Package, name, out setting))

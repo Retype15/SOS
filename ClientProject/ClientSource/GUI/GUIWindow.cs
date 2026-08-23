@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Retype15
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
-// Code maded for AI, but revised and tested.
+// Code maded for AI, but revised and tested. (Re-Revised and edited)
 
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
@@ -21,13 +21,6 @@ namespace SOS.GUI
         MinClose = Minimize | Close,
         MaxClose = Maximize | Close,
         All = Minimize | Maximize | Close
-    }
-
-    public enum WState
-    {
-        Normal,
-        Maximized,
-        Minimized
     }
 
     /// <summary>
@@ -60,22 +53,24 @@ namespace SOS.GUI
         public event Action? OnRestore;
         public event Action? OnClose;
 
-        private WState _windowState = WState.Normal;
+        private WindowMode _mode = WindowMode.Windowed;
         private ResizeDirection _normalResizeDirections = ResizeDirection.All;
 
-        public override bool CanMove => WindowState != WState.Maximized;
+        public override bool CanMove => Mode != WindowMode.Fullscreen;
 
-        public WState WindowState
+        public WindowMode Mode
         {
-            get => _windowState;
-            set => SetState(value);
+            get => _mode;
+            set => SetMode(value);
         }
 
-        public GUIWindow(RectTransform rectT, LocalizedString titleText, string style = "InnerFrame", Color? color = null, WindowButtons buttons = WindowButtons.All)
+        public GUIWindow(RectTransform rectT, LocalizedString titleText, string style = "InnerFrame", Color? color = null, WindowButtons buttons = WindowButtons.All, WindowMode mode = WindowMode.Windowed)
             : base(rectT, style, color)
         {
             CanBeFocused = true;
             AllowedDirections = ResizeDirection.All;
+            NormalSize = RectTransform.NonScaledSize;
+            NormalOffset = RectTransform.AbsoluteOffset;
 
             try
             {
@@ -147,6 +142,8 @@ namespace SOS.GUI
 
                 RectTransform.SizeChanged += ResizeContentArea;
                 ResizeContentArea();
+
+                Mode = mode;
             }
             catch (Exception ex)
             {
@@ -215,19 +212,23 @@ namespace SOS.GUI
             RightArea.RectTransform.NonScaledSize = new Point(width, RightArea.Rect.Height);
         }
 
-        public void Open(WState forceState = WState.Normal)
+        public void Open(WindowMode forceMode = WindowMode.Windowed)
         {
             Visible = true;
-            WindowState = forceState;
+            Mode = forceMode;
         }
 
-        public void Minimize() => WindowState = WState.Minimized;
+        public void Minimize()
+        {
+            Visible = false;
+            OnMinimize?.Invoke();
+        }
 
-        public void Maximize() => WindowState = WState.Maximized;
+        public void Maximize() => Mode = WindowMode.Fullscreen;
 
-        public void Restore() => WindowState = WState.Normal;
+        public void Restore() => Mode = WindowMode.Windowed;
 
-        public void ToggleMaximize() => WindowState = WindowState == WState.Maximized ? WState.Normal : WState.Maximized;
+        public void ToggleMaximize() => Mode = Mode == WindowMode.Fullscreen ? WindowMode.Windowed : WindowMode.Fullscreen;
 
         public void Close()
         {
@@ -240,7 +241,7 @@ namespace SOS.GUI
             try
             {
                 base.Update(deltaTime);
-                if (!Visible || WindowState == WState.Maximized) return;
+                if (!Visible || Mode == WindowMode.Fullscreen) return;
 
                 NormalSize = RectTransform.NonScaledSize;
                 NormalOffset = RectTransform.AbsoluteOffset;
@@ -251,33 +252,23 @@ namespace SOS.GUI
             }
         }
 
-        private void SetState(WState newState)
+        private void SetMode(WindowMode newMode)
         {
-            if (_windowState == newState) return;
+            if (_mode == newMode) return;
 
             try
             {
-                if (_windowState == WState.Maximized && newState != WState.Maximized)
-                {
-                    ExitMaximized();
-                }
+                _mode = newMode;
 
-                _windowState = newState;
-
-                switch (_windowState)
+                switch (_mode)
                 {
-                    case WState.Minimized:
-                        Visible = false;
-                        UpdateSystemButtons();
-                        OnMinimize?.Invoke();
-                        break;
-                    case WState.Maximized:
+                    case WindowMode.Fullscreen:
                         EnterMaximized();
                         UpdateSystemButtons();
                         OnMaximize?.Invoke();
                         break;
-                    case WState.Normal:
-                        Visible = true;
+                    case WindowMode.Windowed:
+                        ExitMaximized();
                         UpdateSystemButtons();
                         OnRestore?.Invoke();
                         break;
@@ -285,7 +276,7 @@ namespace SOS.GUI
             }
             catch (Exception ex)
             {
-                Logger.LogDebugError($"[SOS] GUIWindow.SetState failed\n{ex}", level: LogLevel.Error);
+                Logger.LogDebugError($"[SOS] GUIWindow.SetMode failed\n{ex}", level: LogLevel.Error);
             }
         }
 
@@ -311,7 +302,7 @@ namespace SOS.GUI
         {
             if (MaximizeButton == null) return;
 
-            bool isMaximized = WindowState == WState.Maximized;
+            bool isMaximized = Mode == WindowMode.Fullscreen;
             MaximizeButton.Text = Texts.Get(isMaximized ? "sos.window.restore_btn" : "sos.window.maximize_btn", isMaximized ? "R" : "M");
             MaximizeButton.ToolTip = Texts.Get(isMaximized ? "sos.window.restore" : "sos.window.maximize", isMaximized ? "Restore" : "Maximize").Value;
         }

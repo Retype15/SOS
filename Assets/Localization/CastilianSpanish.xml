@@ -15,6 +15,9 @@
 	<sos.config.migrating>[SOS] Migrando configuración desde la ruta antigua...</sos.config.migrating>
 	<sos.config.save_error>[SOS] Fallo al guardar configuración: [error]</sos.config.save_error>
 	<sos.config.saved>[SOS] Configuración guardada (v[version]).</sos.config.saved>
+	<sos.config.reset_section>Restablecer Sección a Predeterminados</sos.config.reset_section>
+	<sos.config.reset_all>RESTABLECER TODO</sos.config.reset_all>
+	<sos.config.reset_all_tooltip>Restablece todas las configuraciones S.O.S. a sus valores predeterminados.</sos.config.reset_all_tooltip>
 
 	<!-- General -->
 	<sos.gen.close>Cerrar [Esc]</sos.gen.close>
@@ -101,6 +104,7 @@ Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<!-- Tabs -->
 	<sos.tab.recipes>RECETAS</sos.tab.recipes>
 	<sos.tab.recipes_tooltip>Muestra recetas de fabricación, fuentes y usos del objeto.</sos.tab.recipes_tooltip>
+	<sos.tab.recipes.analyzing>Analizando gráfico de dependencia de recetas...</sos.tab.recipes.analyzing>
 	<sos.tab.simulator>SIMULADOR</sos.tab.simulator>
 	<sos.tab.simulator_tooltip>Abre el simulador clínico para probar tratamientos y aflicciones en un paciente ficticio.</sos.tab.simulator_tooltip>
 	<sos.tab.preview>VISTA PREVIA</sos.tab.preview>

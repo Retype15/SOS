@@ -21,11 +21,44 @@ namespace SOS.Panels.ItemPanel
         private GUIListBox? _colObtain;
         private GUIListBox? _colUsage;
 
+        private Prefab? _currentPrefab;
+        private Action<Prefab>? _onPrimary;
+        private Action<Prefab>? _onSecondary;
+
         public bool CanHandle(Prefab prefab) => prefab is ItemPrefab;
 
         public void Init(GUIComponent parentContainer)
         {
             _container = new GUIFrame(new RectTransform(Vector2.One, parentContainer.RectTransform), style: null) { Visible = false };
+        }
+
+        public void Show(Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        {
+            _currentPrefab = prefab;
+            _onPrimary = onPrimary;
+            _onSecondary = onSecondary;
+
+            if (_container == null || prefab is not ItemPrefab item) return;
+            _container.Visible = true;
+
+            if (!RecipeAnalyzer.DataInitialized)
+            {
+                _container.ClearChildren();
+                _ = new GUITextBlock(new RectTransform(Vector2.One, _container.RectTransform), Texts.Get("sos.tab.recipes.analyzing", "Analyzing recipe dependency graph..."), font: GUIStyle.SubHeadingFont, textAlignment: Alignment.Center);
+                RecipeAnalyzer.Initialize(onComplete: () =>
+                {
+                    CrossThread.RequestExecutionOnMainThread(() =>
+                    {
+                        if (_container != null && _container.Visible && _currentPrefab != null)
+                        {
+                            Show(_currentPrefab, _onPrimary!, _onSecondary!);
+                        }
+                    });
+                });
+                return;
+            }
+
+            _container.ClearChildren();
 
             var recipeSplit = new GUILayoutGroup(new RectTransform(Vector2.One, _container.RectTransform), isHorizontal: true)
             {
@@ -42,16 +75,6 @@ namespace SOS.Panels.ItemPanel
             var usageContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), usageContainer.RectTransform), Texts.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
             _colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: null) { Spacing = 5, Color = Color.Black * 0.2f };
-
-
-        }
-
-        public void Show(Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
-            if (_container == null || !RecipeAnalyzer.DataInitialized || _colObtain == null || _colUsage == null || prefab is not ItemPrefab item) return;
-            _container.Visible = true;
-            _colObtain.Content.ClearChildren();
-            _colUsage.Content.ClearChildren();
 
             var craft = RecipeAnalyzer.GetCraftingRecipes(item);
             var decon = RecipeAnalyzer.GetDeconstructionOutputs(item);

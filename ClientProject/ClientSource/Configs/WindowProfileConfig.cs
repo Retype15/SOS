@@ -48,6 +48,17 @@ namespace SOS.Configs
             SOSController.Instance.ActiveProfile?.ProfileConfig?.Save();
         }
 
+        public void Reset()
+        {
+            ActiveProfileId = "SOS.Profile.Default3Column";
+            _settingsWindowSizeX.SetIfNotEqual(_settingsWindowSizeX.DefaultValue);
+            _settingsWindowSizeY.SetIfNotEqual(_settingsWindowSizeY.DefaultValue);
+            _settingsWindowPositionX.SetIfNotEqual(_settingsWindowPositionX.DefaultValue);
+            _settingsWindowPositionY.SetIfNotEqual(_settingsWindowPositionY.DefaultValue);
+            _settingsWindowSize = null;
+            _settingsWindowPosition = null;
+        }
+
         public bool DrawSettings(GUIListBox container)
         {
             using var l = new GUILayoutBuilder(container);
@@ -69,6 +80,10 @@ namespace SOS.Configs
             l.Separator();
 
             SOSController.Instance.ActiveProfile?.ProfileConfig?.DrawSettings(container);
+
+            l.Separator();
+            l.ButtonToResetSection(this);
+
             return true;
         }
 
