@@ -172,6 +172,8 @@ namespace SOS.Profiles.TCWP
             API.Off<TPLayout>(CommKeys.ApplyLayout, OnApplyLayout);
             API.Off(CommKeys.RefreshSearch, RefreshSearch);
 
+            SaveSettings();
+
             ClinicalSimulatorManager.Destroy();
 
             if (centerTabWidget is IDisposable d) d.Dispose();
@@ -184,6 +186,21 @@ namespace SOS.Profiles.TCWP
             searchBox = null;
             metaPanel = null;
             config = null;
+        }
+
+        private void SaveSettings()
+        {
+            if (config != null)
+            {
+                config.WindowSize = NormalSize;
+                config.WindowPosition = NormalOffset;
+                config.IsMaximized = Mode == WindowMode.Fullscreen;
+                if (leftPanel != null) config.LeftPanelWidth = leftPanel.Rect.Width;
+                if (rightPanel != null) config.RightPanelWidth = rightPanel.Rect.Width;
+
+                config.Save();
+                Logger.LogDebug($"Settings for 3ColumnWindowProfile has saved...", level: LogLevel.Trace);
+            }
         }
 
         private void OnTargetChangedHandler(Prefab? target)
@@ -715,16 +732,6 @@ namespace SOS.Profiles.TCWP
             if (needsLeftRefresh) { leftPanelMode = newLeftMode; lastLeftWForReflow = leftW; if (leftContainer != null) leftContainer.Visible = leftPanelMode != DisplayMode.Hidden; RefreshSearch(); }
             if (needsCenterRefresh) { centerPanelMode = newCenterMode; lastCenterWForReflow = centerWidth; if (_currentItem != null) OnTargetChangedHandler(_currentItem); }
             if (needsRightRefresh) { rightPanelMode = newRightMode; if (rightContainer != null) rightContainer.Visible = rightPanelMode != DisplayMode.Hidden; if (_currentItem != null) OnTargetChangedHandler(_currentItem); }
-
-            //TODO: Ver si optimizamos esto para no guardar cada frame.
-            if (config != null && NormalSize != Point.Zero)
-            {
-                config.WindowSize = NormalSize;
-                config.WindowPosition = NormalOffset;
-                config.IsMaximized = Mode == WindowMode.Fullscreen;
-                config.LeftPanelWidth = leftPanel.Rect.Width;
-                config.RightPanelWidth = rightPanel.Rect.Width;
-            }
 
             AddToGUIUpdateList(order: 1);
         }

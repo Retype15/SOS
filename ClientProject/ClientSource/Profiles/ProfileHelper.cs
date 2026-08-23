@@ -203,7 +203,7 @@ namespace SOS.Profiles
 
         public static void DrawSettings(GUIComponent container, IEnumerable<ISOSConfig> configs, float minColumnWidth = MinColumnWidth)
         {
-            if (container == null || configs.Any()) return;
+            if (container == null || !configs.Any()) return;
 
             try
             {

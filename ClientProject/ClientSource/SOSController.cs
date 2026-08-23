@@ -173,10 +173,10 @@ namespace SOS
         {
             if (ActiveProfile == null) return;
             SaveSettings();
-            ActiveProfile.ProfileConfig?.Save();
             ActiveProfile.Dispose();
             ActiveProfile = null;
             API.ClearCache();
+            GUIAnimSequence.ClearAll();
         }
 
         public void Update()
