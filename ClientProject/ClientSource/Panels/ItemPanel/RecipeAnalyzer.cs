@@ -20,7 +20,7 @@ namespace SOS.Panels.ItemPanel
         {
             if (!DataInitialized)
             {
-                System.Threading.Tasks.Task.Run(() =>
+                Task.Run(() =>
                 {
                     RecipeAnalyzer.PrecomputeCaches();
                     DataInitialized = true;
@@ -129,6 +129,9 @@ namespace SOS.Panels.ItemPanel
                 }
             }
 
+#if DEBUG
+            //System.Threading.Thread.Sleep(3000);
+#endif
             Logger.LogDebug("[SOS] Dependency graph precomputed.");
         }
     }

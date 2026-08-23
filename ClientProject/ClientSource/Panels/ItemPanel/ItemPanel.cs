@@ -7,6 +7,7 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using SOS.GUI;
 
 namespace SOS.Panels.ItemPanel
 {
@@ -24,6 +25,8 @@ namespace SOS.Panels.ItemPanel
         private Prefab? _currentPrefab;
         private Action<Prefab>? _onPrimary;
         private Action<Prefab>? _onSecondary;
+
+        private static bool needsAnim = true;
 
         public bool CanHandle(Prefab prefab) => prefab is ItemPrefab;
 
@@ -47,13 +50,10 @@ namespace SOS.Panels.ItemPanel
                 _ = new GUITextBlock(new RectTransform(Vector2.One, _container.RectTransform), Texts.Get("sos.tab.recipes.analyzing", "Analyzing recipe dependency graph..."), font: GUIStyle.SubHeadingFont, textAlignment: Alignment.Center);
                 RecipeAnalyzer.Initialize(onComplete: () =>
                 {
-                    CrossThread.RequestExecutionOnMainThread(() =>
+                    if (_container != null && _container.Visible && _currentPrefab != null)
                     {
-                        if (_container != null && _container.Visible && _currentPrefab != null)
-                        {
-                            Show(_currentPrefab, _onPrimary!, _onSecondary!);
-                        }
-                    });
+                        Show(_currentPrefab, _onPrimary!, _onSecondary!);
+                    }
                 });
                 return;
             }
@@ -136,6 +136,12 @@ namespace SOS.Panels.ItemPanel
                     .AddCard(new CardBuilder.UsageRecipeCard(usage, onPrimary, onSecondary));
 
             foreach (var group in usageDict.Values) group.Draw(_colUsage);
+
+            if (needsAnim)
+            {
+                recipeSplit.ExFadeIn(1f, alsoChildren: true);
+                needsAnim = false;
+            }
         }
 
         public void Hide()
