@@ -181,6 +181,7 @@ namespace SOS.GUI
                     foreach (var child in Component.GetAllChildren())
                     {
                         // IMPORTANTE: Capturamos el diseño del hijo ANTES de ponerlo en 0
+                        if (child is GUIButton) continue;
                         if (!designColors.ContainsKey(child) || child.Color.A > 0) designColors[child] = child.Color;
                         if (child is GUITextBlock tb && (!designTextColors.ContainsKey(tb) || tb.TextColor.A > 0)) designTextColors[tb] = tb.TextColor;
 
@@ -193,7 +194,9 @@ namespace SOS.GUI
             {
                 if (alsoChildren)
                 {
-                    foreach (var child in Component.GetAllChildren()) child.ExFadeIn(duration, targetFactor, false);
+                    foreach (var child in Component.GetAllChildren())
+                        if (child is GUIButton) continue;
+                        else child.ExFadeIn(duration, targetFactor, false);
                 }
                 float finalFactor = targetFactor ?? 1.0f;
                 return DoFadeInRecursive(duration, finalFactor);
@@ -207,7 +210,8 @@ namespace SOS.GUI
             {
                 if (alsoChildren)
                 {
-                    foreach (var child in Component.GetAllChildren()) child.ExFadeOut(duration, targetFactor, false);
+                    foreach (var child in Component.GetAllChildren())
+                        child.ExFadeOut(duration, targetFactor, false);
                 }
                 return DoFadeOutRecursive(duration, targetFactor);
             });
