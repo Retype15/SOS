@@ -132,8 +132,8 @@ namespace SOS
                     string historyStr = state.Attribute("tabHistory")?.Value ?? "";
                     if (!string.IsNullOrEmpty(historyStr))
                     {
-                        controller.TabHistory.Clear();
-                        controller.TabHistory.AddRange(historyStr.Split(',', StringSplitOptions.RemoveEmptyEntries));
+                        Profiles.ProfileHelper.TabHistory.Clear();
+                        Profiles.ProfileHelper.TabHistory.AddRange(historyStr.Split(',', StringSplitOptions.RemoveEmptyEntries));
                     }
                     controller.cfg.RawXmlMode = ParseBool(state.Attribute("rawXml")?.Value);
                     controller.cfg.XmlFontScale = ParseFloat(state.Attribute("xmlScale")?.Value, 0.9f);

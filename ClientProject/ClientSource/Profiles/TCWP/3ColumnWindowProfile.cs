@@ -41,7 +41,7 @@ namespace SOS.Profiles.TCWP
         // Center panel
         private GUIFrame? centerPanel;
         private GUIFrame? detailsHeader;
-        private GUIComponent? centerTabWidget;
+        private GUITabWidget? centerTabWidget;
 
         // Right panel
         private GUIResizableFrame? rightPanel;
@@ -244,8 +244,7 @@ namespace SOS.Profiles.TCWP
             };
 
 
-            if (centerTabWidget is GUITabWidget tw)
-                tw.UpdateTabs(target, OnPrimary, OnSecondary);
+            ProfileHelper.UpdateTabWidget(centerTabWidget, target, OnPrimary, OnSecondary);
 
             foreach (var section in API.CreateSections())
             {
@@ -445,7 +444,7 @@ namespace SOS.Profiles.TCWP
                 RectTransform = { MinSize = new Point(0, 65), MaxSize = new Point(int.MaxValue, 65) }
             };
 
-            centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform));
+            centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform), API.CreateTabs());
 
             prefabProviders = [.. API.GetAllPrefabProviders()];
             prefabHeaders = prefabProviders.ToDictionary(p => p.PrefabType, p => p.Header);
@@ -671,22 +670,20 @@ namespace SOS.Profiles.TCWP
             if (btnBack != null)
             {
                 btnBack.Enabled = ProfileHelper.CanNavigateBack;
-                if (btnBack.Enabled && SOSController.Instance.HistoryBack.Count > 0)
+                if (btnBack.Enabled && ProfileHelper.PeekBack() is { } prevItem)
                 {
-                    var prevItem = SOSController.Instance.HistoryBack.Peek();
                     var (navBackName, _) = prevItem.SafeName(Color.White);
-                    btnBack.OnDrawToolTip = component => component.ToolTip = RichString.Rich($"{Texts.Get("sos.window.back", "Back")}: {navBackName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}");
+                    btnBack.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.back", "Back")}: {navBackName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}".Rich();
                 }
             }
 
             if (btnForward != null)
             {
                 btnForward.Enabled = ProfileHelper.CanNavigateForward;
-                if (btnForward.Enabled && SOSController.Instance.HistoryForward.Count > 0)
+                if (btnForward.Enabled && ProfileHelper.PeekForward() is { } nextItem)
                 {
-                    var nextItem = SOSController.Instance.HistoryForward.Peek();
                     var (navForwardName, _) = nextItem.SafeName(Color.White);
-                    btnForward.OnDrawToolTip = component => component.ToolTip = RichString.Rich($"{Texts.Get("sos.window.forward", "Forward")}: {navForwardName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}");
+                    btnForward.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.forward", "Forward")}: {navForwardName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}".Rich();
                 }
             }
         }

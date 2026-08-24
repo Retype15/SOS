@@ -10,6 +10,7 @@ using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework.Input;
 using SOS.Panels.AfflictionPanel;
+using SOS.Profiles;
 
 namespace SOS.Configs
 {
@@ -28,8 +29,8 @@ namespace SOS.Configs
 
             var ctr = SOSController.Instance;
 
-            ctr.TabHistory.Clear();
-            ctr.TabHistory.AddRange(ConfigHelper.CsvToList(TabHistoryRaw));
+            ProfileHelper.TabHistory.Clear();
+            ProfileHelper.TabHistory.AddRange(ConfigHelper.CsvToList(TabHistoryRaw));
 
             // Restore tracker
             ctr.Tracker.FromCsv(TrackedRecipesRaw);
@@ -53,15 +54,20 @@ namespace SOS.Configs
                 _dummyCharacterXMLRaw.SetIfNotEqual(DummyCharacterXML.ToString());
             }
 
-            if (CurrentTarget != null) _lastItemId.SetIfNotEqual(CurrentTarget.Identifier.Value);
+            var prefab = API.GetState<Prefab?>(CommKeys.SelectTarget);
+            if (prefab != null)
+            {
+                CurrentTarget = prefab;
+                _lastItemId.SetIfNotEqual(CurrentTarget.Identifier.Value);
+            }
 
-            TabHistoryRaw = ctr.TabHistory.ToCsv();
+            TabHistoryRaw = ProfileHelper.TabHistory.ToCsv();
             TrackedRecipesRaw = ctr.Tracker.ToCsv();
             TrackerVisible = ctr.Tracker.Visible;
 
             _favoritesRaw.SetIfNotEqual(FavoritedItems.ToCsv());
 
-            SaveChanges();
+            SaveChanges(Plugin.Instance.ConfigService);
         }
 
         public void Reset()
@@ -77,6 +83,7 @@ namespace SOS.Configs
             DummySimulated = false;
             DummyCharacterXML = XElement.Parse("<Character />");
             FavoritedItems.Clear();
+            ProfileHelper.ClearTabHistory();
             TabHistoryRaw = "";
 
             _currentTarget = null;
@@ -84,7 +91,6 @@ namespace SOS.Configs
             _favoritedItems = null;
 
             var ctr = SOSController.Instance;
-            ctr.TabHistory.Clear();
             ctr.Tracker.Clear();
             ctr.Tracker.Visible = TrackerVisible;
         }
@@ -204,6 +210,10 @@ namespace SOS.Configs
 
         private ClientConfig()
         {
+            var pms = Plugin.Instance.ConfigService;
+            var p = Plugin.Instance.Package;
+            void TryInitConfig<T>(string name, out T setting) where T : ISettingBase => base.TryInitConfig(name, out setting, pms, p);
+
             TryInitConfig("SOSOpenKey", out _sosOpenKey);
             TryInitConfig("LastSearchQuery", out _lastSearchQuery);
             TryInitConfig("LastItemId", out _lastItemId);

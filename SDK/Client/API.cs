@@ -429,8 +429,6 @@ namespace SOS
             lock (_delegates)
                 _delegates.TryGetValue(key, out d);
 
-            if (setState) SetState(key, value, false);
-
             if (d != null)
                 foreach (var handler in d.GetInvocationList())
                 {
@@ -444,6 +442,8 @@ namespace SOS
                     }
                     catch (Exception ex) { Logger.LogError($"[SOS] Observer error in key:'{key}'  method:'{handler.Method.Name}' Exception: {ex.Message}"); }
                 }
+
+            if (setState) SetState(key, value, false);
 
             Logger.LogDebug($"EMIT CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Trace);
         }
@@ -535,6 +535,10 @@ namespace SOS
 
     public static class CommKeys
     {
+        /// <summary>
+        /// Cambia el Prefab objetivo.
+        /// </summary>
+        /// <param name="Type">Prefab?</param>
         public static string SelectTarget => "SelectTarget";
         public static string ChangeProfile => "ChangeProfile";
         public static string ApplyLayout => "ApplyLayout";

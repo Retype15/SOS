@@ -5,11 +5,10 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using System.Collections.Immutable;
 using Barotrauma;
 using Microsoft.Xna.Framework;
-using SOS.Configs;
 using SOS.GUI;
-using SOS.Panels.ItemPanel;
 
 using BGUI = Barotrauma.GUI;
 
@@ -25,6 +24,127 @@ namespace SOS.Profiles
         private static int _currentColumnCount = 0;
 
         public static bool IsSettingsOpen => _settingsWindow != null || _contentContainer != null || _contentLists != null;
+
+        internal static readonly List<string> TabHistory = [];
+
+        public static void PushTabHistory(string uid)
+        {
+            TabHistory.Remove(uid);
+            TabHistory.Insert(0, uid);
+        }
+
+        public static IReadOnlyList<string> GetTabHistory() => TabHistory;
+
+        public static void ClearTabHistory() => TabHistory.Clear();
+
+        private static readonly Stack<Prefab> historyBack = new();
+        private static readonly Stack<Prefab> historyForward = new();
+
+        public static bool CanNavigateBack => historyBack.Count > 0;
+        public static bool CanNavigateForward => historyForward.Count > 0;
+
+        public static Prefab? PeekBack() => historyBack.Count > 0 ? historyBack.Peek() : null;
+        public static Prefab? PeekForward() => historyForward.Count > 0 ? historyForward.Peek() : null;
+
+        private static bool _isNavigating = false;
+        private static bool _subscribed = false;
+
+        public static void Subscribe()
+        {
+            if (_subscribed) return;
+            API.On<Prefab?>(CommKeys.SelectTarget, HistoryPush);
+            API.On(CommKeys.NavigateBack, HistoryBack);
+            API.On(CommKeys.NavigateForward, HistoryForward);
+            _subscribed = true;
+        }
+
+        public static void Unsubscribe()
+        {
+            if (!_subscribed) return;
+            API.Off<Prefab?>(CommKeys.SelectTarget, HistoryPush);
+            API.Off(CommKeys.NavigateBack, HistoryBack);
+            API.Off(CommKeys.NavigateForward, HistoryForward);
+            _subscribed = false;
+        }
+
+        public static void Update()
+        {
+            _settingsWindow?.AddToGUIUpdateList(order: 1);
+        }
+
+        public static void OnTargetSelected(Prefab? item)
+        {
+            if (item == null) return;
+            var cur = API.GetState<Prefab?>(CommKeys.SelectTarget);
+            if (cur == item) return;
+            API.Emit(CommKeys.SelectTarget, item);
+        }
+        public static void NavigateBack() => API.Emit(CommKeys.NavigateBack);
+        public static void NavigateForward() => API.Emit(CommKeys.NavigateForward);
+
+        private static void HistoryPush(Prefab? prefab)
+        {
+            if (prefab == null || _isNavigating) return;
+
+            RemoveFromStack(historyBack, prefab);
+            RemoveFromStack(historyForward, prefab);
+
+            var current = API.GetState<Prefab?>(CommKeys.SelectTarget);
+            if (current != null && current != prefab)
+            {
+                historyBack.Push(current);
+                historyForward.Clear();
+            }
+        }
+
+        private static void HistoryBack()
+        {
+            if (historyBack.Count == 0) return;
+            var current = API.GetState<Prefab?>(CommKeys.SelectTarget);
+            if (current != null) historyForward.Push(current);
+            var prev = historyBack.Pop();
+            _isNavigating = true;
+            API.Emit(CommKeys.SelectTarget, prev);
+            _isNavigating = false;
+        }
+
+        private static void HistoryForward()
+        {
+            if (historyForward.Count == 0) return;
+            var current = API.GetState<Prefab?>(CommKeys.SelectTarget);
+            if (current != null) historyBack.Push(current);
+            var next = historyForward.Pop();
+            _isNavigating = true;
+            API.Emit(CommKeys.SelectTarget, next);
+            _isNavigating = false;
+        }
+
+        // Reestructurar los stacks para limpieza atómica.
+        private static void RemoveFromStack<T>(Stack<T> stack, T prefab) where T : class
+        {
+            if (stack.Count == 0) return;
+            var tmp = stack.ToImmutableArray();
+            bool removed = false;
+            var filtered = new List<T>(tmp.Length);
+            foreach (var p in tmp)
+            {
+                if (!removed && p == prefab) { removed = true; continue; }
+                filtered.Add(p);
+            }
+            if (!removed) return;
+            stack.Clear();
+            for (int i = filtered.Count - 1; i >= 0; i--) stack.Push(filtered[i]);
+        }
+
+        public static void SelectTarget(Prefab target)
+        {
+            var cur = API.GetState<Prefab?>(CommKeys.SelectTarget);
+            if (cur == target) return;
+            API.Emit(CommKeys.SelectTarget, target);
+        }
+
+        public static Point SettingsWindowSize { get; set; } = new(550, 600);
+        public static Point SettingsWindowPosition { get; set; } = new(-1, -1);
 
         public static GUIButton CreateSettingsButton(RectTransform parent, GUIComponent? configHost = null)
         {
@@ -44,13 +164,9 @@ namespace SOS.Profiles
         public static void OpenSettings(GUIComponent? host = null)
         {
             Logger.LogDebug("ProfileHelper.OpenSettings: start", level: LogLevel.Trace);
-
             try
             {
-                if (IsSettingsOpen)
-                {
-                    CloseSettings();
-                }
+                if (IsSettingsOpen) CloseSettings();
 
                 if (host != null)
                 {
@@ -59,9 +175,8 @@ namespace SOS.Profiles
                 }
                 else
                 {
-                    var cfg = WindowProfileConfig.Instance;
-                    Point initialSize = cfg.SettingsWindowSize.X > 0 && cfg.SettingsWindowSize.Y > 0
-                        ? cfg.SettingsWindowSize
+                    Point initialSize = SettingsWindowSize.X > 0 && SettingsWindowSize.Y > 0
+                        ? SettingsWindowSize
                         : new Point(550, 600);
 
                     _settingsWindow = new GUIWindow(
@@ -76,8 +191,8 @@ namespace SOS.Profiles
                         AllowedDirections = ResizeDirection.All
                     };
 
-                    if (cfg.SettingsWindowPosition.X >= 0 && cfg.SettingsWindowPosition.Y >= 0)
-                        _settingsWindow.RectTransform.AbsoluteOffset = cfg.SettingsWindowPosition;
+                    if (SettingsWindowPosition.X >= 0 && SettingsWindowPosition.Y >= 0)
+                        _settingsWindow.RectTransform.AbsoluteOffset = SettingsWindowPosition;
 
                     _settingsWindow.OnClose += CloseSettings;
                     _settingsWindow.RectTransform.SizeChanged += OnSettingsWindowResized;
@@ -101,37 +216,29 @@ namespace SOS.Profiles
                         }
                     };
                     _settingsWindow.SetControlBoxContentWidth();
-
                     _contentContainer = _settingsWindow.ContentArea;
                 }
-
                 RefreshSettings();
             }
             catch (Exception ex)
             {
                 Logger.LogDebugError($"[SOS] ProfileHelper.OpenSettings failed\n{ex}", level: LogLevel.Error);
             }
-
             Logger.LogDebug("ProfileHelper.OpenSettings: end", level: LogLevel.Trace);
         }
 
         private static void OnSettingsWindowResized()
         {
             if (_settingsWindow == null || _contentContainer == null) return;
-
             try
             {
-                var cfg = WindowProfileConfig.Instance;
-                cfg.SettingsWindowSize = _settingsWindow.NormalSize;
-                cfg.SettingsWindowPosition = _settingsWindow.NormalOffset;
+                SettingsWindowSize = _settingsWindow.NormalSize;
+                SettingsWindowPosition = _settingsWindow.NormalOffset;
 
                 var configs = API.GetAllConfigs();
-
                 int targetColumns = CalculateColumnCount(_contentContainer.Rect.Width, configs.Count(), MinColumnWidth);
                 if (targetColumns != _currentColumnCount)
-                {
                     RefreshSettings();
-                }
             }
             catch (Exception ex)
             {
@@ -143,14 +250,12 @@ namespace SOS.Profiles
         {
             if (!IsSettingsOpen) return;
             Logger.LogDebug("ProfileHelper.CloseSettings: closing settings", level: LogLevel.Trace);
-
             try
             {
                 if (_settingsWindow != null)
                 {
-                    var cfg = WindowProfileConfig.Instance;
-                    cfg.SettingsWindowSize = _settingsWindow.NormalSize;
-                    cfg.SettingsWindowPosition = _settingsWindow.NormalOffset;
+                    SettingsWindowSize = _settingsWindow.NormalSize;
+                    SettingsWindowPosition = _settingsWindow.NormalOffset;
 
                     _settingsWindow.OnClose -= CloseSettings;
                     _settingsWindow.RectTransform.SizeChanged -= OnSettingsWindowResized;
@@ -158,7 +263,6 @@ namespace SOS.Profiles
                     _settingsWindow.Parent?.RemoveChild(_settingsWindow);
                     _settingsWindow = null;
                 }
-
                 _contentContainer = null;
                 _contentLists = null;
                 _currentColumnCount = 0;
@@ -167,18 +271,15 @@ namespace SOS.Profiles
             {
                 Logger.LogDebugError($"[SOS] ProfileHelper.CloseSettings failed\n{ex}", level: LogLevel.Error);
             }
-
-            SOSController.SaveSettings();
+            foreach (var c in API.GetAllConfigs()) c.Save();
         }
 
         public static void RefreshSettings()
         {
             Logger.LogDebug("ProfileHelper.RefreshSettings: start in-place refresh", level: LogLevel.Trace);
-
             try
             {
                 var configs = API.GetAllConfigs();
-
                 if (_contentContainer != null)
                 {
                     _contentContainer.ClearChildren();
@@ -187,9 +288,7 @@ namespace SOS.Profiles
                 else if (_contentLists != null)
                 {
                     foreach (var list in _contentLists)
-                    {
                         list.Content.ClearChildren();
-                    }
                     DrawSettings(_contentLists, configs);
                 }
             }
@@ -197,29 +296,24 @@ namespace SOS.Profiles
             {
                 Logger.LogDebugError($"[SOS] ProfileHelper.RefreshSettings failed\n{ex}", level: LogLevel.Error);
             }
-
             Logger.LogDebug("ProfileHelper.RefreshSettings: end in-place refresh", level: LogLevel.Trace);
         }
 
         public static void DrawSettings(GUIComponent container, IEnumerable<ISOSConfig> configs, float minColumnWidth = MinColumnWidth)
         {
             if (container == null || !configs.Any()) return;
-
             try
             {
                 int colCount = CalculateColumnCount(container.Rect.Width, configs.Count(), minColumnWidth);
                 _currentColumnCount = colCount;
-
                 var layoutGroup = new GUILayoutGroup(new RectTransform(Vector2.One, container.RectTransform), isHorizontal: true)
                 {
                     Stretch = true,
                     RelativeSpacing = 0.01f,
                     CanBeFocused = false
                 };
-
                 float relWidth = 1.0f / colCount;
                 var createdLists = new List<GUIListBox>(colCount);
-
                 for (int i = 0; i < colCount; i++)
                 {
                     var list = new GUIListBox(new RectTransform(new Vector2(relWidth, 1f), layoutGroup.RectTransform), style: null)
@@ -230,12 +324,9 @@ namespace SOS.Profiles
                     };
                     createdLists.Add(list);
                 }
-
                 _contentLists = createdLists;
                 DrawSettings(createdLists, configs);
-
                 var activeLists = createdLists.Where(l => l.Content.Children.Any()).ToList();
-
                 if (activeLists.Count < createdLists.Count)
                 {
                     foreach (var emptyList in createdLists.Where(l => !l.Content.Children.Any()))
@@ -243,14 +334,11 @@ namespace SOS.Profiles
                         emptyList.RemoveFromGUIUpdateList();
                         layoutGroup.RemoveChild(emptyList);
                     }
-
                     if (activeLists.Count > 0)
                     {
                         float adjustedWidth = 1.0f / activeLists.Count;
                         foreach (var list in activeLists)
-                        {
                             list.RectTransform.RelativeSize = new Vector2(adjustedWidth, 1f);
-                        }
                     }
                     layoutGroup.Recalculate();
                 }
@@ -261,31 +349,24 @@ namespace SOS.Profiles
             }
         }
 
-        public static void DrawSettings(GUIListBox targetList, IReadOnlyList<ISOSConfig> configs)
-        {
-            DrawSettings([targetList], configs);
-        }
+        public static void DrawSettings(GUIListBox targetList, IReadOnlyList<ISOSConfig> configs) => DrawSettings([targetList], configs);
 
         public static void DrawSettings(IEnumerable<GUIListBox> targetLists, IEnumerable<ISOSConfig> configs)
         {
             var lists = targetLists as IList<GUIListBox> ?? [.. targetLists];
             var configList = configs.ToList();
             if (lists.Count == 0 || configList.Count == 0) return;
-
             try
             {
                 int listCount = lists.Count;
                 int totalConfigs = configList.Count;
                 int chunkSize = (int)Math.Ceiling((double)totalConfigs / listCount);
-
                 for (int listIndex = 0; listIndex < listCount; listIndex++)
                 {
                     int startIndex = listIndex * chunkSize;
                     int count = Math.Min(chunkSize, totalConfigs - startIndex);
-
                     if (count <= 0) break;
-
-                    var targetList = lists[listIndex]; // fallback or direct cast
+                    var targetList = lists[listIndex];
                     for (int i = 0; i < count; i++)
                     {
                         var config = configList[startIndex + i];
@@ -314,48 +395,43 @@ namespace SOS.Profiles
                 OnClicked = (_, _) => { API.Emit(CommKeys.NavigateBack); return true; }
             };
             if (back.Children.FirstOrDefault() is GUIImage imgB) imgB.SpriteEffects = Microsoft.Xna.Framework.Graphics.SpriteEffects.FlipHorizontally;
-
             var forward = new GUIButton(new RectTransform(new Point(32, 32), parent, isFixedSize: true), "", style: "GUIButtonToggleRight")
             {
                 ToolTip = Texts.Get("sos.window.forward", "Forward").Value,
                 OnClicked = (_, _) => { API.Emit(CommKeys.NavigateForward); return true; }
             };
-
             return (back, forward);
         }
 
-        public static GUITabWidget CreateTabWidget(RectTransform parent)
+        public static GUITabWidget CreateTabWidget(RectTransform parent, IEnumerable<ITab> tabs)
         {
             var widget = new GUITabWidget(parent);
-            foreach (var tab in API.CreateTabs())
+            foreach (var tab in tabs)
                 widget.RegisterTab(tab);
+            widget.OnTabSelected = tab => PushTabHistory(tab.Id);
             return widget;
         }
 
-        public static bool DataInitialized => RecipeAnalyzer.DataInitialized;
-        public static bool CanNavigateBack => SOSController.Instance.HistoryBack.Count > 0;
-        public static bool CanNavigateForward => SOSController.Instance.HistoryForward.Count > 0;
-
-        public static void SelectTarget(Prefab target) => SOSController.Instance.OnTargetSelected(target);
+        public static void UpdateTabWidget(GUITabWidget widget, Prefab target, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        {
+            widget.UpdateTabs(target, onPrimary, onSecondary);
+            foreach (var id in TabHistory)
+                if (widget.TrySelectTab(id)) break;
+        }
 
         public static void OpenContextMenu(Prefab target, Vector2? position = null)
         {
             if (target == null) return;
-
             var options = API.GetAllPrefabProviders()
                 .Where(p => p.PrefabType.IsAssignableFrom(target.GetType()))
                 .SelectMany(p => p.BuildContextOptions(target))
                 .ToList();
-
             if (options.Count == 0) return;
-
             RichString name = target.Name();
-
             _ = GUIContextMenu.CreateContextMenu(position ?? PlayerInput.MousePosition, name, null, [.. options]);
         }
 
         #region XML
-
         public static string GetRawXMLSafe(Prefab item)
         {
             var configElement = item.ConfigElement();
@@ -390,7 +466,6 @@ namespace SOS.Profiles
             };
             GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, "XML Actions", null, [.. options]);
         }
-
         #endregion
 
         public static void ToggleWindow() => API.Emit(CommKeys.ToggleWindow);
