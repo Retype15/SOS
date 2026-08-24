@@ -5,189 +5,13 @@
 //   marked as AI generated are free to use without licence 
 //   requirements.
 
-#pragma warning disable IDE0130
-#pragma warning disable IDE0290
-
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
-namespace SOS
+#pragma warning disable IDE0130
+
+namespace SOS.GUI
 {
-    public static class RichStringExt
-    {
-        public static RichString Rich(this string text) => RichString.Rich(text);
-
-        public static string SetHyperlink(this string text, Color? color = null)
-            => text.SetColor(color ?? Color.LightSkyBlue);
-
-        public static LocalizedString SetHyperlink(this LocalizedString text, Color? color = null)
-            => text.SetColor(color ?? Color.LightSkyBlue);
-
-        public static string SetColor(this string text, string colorName)
-        => $"‖color:{colorName}‖{text}‖end‖";
-
-        public static string SetColor(this string text, Color color)
-            => $"‖color:{color.R},{color.G},{color.B}‖{text}‖end‖";
-
-        public static string SetColorHex(this string text, string hexCode)
-            => $"‖color:{hexCode}‖{text}‖end‖";
-
-        public static string SetBold(this string text)
-            => $"‖bold‖{text}‖end‖";
-
-        public static string SetItalic(this string text)
-            => $"‖italic‖{text}‖end‖";
-
-        public static string SetUnderline(this string text)
-            => $"‖underline‖{text}‖end‖";
-
-        public static string SetStrikethrough(this string text)
-            => $"‖strikethrough‖{text}‖end‖";
-
-        public static LocalizedString SetColor(this LocalizedString text, string colorName)
-        => $"‖color:{colorName}‖{text}‖end‖";
-
-        public static LocalizedString SetColor(this LocalizedString text, Color color)
-            => $"‖color:{color.R},{color.G},{color.B}‖{text}‖end‖";
-
-        public static LocalizedString SetColorHex(this LocalizedString text, string hexCode)
-            => $"‖color:{hexCode}‖{text}‖end‖";
-
-        public static LocalizedString SetBold(this LocalizedString text)
-            => $"‖bold‖{text}‖end‖";
-
-        public static LocalizedString SetItalic(this LocalizedString text)
-            => $"‖italic‖{text}‖end‖";
-
-        public static LocalizedString SetUnderline(this LocalizedString text)
-            => $"‖underline‖{text}‖end‖";
-
-        public static LocalizedString SetStrikethrough(this LocalizedString text)
-            => $"‖strikethrough‖{text}‖end‖";
-
-    }
-
-    public static class HyperlinkExtensions
-    {
-        public static RichString JoinToRichString<T>(
-            this IEnumerable<T> items,
-            string separator,
-            Func<T, string> textSelector,
-            Func<T, Color> colorSelector)
-        {
-            var sb = new System.Text.StringBuilder();
-            var list = items.ToList();
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                var item = list[i];
-                Color color = colorSelector(item);
-                string text = textSelector(item).Replace("‖", "");
-
-                // Formateo simple por color.
-                sb.Append(text.SetColor(color));
-
-                if (i < list.Count - 1) sb.Append(separator);
-            }
-
-            return RichString.Rich(sb.ToString());
-        }
-
-        public static void BindHyperlinks<T>(
-            this GUITextBlock textBlock,
-            IEnumerable<T> items,
-            Action<T> onPrimaryClick,
-            Action<T>? onSecondaryClick = null)
-        {
-            var list = items.ToList();
-
-            void ApplyLinks()
-            {
-                if (textBlock.RichTextData == null) return;
-                textBlock.ClickableAreas.Clear();
-
-                int index = 0;
-                foreach (var data in textBlock.RichTextData)
-                {
-                    if (data.StartIndex >= data.EndIndex || data.StartIndex < 0 || data.Color == null) continue;
-                    if (index >= list.Count) break;
-
-                    var target = list[index];
-                    textBlock.ClickableAreas.Add(new GUITextBlock.ClickableArea()
-                    {
-                        Data = data,
-                        OnClick = (tb, area) => { onPrimaryClick?.Invoke(target); },
-                        OnSecondaryClick = onSecondaryClick != null ? ((tb, area) => { onSecondaryClick.Invoke(target); }) : null
-                    });
-                    index++;
-                }
-            }
-
-            ApplyLinks();
-            textBlock.RectTransform.SizeChanged += ApplyLinks;
-        }
-    }
-
-    public static class FloatExt
-    {
-        public static string ToMeters(this float value) => (value / 10f).ToValue() + 'm';
-        public static string ToValue(this float value) => value.ToString("0.###");
-        public static string ToSignedValue(this float value) => (value > 0) ? '+' + value.ToValue() : value.ToValue();
-    }
-
-    public static class PrefabExt
-    {
-
-        public static (string Name, Color TextColor) SafeName(this Prefab? prefab, Color defaultColor)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.Name.IsNullOrEmpty()
-                                        ? ($"[{item.Identifier}]", Color.Red)
-                                        : (item.Name.Value, defaultColor),
-                AfflictionPrefab affliction => affliction.Name.IsNullOrEmpty()
-                                        ? ($"[{affliction.Identifier}]", Color.Red)
-                                        : (affliction.Name.Value, defaultColor),
-                _ => (TextSOS.Get("sos.gen.unknown", "???").Value, defaultColor),
-            };
-        }
-        public static string Name(this Prefab prefab)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.Name.ToString(),
-                AfflictionPrefab affliction => affliction.Name.ToString(),
-                _ => prefab.Identifier.ToString()
-            };
-        }
-        public static Sprite? Icon(this Prefab? prefab)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.InventoryIcon ?? item.sprite,
-                AfflictionPrefab affliction => affliction.Icon,
-                _ => null
-            };
-        }
-        public static Color IconColor(this Prefab? prefab)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.InventoryIconColor,
-                AfflictionPrefab affliction => affliction.IconColors?.FirstOrDefault(Color.White),
-                _ => null
-            } ?? Color.White;
-        }
-    }
-
-    public static class IEnumerableExt
-    {
-        internal static string ToCsv<T>(this T collection) where T : IEnumerable<string>
-        {
-            return string.Join(",", collection);
-        }
-    }
-
     // AI Generated Code
     public static class GUIComponentExt
     {
@@ -652,7 +476,7 @@ namespace SOS
 
         private IEnumerable<CoroutineStatus> DoLogMsg(Color? color)
         {
-            RLogger.LogDebug($"Anim Sequence Progress on {Component.GetType().Name} ({(Component as GUITextBlock)?.Text ?? "NoText"})", color);
+            Logger.LogDebug($"Anim Sequence Progress on {Component.GetType().Name} ({(Component as GUITextBlock)?.Text ?? "NoText"})", color);
             yield return CoroutineStatus.Success;
         }
 

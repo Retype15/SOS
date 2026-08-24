@@ -11,19 +11,7 @@ using Microsoft.Xna.Framework;
 namespace SOS.GUI
 {
 
-    public interface ITab
-    {
-        string TabName { get; }
-        string TabTooltip { get; }
-        bool CanHandle(Prefab prefab);
-        void Initialize(GUIComponent contentContainer);
-        void Activate(Prefab prefab, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
-        void Deactivate();
-
-        GUIButton CreateTabButton(string text, RectTransform parent, bool isActive, Action onClick);
-    }
-
-    public class GUITabWidget : GUIFrame
+    public class GUITabWidget : GUIFrame, IDisposable
     {
         private readonly GUILayoutGroup _verticalLayout;
         private readonly GUIListBox _buttonArea;
@@ -32,7 +20,6 @@ namespace SOS.GUI
         private ITab? _activeTab;
 
         private Prefab? _currentTarget;
-        private SOSController? _controller;
         private Action<Prefab>? _onPrimary;
         private Action<Prefab>? _onSecondary;
 
@@ -63,14 +50,21 @@ namespace SOS.GUI
 
         public void RegisterTab(ITab tab)
         {
-            _tabs.Add(tab);
-            tab.Initialize(_contentArea);
+            try
+            {
+                tab.Init(_contentArea);
+                _tabs.Add(tab);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogReleaseError(ex.Message);
+                Logger.LogDebugError(ex.StackTrace ?? ex.Message);
+            }
         }
 
-        public void UpdateTabs(Prefab target, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public void UpdateTabs(Prefab target, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             _currentTarget = target;
-            _controller = controller;
             _onPrimary = onPrimary;
             _onSecondary = onSecondary;
 
@@ -78,9 +72,9 @@ namespace SOS.GUI
             List<ITab> validTabs = [.. _tabs.Where(t => t.CanHandle(target))];
 
             ITab? resolved = null;
-            foreach (var uid in controller.TabHistory)
+            foreach (var uid in SOSController.Instance.TabHistory)
             {
-                resolved = validTabs.FirstOrDefault(t => t.GetType().Name == uid);
+                resolved = validTabs.FirstOrDefault(t => t.Id == uid);
                 if (resolved != null) break;
             }
 
@@ -99,10 +93,10 @@ namespace SOS.GUI
                 _buttonArea.RectTransform.MinSize = new Point(0, 32);
                 _buttonArea.RectTransform.MaxSize = new Point(int.MaxValue, 32);
                 _contentArea.RectTransform.RelativeSize = new Vector2(1f, 0.92f);
+
                 foreach (var tab in validTabs)
-                {
-                    _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == _activeTab, () => SelectTab(tab));
-                }
+                    _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == _activeTab, () => SelectTab(tab), tab.ToolTip);
+
                 _buttonArea.RecalculateChildren();
             }
             else
@@ -122,37 +116,40 @@ namespace SOS.GUI
             if (_activeTab == tab) return;
             _activeTab = tab;
 
-            _controller?.PushTabHistory(tab.GetType().Name);
+            SOSController.Instance.PushTabHistory(tab.Id);
 
-            if (_currentTarget != null && _controller != null && _onPrimary != null && _onSecondary != null)
+            if (_currentTarget != null && _onPrimary != null && _onSecondary != null)
             {
-                UpdateTabs(_currentTarget, _controller, _onPrimary, _onSecondary);
+                UpdateTabs(_currentTarget, _onPrimary, _onSecondary);
             }
         }
 
         private void RefreshTabContent()
         {
-            if (_currentTarget == null || _controller == null || _onPrimary == null || _onSecondary == null) return;
+            if (_currentTarget == null || _onPrimary == null || _onSecondary == null) return;
 
             foreach (var tab in _tabs)
             {
                 if (tab == _activeTab)
                 {
-                    tab.Activate(_currentTarget, _controller, _onPrimary, _onSecondary);
+                    tab.Show(_currentTarget, _onPrimary, _onSecondary);
                 }
                 else
                 {
-                    tab.Deactivate();
+                    tab.Hide();
                 }
             }
         }
 
-        public void Clear()
+        public void Dispose()
         {
-            _activeTab = null;
-            _currentTarget = null;
             _buttonArea.Content.ClearChildren();
-            foreach (var tab in _tabs) tab.Deactivate();
+            foreach (var tab in _tabs)
+                if (tab is IDisposable d) d.Dispose();
+            _tabs.Clear();
+            GC.SuppressFinalize(this);
         }
+
+        ~GUITabWidget() => Dispose();
     }
 }

@@ -136,8 +136,6 @@ namespace SOS.GUI
             }
         }
 
-        public GUIImage? DropDownIcon => icon;
-
         public GUIDropDown2(RectTransform rectT, int elementCount = 4, string style = "", bool selectMultiple = false, bool dropAbove = false, int? listBoxWidth = null, bool? expandToRight = null) : base(style, rectT)
         {
             HoverCursor = CursorState.Hand;
@@ -345,7 +343,6 @@ namespace SOS.GUI
             if (Dropped && Enabled)
             {
                 OnDropped?.Invoke(this, UserData);
-                listBox.UpdateScrollBarSize();
                 listBox.UpdateDimensions();
                 BGUI.KeyboardDispatcher.Subscriber = this;
             }

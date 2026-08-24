@@ -11,7 +11,7 @@ using BGUI = Barotrauma.GUI;
 
 namespace SOS
 {
-    public static class MigrationDialog
+    internal static class MigrationDialog
     {
         private const string LegacyConfigPath = "Data/sossettings.xml";
 
@@ -41,15 +41,15 @@ namespace SOS
 
             var titleArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.30f), dialog.RectTransform), style: null);
             _ = new GUITextBlock(new RectTransform(Vector2.One, titleArea.RectTransform, Anchor.Center),
-                TextSOS.Get("sos.migration.title", "SOS — Migración de Configuración"),
+                Texts.Get("sos.migration.title", "SOS — Configuration Migration"),
                 font: GUIStyle.LargeFont, textAlignment: Alignment.Center);
 
             // ─── Description ───
 
             var descArea = new GUIFrame(new RectTransform(new Vector2(1f, 0.5f), dialog.RectTransform), style: null);
             _ = new GUITextBlock(new RectTransform(Vector2.One, descArea.RectTransform, Anchor.Center),
-                TextSOS.Get("sos.migration.description",
-                    "Se encontró una configuración anterior de SOS.\n¿Deseas importar tus datos al nuevo sistema?"),
+                Texts.Get("sos.migration.description",
+                    "A previous SOS configuration was found.\nDo you want to import your data to the new system?"),
                 font: GUIStyle.SmallFont, textAlignment: Alignment.Center);
 
             // ─── Buttons ───
@@ -63,32 +63,32 @@ namespace SOS
 
             // Import button
             var importBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
-                TextSOS.Get("sos.migration.import", "Import"))
+                Texts.Get("sos.migration.import", "Import"))
             {
-                ToolTip = TextSOS.Get("sos.migration.import_tooltip",
+                ToolTip = Texts.Get("sos.migration.import_tooltip",
                     "Imports your old settings and renames \"Data/sossettings.xml\" to \"Data/sossettings_old.xml\".")
             };
             importBtn.OnClicked += ImportAction;
 
             // Discard button
             var discardBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
-                TextSOS.Get("sos.migration.discard", "Discard"))
+                Texts.Get("sos.migration.discard", "Discard"))
             {
-                ToolTip = TextSOS.Get("sos.migration.discard_tooltip",
+                ToolTip = Texts.Get("sos.migration.discard_tooltip",
                     "Discards the old settings and renames \"Data/sossettings.xml\" to \"Data/sossettings_old.xml\".")
             };
             discardBtn.OnClicked += DiscardAction;
 
             // Ignore button
             var ignoreBtn = new GUIButton(new RectTransform(new Vector2(0.3f, 1f), btnLayout.RectTransform),
-                TextSOS.Get("sos.migration.ignore", "Ignore"))
+                Texts.Get("sos.migration.ignore", "Ignore"))
             {
-                ToolTip = TextSOS.Get("sos.migration.ignore_tooltip",
+                ToolTip = Texts.Get("sos.migration.ignore_tooltip",
                     "Closes without changes. The old file remains untouched; you will be prompted again on next launch.")
             };
             ignoreBtn.OnClicked += IgnoreAction;
 
-            RLogger.LogDebug("Showing MigrationDialog");
+            Logger.LogDebug("Showing MigrationDialog", level: LogLevel.Trace);
         }
 
         private static bool ImportAction(GUIButton button, object userdata)
@@ -128,26 +128,26 @@ namespace SOS
                 if (state != null)
                 {
                     lastItemId = state.Attribute("lastItem")?.Value ?? "";
-                    controller.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
+                    controller.cfg.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
                     string historyStr = state.Attribute("tabHistory")?.Value ?? "";
                     if (!string.IsNullOrEmpty(historyStr))
                     {
                         controller.TabHistory.Clear();
                         controller.TabHistory.AddRange(historyStr.Split(',', StringSplitOptions.RemoveEmptyEntries));
                     }
-                    controller.RawXmlMode = ParseBool(state.Attribute("rawXml")?.Value);
-                    controller.XmlFontScale = ParseFloat(state.Attribute("xmlScale")?.Value, 0.9f);
+                    controller.cfg.RawXmlMode = ParseBool(state.Attribute("rawXml")?.Value);
+                    controller.cfg.XmlFontScale = ParseFloat(state.Attribute("xmlScale")?.Value, 0.9f);
                 }
 
                 // MedicalSim
                 var simulator = root.Element("MedicalSim");
                 if (simulator != null)
                 {
-                    controller.DummyDeathCount = ParseInt(simulator.Attribute("deathCount")?.Value);
-                    controller.DummySimulated = ParseBool(simulator.Attribute("simulated")?.Value);
+                    controller.cfg.DummyDeathCount = ParseInt(simulator.Attribute("deathCount")?.Value);
+                    controller.cfg.DummySimulated = ParseBool(simulator.Attribute("simulated")?.Value);
                     var dummyNode = simulator.Elements().FirstOrDefault();
                     if (dummyNode != null)
-                        controller.DummyCharacterXML = dummyNode.ToString();
+                        controller.cfg.DummyCharacterXML = dummyNode;
                 }
 
                 // Tracker
@@ -159,8 +159,8 @@ namespace SOS
                     controller.Tracker.AddRecipe(targetId, hash);
                 }
 
-                // Layout
-                var layout = root.Element("Layout");
+                //TODO: Layout [DEPRECATED]
+                /*var layout = root.Element("Layout");
                 if (layout != null)
                 {
                     int winX = ParseInt(layout.Attribute("winX")?.Value, -1);
@@ -197,7 +197,7 @@ namespace SOS
                             RightPanelWidth = ParseInt(l.Attribute("rightW")?.Value)
                         };
                     }
-                }
+                }*/
 
                 // Restore last selected item
                 if (!string.IsNullOrEmpty(lastItemId))
@@ -208,14 +208,14 @@ namespace SOS
                             .FirstOrDefault(a => a.Identifier.Value == lastItemId);
                 }
 
-                // Persist to new config system
-                controller.SaveSettings();
+                // save
+                SOSController.SaveSettings();
 
-                RLogger.Log(TextSOS.Get("sos.migration.success", "[SOS] Previous configuration imported successfully.").Value);
+                Logger.Log(Texts.Get("sos.migration.success", "[SOS] Previous configuration imported successfully.").Value);
             }
             catch (Exception e)
             {
-                RLogger.LogError(TextSOS.Get("sos.migration.error",
+                Logger.LogError(Texts.Get("sos.migration.error",
                     "[SOS] Error importing previous configuration: [error]")
                     .Replace("[error]", e.Message).Value);
             }
@@ -254,7 +254,7 @@ namespace SOS
             }
             catch (Exception e)
             {
-                RLogger.LogError($"[SOS] Failed to rename old settings file: {e.Message}");
+                Logger.LogError($"[SOS] Failed to rename old settings file: {e.Message}");
             }
         }
 

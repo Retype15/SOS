@@ -7,52 +7,34 @@
 
 using Barotrauma;
 
-namespace SOS
+namespace SOS.Panels.ItemPanel
 {
     // MARK: RecipeAnalyzer
-    public static class RecipeAnalyzer
+    internal static class RecipeAnalyzer
     {
-        private static readonly Dictionary<Identifier, LinkedListNode<ItemAnalysis>> analysisCache = [];
-        private static readonly LinkedList<ItemAnalysis> lruList = new();
         private static readonly Dictionary<Identifier, List<(ItemPrefab Item, FabricationRecipe Recipe)>> usesCache = [];
         private static readonly Dictionary<Identifier, List<(ItemPrefab Item, DeconstructItem DeconstructItem)>> sourcesCache = [];
+        public static bool DataInitialized { get; private set; } = false;
 
-        private const int MaxAnalysisCacheSize = 30;
-
-        public static ItemAnalysis? GetAnalysis(Prefab? item)
+        public static void Initialize(Action? onComplete = null)
         {
-            if (item == null) return null;
-
-            if (analysisCache.TryGetValue(item.Identifier, out var node))
+            if (!DataInitialized)
             {
-                lruList.Remove(node);
-                lruList.AddFirst(node);
-                return node.Value;
-            }
-
-            var analysis = new ItemAnalysis(item);
-
-            if (analysisCache.Count >= MaxAnalysisCacheSize)
-            {
-                var lastNode = lruList.Last;
-                if (lastNode != null)
+                Task.Run(() =>
                 {
-                    analysisCache.Remove(lastNode.Value.PrefabId);
-                    lruList.RemoveLast();
-                }
+                    RecipeAnalyzer.PrecomputeCaches();
+                    DataInitialized = true;
+                    onComplete?.Invoke();
+                });
             }
-
-            var newNode = new LinkedListNode<ItemAnalysis>(analysis);
-            lruList.AddFirst(newNode);
-            analysisCache[item.Identifier] = newNode;
-
-            return analysis;
+            else
+            {
+                onComplete?.Invoke();
+            }
         }
 
         public static void Clear()
         {
-            analysisCache.Clear();
-            lruList.Clear();
             usesCache.Clear();
             sourcesCache.Clear();
         }
@@ -146,11 +128,11 @@ namespace SOS
                     }
                 }
             }
-            // MARK: AAAA
+
 #if DEBUG
-            //System.Threading.Thread.Sleep(1000);
-            RLogger.LogDebug("[SOS] Dependency graph precomputed.");
+            //System.Threading.Thread.Sleep(3000);
 #endif
+            Logger.LogDebug("[SOS] Dependency graph precomputed.");
         }
     }
 }

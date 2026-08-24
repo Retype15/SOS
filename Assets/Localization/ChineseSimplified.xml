@@ -3,6 +3,7 @@
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] 客户端：已初始化。按 'J' 键打开。</sos.client.init>
 	<sos.command.help>打开/关闭 SOS。</sos.command.help>
+	<sos.command.help.log>- log [{logCommands}]\n示例：'sos log verbose'</sos.command.help.log>
 	<sos.command.name>sos</sos.command.name>
 	<sos.shared.debugmode>[SOS] 调试模式已启用。</sos.shared.debugmode>
 	<sos.shared.loaded>[SOS] 已成功加载。</sos.shared.loaded>
@@ -14,6 +15,9 @@
 	<sos.config.migrating>[SOS] 正在从旧路径迁移设置...</sos.config.migrating>
 	<sos.config.save_error>[SOS] 无法保存设置：[error]</sos.config.save_error>
 	<sos.config.saved>[SOS] 设置已保存 (v[version])。</sos.config.saved>
+	<sos.config.reset_section>重置节点默认值</sos.config.reset_section>
+	<sos.config.reset_all>重置全部</sos.config.reset_all>
+	<sos.config.reset_all_tooltip>重置所有 S.O.S. 配置到默认值</sos.config.reset_all_tooltip>
 
 	<!-- General -->
 	<sos.gen.close>关闭 [Esc]</sos.gen.close>
@@ -35,7 +39,10 @@
 	<!-- Window -->
 	<sos.window.additional_info>额外信息</sos.window.additional_info>
 	<sos.window.back>返回</sos.window.back>
-	<sos.window.back.shortcuts>快捷键：&#xA;- Alt + 左箭头&#xA;- 退格键&#xA;- 鼠标 4</sos.window.back.shortcuts>
+	<sos.window.back.shortcuts>快捷键：
+- Alt + 左箭头
+- 退格键
+- 鼠标 4</sos.window.back.shortcuts>
 	<sos.window.manage_hud>管理 HUD</sos.window.manage_hud>
 	<sos.window.manage_hud_tooltip>管理 HUD 上的追踪配方</sos.window.manage_hud_tooltip>
 	<sos.window.toggle_tracker_tooltip>切换 HUD 追踪器可见性 (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
@@ -45,24 +52,43 @@
 	<sos.window.remove_all>全部移除</sos.window.remove_all>
 	<sos.window.track_all>追踪全部</sos.window.track_all>
 	<sos.window.forward>前进</sos.window.forward>
-	<sos.window.forward.shortcuts>快捷键：&#xA;- Alt + 右箭头&#xA;- Shift + 退格键&#xA;- 鼠标 5</sos.window.forward.shortcuts>
+	<sos.window.forward.shortcuts>快捷键：
+- Alt + 右箭头
+- Shift + 退格键
+- 鼠标 5</sos.window.forward.shortcuts>
 	<sos.window.loading>正在加载依赖项...</sos.window.loading>
 	<sos.window.loading.complete>加载完成！</sos.window.loading.complete>
 	<sos.window.obtain>获取途径</sos.window.obtain>
 	<sos.window.raw_xml>原始 XML</sos.window.raw_xml>
 	<sos.window.raw_xml_tooltip>在元数据视图和物品原始XML视图之间切换。</sos.window.raw_xml_tooltip>
 	<sos.window.search_placeholder>搜索物品...</sos.window.search_placeholder>
-	<sos.window.search_tooltip>按名称、ID、类别、标签、ModName、ItemType、Prefab等搜索&#xA;高级过滤器：&#xA;  @模组        (例：@Vanilla @Neurotrauma)&#xA;  #类别        (例：#Medical #Weapon)&#xA;  $标签        (例：$smallitem $diving)&#xA;  &amp;槽位        (例：&amp;Head &amp;Inner)&#xA;  !ID          (例：!weldingtool)&#xA;  %Prefab         (例：%Affliction %Item)&#xA;示例：'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
-	<sos.window.section_container>作为容器</sos.window.section_container>
+	<sos.window.search_tooltip>按名称、ID、类别、标签、ModName、ItemType、Prefab等搜索
+  高级过滤器：
+  标识符     |  示例：
+———————————————————
+  @模组             |  @Vanilla @Neurotrauma
+  #类别           |  #Medical #Weapon
+  $标签             |  $smallitem $pill
+  &amp;槽位         |  &amp;Head &amp;Inner
+  !ID              |  !weldingtool
+  %Prefab        |  %Affliction %Item
+
+示例：'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
+	<sos.window.section_container>容器</sos.window.section_container>
 	<sos.window.section_economy>经济</sos.window.section_economy>
-	<sos.window.section_equipment>作为装备</sos.window.section_equipment>
+	<sos.window.section_equipment>装备</sos.window.section_equipment>
 	<sos.window.section_general>常规</sos.window.section_general>
 	<sos.window.section_medical>医疗</sos.window.section_medical>
 	<sos.window.section_spawning>获取位置</sos.window.section_spawning>
 	<sos.window.section_treatments>治疗和药物</sos.window.section_treatments>
 	<sos.window.section_utility>功能</sos.window.section_utility>
 	<sos.window.section_weapon>作为武器</sos.window.section_weapon>
-	<sos.window.settings>设置 (WIP)</sos.window.settings>
+	<sos.window.settings>设置</sos.window.settings>
+	<sos.window.minimize>最小化</sos.window.minimize>
+	<sos.window.maximize>最大化</sos.window.maximize>
+	<sos.window.restore>还原</sos.window.restore>
+	<sos.window.maximize_btn>M</sos.window.maximize_btn>
+	<sos.window.restore_btn>R</sos.window.restore_btn>
 	<sos.window.tag_tooltip>搜索带有标签的物品：[tag]</sos.window.tag_tooltip>
 	<sos.window.title>SOS - 配方浏览器</sos.window.title>
 	<sos.window.usage>用途</sos.window.usage>
@@ -78,8 +104,11 @@
 	<!-- Tabs -->
 	<sos.tab.recipes>配方</sos.tab.recipes>
 	<sos.tab.recipes_tooltip>显示物品的制作配方、来源和用途。</sos.tab.recipes_tooltip>
+	<sos.tab.recipes.analyzing>正在分析配方依赖图...</sos.tab.recipes.analyzing>
 	<sos.tab.simulator>模拟器</sos.tab.simulator>
 	<sos.tab.simulator_tooltip>打开临床模拟器，在假人患者身上测试治疗和病症。</sos.tab.simulator_tooltip>
+	<sos.tab.preview>预览</sos.tab.preview>
+	<sos.tab.preview_tooltip>显示所选预制体的视觉精灵图。</sos.tab.preview_tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>别名：</sos.item.aliases>
@@ -89,7 +118,7 @@
 	<sos.item.cargo_box>货物箱：</sos.item.cargo_box>
 	<sos.item.category>类别：</sos.item.category>
 	<sos.item.causes_fire>导致火灾</sos.item.causes_fire>
-	<sos.item.description>描述：</sos.item.description>
+	<sos.item.description>描述</sos.item.description>
 	<sos.item.drains_oxygen>消耗氧气</sos.item.drains_oxygen>
 	<sos.item.hazards>危险性：</sos.item.hazards>
 	<sos.item.header_info>ID: [id] | 价格: [price] mk</sos.item.header_info>
@@ -97,6 +126,7 @@
 	<sos.item.locations>位置：</sos.item.locations>
 	<sos.item.max_stack>最大堆叠:</sos.item.max_stack>
 	<sos.item.min_difficulty>最低难度：</sos.item.min_difficulty>
+	<sos.item.mod>模组：</sos.item.mod>
 	<sos.item.price>价格:</sos.item.price>
 	<sos.item.required_faction>所需派系：</sos.item.required_faction>
 	<sos.item.tags>标签：</sos.item.tags>
@@ -107,11 +137,16 @@
 	<sos.weapon.base_spread>基础散布：</sos.weapon.base_spread>
 	<sos.weapon.dismember_chance>肢解率：</sos.weapon.dismember_chance>
 	<sos.weapon.dmg_multiplier>伤害倍率：</sos.weapon.dmg_multiplier>
+	<sos.weapon.explosion_radius>爆炸范围：</sos.weapon.explosion_radius>
 	<sos.weapon.fire_rate>射速：</sos.weapon.fire_rate>
 	<sos.weapon.hull_damage>船体伤害：</sos.weapon.hull_damage>
+	<sos.weapon.item_damage>物品伤害：</sos.weapon.item_damage>
+	<sos.weapon.max_targets>最大目标数：</sos.weapon.max_targets>
 	<sos.weapon.power_use>能量消耗：</sos.weapon.power_use>
+	<sos.weapon.projectiles>弹丸数：</sos.weapon.projectiles>
 	<sos.weapon.range>范围：</sos.weapon.range>
 	<sos.weapon.reload>装填时间：</sos.weapon.reload>
+	<sos.weapon.structure_damage>结构伤害：</sos.weapon.structure_damage>
 	<sos.weapon.throwable>可投掷</sos.weapon.throwable>
 	<sos.weapon.type>类型：</sos.weapon.type>
 
@@ -121,6 +156,7 @@
 	<sos.equip.equips_in>装备槽位：</sos.equip.equips_in>
 	<sos.equip.max_durability>最大耐久：</sos.equip.max_durability>
 	<sos.equip.pressure_protection>水压保护：</sos.equip.pressure_protection>
+	<sos.equip.res_suffix>抗性：</sos.equip.res_suffix>
 
 	<!-- Medical -->
 	<sos.med.always_causes>总是施加：</sos.med.always_causes>
@@ -139,6 +175,38 @@
 	<sos.affliction.contraindicated_warn>警告：以下物品会加重病情！</sos.affliction.contraindicated_warn>
 	<sos.affliction.effective>有效：</sos.affliction.effective>
 	<sos.affliction.highlyeffective>非常有效：</sos.affliction.highlyeffective>
+	<sos.affliction.activation_threshold>激活阈值：</sos.affliction.activation_threshold>
+	<sos.affliction.buff>增益</sos.affliction.buff>
+	<sos.affliction.classification>分类：</sos.affliction.classification>
+	<sos.affliction.convulsions>抽搐/痉挛</sos.affliction.convulsions>
+	<sos.affliction.death_cause>死亡原因：</sos.affliction.death_cause>
+	<sos.affliction.debuff>减益</sos.affliction.debuff>
+	<sos.affliction.effects_header>按强度阶段的效果</sos.affliction.effects_header>
+	<sos.affliction.event_animations>强制动画</sos.affliction.event_animations>
+	<sos.affliction.event_explosion>引发爆炸</sos.affliction.event_explosion>
+	<sos.affliction.event_particles>生成粒子</sos.affliction.event_particles>
+	<sos.affliction.event_sounds>触发声音/噪音</sos.affliction.event_sounds>
+	<sos.affliction.exp_gain>医疗经验值：</sos.affliction.exp_gain>
+	<sos.affliction.frequency>频率：</sos.affliction.frequency>
+	<sos.affliction.heal_cost>诊所治疗费用：</sos.affliction.heal_cost>
+	<sos.affliction.icon_threshold>图标出现于：</sos.affliction.icon_threshold>
+	<sos.affliction.indicator_limb>指示肢体：</sos.affliction.indicator_limb>
+	<sos.affliction.interval>间隔：</sos.affliction.interval>
+	<sos.affliction.limb_specific>仅特定肢体：</sos.affliction.limb_specific>
+	<sos.affliction.max_hp_penalty>最大生命值惩罚：</sos.affliction.max_hp_penalty>
+	<sos.affliction.max_strength>最大强度：</sos.affliction.max_strength>
+	<sos.affliction.natural_healing>自然恢复：</sos.affliction.natural_healing>
+	<sos.affliction.periodic_header>周期性事件</sos.affliction.periodic_header>
+	<sos.affliction.resistances>抗性：</sos.affliction.resistances>
+	<sos.affliction.scanner_threshold>扫描仪检测于：</sos.affliction.scanner_threshold>
+	<sos.affliction.speed>速度：</sos.affliction.speed>
+	<sos.affliction.str>强度：</sos.affliction.str>
+	<sos.affliction.strength_range>强度范围：</sos.affliction.strength_range>
+	<sos.affliction.treatment_threshold>AI 治疗于：</sos.affliction.treatment_threshold>
+	<sos.affliction.triggers>触发：</sos.affliction.triggers>
+	<sos.affliction.type>类型：</sos.affliction.type>
+	<sos.affliction.visual_distortions>视觉扭曲</sos.affliction.visual_distortions>
+	<sos.affliction.worsens>恶化：</sos.affliction.worsens>
 
 	<!-- Simulator -->
 	<sos.aff.speedDropdown>x1 以上仍在开发中。\n在单人游戏中运行良好，但在多人游戏中完全不行。</sos.aff.speedDropdown>
@@ -179,13 +247,14 @@
 
 	<!-- List Headers -->
 	<sos.list.header.afflictionprefab>病症</sos.list.header.afflictionprefab>
-	<sos.list.header.afflictionprefabhusk> Husk 病症</sos.list.header.afflictionprefabhusk>
+	<sos.list.header.afflictionprefabhusk>Husk 病症</sos.list.header.afflictionprefabhusk>
 	<sos.list.header.itemprefab>物品</sos.list.header.itemprefab>
 
 	<!-- List -->
 	<sos.list.separator_tooltip>点击按此对象类型筛选列表。</sos.list.separator_tooltip>
 
 	<!-- Layout -->
+	<sos.layout.save>保存当前布局</sos.layout.save>
 	<sos.layout.save_tooltip>将当前面板布局保存为新预设。</sos.layout.save_tooltip>
 	<sos.layout.apply_tooltip>应用此面板布局预设。</sos.layout.apply_tooltip>
 	<sos.layout.delete_tooltip>删除此布局预设。</sos.layout.delete_tooltip>
@@ -202,7 +271,8 @@
 
 	<!-- Migration -->
 	<sos.migration.title>SOS — 设置迁移</sos.migration.title>
-	<sos.migration.description>检测到旧版 SOS 设置。&#xA;是否要导入已有数据到新系统？</sos.migration.description>
+	<sos.migration.description>检测到旧版 SOS 设置。
+是否要导入已有数据到新系统？</sos.migration.description>
 	<sos.migration.import>导入</sos.migration.import>
 	<sos.migration.discard>丢弃</sos.migration.discard>
 	<sos.migration.ignore>忽略</sos.migration.ignore>

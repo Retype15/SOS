@@ -1,5 +1,5 @@
 <Project>
-  <!-- 
+  <!--
     Localization Watchdog by Visual Studio
     This file runs during compilation to ensure all localization keys are translated.
     AI GENERATED FILE.
@@ -8,16 +8,60 @@
     <ParameterGroup>
       <LocalizationFolder ParameterType="System.String" Required="true" />
       <OutputFile ParameterType="System.String" Required="true" />
+      <SourceFiles ParameterType="System.String" Required="false" />
     </ParameterGroup>
     <Task>
       <Using Namespace="System" />
       <Using Namespace="System.IO" />
+      <Using Namespace="System.Text" />
       <Using Namespace="System.Xml.Linq" />
       <Using Namespace="System.Collections.Generic" />
       <Using Namespace="System.Linq" />
+      <Using Namespace="System.Text.RegularExpressions" />
 
       <Code Type="Fragment" Language="cs">
         <![CDATA[
+          // --- Helpers -------------------------------------------------------
+
+          // Unescapes a C# string literal's common escape sequences (\n, \t, \", \\, etc.).
+          string UnescapeCSharp(string s) {
+              if (string.IsNullOrEmpty(s)) return s;
+              var sb = new StringBuilder(s.Length);
+              for (int i = 0; i < s.Length; i++) {
+                  if (s[i] == '\\' && i + 1 < s.Length) {
+                      char n = s[i + 1];
+                      switch (n) {
+                          case 'n': sb.Append('\n'); break;
+                          case 't': sb.Append('\t'); break;
+                          case 'r': sb.Append('\r'); break;
+                          case '0': sb.Append('\0'); break;
+                          case '"': sb.Append('"'); break;
+                          case '\\': sb.Append('\\'); break;
+                          case '\'': sb.Append('\''); break;
+                          default: sb.Append('\\').Append(n); break;
+                      }
+                      i++;
+                  }
+                  else sb.Append(s[i]);
+              }
+              return sb.ToString();
+          }
+
+          // Strip the surrounding quotes of a matched string literal and unescape its contents.
+          string LiteralValue(string literal) {
+              if (literal.Length >= 2) literal = literal.Substring(1, literal.Length - 2);
+              return UnescapeCSharp(literal);
+          }
+
+          // Canonicalize both sides before comparison so line-break/tab/space formatting
+          // differences don't produce false "modified" reports.
+          string Normalize(string s) {
+              if (s == null) return "";
+              s = s.Replace("\\n", " ").Replace("\\t", " ").Replace("\\r", " ");
+              s = Regex.Replace(s, @"\s+", " ");
+              return s.Trim();
+          }
+
           try {
               string englishPath = Path.Combine(LocalizationFolder, "English.xml");
               if (!File.Exists(englishPath)) {
@@ -25,22 +69,54 @@
                   return true;
               }
 
+              // --- English (source of truth) ---------------------------------
               var englishDoc = XDocument.Load(englishPath);
-              var englishKeys = new HashSet<string>(
-                  englishDoc.Elements().Select(e => e.Name.LocalName)
-              );
+              var englishKeys = new HashSet<string>(englishDoc.Root.Elements().Select(e => e.Name.LocalName));
+              var englishValues = englishDoc.Root.Elements()
+                  .ToDictionary(e => e.Name.LocalName, e => e.Value);
+
+              // --- Collect keys / fallbacks used in code (Texts.Get(...)) ----
+              // A C# string literal: "..." with optional backslash escapes.
+              const string literalRegex = "\"(?:\\\\.|[^\"\\\\])*\"";
+              // when matched, capture groups: 1 = key literal, 2 = fallback concatenation.
+              string withFallback = "Texts\\.Get\\(\\s*(" + literalRegex + ")\\s*,\\s*((?:" + literalRegex + ")(?:\\s*\\+\\s*(?:" + literalRegex + "))*)\\s*\\)";
+              string withoutFallback = "Texts\\.Get\\(\\s*(" + literalRegex + ")\\s*\\)";
+
+              // key -> hasFallback
+              var codeUsed = new Dictionary<string, bool>();
+              // key -> representative code fallback (concatenated string)
+              var codeFallbacks = new Dictionary<string, string>();
+
+              string[] sources = (SourceFiles ?? "").Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+              foreach (var src in sources) {
+                  if (!File.Exists(src)) continue;
+                  string text = File.ReadAllText(src);
+
+                  foreach (Match m in Regex.Matches(text, withFallback)) {
+                      string key = QuoteValue(m.Groups[1].Value);
+                      var parts = Regex.Matches(m.Groups[2].Value, literalRegex).Cast<Match>()
+                          .Select(x => QuoteValue(x.Value)).ToArray();
+                      codeUsed[key] = true;
+                      codeFallbacks[key] = string.Concat(parts);
+                  }
+                  foreach (Match m in Regex.Matches(text, withoutFallback)) {
+                      string key = QuoteValue(m.Groups[1].Value);
+                      if (!codeUsed.ContainsKey(key)) codeUsed[key] = false;
+                  }
+              }
+
+              string QuoteValue(string lit) => LiteralValue(lit);
 
               var reportRoot = new XElement("LocalizationReport");
 
+              // --- Per-language translation coverage -------------------------
               string[] otherFiles = Directory.GetFiles(LocalizationFolder, "*.xml");
               foreach (string file in otherFiles) {
                   if (Path.GetFileName(file).Equals("English.xml", StringComparison.OrdinalIgnoreCase))
                       continue;
 
                   var otherDoc = XDocument.Load(file);
-                  var otherKeys = new HashSet<string>(
-                      otherDoc.Elements().Select(e => e.Name.LocalName)
-                  );
+                  var otherKeys = new HashSet<string>(otherDoc.Root.Elements().Select(e => e.Name.LocalName));
 
                   string langName = Path.GetFileNameWithoutExtension(file);
 
@@ -56,17 +132,77 @@
                           extraKeys.Select(k => new XElement("Key", k))
                       )
                   );
-
                   reportRoot.Add(langElement);
+              }
+
+              // --- Keys referenced in code but not defined in English.xml ----
+              var usedNotDefined = codeUsed.Keys
+                  .Where(k => !englishKeys.Contains(k))
+                  .OrderBy(k => k)
+                  .Select(k => new
+                  {
+                      Key = k,
+                      Fallback = codeFallbacks.TryGetValue(k, out var fb) ? fb : ""
+                  });
+              if (usedNotDefined.Any()) {
+                  reportRoot.Add(new XElement("UsedNotDefined",
+                      usedNotDefined.Select(x => new XElement("Key",
+                          new XAttribute("name", x.Key),
+                          new XAttribute("fallback", x.Fallback)))
+                  ));
+              }
+
+              // --- Dynamic / prefix-based key references (GetTranslationsByPrefix, interpolated) ---
+              var dynPrefixes = new List<string>();
+              foreach (var src in sources) {
+                  if (!File.Exists(src)) continue;
+                  string text = File.ReadAllText(src);
+                  foreach (Match m in Regex.Matches(text, "Texts\\.GetTranslationsByPrefix\\(\\s*\"([^\")]+)\""))
+                      dynPrefixes.Add(m.Groups[1].Value.Trim());
+                  foreach (Match m in Regex.Matches(text, "Texts\\.Get\\(\\s*\\$\"([^\"{]*){"))
+                      dynPrefixes.Add(m.Groups[1].Value);
+              }
+
+              // --- Obsolete: English "sos.*" keys with no reference in code -------------
+              var referenced = new HashSet<string>(codeUsed.Keys.Distinct());
+              foreach (var p in dynPrefixes)
+                  foreach (var k in englishKeys)
+                      if (k.StartsWith(p)) referenced.Add(k);
+
+              var obsolete = englishKeys
+                  .Where(k => k.StartsWith("sos.") && !referenced.Contains(k))
+                  .OrderBy(k => k)
+                  .Select(k => (Key: k, Value: englishValues[k]));
+              if (obsolete.Any()) {
+                  reportRoot.Add(new XElement("Obsolete",
+                      obsolete.Select(x => new XElement("Key",
+                          new XAttribute("name", x.Key),
+                          new XAttribute("english", x.Value)))
+                  ));
+              }
+
+              // --- Keys whose code fallback differs from the English value ---
+              var modified = codeFallbacks
+                  .Where(kvp => englishValues.TryGetValue(kvp.Key, out var eng) &&
+                                 Normalize(kvp.Value) != Normalize(eng))
+                  .OrderBy(kvp => kvp.Key)
+                  .Select(kvp => new XElement("Key",
+                      new XAttribute("name", kvp.Key),
+                      new XAttribute("code", kvp.Value),
+                      new XAttribute("english", englishValues[kvp.Key])))
+                  .ToList();
+              if (modified.Count > 0) {
+                  reportRoot.Add(new XElement("Modified", modified));
               }
 
               var reportDoc = new XDocument(reportRoot);
               reportDoc.Save(OutputFile);
 
               Log.LogMessage("Localization report generated at: " + OutputFile);
+              Log.LogMessage("Used keys: " + codeUsed.Count + " | Used-but-not-defined: " + (usedNotDefined.Any() ? usedNotDefined.Count() : 0) + " | Modified fallbacks: " + modified.Count);
           }
           catch (Exception e) {
-              Log.LogError("Localization Check Error: " + e.Message);
+              Log.LogError("Localization Check Error: " + e.Message + "\n" + e.StackTrace);
           }
         ]]>
       </Code>
@@ -74,9 +210,16 @@
   </UsingTask>
 
   <Target Name="VerifyLocalization" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Assets'">
-    <VerifyLocalizationTask 
-      LocalizationFolder="$(MSBuildThisFileDirectory)/Assets/Localization/" 
+    <ItemGroup>
+      <_LocalizationSources Include="$(MSBuildThisFileDirectory)/API/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/API/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/API/**/obj/**/*.cs" />
+      <_LocalizationSources Include="$(MSBuildThisFileDirectory)/ClientProject/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/ClientProject/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/ClientProject/**/obj/**/*.cs" />
+      <_LocalizationSources Include="$(MSBuildThisFileDirectory)/SharedProject/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/SharedProject/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/SharedProject/**/obj/**/*.cs" />
+    </ItemGroup>
+
+    <VerifyLocalizationTask
+      LocalizationFolder="$(MSBuildThisFileDirectory)/Assets/Localization/"
       OutputFile="$(MSBuildThisFileDirectory)/missingtranslation.xml"
+      SourceFiles="@(_LocalizationSources)"
       />
   </Target>
 </Project>

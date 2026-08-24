@@ -12,9 +12,9 @@ using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
-namespace SOS
+namespace SOS.Panels.AfflictionPanel
 {
-    public static class ClinicalSimulatorManager
+    internal static class ClinicalSimulatorManager
     {
         public static DummySubject? ActiveDummy { get; private set; }
         public static Character? Patient => ActiveDummy?.Character;
@@ -145,49 +145,48 @@ namespace SOS
             }
         }
 
-        public static void Initialize(int savedDeathCount, string? savedXml, bool savedSimulated = false)
+        public static void Initialize()
         {
             MedicalReflector.Validate();
             if (ActiveDummy != null && ActiveDummy.Character != null && !ActiveDummy.Character.Removed) return;
             ActiveDummy?.Discard();
             ActiveDummy = null;
-            DeathCount = savedDeathCount;
+            var controller = SOSController.Instance;
+            DeathCount = controller.cfg.DummyDeathCount;
 
             bool loadedSuccessfully = false;
-            if (!string.IsNullOrEmpty(savedXml))
+
+            try
             {
-                try
+                XElement? element = controller.cfg.DummyCharacterXML;
+
+                var charNode = element.Name.ToString().Equals("Character", StringComparison.OrdinalIgnoreCase)
+                    ? element
+                    : element.Element("Character");
+
+                if (charNode != null)
                 {
-                    XElement element = XElement.Parse(savedXml);
+                    var contentX = new ContentXElement(null, charNode);
+                    CharacterInfo info = new(contentX);
 
-                    var charNode = element.Name.ToString().Equals("Character", StringComparison.OrdinalIgnoreCase)
-                        ? element
-                        : element.Element("Character");
+                    var character = Character.Create(info.SpeciesName, new Vector2(0, -10000), "SOS_DUMMY", info, isRemotePlayer: false, hasAi: false, createNetworkEvent: false, spawnInitialItems: false, id: GetFreshDummyID());
+                    ActiveDummy = new DummySubject(character, DeathCount);
+                    ActiveDummy.SetupDummyEntity();
 
-                    if (charNode != null)
+                    XElement? healthNode = element.Element("health");
+                    if (healthNode != null)
                     {
-                        var contentX = new ContentXElement(null, charNode);
-                        CharacterInfo info = new(contentX);
-
-                        var character = Character.Create(info.SpeciesName, new Vector2(0, -10000), "SOS_DUMMY", info, isRemotePlayer: false, hasAi: false, createNetworkEvent: false, spawnInitialItems: false, id: GetFreshDummyID());
-                        ActiveDummy = new DummySubject(character, DeathCount);
-                        ActiveDummy.SetupDummyEntity();
-
-                        XElement? healthNode = element.Element("health");
-                        if (healthNode != null)
-                        {
-                            CharacterInfo.ApplyHealthData(Patient, healthNode);
-                            MedicalReflector.HealthBiologicalUpdateMethod?.Invoke(Patient?.CharacterHealth, [0f]);
-                            Patient?.CharacterHealth.CalculateVitality();
-                        }
-
-                        loadedSuccessfully = true;
+                        CharacterInfo.ApplyHealthData(Patient, healthNode);
+                        MedicalReflector.HealthBiologicalUpdateMethod?.Invoke(Patient?.CharacterHealth, [0f]);
+                        Patient?.CharacterHealth.CalculateVitality();
                     }
+
+                    loadedSuccessfully = true;
                 }
-                catch (Exception e)
-                {
-                    LuaCsLogger.LogError($"[SOS] Failed to load saved Dummy XML: {e.Message}");
-                }
+            }
+            catch (Exception e)
+            {
+                LuaCsLogger.LogError($"[SOS] Failed to load saved Dummy XML: {e.Message}");
             }
 
             if (!loadedSuccessfully)
@@ -196,14 +195,14 @@ namespace SOS
             }
 
             IsPlaying = false;
-            if (loadedSuccessfully && savedSimulated)
+            if (loadedSuccessfully && controller.cfg.DummySimulated)
             {
                 HasStarted = false;
                 TakeSnapshot();
             }
             else
             {
-                HasStarted = true;
+                HasStarted = false;
                 snapshot = null;
             }
         }
@@ -227,11 +226,11 @@ namespace SOS
             {
                 int tier = deathCount / 10;
                 if (tier == 0) tier = 1;
-                nameTemplate = TextSOS.Get($"sos.dummyname.rand.{tier}", $"Dummy Subject #[id]").Value;
+                nameTemplate = Texts.Get($"sos.dummyname.rand.{tier}", $"Dummy Subject #[id]").Value;
             }
             else
             {
-                var randomNames = TextSOS.GetTranslationsByPrefix("sos.dummyname.rand.").Values.ToImmutableArray();
+                var randomNames = Texts.GetTranslationsByPrefix("sos.dummyname.rand.").Values.ToImmutableArray();
                 if (randomNames.Length > 0)
                     nameTemplate = randomNames[Rand.Range(0, randomNames.Length)];
                 else
@@ -239,7 +238,7 @@ namespace SOS
             }
 
             string finalName = nameTemplate.Replace("[id]", deathCount.ToString());
-            RLogger.LogDebug("[SOS] Assigning Subject Identity: " + finalName);
+            Logger.LogDebug("[SOS] Assigning Subject Identity: " + finalName);
             info.Name = finalName;
             info.OriginalName = finalName;
         }
@@ -553,7 +552,7 @@ namespace SOS
                 }
                 catch (System.Exception e)
                 {
-                    RLogger.LogWarning($"[SOS] Safety warning during native window rescue: {e.Message}");
+                    Logger.LogWarning($"[SOS] Safety warning during native window rescue: {e.Message}");
                 }
                 finally
                 {

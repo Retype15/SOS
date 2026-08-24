@@ -5,45 +5,48 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using System.Diagnostics;
 using Barotrauma;
 using Barotrauma.LuaCs;
 using Barotrauma.LuaCs.Events;
-using Microsoft.Xna.Framework;
+using SOS.Configs;
 
 namespace SOS
 {
     // Client-specific code
     public partial class Plugin : IAssemblyPlugin, IEventKeyUpdate
     {
-        private SOSController? controller;
+        public SOSController? controller;
 
+        [Conditional("CLIENT")]
         public void InitClient()
         {
-            controller = SOSController.Instance;
-            controller.LoadSettings();
-
-            if (!DebugConsole.commands.Exists(c => c.Names.ToString() == "sos")) // \\//
-                DebugConsole.commands.Add(new DebugConsole.Command(
-                    name: "sos",
-                    help: TextSOS.Get("sos.command.help", "Open/Close SOS.").Value,
-                    onExecute: _ => controller?.ToggleUI(),
-                    getValidArgs: null,
-                    isCheat: false
-                )
-                {
-                    RelayToServer = false,
-                    OnClientExecute = _ => controller?.ToggleUI()
-                });
-
-            LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
-
-            // Migration: old config file detected
-            if (File.Exists("Data/sossettings.xml"))
+            try
             {
-                controller.HaveOldConfigFile = true;
-            }
+                controller = SOSController.Instance;
+                API.RegisterConfig(() => ClientConfig.Instance);
+                API.RegisterConfig(() => WindowProfileConfig.Instance);
 
-            RLogger.Log(TextSOS.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
+                ConsoleCommandsService.RegisterCommand(
+                        name: "sos",
+                        help: CommandHelp(),
+                        onExecute: args => controller?.ResolveCommand(args),
+                        getValidArgs: () => [["log", .. LogLevelStates.Strings], ["help"]]
+                );
+
+                LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
+
+                if (File.Exists("Data/sossettings.xml"))
+                {
+                    controller.HaveOldConfigFile = true;
+                }
+
+                Logger.Log(Texts.Get("sos.client.init", "[SOS] Client: Initialized. Press 'J' to open.").Value);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"[SOS] InitClient FAILED: {ex}");
+            }
         }
 
         public void OnKeyUpdate(double deltaTime)
@@ -51,56 +54,25 @@ namespace SOS
             controller?.Update();
         }
 
+        [Conditional("CLIENT")]
         public void DisposeClient()
         {
             LuaCsSetup.Instance.EventService.Unsubscribe<IEventKeyUpdate>(this);
 
-            DebugConsole.commands.RemoveAll(c => c.Names.Contains("sos"));
+            ConsoleCommandsService.RemoveCommand("sos");
 
-            controller?.SaveSettings();
-            controller?.Destroy();
-            controller = null;
-        }
-    }
-
-    // TODO: Must to Change site...
-    public class PrefabAdapter
-    {
-        public static Sprite? Icon(Prefab prefab)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.InventoryIcon ?? item.Sprite,
-                AfflictionPrefab affliction => affliction.Icon,
-                _ => null
-            };
-        }
-        public static Color IconColor(Prefab prefab)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.InventoryIconColor,
-                AfflictionPrefab affliction => affliction.IconColors?.First() ?? Color.White,
-                _ => Color.White
-            };
-        }
-        public static PriceInfo? DefaultPrice(Prefab prefab)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.DefaultPrice,
-                _ => null
-            };
+            ClientConfig.Destroy();
+            WindowProfileConfig.Destroy();
+            SOSController.Instance.Destroy();
+            controller = null!;
+            API.Clear();
         }
 
-        public static ContentXElement? ConfigElement(Prefab prefab)
+        internal static string CommandHelp()
         {
-            return prefab switch
-            {
-                ItemPrefab item => item.ConfigElement,
-                AfflictionPrefab affliction => affliction.configElement,
-                _ => null
-            };
+            return
+                Texts.Get("sos.command.help", "Open/Close SOS.\nSub-command available:").Value +
+                string.Join("\n", Texts.GetTranslationsByPrefix("sos.command.help")).Replace("{logCommands}", string.Join(", ", LogLevelStates.Strings));
         }
     }
 }

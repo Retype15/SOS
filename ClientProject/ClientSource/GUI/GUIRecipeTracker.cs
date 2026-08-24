@@ -15,7 +15,7 @@ using BGUI = Barotrauma.GUI;
 
 namespace SOS.GUI
 {
-    public class GUIRecipeTracker : GUIFrame
+    internal class GUIRecipeTracker : GUIFrame
     {
         // CONSTS
         private const ushort TIMECACHERESET = 60;
@@ -71,7 +71,7 @@ namespace SOS.GUI
             }
         }
 
-        public GUIRecipeTracker(RectTransform rectT, string style = "", Color? color = null) : base(rectT, style, color)
+        internal GUIRecipeTracker(RectTransform rectT, string style = "", Color? color = null) : base(rectT, style, color)
         {
             contentLayout = new GUILayoutGroup(
                 new RectTransform(new Vector2(1f, 1f), RectTransform) { AbsoluteOffset = new Point(8, 8) })
@@ -81,10 +81,10 @@ namespace SOS.GUI
             };
 
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), contentLayout.RectTransform) { MinSize = new Point(0, 22) },
-                TextSOS.Get("sos.hud.tracking", "TRACKING:").Value, font: GUIStyle.SubHeadingFont, textColor: Color.Gold)
+                Texts.Get("sos.hud.tracking", "TRACKING:").Value, font: GUIStyle.SubHeadingFont, textColor: Color.Gold)
             {
                 CanBeFocused = false,
-                ToolTip = TextSOS.Get("sos.hud.tracking_tooltip", "Active crafting tracker. Shows required ingredients and amounts.")
+                ToolTip = Texts.Get("sos.hud.tracking_tooltip", "Active crafting tracker. Shows required ingredients and amounts.")
             };
 
             emptyLabel = new GUITextBlock(
@@ -93,11 +93,11 @@ namespace SOS.GUI
                     AbsoluteOffset = new Point(8, 34),
                     MinSize = new Point(0, 22)
                 },
-                TextSOS.Get("sos.hud.nothing_tracked", "Nothing tracked here."),
+                Texts.Get("sos.hud.nothing_tracked", "Nothing tracked here."),
                 font: GUIStyle.SmallFont, textColor: Color.Gray)
             { CanBeFocused = false };
 
-            ClientConfig.Instance.OnTrackerVisibleValueChanged += RegisterIfChange;
+            SOSController.Instance.cfg.OnTrackerVisibleValueChanged += RegisterIfChange;
         }
 
         public bool AddRecipe(FabricationRecipe? recipe)
@@ -178,12 +178,12 @@ namespace SOS.GUI
         public bool AddOrRemoveRecipe(ItemPrefab itemPrefab, IConvertible? recipeHash = null) => AddOrRemoveRecipe(PrefabResolver.GetFabricationRecipe(itemPrefab, recipeHash));
         public bool AddOrRemoveRecipe(string itemString, IConvertible? recipeHash = null) => AddOrRemoveRecipe(PrefabResolver.GetFabricationRecipe(itemString, recipeHash));
 
-        public static LocalizedString GetTrackOrUntrackToHUD(bool state) => state ? TextSOS.Get("sos.context.track_to_hud", "Track to HUD") : TextSOS.Get("sos.context.untrack_from_hud", "Remove from HUD");
+        public static LocalizedString GetTrackOrUntrackToHUD(bool state) => state ? Texts.Get("sos.context.track_to_hud", "Track to HUD") : Texts.Get("sos.context.untrack_from_hud", "Remove from HUD");
 
         public LocalizedString GetStringTrackToHUD(FabricationRecipe? recipe) => GetTrackOrUntrackToHUD(!ContainsRecipe(recipe));
         public LocalizedString GetStringTrackToHUD(ItemPrefab? itemPrefab) => GetTrackOrUntrackToHUD(!ContainsAnyRecipes(itemPrefab));
 
-        public static LocalizedString GetTrackOrUntrack(bool state) => state ? TextSOS.Get("sos.context.track", "Track") : TextSOS.Get("sos.context.untrack", "Untrack");
+        public static LocalizedString GetTrackOrUntrack(bool state) => state ? Texts.Get("sos.context.track", "Track") : Texts.Get("sos.context.untrack", "Untrack");
 
         public void Clear() => RemoveRecipes();
 
@@ -192,15 +192,15 @@ namespace SOS.GUI
             if (Visible) HideTracker();
             else ShowTracker();
         }
-        public static void ShowTracker() => ClientConfig.Instance.TrackerVisible = true;
-        public static void HideTracker() => ClientConfig.Instance.TrackerVisible = false;
+        public static void ShowTracker() => SOSController.Instance.cfg.TrackerVisible = true;
+        public static void HideTracker() => SOSController.Instance.cfg.TrackerVisible = false;
 
         public List<ContextMenuOption> GetManageHudContextMenuOptions()
         {
             var options = new List<ContextMenuOption>
             {
                 new(
-                TextSOS.Get("sos.window.remove_all", "Remove All"),
+                Texts.Get("sos.window.remove_all", "Remove All"),
                 isEnabled: trackedRecipes.Count > 0,
                 onSelected: Clear)
             };
@@ -316,7 +316,7 @@ namespace SOS.GUI
                     if (!hasEnough) allComplete = false;
 
                     string? value = req.FirstMatchingPrefab?.Name.Value;
-                    string name = value.IsNullOrEmpty() ? TextSOS.Get("sos.gen.unknown", "???").Value : value;
+                    string name = value.IsNullOrEmpty() ? Texts.Get("sos.gen.unknown", "???").Value : value;
                     ingUI.text.Text = $"{name}: {owned}/{req.Amount}";
                     ingUI.text.TextColor = hasEnough ? Color.LightGreen : Color.Salmon;
                 }
@@ -328,17 +328,7 @@ namespace SOS.GUI
             if (layoutDirty) RecalculateSize();
         }
 
-        public static GUIRecipeTracker InstantiateWithDefault()
-        {
-            return new(new RectTransform(new Point(280, 180), BGUI.Canvas, Anchor.TopRight) { AbsoluteOffset = new Point(20, 150) }, style: "InnerFrame")
-            {
-                CanBeFocused = false,
-                Color = Color.Black * 0.6f
-            }
-            ;
-        }
-
-        private void RegisterIfChange(ISettingBase trk) => Visible = ClientConfig.Instance.TrackerVisible;
+        private void RegisterIfChange(ISettingBase _) => Visible = SOSController.Instance.cfg.TrackerVisible;
 
         public void Destroy()
         {
@@ -346,15 +336,7 @@ namespace SOS.GUI
             emptyLabel.RectTransform.Parent = null;
             emptyLabel.RemoveFromGUIUpdateList();
             RemoveRecipes();
-            ClientConfig.Instance.OnTrackerVisibleValueChanged -= RegisterIfChange;
-        }
-
-        private static int GetPlayerCount(FabricationRecipe.RequiredItem req)
-        {
-            if (Character.Controlled?.Inventory == null) return 0;
-
-            return Character.Controlled.Inventory.AllItems
-                .Count(item => req.ItemPrefabs.Any(p => p.Identifier == item.Prefab.Identifier));
+            SOSController.Instance.cfg.OnTrackerVisibleValueChanged -= RegisterIfChange;
         }
 
         private void RecalculateSize()
@@ -392,6 +374,24 @@ namespace SOS.GUI
                     AddRecipe(parts[0], hash);
                 else if (parts.Length == 1) AddRecipe(parts[0]);
             }
+        }
+
+        private static int GetPlayerCount(FabricationRecipe.RequiredItem req)
+        {
+            if (Character.Controlled?.Inventory == null) return 0;
+
+            return Character.Controlled.Inventory.AllItems
+                .Count(item => req.ItemPrefabs.Any(p => p.Identifier == item.Prefab.Identifier));
+        }
+
+        public static GUIRecipeTracker InstantiateWithDefault()
+        {
+            return new(new RectTransform(new Point(280, 180), BGUI.Canvas, Anchor.TopRight) { AbsoluteOffset = new Point(20, 150) }, style: "InnerFrame")
+            {
+                CanBeFocused = false,
+                Color = Color.Black * 0.6f
+            }
+            ;
         }
     }
 

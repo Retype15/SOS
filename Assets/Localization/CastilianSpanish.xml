@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <infotexts language="Castilian Spanish" nowhitespace="false" translatedname="Castellano">
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] Client: Inicializado. Pulsa 'J' para abrir.</sos.client.init>
 	<sos.command.help>Abre/Cierra SOS.</sos.command.help>
+	<sos.command.help.log>- log [{logCommands}]\nEjemplo: 'sos log verbose'</sos.command.help.log>
 	<sos.command.name>sos</sos.command.name>
 	<sos.shared.debugmode>[SOS] Modo depuración activado.</sos.shared.debugmode>
 	<sos.shared.loaded>[SOS] Cargado correctamente.</sos.shared.loaded>
@@ -14,6 +15,9 @@
 	<sos.config.migrating>[SOS] Migrando configuración desde la ruta antigua...</sos.config.migrating>
 	<sos.config.save_error>[SOS] Fallo al guardar configuración: [error]</sos.config.save_error>
 	<sos.config.saved>[SOS] Configuración guardada (v[version]).</sos.config.saved>
+	<sos.config.reset_section>Restablecer Sección a Predeterminados</sos.config.reset_section>
+	<sos.config.reset_all>RESTABLECER TODO</sos.config.reset_all>
+	<sos.config.reset_all_tooltip>Restablece todas las configuraciones S.O.S. a sus valores predeterminados.</sos.config.reset_all_tooltip>
 
 	<!-- General -->
 	<sos.gen.close>Cerrar [Esc]</sos.gen.close>
@@ -35,7 +39,10 @@
 	<!-- Window -->
 	<sos.window.additional_info>INFO ADICIONAL</sos.window.additional_info>
 	<sos.window.back>Atrás</sos.window.back>
-	<sos.window.back.shortcuts>Atajos:&#xA;- Alt + Flecha Izquierda&#xA;- Retroceso&#xA;- Ratón 4</sos.window.back.shortcuts>
+	<sos.window.back.shortcuts>Atajos:
+- Alt + Flecha Izquierda
+- Retroceso
+- Ratón 4</sos.window.back.shortcuts>
 	<sos.window.manage_hud>GESTIONAR HUD</sos.window.manage_hud>
 	<sos.window.manage_hud_tooltip>Gestiona las recetas rastreadas en el HUD</sos.window.manage_hud_tooltip>
 	<sos.window.toggle_tracker_tooltip>Alternar visibilidad del rastreador HUD (Ctrl+[key])</sos.window.toggle_tracker_tooltip>
@@ -45,24 +52,43 @@
 	<sos.window.remove_all>Eliminar Todo</sos.window.remove_all>
 	<sos.window.track_all>Rastrear Todo</sos.window.track_all>
 	<sos.window.forward>Adelante</sos.window.forward>
-	<sos.window.forward.shortcuts>Atajos:&#xA;- Alt + Flecha Derecha&#xA;- Mayús + Retroceso&#xA;- Ratón 5</sos.window.forward.shortcuts>
+	<sos.window.forward.shortcuts>Atajos:
+- Alt + Flecha Derecha
+- Mayús + Retroceso
+- Ratón 5</sos.window.forward.shortcuts>
 	<sos.window.loading>Cargando dependencias...</sos.window.loading>
 	<sos.window.loading.complete>¡Carga completa!</sos.window.loading.complete>
 	<sos.window.obtain>OBTENCIÓN</sos.window.obtain>
 	<sos.window.raw_xml>VER XML</sos.window.raw_xml>
 	<sos.window.raw_xml_tooltip>Alterna entre la vista de metadatos y el XML del objeto.</sos.window.raw_xml_tooltip>
 	<sos.window.search_placeholder>Buscar objeto...</sos.window.search_placeholder>
-	<sos.window.search_tooltip>Buscar por Nombre, ID, Categoría, Etiquetas, ModName, ItemType, Prefab, etc.&#xA;Filtros avanzados:&#xA;  @Mod        (ej., @Vanilla @Neurotrauma)&#xA;  #Categoría  (ej., #Medical #Weapon)&#xA;  $Etiqueta   (ej., $smallitem $diving)&#xA;  &amp;Ranura     (ej., &amp;Head &amp;Inner)&#xA;  !ID         (ej., !weldingtool)&#xA;  %Prefab         (ej., %Affliction %Item)&#xA;Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
+	<sos.window.search_tooltip>Buscar por Nombre, ID, Categoría, Etiquetas, ModName, ItemType, Prefab, etc.
+  Filtros avanzados:
+Identificadores     |  Ejemplos:
+———————————————————
+  @Mod                    |  @Vanilla @Neurotrauma
+  #Categoría          |  #Medical #Weapon
+  $Etiqueta             |  $smallitem $pill
+  &amp;Ranura               |  &amp;Head &amp;Inner
+  !ID                           |  !weldingtool
+  %Prefab               |  %Affliction %Item
+
+Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.window.section_container>CONTENEDOR</sos.window.section_container>
 	<sos.window.section_economy>ECONOMÍA</sos.window.section_economy>
-	<sos.window.section_equipment>EQUIPO</sos.window.section_equipment>
+	<sos.window.section_equipment>AL EQUIPAR</sos.window.section_equipment>
 	<sos.window.section_general>GENERAL</sos.window.section_general>
 	<sos.window.section_medical>MEDICINA</sos.window.section_medical>
 	<sos.window.section_spawning>SE ENCUENTRA EN</sos.window.section_spawning>
 	<sos.window.section_treatments>TRATAMIENTOS Y MEDICACIÓN</sos.window.section_treatments>
 	<sos.window.section_utility>UTILIDAD</sos.window.section_utility>
-	<sos.window.section_weapon>ARMA</sos.window.section_weapon>
-	<sos.window.settings>Configuración (WIP)</sos.window.settings>
+	<sos.window.section_weapon>COMO ARMA</sos.window.section_weapon>
+	<sos.window.settings>Configuración</sos.window.settings>
+	<sos.window.minimize>Minimizar</sos.window.minimize>
+	<sos.window.maximize>Maximizar</sos.window.maximize>
+	<sos.window.restore>Restaurar</sos.window.restore>
+	<sos.window.maximize_btn>M</sos.window.maximize_btn>
+	<sos.window.restore_btn>R</sos.window.restore_btn>
 	<sos.window.tag_tooltip>Buscar objetos con etiqueta: [tag]</sos.window.tag_tooltip>
 	<sos.window.title>SOS - Buscador de Recetas</sos.window.title>
 	<sos.window.usage>USOS</sos.window.usage>
@@ -78,8 +104,11 @@
 	<!-- Tabs -->
 	<sos.tab.recipes>RECETAS</sos.tab.recipes>
 	<sos.tab.recipes_tooltip>Muestra recetas de fabricación, fuentes y usos del objeto.</sos.tab.recipes_tooltip>
+	<sos.tab.recipes.analyzing>Analizando gráfico de dependencia de recetas...</sos.tab.recipes.analyzing>
 	<sos.tab.simulator>SIMULADOR</sos.tab.simulator>
 	<sos.tab.simulator_tooltip>Abre el simulador clínico para probar tratamientos y aflicciones en un paciente ficticio.</sos.tab.simulator_tooltip>
+	<sos.tab.preview>VISTA PREVIA</sos.tab.preview>
+	<sos.tab.preview_tooltip>Muestra el sprite visual del prefab seleccionado.</sos.tab.preview_tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>Alias:</sos.item.aliases>
@@ -89,7 +118,7 @@
 	<sos.item.cargo_box>Caja de Carga:</sos.item.cargo_box>
 	<sos.item.category>Categoría:</sos.item.category>
 	<sos.item.causes_fire>Causa Incendio</sos.item.causes_fire>
-	<sos.item.description>DESCRIPCIÓN:</sos.item.description>
+	<sos.item.description>DESCRIPCIÓN</sos.item.description>
 	<sos.item.drains_oxygen>Drena Oxígeno</sos.item.drains_oxygen>
 	<sos.item.hazards>Peligros:</sos.item.hazards>
 	<sos.item.header_info>ID: [id] | Precio: [price] mr</sos.item.header_info>
@@ -97,6 +126,7 @@
 	<sos.item.locations>Ubicaciones:</sos.item.locations>
 	<sos.item.max_stack>Max Stack:</sos.item.max_stack>
 	<sos.item.min_difficulty>Min. Dificultad:</sos.item.min_difficulty>
+	<sos.item.mod>Mod:</sos.item.mod>
 	<sos.item.price>Precio:</sos.item.price>
 	<sos.item.required_faction>Facción Requerida:</sos.item.required_faction>
 	<sos.item.tags>TAGS:</sos.item.tags>
@@ -107,11 +137,16 @@
 	<sos.weapon.base_spread>Dispersión Base:</sos.weapon.base_spread>
 	<sos.weapon.dismember_chance>Prob. de Desmembramiento:</sos.weapon.dismember_chance>
 	<sos.weapon.dmg_multiplier>Mult. de Daño:</sos.weapon.dmg_multiplier>
+	<sos.weapon.explosion_radius>Radio de Explosión:</sos.weapon.explosion_radius>
 	<sos.weapon.fire_rate>Cadencia de tiro:</sos.weapon.fire_rate>
 	<sos.weapon.hull_damage>Daño al Casco:</sos.weapon.hull_damage>
+	<sos.weapon.item_damage>Daño al Objeto:</sos.weapon.item_damage>
+	<sos.weapon.max_targets>Máx. de Objetivos:</sos.weapon.max_targets>
 	<sos.weapon.power_use>Uso de Energía:</sos.weapon.power_use>
+	<sos.weapon.projectiles>Proyectiles:</sos.weapon.projectiles>
 	<sos.weapon.range>Rango:</sos.weapon.range>
 	<sos.weapon.reload>Recarga:</sos.weapon.reload>
+	<sos.weapon.structure_damage>Daño Estructural:</sos.weapon.structure_damage>
 	<sos.weapon.throwable>Arrojadiza</sos.weapon.throwable>
 	<sos.weapon.type>Tipo:</sos.weapon.type>
 
@@ -121,6 +156,7 @@
 	<sos.equip.equips_in>Equipa en:</sos.equip.equips_in>
 	<sos.equip.max_durability>Durabilidad Máx:</sos.equip.max_durability>
 	<sos.equip.pressure_protection>Protección de Presión:</sos.equip.pressure_protection>
+	<sos.equip.res_suffix>Res.:</sos.equip.res_suffix>
 
 	<!-- Medical -->
 	<sos.med.always_causes>Siempre Aplica:</sos.med.always_causes>
@@ -139,6 +175,38 @@
 	<sos.affliction.contraindicated_warn>ADVERTENCIA: ¡Los siguientes objetos empeoran la condición!</sos.affliction.contraindicated_warn>
 	<sos.affliction.effective>Efectivo:</sos.affliction.effective>
 	<sos.affliction.highlyeffective>Altamente Efectivo:</sos.affliction.highlyeffective>
+	<sos.affliction.activation_threshold>Umbral de Activación:</sos.affliction.activation_threshold>
+	<sos.affliction.buff>Buff</sos.affliction.buff>
+	<sos.affliction.classification>Clasificación:</sos.affliction.classification>
+	<sos.affliction.convulsions>Convulsiones/Espasmos</sos.affliction.convulsions>
+	<sos.affliction.death_cause>Causa de Muerte:</sos.affliction.death_cause>
+	<sos.affliction.debuff>Debuff</sos.affliction.debuff>
+	<sos.affliction.effects_header>EFECTOS POR FASE DE FUERZA</sos.affliction.effects_header>
+	<sos.affliction.event_animations>Fuerza Animaciones</sos.affliction.event_animations>
+	<sos.affliction.event_explosion>Causa Explosión</sos.affliction.event_explosion>
+	<sos.affliction.event_particles>Genera Partículas</sos.affliction.event_particles>
+	<sos.affliction.event_sounds>Activa Sonidos/Ruidos</sos.affliction.event_sounds>
+	<sos.affliction.exp_gain>Ganancia de Exp. Médica:</sos.affliction.exp_gain>
+	<sos.affliction.frequency>Frecuencia:</sos.affliction.frequency>
+	<sos.affliction.heal_cost>Costo de Curación Clínica:</sos.affliction.heal_cost>
+	<sos.affliction.icon_threshold>El Ícono Aparece En:</sos.affliction.icon_threshold>
+	<sos.affliction.indicator_limb>Miembro Indicador:</sos.affliction.indicator_limb>
+	<sos.affliction.interval>Intervalo:</sos.affliction.interval>
+	<sos.affliction.limb_specific>Específico de Miembro:</sos.affliction.limb_specific>
+	<sos.affliction.max_hp_penalty>Penalización de PV Máx:</sos.affliction.max_hp_penalty>
+	<sos.affliction.max_strength>Fuerza Máx:</sos.affliction.max_strength>
+	<sos.affliction.natural_healing>Curación Natural:</sos.affliction.natural_healing>
+	<sos.affliction.periodic_header>EVENTOS PERIÓDICOS</sos.affliction.periodic_header>
+	<sos.affliction.resistances>Resistencias:</sos.affliction.resistances>
+	<sos.affliction.scanner_threshold>El Escáner Detecta En:</sos.affliction.scanner_threshold>
+	<sos.affliction.speed>Velocidad:</sos.affliction.speed>
+	<sos.affliction.str>Fuerza:</sos.affliction.str>
+	<sos.affliction.strength_range>Rango de Fuerza:</sos.affliction.strength_range>
+	<sos.affliction.treatment_threshold>La IA Trata En:</sos.affliction.treatment_threshold>
+	<sos.affliction.triggers>Desencadena:</sos.affliction.triggers>
+	<sos.affliction.type>Tipo:</sos.affliction.type>
+	<sos.affliction.visual_distortions>Distorsiones Visuales</sos.affliction.visual_distortions>
+	<sos.affliction.worsens>Empeora:</sos.affliction.worsens>
 
 	<!-- Simulator -->
 	<sos.aff.speedDropdown>Más de x1 aún están en progreso. \nFunciona bien en un jugador, pero no en multijugador.</sos.aff.speedDropdown>
@@ -186,6 +254,7 @@
 	<sos.list.separator_tooltip>Haz clic para filtrar la lista por este tipo de objeto.</sos.list.separator_tooltip>
 
 	<!-- Layout -->
+	<sos.layout.save>Guardar ACTUAL</sos.layout.save>
 	<sos.layout.save_tooltip>Guarda la distribución actual de paneles como un nuevo preset.</sos.layout.save_tooltip>
 	<sos.layout.apply_tooltip>Aplica este preset de distribución de paneles.</sos.layout.apply_tooltip>
 	<sos.layout.delete_tooltip>Elimina este preset de distribución.</sos.layout.delete_tooltip>
@@ -202,7 +271,8 @@
 
 	<!-- Migration -->
 	<sos.migration.title>SOS — Migración de Configuración</sos.migration.title>
-	<sos.migration.description>Se encontró una configuración anterior de SOS.&#xA;¿Deseas importar tus datos al nuevo sistema?</sos.migration.description>
+	<sos.migration.description>Se encontró una configuración anterior de SOS.
+¿Deseas importar tus datos al nuevo sistema?</sos.migration.description>
 	<sos.migration.import>Importar</sos.migration.import>
 	<sos.migration.discard>Descartar</sos.migration.discard>
 	<sos.migration.ignore>Ignorar</sos.migration.ignore>

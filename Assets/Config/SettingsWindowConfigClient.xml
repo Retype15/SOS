@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Client-only settings -->
+<Configuration>
+    <Settings>
+        <!-- State -->
+        <Setting Name="ActiveProfileId" Type="string" Value="" ShowInMenus="false" />
+
+        <!-- Settings Window Dimensions -->
+        <Setting Name="SettingsWindowSizeX" Type="int" Value="550" ShowInMenus="false" />
+        <Setting Name="SettingsWindowSizeY" Type="int" Value="600" ShowInMenus="false" />
+        <Setting Name="SettingsWindowPositionX" Type="int" Value="-1" ShowInMenus="false" />
+        <Setting Name="SettingsWindowPositionY" Type="int" Value="-1" ShowInMenus="false" />
+    </Settings>
+</Configuration>

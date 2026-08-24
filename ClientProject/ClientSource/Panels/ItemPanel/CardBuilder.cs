@@ -8,10 +8,29 @@
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
-
-namespace SOS
+namespace SOS.Panels.ItemPanel
 {
-    public static class CardBuilder
+    internal enum DisplayMode { Normal, Compact, Hidden }
+
+    internal class GroupedSource
+    {
+        public ItemPrefab? SourceItem;
+        public Identifier[]? MachineIds;
+        public List<Identifier>? RequiredOtherItems;
+        public float TotalCommonness;
+        public int Amount;
+        public bool IsRandom;
+    }
+
+    internal class GroupedUsage
+    {
+        public ItemPrefab? TargetItem;
+        public List<Identifier>? MachineIds;
+        public float AmountCreated;
+        public float AmountRequired;
+    }
+
+    internal static class CardBuilder
     {
         private const int RowHeight = 32;
         private const int HeaderHeight = 20;
@@ -25,7 +44,7 @@ namespace SOS
             {
                 ItemPrefab item => item?.GetTooltip(Character.Controlled) ?? "",
                 AfflictionPrefab affliction => (LocalizedString)(affliction?.GetDescription(0f, AfflictionPrefab.Description.TargetType.Self) ?? ""),
-                _ => TextSOS.Get("sos.gen.unknown", "???"),
+                _ => Texts.Get("sos.gen.unknown", "???"),
             };
             ReadOnlySpan<char> value = actual.Value.AsSpan();
             int idx = value.LastIndexOf('\n');
@@ -57,7 +76,7 @@ namespace SOS
             }
             var textLayout = new GUILayoutGroup(new RectTransform(new Vector2(0.8f, 1f), layout.RectTransform)) { RelativeSpacing = 0.02f };
             _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.6f), textLayout.RectTransform), item.Name.Value, font: GUIStyle.LargeFont, textColor: Color.Cyan);
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.4f), textLayout.RectTransform), TextSOS.Get("sos.item.header_info", "ID: [id] | Price: [price] mk").Replace("[id]", item.Identifier.Value).Replace("[price]", (item.DefaultPrice?.Price ?? 0).ToString()), font: GUIStyle.SmallFont, textColor: Color.Gray);
+            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.4f), textLayout.RectTransform), Texts.Get("sos.item.header_info", "ID: [id] | Price: [price] mk").Replace("[id]", item.Identifier.Value).Replace("[price]", (item.DefaultPrice?.Price ?? 0).ToString()), font: GUIStyle.SmallFont, textColor: Color.Gray);
         }
 
         public static void BuildColumn<T>(GUIListBox container, string title, List<T> items, Action<GUIListBox, T, DisplayMode> drawCard, DisplayMode mode = DisplayMode.Normal)
@@ -105,7 +124,7 @@ namespace SOS
             {
                 var frame = new GUIFrame(new RectTransform(new Vector2(1f, 0f), list.Content.RectTransform) { MinSize = new Point(0, HeaderHeight) }, style: null);
                 string text = IsVendingMachine
-                    ? TextSOS.Get("sos.recipe.buyable", "Buyable at [Title] a [Price] mk").Replace("[Title]", Title).Replace("[Price]", Price).Value
+                    ? Texts.Get("sos.recipe.buyable", "Buyable at [Title] for [Price] mk").Replace("[Title]", Title).Replace("[Price]", Price).Value
                     : Title.ToUpper() + ":";
                 _ = new GUITextBlock(new RectTransform(Vector2.One, frame.RectTransform), text, font: GUIStyle.SmallFont, textColor: Color.Yellow, textAlignment: Alignment.CenterLeft);
             }
@@ -136,7 +155,7 @@ namespace SOS
                     Color = Color.Black * 0.4f,
                     OutlineColor = isTracked ? Color.Gold : Color.Transparent,
                     OnClicked = (_, _) => { OnPrimary?.Invoke(TargetItem); return true; },
-                    OnSecondaryClicked = (_, _) => { Controller.OpenRecipeContextMenu(TargetItem, Recipe); return true; }
+                    OnSecondaryClicked = (_, _) => { OpenRecipeContextMenu(TargetItem, Recipe); return true; }
                 };
 
                 var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { AbsoluteSpacing = 2, CanBeFocused = false };
@@ -160,7 +179,7 @@ namespace SOS
                 if (Recipe.RequiresRecipe)
                 {
                     bool hasUnlocked = Character.Controlled != null && Character.Controlled.HasRecipeForItem(TargetItem.Identifier);
-                    string txt = hasUnlocked ? TextSOS.Get("sos.recipe.unlocked", "Recipe Unlocked").Value : TextSOS.Get("sos.recipe.locked", "Requires Recipe to Unlock").Value;
+                    string txt = hasUnlocked ? Texts.Get("sos.recipe.unlocked", "Recipe Unlocked").Value : Texts.Get("sos.recipe.locked", "Requires Recipe to Unlock").Value;
                     DrawRowWithTime(txt, hasUnlocked ? Color.LightGreen : Color.Salmon);
                 }
 
@@ -178,6 +197,21 @@ namespace SOS
                 }
 
                 foreach (var req in Recipe.RequiredItems) DrawCompactItemRow(layout, req.FirstMatchingPrefab, req.Amount, true, "", null, OnPrimary, OnSecondary);
+            }
+
+            public static void OpenRecipeContextMenu(Prefab target, FabricationRecipe recipe)
+            {
+                if (target == null || recipe == null) return;
+
+                var options = new List<ContextMenuOption>();
+
+                if (target is ItemPrefab)
+                {
+                    var tracker = SOSController.Instance.Tracker;
+                    options.Add(new ContextMenuOption(tracker.GetStringTrackToHUD(recipe).Value, isEnabled: true, () => tracker.AddOrRemoveRecipe(recipe)));
+                }
+
+                _ = GUIContextMenu.CreateContextMenu(PlayerInput.MousePosition, Texts.Get("sos.context.recipe_options", "Recipe Options"), null, [.. options]);
             }
         }
 
@@ -237,7 +271,7 @@ namespace SOS
                 if (isRandom)
                 {
                     _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), layout.RectTransform) { MinSize = new Point(0, RowHeight) },
-                        TextSOS.Get("sos.recipe.random_outputs", "Gives [amount] at random:").Replace("[amount]", Item.RandomDeconstructionOutputAmount.ToString()).Value,
+                        Texts.Get("sos.recipe.random_outputs", "Gives [amount] at random:").Replace("[amount]", Item.RandomDeconstructionOutputAmount.ToString()).Value,
                         font: GUIStyle.SmallFont, textColor: Color.Orange)
                     { CanBeFocused = false };
                 }
@@ -308,7 +342,7 @@ namespace SOS
 
                 var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.95f, 0.95f), card.RectTransform, Anchor.Center)) { CanBeFocused = false };
 
-                string req = Usage.AmountRequired > 1 ? $" ({TextSOS.Get("sos.recipe.requires", "Requires")} x{Usage.AmountRequired})" : "";
+                string req = Usage.AmountRequired > 1 ? $" ({Texts.Get("sos.recipe.requires", "Requires")} x{Usage.AmountRequired})" : "";
                 DrawCompactItemRow(layout, Usage.TargetItem, Usage.AmountCreated, true, req, null, null, null);
             }
         }

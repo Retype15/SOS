@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>API</AssemblyName>
+    <RootNamespace>SOS</RootNamespace>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+
+  <Import Project="..\Build.props" />
+
+  <ItemGroup>
+    <Reference Include="0Harmony" HintPath="$(RefsPath)\0Harmony.dll" />
+    <Reference Include="Barotrauma" HintPath="$(RefsPath)\Windows\Barotrauma.dll" />
+    <Reference Include="BarotraumaCore" HintPath="$(RefsPath)\Windows\BarotraumaCore.dll" />
+    <Reference Include="Mono.Cecil" HintPath="$(RefsPath)\Mono.Cecil.dll" />
+    <Reference Include="MonoGame.Framework.Windows.NetStandard" HintPath="$(RefsPath)\MonoGame.Framework.Windows.NetStandard.dll" />
+    <Reference Include="MoonSharp.Interpreter" HintPath="$(RefsPath)\MoonSharp.Interpreter.dll" />
+    <Reference Include="XNATypes" HintPath="$(RefsPath)\XNATypes.dll" />
+    <Reference Include="MonoMod.Utils" HintPath="$(RefsPath)\MonoMod.Utils.dll" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <RootNamespace>$(SolutionName.Replace(" ", "_"))</RootNamespace>
+    <AssemblyName>API</AssemblyName>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>TRACE;CLIENT</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DefineConstants>TRACE;CLIENT</DefineConstants>
+  </PropertyGroup>
+
+  <Target Name="Deploy" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFiles="$(ModDeployDir)bin\Shared\$(AssemblyName).dll" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFiles="$(RefsPath)\$(AssemblyName).dll" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).deps.json" DestinationFiles="$(ModDeployDir)bin\Shared\$(AssemblyName).deps.json" />
+  </Target>
+
+</Project>

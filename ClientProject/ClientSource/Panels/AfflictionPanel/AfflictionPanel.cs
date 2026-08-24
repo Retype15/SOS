@@ -8,141 +8,18 @@
 using Barotrauma;
 using Microsoft.Xna.Framework;
 
-namespace SOS
+namespace SOS.Panels.AfflictionPanel
 {
-
-    public abstract class CenterPanelTab
-    {
-        public virtual string TabTooltip => "";
-
-        public virtual GUIButton CreateTabButton(string text, RectTransform parent, bool isActive, Action onClick)
-        {
-            Vector2 textSize = GUIStyle.SmallFont.MeasureString(text);
-            int width = (int)textSize.X + 24;
-
-            var tabBtn = new GUIButton(new RectTransform(new Point(width, 32), parent), text, style: "MainMenuNotificationButton") //MainMenuNotificationButton,
-            {
-                Selected = isActive,
-                ToolTip = TextSOS.Get(TabTooltip, ""),
-                OnClicked = (_, _) => { onClick(); return true; },
-            };
-            //tabBtn.ExBlink(3f, 0.5f, 1f, 0.5f).WaitFinish();
-
-            return tabBtn;
-        }
-    }
-
-    // MARK: Item Recipes Tab
-    public class ItemCenterPanelTab : CenterPanelTab, SOS.GUI.ITab
-    {
-        public string TabName => TextSOS.Get("sos.tab.recipes", "RECIPES").Value;
-        public override string TabTooltip => "sos.tab.recipes_tooltip";
-        private GUIFrame? _container;
-
-        public bool CanHandle(Prefab prefab) => prefab is ItemPrefab;
-
-        public void Initialize(GUIComponent parentContainer)
-        {
-            _container = new GUIFrame(new RectTransform(Vector2.One, parentContainer.RectTransform), style: null) { Visible = false };
-        }
-
-        public void Activate(Prefab prefab, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
-            if (_container == null || prefab is not ItemPrefab item) return;
-            _container.Visible = true;
-            _container.ClearChildren();
-
-            var craft = RecipeAnalyzer.GetCraftingRecipes(item);
-            var decon = RecipeAnalyzer.GetDeconstructionOutputs(item);
-            var uses = RecipeAnalyzer.GetUsesAsIngredient(item);
-            var sources = RecipeAnalyzer.GetSourcesFromDeconstruction(item);
-
-            var recipeSplit = new GUILayoutGroup(new RectTransform(Vector2.One, _container.RectTransform), isHorizontal: true)
-            {
-                Stretch = true,
-                RelativeSpacing = 0.02f
-            };
-
-            // obtain
-            var obtainContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), obtainContainer.RectTransform), TextSOS.Get("sos.window.obtain", "OBTAIN"), font: GUIStyle.SubHeadingFont, textColor: Color.LightGreen, textAlignment: Alignment.Center);
-            var colObtain = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), obtainContainer.RectTransform), style: null) { Spacing = 5, Color = Color.Black * 0.2f };
-
-            // usage
-            var usageContainer = new GUILayoutGroup(new RectTransform(new Vector2(0.49f, 1f), recipeSplit.RectTransform)) { Stretch = true };
-            _ = new GUITextBlock(new RectTransform(new Vector2(1f, 0.05f), usageContainer.RectTransform), TextSOS.Get("sos.window.usage", "USAGE"), font: GUIStyle.SubHeadingFont, textColor: Color.Cyan, textAlignment: Alignment.Center);
-            var colUsage = new GUIListBox(new RectTransform(new Vector2(1f, 0.95f), usageContainer.RectTransform), style: null) { Spacing = 5, Color = Color.Black * 0.2f };
-
-            CardBuilder.UIMachineGroup GetOrCreateMachineGroup(Dictionary<string, CardBuilder.UIMachineGroup> dict, IEnumerable<Identifier> machineIds, string fallbackName)
-            {
-                string key = machineIds.Any() ? string.Join(", ", machineIds.Select(id => CardBuilder.ResolveMachineName(id)).OrderBy(s => s)) : fallbackName;
-                if (!dict.TryGetValue(key, out CardBuilder.UIMachineGroup? value))
-                {
-                    value = new CardBuilder.UIMachineGroup { MachineName = key };
-                    if (machineIds.Any(id => id == "vendingmachine"))
-                    {
-                        value.IsVendingMachine = true;
-                        value.PriceString = (PrefabAdapter.DefaultPrice(item)?.Price ?? 0).ToString();
-                    }
-                    dict[key] = value;
-                }
-                return value;
-            }
-
-            // fill obtain
-            var obtainGroups = new Dictionary<string, CardBuilder.UIMachineGroup>();
-            foreach (var r in craft ?? [])
-                GetOrCreateMachineGroup(obtainGroups, r.SuitableFabricatorIdentifiers, TextSOS.Get("sos.recipe.hand", "Hand").Value)
-                    .AddCard(new CardBuilder.CraftRecipeCard(r, item, controller, onPrimary, onSecondary));
-
-            var groupedSources = sources?.GroupBy(s => new { SourceId = s.Item.Identifier, MachineKey = string.Join(",", s.DeconstructItem.RequiredDeconstructor.Select(id => id.Value).OrderBy(x => x)), OtherItemsKey = string.Join(",", s.DeconstructItem.RequiredOtherItem.Select(id => id.Value).OrderBy(x => x)) })
-                .Select(group => new GroupedSource { SourceItem = group.First().Item, MachineIds = group.First().DeconstructItem.RequiredDeconstructor, RequiredOtherItems = [.. group.First().DeconstructItem.RequiredOtherItem], TotalCommonness = group.Sum(g => g.DeconstructItem.Commonness), Amount = group.First().DeconstructItem.Amount, IsRandom = group.First().Item.RandomDeconstructionOutput }).ToList();
-
-            foreach (var src in groupedSources ?? [])
-                GetOrCreateMachineGroup(obtainGroups, src.MachineIds ?? [], CardBuilder.ResolveMachineName("deconstructor".ToIdentifier()))
-                    .AddCard(new CardBuilder.SourceRecipeCard(src, onPrimary, onSecondary));
-
-            foreach (var group in obtainGroups.Values) group.Draw(colObtain);
-
-            // f usage
-            var usageDict = new Dictionary<string, CardBuilder.UIMachineGroup>();
-            if (decon?.Count > 0)
-            {
-                foreach (var machineDecons in decon.GroupBy(di => string.Join(",", di.RequiredDeconstructor.Select(id => id.Value).OrderBy(s => s))))
-                {
-                    var mg = GetOrCreateMachineGroup(usageDict, machineDecons.First().RequiredDeconstructor, CardBuilder.ResolveMachineName("deconstructor".ToIdentifier()));
-                    var deconList = machineDecons.ToList();
-
-                    if (item.RandomDeconstructionOutput) mg.AddCard(new CardBuilder.DeconOutputCard(item, deconList, onPrimary, onSecondary));
-                    else foreach (var output in deconList.GroupBy(di => di.ItemIdentifier).Select(g => new { ID = g.Key, Amount = g.Max(di => di.Amount), Weight = g.Sum(di => di.Commonness) }))
-                            mg.AddCard(new CardBuilder.SingleDeconOutputCard(item, output.ID, output.Amount, output.Weight, onPrimary, onSecondary));
-                }
-            }
-
-            var groupedUses = uses?.GroupBy(u => string.Join(",", u.Recipe.SuitableFabricatorIdentifiers.Select(id => id.Value).OrderBy(s => s)))
-                .SelectMany(mg => mg.GroupBy(u => u.Item.Identifier).Select(ig => new GroupedUsage { TargetItem = ig.First().Item, MachineIds = [.. ig.First().Recipe.SuitableFabricatorIdentifiers], AmountCreated = ig.First().Recipe.Amount, AmountRequired = ig.First().Recipe.RequiredItems.FirstOrDefault(ri => ri.ItemPrefabs.Any(p => p.Identifier == item.Identifier))?.Amount ?? 1 })).ToList();
-
-            foreach (var usage in groupedUses ?? [])
-                GetOrCreateMachineGroup(usageDict, usage.MachineIds ?? [], TextSOS.Get("sos.recipe.hand", "Hand").Value)
-                    .AddCard(new CardBuilder.UsageRecipeCard(usage, onPrimary, onSecondary));
-
-            foreach (var group in usageDict.Values) group.Draw(colUsage);
-        }
-
-        public void Deactivate()
-        {
-            if (_container != null) _container.Visible = false;
-        }
-    }
-
     // MARK: - Clinic SIM
-    public class AfflictionCenterPanelTab : CenterPanelTab, SOS.GUI.ITab
+    [AutoRegister]
+    public class AfflictionPanelTab : ISOSTab, IDisposable
     {
-        public const int MENU_WIDTH = 280;
-        public const int MENU_HEIGHT = 220;
+        private const int MENU_WIDTH = 280;
+        private const int MENU_HEIGHT = 220;
 
-        public string TabName => TextSOS.Get("sos.tab.simulator", "SIMULATOR").Value;
-        public override string TabTooltip => "sos.tab.simulator_tooltip";
+        public double Order => 10;
+        public string TabName => Texts.Get("sos.tab.simulator", "SIMULATOR").Value;
+        public string ToolTip => Texts.Get("sos.tab.simulator_tooltip").Value;
         private GUIFrame? _container;
         private static GUIComponent? activeAfflictionMenu;
         private static Prefab? CurrentPrefab;
@@ -152,7 +29,7 @@ namespace SOS
 
         public bool CanHandle(Prefab prefab) => prefab is ItemPrefab || prefab is AfflictionPrefab;
 
-        public void Initialize(GUIComponent parentContainer)
+        public void Init(GUIComponent parentContainer)
         {
             _container = new GUIFrame(new RectTransform(Vector2.One, parentContainer.RectTransform), style: null) { Visible = false };
 
@@ -238,7 +115,7 @@ namespace SOS
 
             var playBtn = new GUIButton(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), "START", style: "DeviceButton")
             {
-                OnDrawToolTip = component => component.ToolTip = TextSOS.Get(
+                OnDrawToolTip = component => component.ToolTip = Texts.Get(
                     ClinicalSimulatorManager.IsPlaying ? "sos.sim.pause_tooltip" : "sos.sim.play_tooltip",
                     ClinicalSimulatorManager.IsPlaying ? "Pauses the clinical simulation." : "Starts the clinical simulation."),
                 OnClicked = (_, _) => { ClinicalSimulatorManager.HasPlaying(!ClinicalSimulatorManager.IsPlaying); return true; }
@@ -250,7 +127,7 @@ namespace SOS
 
             var speedDropdown = new GUIDropDown(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), text: "Speed", elementCount: 4)
             {
-                ToolTip = TextSOS.Get("sos.aff.speedDropdown", "More than x1 are still in progress. \nIt's work fine in Singleplayer, but not at all in Multiplayer."),
+                ToolTip = Texts.Get("sos.aff.speedDropdown", "More than x1 are still in progress. \nIt's work fine in Singleplayer, but not at all in Multiplayer."),
                 OnSelected = (comp, obj) =>
                 {
                     string s = (string)obj;
@@ -263,7 +140,7 @@ namespace SOS
 
             var actionBtn = new GUIButton(new RectTransform(new Vector2(0.25f, 1f), tools.RectTransform), "DROP", style: "DeviceButton")
             {
-                OnDrawToolTip = component => component.ToolTip = TextSOS.Get(
+                OnDrawToolTip = component => component.ToolTip = Texts.Get(
                     ClinicalSimulatorManager.HasStarted ? "sos.sim.drop_tooltip" : "sos.sim.reset_tooltip",
                     ClinicalSimulatorManager.HasStarted ? "Discards the current patient." : "Resets the patient's health to its initial state."),
                 OnClicked = (_, _) =>
@@ -354,7 +231,7 @@ namespace SOS
             }
         }
 
-        public void Activate(Prefab prefab, SOSController controller, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public void Show(Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             if (_container == null) return;
             CurrentPrefab = prefab;
@@ -362,13 +239,13 @@ namespace SOS
 
             if (ClinicalSimulatorManager.Patient == null || ClinicalSimulatorManager.Patient.Removed)
             {
-                ClinicalSimulatorManager.Initialize(controller.DummyDeathCount, controller.DummyCharacterXML);
+                ClinicalSimulatorManager.Initialize();
             }
 
             _container.Visible = true;
         }
 
-        public void Deactivate()
+        public void Hide()
         {
             if (_container != null) _container.Visible = false;
         }
@@ -406,7 +283,7 @@ namespace SOS
             {
                 _ = new GUIButton(new RectTransform(new Vector2(1f, 0.18f), menuLayout.RectTransform), "SET MAX (100%)", style: "GUIButtonSmall")
                 {
-                    ToolTip = TextSOS.Get("sos.sim.set_max_tooltip", "Sets this affliction's strength to maximum."),
+                    ToolTip = Texts.Get("sos.sim.set_max_tooltip", "Sets this affliction's strength to maximum."),
                     OnClicked = (_, _) => { ClinicalSimulatorManager.SetAfflictionStrength(affPrefab, affPrefab.MaxStrength, targetLimb); activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu); activeAfflictionMenu = null; return true; }
                 };
 
@@ -430,7 +307,7 @@ namespace SOS
 
                 _ = new GUIButton(new RectTransform(new Vector2(1f, 0.18f), menuLayout.RectTransform), "REMOVE", style: "GUIButtonSmall")
                 {
-                    ToolTip = TextSOS.Get("sos.sim.remove_tooltip", "Removes this affliction from the patient."),
+                    ToolTip = Texts.Get("sos.sim.remove_tooltip", "Removes this affliction from the patient."),
                     OnClicked = (_, _) => { ClinicalSimulatorManager.RemoveAffliction(affPrefab, targetLimb); activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu); activeAfflictionMenu = null; return true; }
                 };
             }
@@ -440,7 +317,7 @@ namespace SOS
 
                 _ = new GUIButton(new RectTransform(new Vector2(1f, 0.25f), menuLayout.RectTransform), "USE / APPLY", style: "GUIButton")
                 {
-                    ToolTip = TextSOS.Get("sos.sim.apply_item_tooltip", "Simulates using this item on the patient to see its effects."),
+                    ToolTip = Texts.Get("sos.sim.apply_item_tooltip", "Simulates using this item on the patient to see its effects."),
                     OnClicked = (_, _) =>
                     {
                         ClinicalSimulatorManager.ApplyMockItem(itemPrefab, targetLimb);
@@ -453,9 +330,80 @@ namespace SOS
 
             _ = new GUIButton(new RectTransform(new Vector2(1f, 0.18f), menuLayout.RectTransform), "CLOSE", style: "GUIButtonSmall")
             {
-                ToolTip = TextSOS.Get("sos.misc.close_button", "Closes this menu."),
+                ToolTip = Texts.Get("sos.misc.close_button", "Closes this menu."),
                 OnClicked = (_, _) => { activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu); activeAfflictionMenu = null; return true; }
             };
+        }
+
+        public void Dispose()
+        {
+            _container?.Parent?.RemoveChild(_container);
+            activeAfflictionMenu?.Parent?.RemoveChild(activeAfflictionMenu);
+            activeAfflictionMenu = null;
+            GC.SuppressFinalize(this);
+        }
+    }
+
+    // MARK: Preview Tab
+    [AutoRegister]
+    public class PreviewPanelTab : ISOSTab, IDisposable
+    {
+        public double Order => 100;
+        public string TabName => Texts.Get("sos.tab.preview", "PREVIEW").Value;
+        public string ToolTip => Texts.Get("sos.tab.preview_tooltip", "Shows the visual sprite of the selected prefab.").Value;
+
+        private GUIFrame? _container;
+        private GUITextBlock _nameBlock = null!;
+        private GUITextBlock _idBlock = null!;
+        private Prefab _currentPrefab = null!;
+
+        public bool CanHandle(Prefab prefab) => prefab is ItemPrefab || prefab is AfflictionPrefab;
+
+        public void Init(GUIComponent parentContainer)
+        {
+            _container = new GUIFrame(new RectTransform(Vector2.One, parentContainer.RectTransform), style: null) { Visible = false };
+
+            var layout = new GUILayoutGroup(new RectTransform(Vector2.One, _container.RectTransform)) { Stretch = true, AbsoluteSpacing = 10 };
+
+            _nameBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0.07f), layout.RectTransform), "", font: GUIStyle.LargeFont, textAlignment: Alignment.Center);
+            _idBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0.04f), layout.RectTransform), "", font: GUIStyle.SmallFont, textAlignment: Alignment.Center, textColor: Color.Gray);
+
+            var spriteContainer = new GUIFrame(new RectTransform(new Vector2(1f, 0.75f), layout.RectTransform), style: null)
+            {
+                Color = Color.Black * 0.25f
+            };
+            var _ = new GUICustomComponent(new RectTransform(Vector2.One, spriteContainer.RectTransform),
+                onDraw: (sb, comp) =>
+                {
+                    var sprite = _currentPrefab.Icon();
+                    if (sprite == null) return;
+                    Vector2 center = comp.Rect.Location.ToVector2() + comp.Rect.Size.ToVector2() * 0.5f;
+                    float scale = Math.Min(
+                        comp.Rect.Width / (float)sprite.SourceRect.Width,
+                        comp.Rect.Height / (float)sprite.SourceRect.Height) * 0.85f;
+                    sb.Draw(sprite.Texture, center, sprite.SourceRect, Color.White, 0f, new Vector2(sprite.SourceRect.Width * 0.5f, sprite.SourceRect.Height * 0.5f), scale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0f);
+                });
+        }
+
+        public void Show(Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        {
+            if (_container == null) return;
+            _container.Visible = true;
+            _currentPrefab = prefab;
+            _nameBlock.Text = prefab.Name();
+            _idBlock.Text = prefab.Identifier.Value;
+        }
+
+        public void Hide()
+        {
+            if (_container != null) _container.Visible = false;
+        }
+
+        public void Dispose()
+        {
+            _container?.Parent?.RemoveChild(_container);
+            _currentPrefab = null!;
+            GC.SuppressFinalize(this);
         }
     }
 }
