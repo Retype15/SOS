@@ -2,7 +2,7 @@
 <ModConfig>
 
     <!-- Binaries -->
-    <Assembly File="%ModDir%/bin/Shared/API.dll" Target="Client" LoadPriority="100" />
+    <Assembly File="%ModDir%/bin/Client/Shared/SOS.SDK.dll" Target="Client" />
     <Assembly File="%ModDir%/bin/Client/Linux/SOS.dll" Target="Client" Platform="Linux" />
     <Assembly File="%ModDir%/bin/Client/OSX/SOS.dll" Target="Client" Platform="OSX" />
     <Assembly File="%ModDir%/bin/Client/Windows/SOS.dll" Target="Client" Platform="Windows" />

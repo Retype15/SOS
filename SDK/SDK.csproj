@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <Platforms>x64</Platforms>
     <PlatformTarget>x64</PlatformTarget>
-    <AssemblyName>API</AssemblyName>
+    <AssemblyName>SOS.SDK</AssemblyName>
     <RootNamespace>SOS</RootNamespace>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
@@ -28,7 +28,7 @@
 
   <PropertyGroup>
     <RootNamespace>$(SolutionName.Replace(" ", "_"))</RootNamespace>
-    <AssemblyName>API</AssemblyName>
+    <AssemblyName>SOS.SDK</AssemblyName>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -41,9 +41,9 @@
   </PropertyGroup>
 
   <Target Name="Deploy" AfterTargets="Build">
-    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFiles="$(ModDeployDir)bin\Shared\$(AssemblyName).dll" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFiles="$(ModDeployDir)bin\Client\Shared\$(AssemblyName).dll" />
     <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFiles="$(RefsPath)\$(AssemblyName).dll" />
-    <Copy SourceFiles="$(TargetDir)$(AssemblyName).deps.json" DestinationFiles="$(ModDeployDir)bin\Shared\$(AssemblyName).deps.json" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).deps.json" DestinationFiles="$(ModDeployDir)bin\Client\Shared\$(AssemblyName).deps.json" />
   </Target>
 
 </Project>

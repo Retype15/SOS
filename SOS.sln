@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OSX", "OSX", "{FB4AF98D-A8B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSXClient", "ClientProject\OSXClient.csproj", "{8C80A256-914B-41AC-84E7-6EA528AF60D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{3105C764-A99C-44D7-BF51-66E953F5D87D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDK", "SDK\SDK.csproj", "{3105C764-A99C-44D7-BF51-66E953F5D87D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

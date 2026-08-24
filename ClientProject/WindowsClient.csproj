@@ -58,7 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\API\API.csproj" />
+    <ProjectReference Include="..\SDK\SDK.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
