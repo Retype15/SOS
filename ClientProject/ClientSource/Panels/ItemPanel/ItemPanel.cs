@@ -50,10 +50,13 @@ namespace SOS.Panels.ItemPanel
                 _ = new GUITextBlock(new RectTransform(Vector2.One, _container.RectTransform), Texts.Get("sos.tab.recipes.analyzing", "Analyzing recipe dependency graph..."), font: GUIStyle.SubHeadingFont, textAlignment: Alignment.Center);
                 RecipeAnalyzer.Initialize(onComplete: () =>
                 {
-                    if (_container != null && _container.Visible && _currentPrefab != null)
+                    CrossThread.RequestExecutionOnMainThread(() =>
                     {
-                        Show(_currentPrefab, _onPrimary!, _onSecondary!);
-                    }
+                        if (_container != null && _container.Visible && _currentPrefab != null)
+                        {
+                            Show(_currentPrefab, _onPrimary!, _onSecondary!);
+                        }
+                    });
                 });
                 return;
             }

@@ -45,8 +45,8 @@ namespace SOS.GUI
         public GUIButton? MaximizeButton { get; }
         public GUIButton? CloseButton { get; }
 
-        public Point NormalSize { get; private set; }
-        public Point NormalOffset { get; private set; }
+        public Point NormalSize { get; protected set; }
+        public Point NormalOffset { get; protected set; }
 
         public event Action? OnMinimize;
         public event Action? OnMaximize;
@@ -71,6 +71,7 @@ namespace SOS.GUI
             AllowedDirections = ResizeDirection.All;
             NormalSize = RectTransform.NonScaledSize;
             NormalOffset = RectTransform.AbsoluteOffset;
+            Mode = mode;
 
             try
             {
@@ -142,8 +143,6 @@ namespace SOS.GUI
 
                 RectTransform.SizeChanged += ResizeContentArea;
                 ResizeContentArea();
-
-                Mode = mode;
             }
             catch (Exception ex)
             {

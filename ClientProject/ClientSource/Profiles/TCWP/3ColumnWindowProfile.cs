@@ -108,6 +108,7 @@ namespace SOS.Profiles.TCWP
 
             ProfileConfig.Load();
             ApplySavedSizeAndPosition();
+            Mode = (config?.IsMaximized ?? false) ? WindowMode.Fullscreen : WindowMode.Windowed;
             BuildMainUI();
 
             if (needsShowLogo)
@@ -115,8 +116,6 @@ namespace SOS.Profiles.TCWP
                 BuildLoadingUI();
                 needsShowLogo = false;
             }
-
-            Mode = config!.IsMaximized ? WindowMode.Fullscreen : WindowMode.Windowed;
         }
 
         private void OnToggleWindow()
@@ -340,6 +339,9 @@ namespace SOS.Profiles.TCWP
                 int cy = (GameMain.GraphicsHeight / 2) - (Rect.Height / 2);
                 RectTransform.AbsoluteOffset = new Point(cx, cy);
             }
+
+            NormalSize = RectTransform.NonScaledSize;
+            NormalOffset = RectTransform.AbsoluteOffset;
         }
 
         private void BuildMainUI()
@@ -381,16 +383,16 @@ namespace SOS.Profiles.TCWP
             OnClose += ProfileHelper.CloseWindow;
 
             // Left panel
-            leftPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.20f, 1f), ContentArea.RectTransform, Anchor.TopLeft), style: "InnerFrame")
+            int initialLeftW = (config != null && config.LeftPanelWidth > 0) ? config.LeftPanelWidth : 250;
+            leftPanel = new GUIResizableFrame(
+                new RectTransform(new Point(initialLeftW, ContentArea.Rect.Height), ContentArea.RectTransform, Anchor.TopLeft, isFixedSize: true),
+                style: "InnerFrame")
             {
                 AllowedDirections = ResizeDirection.Right,
                 IsFixed = true,
                 Color = Color.Black * 0.4f,
                 RectTransform = { MinSize = new Point(20, 50), MaxSize = new Point(500, 2000) }
             };
-
-            if (config != null && config.LeftPanelWidth > 0)
-                leftPanel.RectTransform.NonScaledSize = new Point(config.LeftPanelWidth, 0);
 
             leftContainer = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.98f), leftPanel.RectTransform, Anchor.Center), style: null);
             var leftLayout = new GUILayoutGroup(new RectTransform(Vector2.One, leftContainer.RectTransform)) { Stretch = true, RelativeSpacing = 0.01f };
@@ -430,8 +432,10 @@ namespace SOS.Profiles.TCWP
             };
 
             // Center panel
-            centerPanel = new GUIFrame(new RectTransform(new Vector2(0.52f, 1f), ContentArea.RectTransform, Anchor.TopLeft), style: null)
-            { RectTransform = { MinSize = new Point(200, 50) } };
+            centerPanel = new GUIFrame(new RectTransform(new Point(200, ContentArea.Rect.Height), ContentArea.RectTransform, Anchor.TopLeft, isFixedSize: true), style: null)
+            {
+                RectTransform = { MinSize = new Point(200, 50) }
+            };
 
             var centerLayout = new GUILayoutGroup(new RectTransform(Vector2.One, centerPanel.RectTransform)) { Stretch = true, RelativeSpacing = 0.01f };
 
@@ -447,16 +451,16 @@ namespace SOS.Profiles.TCWP
             prefabHeaders = prefabProviders.ToDictionary(p => p.PrefabType, p => p.Header);
 
             // Right panel
-            rightPanel = new GUIResizableFrame(new RectTransform(new Vector2(0.24f, 1f), ContentArea.RectTransform, Anchor.TopRight), style: "InnerFrame")
+            int initialRightW = (config != null && config.RightPanelWidth > 0) ? config.RightPanelWidth : 300;
+            rightPanel = new GUIResizableFrame(
+                new RectTransform(new Point(initialRightW, ContentArea.Rect.Height), ContentArea.RectTransform, Anchor.TopRight, isFixedSize: true),
+                style: "InnerFrame")
             {
                 AllowedDirections = ResizeDirection.Left,
                 IsFixed = true,
                 Color = Color.Black * 0.4f,
                 RectTransform = { MinSize = new Point(20, 50), MaxSize = new Point(1000, 2000) }
             };
-
-            if (config != null && config.RightPanelWidth > 0)
-                rightPanel.RectTransform.NonScaledSize = new Point(config.RightPanelWidth, 0);
 
             rightContainer = new GUIFrame(new RectTransform(new Vector2(0.95f, 0.98f), rightPanel.RectTransform, Anchor.Center), style: null);
             var rightLayout = new GUILayoutGroup(new RectTransform(Vector2.One, rightContainer.RectTransform)) { Stretch = true };
@@ -697,8 +701,8 @@ namespace SOS.Profiles.TCWP
             if (areaRect.Width <= 0) return;
 
             int spacing = (int)(areaRect.Width * 0.015f);
-            int leftW = leftPanel.Rect.Width;
-            int rightW = rightPanel.Rect.Width;
+            int leftW = leftPanel.RectTransform.NonScaledSize.X;
+            int rightW = rightPanel.RectTransform.NonScaledSize.X;
 
             int totalAvailableForSides = areaRect.Width - MinCenterWidth - (spacing * 2);
             if (leftW + rightW > totalAvailableForSides)

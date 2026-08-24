@@ -15,17 +15,22 @@ namespace SOS.Panels.ItemPanel
         private static readonly Dictionary<Identifier, List<(ItemPrefab Item, FabricationRecipe Recipe)>> usesCache = [];
         private static readonly Dictionary<Identifier, List<(ItemPrefab Item, DeconstructItem DeconstructItem)>> sourcesCache = [];
         public static bool DataInitialized { get; private set; } = false;
+        private static bool dataInitializing = false;
 
         public static void Initialize(Action? onComplete = null)
         {
             if (!DataInitialized)
             {
-                Task.Run(() =>
+                if (!dataInitializing)
                 {
-                    RecipeAnalyzer.PrecomputeCaches();
-                    DataInitialized = true;
-                    onComplete?.Invoke();
-                });
+                    dataInitializing = true;
+                    Task.Run(() =>
+                    {
+                        RecipeAnalyzer.PrecomputeCaches();
+                        DataInitialized = true;
+                        onComplete?.Invoke();
+                    });
+                }
             }
             else
             {

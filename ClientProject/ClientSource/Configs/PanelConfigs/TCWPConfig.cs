@@ -21,7 +21,7 @@ namespace SOS.Configs.TCWP
         public string Id => "SOS.Profile.Default3Column.Config";
         public double Order => 0;
 
-        internal SortedDictionary<string, TPLayout> CustomLayouts { get; } = new(StringComparer.Ordinal);
+        internal readonly SortedDictionary<string, TPLayout> CustomLayouts = new(new Comparers.NaturalStringComparer());
 
         private bool _presetsCollapsed = true; //TODO: Convertir a una opción de guardado oficial(Quizás?)
 
@@ -127,8 +127,11 @@ namespace SOS.Configs.TCWP
         {
             Logger.LogDebug($"TCWPConfig.DeleteCustomLayout: '{name}'", level: LogLevel.Trace);
 
-            if (CustomLayouts.Remove(name)) Save();
-            ProfileHelper.RefreshSettings();
+            if (CustomLayouts.Remove(name))
+            {
+                Logger.LogDebug($"[SOS] Deleted 'name' Successfully!");
+                ProfileHelper.RefreshSettings();
+            }
         }
 
         private void ApplyPreset(int? winW, int? winH, int? leftW, int? rightW)
