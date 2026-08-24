@@ -49,7 +49,7 @@ namespace SOS.Configs.TCWP
             _isMaximized.SetIfNotEqual(IsMaximized);
             _customLayoutsRaw.SetIfNotEqual(WindowConfigHelper.LayoutsToXml(CustomLayouts));
 
-            SaveChanges();
+            SaveChanges(Plugin.Instance.ConfigService);
         }
 
         public void Reset()
@@ -177,6 +177,10 @@ namespace SOS.Configs.TCWP
 
         public TCWPConfig()
         {
+            var pms = Plugin.Instance.ConfigService;
+            var p = Plugin.Instance.Package;
+            void TryInitConfig<T>(string name, out T setting) where T : ISettingBase => base.TryInitConfig(name, out setting, pms, p);
+
             TryInitConfig("ThreeColumnWindowSizeX", out _windowSizeX);
             TryInitConfig("ThreeColumnWindowSizeY", out _windowSizeY);
             TryInitConfig("ThreeColumnWindowPositionX", out _windowPositionX);

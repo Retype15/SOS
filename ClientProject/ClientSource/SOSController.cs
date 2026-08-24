@@ -24,15 +24,8 @@ namespace SOS
 
         public bool HaveOldConfigFile = false;
 
-
-
         private GUIRecipeTracker? _tracker;
         internal GUIRecipeTracker Tracker => _tracker ??= GUIRecipeTracker.InstantiateWithDefault();
-
-        public Stack<Prefab> HistoryBack { get; } = new Stack<Prefab>();
-        public Stack<Prefab> HistoryForward { get; } = new Stack<Prefab>();
-
-        public List<string> TabHistory { get; } = [];
 
         private static bool migrationPending = false;
         public static bool MigrationPending { get => migrationPending; set => migrationPending = value; }
@@ -66,15 +59,14 @@ namespace SOS
         private SOSController()
         {
             API.On(CommKeys.CloseWindow, CloseSOS);
-            API.On(CommKeys.NavigateBack, NavigateBack);
-            API.On(CommKeys.NavigateForward, NavigateForward);
             API.On<string>(CommKeys.ChangeProfile, ChangeProfile);
+            Profiles.ProfileHelper.Subscribe();
         }
 
-        public void PushTabHistory(string uid)
+        private void OnSelectTarget(Prefab? prefab)
         {
-            TabHistory.Remove(uid);
-            TabHistory.Insert(0, uid);
+            if (prefab == null) return;
+            cfg.CurrentTarget = prefab;
         }
 
         public void ChangeProfile(string profileId)
@@ -82,42 +74,6 @@ namespace SOS
             ProfileHelper.CloseWindow();
             _windowProfileConfig.ActiveProfileId = profileId;
             ToggleUI();
-        }
-
-        public void OnTargetSelected(Prefab? item)
-        {
-            if (item == null) return;
-
-            if (CurrentTarget != item)
-            {
-                if (CurrentTarget != null)
-                {
-                    HistoryBack.Push(CurrentTarget);
-                    HistoryForward.Clear();
-                }
-                CurrentTarget = item;
-                API.Emit(CommKeys.SelectTarget, item);
-            }
-        }
-
-        public void NavigateBack()
-        {
-            if (HistoryBack.Count > 0)
-            {
-                if (CurrentTarget != null) HistoryForward.Push(CurrentTarget);
-                CurrentTarget = HistoryBack.Pop();
-                API.Emit(CommKeys.SelectTarget, CurrentTarget);
-            }
-        }
-
-        public void NavigateForward()
-        {
-            if (HistoryForward.Count > 0)
-            {
-                if (CurrentTarget != null) HistoryBack.Push(CurrentTarget);
-                CurrentTarget = HistoryForward.Pop();
-                API.Emit(CommKeys.SelectTarget, CurrentTarget);
-            }
         }
 
         public void ResolveCommand(string[] args)
@@ -135,7 +91,7 @@ namespace SOS
 
         public void ToggleUI(Prefab? prefab = null)
         {
-            OnTargetSelected(prefab);
+            ProfileHelper.OnTargetSelected(prefab);
 
             if (ActiveProfile == null)
             {
@@ -222,20 +178,20 @@ namespace SOS
                         (PlayerInput.KeyHit(Keys.Right) && PlayerInput.IsAltDown()) ||
                         (PlayerInput.KeyHit(Keys.Back) && PlayerInput.IsShiftDown()) ||
                         PlayerInput.Mouse5ButtonClicked()
-                    ) CrossThread.RequestExecutionOnMainThread(() => NavigateForward());
+                    ) CrossThread.RequestExecutionOnMainThread(() => ProfileHelper.NavigateForward());
                     else if
                     (
                         (PlayerInput.KeyHit(Keys.Left) && PlayerInput.IsAltDown()) ||
                         PlayerInput.KeyHit(Keys.Back) ||
                         PlayerInput.Mouse4ButtonClicked()
-                    ) CrossThread.RequestExecutionOnMainThread(() => NavigateBack());
+                    ) CrossThread.RequestExecutionOnMainThread(() => ProfileHelper.NavigateBack());
                 }
 
                 ActiveProfile?.Update();
             }
             if (migrationPending) MigrationDialog.Update();
             if (!IsSOSBlocked && Screen.Selected == GameMain.GameScreen) Tracker.Update();
-            ProfileHelper._settingsWindow?.AddToGUIUpdateList(order: 1);
+            ProfileHelper.Update();
         }
 
         public static void SaveSettings()
@@ -305,8 +261,8 @@ namespace SOS
 
             GUIAnimSequence.ClearAll();
 
-            API.Off(CommKeys.NavigateBack, NavigateBack);
-            API.Off(CommKeys.NavigateForward, NavigateForward);
+            API.Off<Prefab?>(CommKeys.SelectTarget, OnSelectTarget);
+            Profiles.ProfileHelper.Unsubscribe();
             API.Off<string>(CommKeys.ChangeProfile, ChangeProfile);
             API.Off(CommKeys.CloseWindow, CloseSOS);
 

@@ -9,6 +9,7 @@ using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 using SOS.GUI;
+using SOS.Profiles;
 
 namespace SOS.Configs
 {
@@ -26,24 +27,20 @@ namespace SOS.Configs
         {
             SOSController.Instance.ActiveProfile?.ProfileConfig?.Load();
             if (_loaded) return;
+            ProfileHelper.SettingsWindowSize = new(_settingsWindowSizeX.Value, _settingsWindowSizeY.Value);
+            ProfileHelper.SettingsWindowPosition = new(_settingsWindowPositionX.Value, _settingsWindowPositionY.Value);
             _loaded = true;
 
         }
 
         public void Save()
         {
-            if (_settingsWindowSize.HasValue)
-            {
-                _settingsWindowSizeX.SetIfNotEqual(_settingsWindowSize.Value.X);
-                _settingsWindowSizeY.SetIfNotEqual(_settingsWindowSize.Value.Y);
-            }
-            if (_settingsWindowPosition.HasValue)
-            {
-                _settingsWindowPositionX.SetIfNotEqual(_settingsWindowPosition.Value.X);
-                _settingsWindowPositionY.SetIfNotEqual(_settingsWindowPosition.Value.Y);
-            }
+            _settingsWindowSizeX.SetIfNotEqual(ProfileHelper.SettingsWindowSize.X);
+            _settingsWindowSizeY.SetIfNotEqual(ProfileHelper.SettingsWindowSize.Y);
+            _settingsWindowPositionX.SetIfNotEqual(ProfileHelper.SettingsWindowPosition.X);
+            _settingsWindowPositionY.SetIfNotEqual(ProfileHelper.SettingsWindowPosition.Y);
 
-            SaveChanges();
+            SaveChanges(Plugin.Instance.ConfigService);
 
             SOSController.Instance.ActiveProfile?.ProfileConfig?.Save();
         }
@@ -55,8 +52,8 @@ namespace SOS.Configs
             _settingsWindowSizeY.SetIfNotEqual(_settingsWindowSizeY.DefaultValue);
             _settingsWindowPositionX.SetIfNotEqual(_settingsWindowPositionX.DefaultValue);
             _settingsWindowPositionY.SetIfNotEqual(_settingsWindowPositionY.DefaultValue);
-            _settingsWindowSize = null;
-            _settingsWindowPosition = null;
+            ProfileHelper.SettingsWindowSize = new(_settingsWindowSizeX.DefaultValue, _settingsWindowSizeY.DefaultValue);
+            ProfileHelper.SettingsWindowPosition = new(_settingsWindowPositionX.DefaultValue, _settingsWindowPositionY.DefaultValue);
         }
 
         public bool DrawSettings(GUIListBox container)
@@ -102,22 +99,12 @@ namespace SOS.Configs
         private readonly ISettingBase<int> _settingsWindowPositionX;
         private readonly ISettingBase<int> _settingsWindowPositionY;
 
-        private Point? _settingsWindowSize;
-        internal Point SettingsWindowSize
-        {
-            get => _settingsWindowSize ??= new(_settingsWindowSizeX.Value, _settingsWindowSizeY.Value);
-            set => _settingsWindowSize = value;
-        }
-
-        private Point? _settingsWindowPosition;
-        internal Point SettingsWindowPosition
-        {
-            get => _settingsWindowPosition ??= new(_settingsWindowPositionX.Value, _settingsWindowPositionY.Value);
-            set => _settingsWindowPosition = value;
-        }
-
         public WindowProfileConfig()
         {
+            var pms = Plugin.Instance.ConfigService;
+            var p = Plugin.Instance.Package;
+            void TryInitConfig<T>(string name, out T setting) where T : ISettingBase => base.TryInitConfig(name, out setting, pms, p);
+
             TryInitConfig("ActiveProfileId", out _activeProfileId);
             TryInitConfig("SettingsWindowSizeX", out _settingsWindowSizeX);
             TryInitConfig("SettingsWindowSizeY", out _settingsWindowSizeY);

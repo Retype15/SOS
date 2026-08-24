@@ -6,6 +6,8 @@
 #pragma warning disable IDE0290
 
 using System.Diagnostics.CodeAnalysis;
+using Barotrauma;
+using Barotrauma.LuaCs;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 using SOS.GUI;
@@ -22,18 +24,18 @@ namespace SOS.Configs
 
         protected bool HasChanges => _dirtySettings.Count > 0;
 
-        protected void SaveChanges()
+        protected void SaveChanges(IConfigService configService)
         {
             if (!HasChanges) return;
 
             foreach (ISettingBase setting in _dirtySettings)
-                Plugin.Instance.ConfigService.SaveConfigValue(setting);
+                configService.SaveConfigValue(setting);
 
             _dirtySettings.Clear();
         }
 
-        protected bool TryInitConfig<T>(string name, out T setting) where T : ISettingBase
-            => ConfigHelper.TryInitConfig<T>(name, out setting, MarkDirty);
+        protected bool TryInitConfig<T>(string name, out T setting, IConfigService configService, ContentPackage package) where T : ISettingBase
+            => ConfigHelper.TryInitConfig<T>(name, out setting, configService, package, MarkDirty);
     }
 
     public static class ConfigHelper
@@ -75,10 +77,10 @@ namespace SOS.Configs
 
         // TryInitConfig
 
-        public static bool TryInitConfig<T>(string name, [NotNullWhen(true)] out T setting, Action<ISettingBase>? onValueChanged = null)
+        public static bool TryInitConfig<T>(string name, [NotNullWhen(true)] out T setting, IConfigService configService, ContentPackage package, Action<ISettingBase>? onValueChanged = null)
                 where T : ISettingBase
         {
-            if (!Plugin.Instance.ConfigService.TryGetConfig(Plugin.Instance.Package, name, out setting))
+            if (!configService.TryGetConfig(package, name, out setting))
             {
                 Logger.LogError($"Failed to find config named {name}!");
                 return false;

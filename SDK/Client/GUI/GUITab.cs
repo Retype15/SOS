@@ -10,7 +10,6 @@ using Microsoft.Xna.Framework;
 
 namespace SOS.GUI
 {
-
     public class GUITabWidget : GUIFrame, IDisposable
     {
         private readonly GUILayoutGroup _verticalLayout;
@@ -18,6 +17,8 @@ namespace SOS.GUI
         private readonly GUIFrame _contentArea;
         private readonly List<ITab> _tabs = [];
         private ITab? _activeTab;
+
+        public Action<ITab>? OnTabSelected;
 
         private Prefab? _currentTarget;
         private Action<Prefab>? _onPrimary;
@@ -71,21 +72,8 @@ namespace SOS.GUI
             _buttonArea.Content.ClearChildren();
             List<ITab> validTabs = [.. _tabs.Where(t => t.CanHandle(target))];
 
-            ITab? resolved = null;
-            foreach (var uid in SOSController.Instance.TabHistory)
-            {
-                resolved = validTabs.FirstOrDefault(t => t.Id == uid);
-                if (resolved != null) break;
-            }
-
-            if (resolved != null)
-            {
-                _activeTab = resolved;
-            }
-            else if (_activeTab == null || !validTabs.Contains(_activeTab))
-            {
+            if (_activeTab == null || !validTabs.Contains(_activeTab))
                 _activeTab = validTabs.FirstOrDefault();
-            }
 
             if (validTabs.Count > 1)
             {
@@ -111,17 +99,51 @@ namespace SOS.GUI
             RefreshTabContent();
         }
 
+        public bool TrySelectTab(string tabId)
+        {
+            if (_currentTarget == null) return false;
+            var tab = _tabs.FirstOrDefault(t => t.Id == tabId);
+            if (tab == null) return false;
+            if (!tab.CanHandle(_currentTarget)) return false;
+            if (_activeTab == tab) return true;
+            return SelectTabInternal(tab);
+        }
+
+        public bool TrySelectTab(ITab tab)
+        {
+            if (!_tabs.Contains(tab)) return false;
+            if (_currentTarget != null && !tab.CanHandle(_currentTarget)) return false;
+            if (_activeTab == tab) return true;
+            return SelectTabInternal(tab);
+        }
+
         public void SelectTab(ITab tab)
         {
             if (_activeTab == tab) return;
+            SelectTabInternal(tab);
+        }
+
+        private bool SelectTabInternal(ITab tab)
+        {
             _activeTab = tab;
-
-            SOSController.Instance.PushTabHistory(tab.Id);
-
+            OnTabSelected?.Invoke(tab);
             if (_currentTarget != null && _onPrimary != null && _onSecondary != null)
             {
-                UpdateTabs(_currentTarget, _onPrimary, _onSecondary);
+                var validTabs = _tabs.Where(t => t.CanHandle(_currentTarget));
+                _buttonArea.Content.ClearChildren();
+                if (validTabs.Count() > 1)
+                {
+                    foreach (var t in validTabs)
+                        _ = t.CreateTabButton(t.TabName, _buttonArea.Content.RectTransform, t == _activeTab, () => SelectTab(t), t.ToolTip);
+                    _buttonArea.RecalculateChildren();
+                }
+                RefreshTabContent();
             }
+            else
+            {
+                RefreshTabContent();
+            }
+            return true;
         }
 
         private void RefreshTabContent()
@@ -131,13 +153,9 @@ namespace SOS.GUI
             foreach (var tab in _tabs)
             {
                 if (tab == _activeTab)
-                {
                     tab.Show(_currentTarget, _onPrimary, _onSecondary);
-                }
                 else
-                {
                     tab.Hide();
-                }
             }
         }
 
