@@ -119,7 +119,7 @@ namespace SOS.Profiles
             _isNavigating = false;
         }
 
-        // Reestructurar los stacks para limpieza atómica.
+        //TODO: Reestructurar los stacks para limpieza atómica.
         private static void RemoveFromStack<T>(Stack<T> stack, T prefab) where T : class
         {
             if (stack.Count == 0) return;
