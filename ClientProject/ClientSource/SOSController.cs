@@ -58,7 +58,10 @@ namespace SOS
         {
             API.On(CommKeys.CloseWindow, CloseSOS);
             API.On<string>(CommKeys.ChangeProfile, ChangeProfile);
+<<<<<<< HEAD
             API.On<Prefab?>(CommKeys.SelectTarget, OnSelectTarget);
+=======
+>>>>>>> c629ca2 (feat: Changed all GUI files and Helpers to SDK project.)
             Profiles.ProfileHelper.Subscribe();
         }
 
