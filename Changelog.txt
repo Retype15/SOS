@@ -1,4 +1,4 @@
-v1.0.0-beta:
+v0.9.0-beta:
 - feat: Migrate configuration management from own xml(Data/sossetings.xml) to LuaCs settings system
 - feat: Implement ClientConfig as singleton pattern for centralized settings access
 - feat: Add SOS open key selector with LuaCs config integration
@@ -19,3 +19,20 @@ v1.0.0-beta:
 - chore: Delete ServerProject (unused)
 - chore: Rename PluginSettings.cs to ClientConfig.cs
 - loc: Add localization support for all new features across 6 languages
+
+v0.10.0-beta:
+- feat: Introduced standalone extension API with ISOS* interfaces and AutoRegister for third-party mod support.
+- feat: Added dynamic DuckProxy interop and decoupled event bus (CommKeys) for Lua/C# mod communication.
+- feat: Refactored window architecture to modular Window Profiles with Windowed and Fullscreen geometry modes.
+- feat: Decoupled recipe dependency analyzer to load on-demand in the background, achieving instant window opening.
+- feat: Added new Preview tab for inspecting item and affliction visual sprites.
+- feat: Added context menus across prefab browser lists and header icons (Favorites, Tracker, HUD).
+- feat: Redesigned Settings menu with multi-column layout, per-section reset, and global Reset All action.
+- feat: Added in-game custom layout preset saving, deletion, and natural alphanumeric sorting.
+- feat: Added custom declarative UI primitives (GUILayoutBuilder, GUIAccordion, GUILayoutGroupAuto, GUITextViewer).
+- feat: Added multi-level logging verbosity and in-game console commands (sos log <level>, sos help).
+- fix: Fixed panel proportion collapse and size accumulation when launching or resizing in Fullscreen mode.
+- fix: Fixed session cleanup errors when exiting a game round without opening the S.O.S. menu.
+- fix: Ensured safe single-execution for background recipe graph initialization during rapid item selection.
+- loc: Synchronized all new UI, configuration, and stat section strings across all 6 supported languages.
+- chore: Standardized ISOSConfig.Reset() lifecycle and centralized instance caching in the API.
