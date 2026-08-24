@@ -211,7 +211,7 @@
 
   <Target Name="VerifyLocalization" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Assets'">
     <ItemGroup>
-      <_LocalizationSources Include="$(MSBuildThisFileDirectory)/API/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/API/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/API/**/obj/**/*.cs" />
+      <_LocalizationSources Include="$(MSBuildThisFileDirectory)/SDK/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/SDK/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/SDK/**/obj/**/*.cs" />
       <_LocalizationSources Include="$(MSBuildThisFileDirectory)/ClientProject/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/ClientProject/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/ClientProject/**/obj/**/*.cs" />
       <_LocalizationSources Include="$(MSBuildThisFileDirectory)/SharedProject/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/SharedProject/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/SharedProject/**/obj/**/*.cs" />
     </ItemGroup>
