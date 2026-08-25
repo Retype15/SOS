@@ -136,6 +136,16 @@ namespace SOS.Profiles.TCWP
                 Visible = true;
         }
 
+        public TPLayout GetTPLayout()
+        {
+            return new TPLayout
+            {
+                WindowSize = NormalSize,
+                LeftPanelWidth = leftPanel?.Rect.Width ?? config!.LeftPanelWidth,
+                RightPanelWidth = rightPanel?.Rect.Width ?? config!.RightPanelWidth
+            };
+        }
+
         public void Update()
         {
             if (!Visible) return;

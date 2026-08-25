@@ -58,6 +58,7 @@ namespace SOS
         {
             API.On(CommKeys.CloseWindow, CloseSOS);
             API.On<string>(CommKeys.ChangeProfile, ChangeProfile);
+            API.On<Prefab?>(CommKeys.SelectTarget, OnSelectTarget);
             Profiles.ProfileHelper.Subscribe();
         }
 

@@ -5,7 +5,6 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
-using System.Collections.Immutable;
 using Barotrauma;
 using Microsoft.Xna.Framework;
 using SOS.GUI;
@@ -37,14 +36,14 @@ namespace SOS.Profiles
 
         public static void ClearTabHistory() => TabHistory.Clear();
 
-        private static readonly Stack<Prefab> historyBack = new();
-        private static readonly Stack<Prefab> historyForward = new();
+        private static readonly List<Prefab> _history = [];
+        private static int _historyIndex = -1;
 
-        public static bool CanNavigateBack => historyBack.Count > 0;
-        public static bool CanNavigateForward => historyForward.Count > 0;
+        public static bool CanNavigateBack => _historyIndex > 0;
+        public static bool CanNavigateForward => _historyIndex >= 0 && _historyIndex < _history.Count - 1;
 
-        public static Prefab? PeekBack() => historyBack.Count > 0 ? historyBack.Peek() : null;
-        public static Prefab? PeekForward() => historyForward.Count > 0 ? historyForward.Peek() : null;
+        public static Prefab? PeekBack() => CanNavigateBack ? _history[_historyIndex - 1] : null;
+        public static Prefab? PeekForward() => CanNavigateForward ? _history[_historyIndex + 1] : null;
 
         private static bool _isNavigating = false;
         private static bool _subscribed = false;
@@ -86,23 +85,20 @@ namespace SOS.Profiles
         {
             if (prefab == null || _isNavigating) return;
 
-            RemoveFromStack(historyBack, prefab);
-            RemoveFromStack(historyForward, prefab);
+            _history.Remove(prefab);
 
-            var current = API.GetState<Prefab?>(CommKeys.SelectTarget);
-            if (current != null && current != prefab)
-            {
-                historyBack.Push(current);
-                historyForward.Clear();
-            }
+            if (CanNavigateForward)
+                _history.RemoveRange(_historyIndex + 1, _history.Count - _historyIndex - 1);
+
+            _history.Add(prefab);
+            _historyIndex++;
         }
 
         private static void HistoryBack()
         {
-            if (historyBack.Count == 0) return;
-            var current = API.GetState<Prefab?>(CommKeys.SelectTarget);
-            if (current != null) historyForward.Push(current);
-            var prev = historyBack.Pop();
+            if (!CanNavigateBack) return;
+            _historyIndex--;
+            var prev = _history[_historyIndex];
             _isNavigating = true;
             API.Emit(CommKeys.SelectTarget, prev);
             _isNavigating = false;
@@ -110,30 +106,12 @@ namespace SOS.Profiles
 
         private static void HistoryForward()
         {
-            if (historyForward.Count == 0) return;
-            var current = API.GetState<Prefab?>(CommKeys.SelectTarget);
-            if (current != null) historyBack.Push(current);
-            var next = historyForward.Pop();
+            if (!CanNavigateForward) return;
+            _historyIndex++;
+            var next = _history[_historyIndex];
             _isNavigating = true;
             API.Emit(CommKeys.SelectTarget, next);
             _isNavigating = false;
-        }
-
-        //TODO: Reestructurar los stacks para limpieza atómica.
-        private static void RemoveFromStack<T>(Stack<T> stack, T prefab) where T : class
-        {
-            if (stack.Count == 0) return;
-            var tmp = stack.ToImmutableArray();
-            bool removed = false;
-            var filtered = new List<T>(tmp.Length);
-            foreach (var p in tmp)
-            {
-                if (!removed && p == prefab) { removed = true; continue; }
-                filtered.Add(p);
-            }
-            if (!removed) return;
-            stack.Clear();
-            for (int i = filtered.Count - 1; i >= 0; i--) stack.Push(filtered[i]);
         }
 
         public static void SelectTarget(Prefab target)
