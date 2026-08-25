@@ -38,8 +38,6 @@ namespace SOS
         //MARK: Config delegates
         public ClientConfig cfg = ClientConfig.Instance;
 
-        public HashSet<string> FavoritedItems => cfg.FavoritedItems;
-
         private Keys ToggleKey => cfg.SOSOpenKey.Key;
 
         public string LastSearchQuery => cfg.LastSearchQuery;
