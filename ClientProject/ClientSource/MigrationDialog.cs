@@ -141,14 +141,15 @@ namespace SOS
                 }
 
                 // MedicalSim
+                // TODO: Agregar revisión sobre el config LuaCs del core sobre Dummy*, notificar migración pendiente, eliminar y transferir.
                 var simulator = root.Element("MedicalSim");
                 if (simulator != null)
                 {
-                    controller.cfg.DummyDeathCount = ParseInt(simulator.Attribute("deathCount")?.Value);
-                    controller.cfg.DummySimulated = ParseBool(simulator.Attribute("simulated")?.Value);
+                    API.Emit("SOS.Migration.DummyDeathCount", ParseInt(simulator.Attribute("deathCount")?.Value), setState: false);
+                    API.Emit("SOS.Migration.DummySimulated", ParseBool(simulator.Attribute("simulated")?.Value), setState: false);
                     var dummyNode = simulator.Elements().FirstOrDefault();
                     if (dummyNode != null)
-                        controller.cfg.DummyCharacterXML = dummyNode;
+                        API.Emit<XElement>("SOS.Migration.DummyCharacterXML", dummyNode, setState: false);
                 }
 
                 // Tracker

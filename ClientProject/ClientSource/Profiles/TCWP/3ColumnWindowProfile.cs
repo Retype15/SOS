@@ -10,7 +10,6 @@ using Barotrauma;
 using Microsoft.Xna.Framework;
 using MonoMod.Utils;
 using SOS.GUI;
-using SOS.Panels.AfflictionPanel;
 using SOS.Panels.ItemPanel;
 using SOS.Prefabs;
 using BGUI = Barotrauma.GUI;
@@ -173,6 +172,7 @@ namespace SOS.Profiles.TCWP
 
         public void Dispose()
         {
+            Logger.LogDebug("EXECUTING PROFILE DISPOSE...", level: LogLevel.Trace);
             API.Off(CommKeys.ToggleWindow, OnToggleWindow);
             API.Off(CommKeys.OpenWindow, OnOpenWindow);
             _windowEventsRegistered = false;
@@ -183,8 +183,6 @@ namespace SOS.Profiles.TCWP
             API.Off(CommKeys.RefreshSearch, RefreshSearch);
 
             SaveSettings();
-
-            ClinicalSimulatorManager.Destroy();
 
             if (centerTabWidget is IDisposable d) d.Dispose();
             centerTabWidget = null;
