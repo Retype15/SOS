@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using MonoMod.Utils;
 using SOS.GUI;
 using SOS.Profiles;
+using SOS.Profiles.TCWP;
 using static SOS.Profiles.TCWP.ThreeColumnWindowProfile;
 
 namespace SOS.Configs.TCWP
@@ -104,6 +105,8 @@ namespace SOS.Configs.TCWP
         {
             Logger.LogDebug("TCWPConfig.SaveCurrentLayout: start", level: LogLevel.Trace);
 
+            if (SOSController.Instance.ActiveProfile is not ThreeColumnWindowProfile profile) return;
+
             int layoutNumber = CustomLayouts.Count + 1;
             while (CustomLayouts.ContainsKey($"Layout {layoutNumber}"))
             {
@@ -111,13 +114,7 @@ namespace SOS.Configs.TCWP
             }
             string newName = $"Layout {layoutNumber}";
 
-            var layout = new TPLayout
-            {
-                WindowSize = WindowSize,
-                LeftPanelWidth = LeftPanelWidth,
-                RightPanelWidth = RightPanelWidth
-            };
-            CustomLayouts[newName] = layout;
+            CustomLayouts[newName] = profile.GetTPLayout(); ;
             Save();
             ProfileHelper.RefreshSettings();
             Logger.LogDebug($"TCWPConfig.SaveCurrentLayout: ok '{newName}'", level: LogLevel.Trace);
