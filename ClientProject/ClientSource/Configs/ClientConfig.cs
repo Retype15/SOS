@@ -10,10 +10,7 @@ using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework.Input;
 using SOS.Panels.AfflictionPanel;
-<<<<<<< HEAD
 using SOS.Prefabs;
-=======
->>>>>>> c629ca2 (feat: Changed all GUI files and Helpers to SDK project.)
 using SOS.Profiles;
 
 namespace SOS.Configs
@@ -35,12 +32,9 @@ namespace SOS.Configs
 
             ProfileHelper.TabHistory.Clear();
             ProfileHelper.TabHistory.AddRange(ConfigHelper.CsvToList(TabHistoryRaw));
-<<<<<<< HEAD
 
             PrefabHelper.ClearFavorites(false);
             PrefabHelper.AddRangeFavorite(ConfigHelper.CsvToHashSet(_favoritesRaw.Value), false);
-=======
->>>>>>> c629ca2 (feat: Changed all GUI files and Helpers to SDK project.)
 
             // Restore tracker
             ctr.Tracker.FromCsv(TrackedRecipesRaw);
@@ -92,10 +86,6 @@ namespace SOS.Configs
             DummyDeathCount = 0;
             DummySimulated = false;
             DummyCharacterXML = XElement.Parse("<Character />");
-<<<<<<< HEAD
-=======
-            FavoritedItems.Clear();
->>>>>>> c629ca2 (feat: Changed all GUI files and Helpers to SDK project.)
             ProfileHelper.ClearTabHistory();
             TabHistoryRaw = "";
 

@@ -5,7 +5,6 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
-using System.Collections.Immutable;
 using Barotrauma;
 using Microsoft.Xna.Framework;
 using SOS.GUI;
