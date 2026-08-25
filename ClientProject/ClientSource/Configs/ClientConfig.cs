@@ -10,11 +10,12 @@ using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework.Input;
 using SOS.Panels.AfflictionPanel;
+using SOS.Prefabs;
 using SOS.Profiles;
 
 namespace SOS.Configs
 {
-    public sealed class ClientConfig : ConfigDirtySaver, ISOSConfig, IHaveFavoritedItems
+    public sealed class ClientConfig : ConfigDirtySaver, ISOSConfig
     {
         public string Id => "SOS.Core";
         public double Order => 0;
@@ -31,6 +32,9 @@ namespace SOS.Configs
 
             ProfileHelper.TabHistory.Clear();
             ProfileHelper.TabHistory.AddRange(ConfigHelper.CsvToList(TabHistoryRaw));
+
+            PrefabHelper.ClearFavorites(false);
+            PrefabHelper.AddRangeFavorite(ConfigHelper.CsvToHashSet(_favoritesRaw.Value), false);
 
             // Restore tracker
             ctr.Tracker.FromCsv(TrackedRecipesRaw);
@@ -65,7 +69,7 @@ namespace SOS.Configs
             TrackedRecipesRaw = ctr.Tracker.ToCsv();
             TrackerVisible = ctr.Tracker.Visible;
 
-            _favoritesRaw.SetIfNotEqual(FavoritedItems.ToCsv());
+            _favoritesRaw.SetIfNotEqual(PrefabHelper.Favorites.ToCsv());
 
             SaveChanges(Plugin.Instance.ConfigService);
         }
@@ -82,13 +86,12 @@ namespace SOS.Configs
             DummyDeathCount = 0;
             DummySimulated = false;
             DummyCharacterXML = XElement.Parse("<Character />");
-            FavoritedItems.Clear();
             ProfileHelper.ClearTabHistory();
             TabHistoryRaw = "";
 
             _currentTarget = null;
             _dummyCharacterXML = null;
-            _favoritedItems = null;
+            _favoritesRaw.SetIfNotEqual(_favoritesRaw.DefaultValue);
 
             var ctr = SOSController.Instance;
             ctr.Tracker.Clear();
@@ -196,13 +199,6 @@ namespace SOS.Configs
 
         private readonly ISettingBase<string> _favoritesRaw;
         private readonly ISettingBase<string> _tabHistoryRaw;
-
-        private HashSet<string>? _favoritedItems;
-        public HashSet<string> FavoritedItems
-        {
-            get => _favoritedItems ??= ConfigHelper.CsvToHashSet(_favoritesRaw.Value);
-            set => _favoritedItems = value;
-        }
 
         public string TabHistoryRaw { get => _tabHistoryRaw.Value; set => _tabHistoryRaw.SetIfNotEqual(value); }
 

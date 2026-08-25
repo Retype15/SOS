@@ -12,6 +12,7 @@ using MonoMod.Utils;
 using SOS.GUI;
 using SOS.Panels.AfflictionPanel;
 using SOS.Panels.ItemPanel;
+using SOS.Prefabs;
 using BGUI = Barotrauma.GUI;
 
 namespace SOS.Profiles.TCWP
@@ -551,7 +552,7 @@ namespace SOS.Profiles.TCWP
 
             var ctrl = SOSController.Instance;
             allFilteredTargets = [.. candidates
-                .OrderByDescending(c => ctrl.FavoritedItems.Contains(c.Identifier.Value))];
+                .OrderByDescending(c => PrefabHelper.IsFavorite(c.Identifier.Value))];
 
             itemsLoaded = 0;
             itemList.Content.ClearChildren();
@@ -601,7 +602,7 @@ namespace SOS.Profiles.TCWP
                     itemsInRow = 0;
                 }
 
-                bool isFav = ctrl.FavoritedItems.Contains(prefab.Identifier.Value);
+                bool isFav = PrefabHelper.IsFavorite(prefab.Identifier.Value);
 
                 switch (leftPanelMode)
                 {

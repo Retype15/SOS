@@ -8,6 +8,7 @@
 using System.ComponentModel;
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using SOS.Prefabs;
 
 namespace SOS
 {
@@ -149,35 +150,14 @@ namespace SOS
                 new(Texts.Get("sos.context.view_recipes", "View Recipes").Value, isEnabled: true, onSelected: () => API.Emit(CommKeys.SelectTarget, prefab))
             };
 
-            if (API.GetConfig("SOS.Core") is IHaveFavoritedItems config)
-            {
+            string targetId = prefab.Identifier.Value;
+            bool isFav = PrefabHelper.IsFavorite(targetId);
+            string favText = isFav ? Texts.Get("sos.context.remove_favorite", "Remove from Favorites").Value : Texts.Get("sos.context.add_favorite", "Add to Favorites").Value;
 
-                var favoritedItems = config.FavoritedItems;
-                string targetId = prefab.Identifier.Value;
-                bool isFav = favoritedItems.Contains(targetId);
-                string favText = isFav ? Texts.Get("sos.context.remove_favorite", "Remove from Favorites").Value : Texts.Get("sos.context.add_favorite", "Add to Favorites").Value;
-
-                options.Add(new ContextMenuOption(favText, true, () =>
-                {
-                    if (isFav) favoritedItems.Remove(targetId);
-                    else favoritedItems.Add(targetId);
-
-                    API.Emit(CommKeys.RefreshSearch);
-                }));
-            }
+            options.Add(new ContextMenuOption(favText, true, () => { PrefabHelper.ToggleFavorite(targetId); }));
 
             return options;
         }
-    }
-
-    #endregion
-
-    #region balls
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IHaveFavoritedItems
-    {
-        HashSet<string> FavoritedItems { get; }
     }
 
     #endregion

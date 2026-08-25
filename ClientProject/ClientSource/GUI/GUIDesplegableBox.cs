@@ -8,6 +8,7 @@
 using Barotrauma;
 using Microsoft.Xna.Framework;
 using SOS.Panels.ItemPanel;
+using SOS.Prefabs;
 
 namespace SOS.GUI
 {
@@ -32,7 +33,7 @@ namespace SOS.GUI
 
             foreach (var item in items)
             {
-                bool isFav = SOSController.Instance.FavoritedItems.Contains(item.Identifier.Value);
+                bool isFav = PrefabHelper.IsFavorite(item.Identifier.Value);
                 string prefix = isFav ? " *" : "";
 
                 CardBuilder.DrawCompactItemRow(dropDown.ListBox.Content, item, 1, true, prefix, isFav ? Color.Gold : Color.White,

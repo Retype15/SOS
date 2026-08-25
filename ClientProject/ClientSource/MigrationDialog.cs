@@ -7,6 +7,7 @@
 using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using SOS.Prefabs;
 using BGUI = Barotrauma.GUI;
 
 namespace SOS
@@ -120,7 +121,7 @@ namespace SOS
                 var favs = root.Element("Favorites")?.Elements("Item");
                 if (favs != null)
                     foreach (var f in favs)
-                        controller.FavoritedItems.Add(f.Attribute("id")?.Value ?? "");
+                        PrefabHelper.AddFavorite(f.Attribute("id")?.Value ?? "");
 
                 // State
                 string lastItemId = "";
