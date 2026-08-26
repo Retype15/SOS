@@ -16,11 +16,10 @@ using BGUI = Barotrauma.GUI;
 
 namespace SOS.Profiles.TCWP
 {
-    [AutoRegister]
+    [AutoRegister("SOS.Default3Column", -1)]
     internal sealed class ThreeColumnWindowProfile : GUIWindow, ISOSWindowProfile
     {
-        public string Id => "SOS.Profile.Default3Column";
-        public double Order => 0;
+        public string Id => "SOS.Default3Column";
 
         private Configs.TCWP.TCWPConfig? config;
         public ISOSConfig ProfileConfig => config ??= new();
@@ -264,7 +263,7 @@ namespace SOS.Profiles.TCWP
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError($"[SOS] Exception in section '{section.Id}': {ex.Message}");
+                    Logger.LogError($"[SOS] Exception in section '{section.GetType().FullOrName()}': {ex.Message}");
                     continue;
                 }
                 finally { if (section is IDisposable d) d.Dispose(); }
@@ -545,7 +544,7 @@ namespace SOS.Profiles.TCWP
 
             var candidates = new List<Prefab>();
 
-            foreach (var provider in prefabProviders.OrderBy(p => p.Order))
+            foreach (var provider in prefabProviders)
             {
                 try
                 {
@@ -554,7 +553,7 @@ namespace SOS.Profiles.TCWP
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogWarning($"[SOS] Provider '{provider.Id}' failed: {ex.Message}");
+                    Logger.LogWarning($"[SOS] Provider '{provider.GetType().FullOrName()}' failed: {ex.Message}");
                 }
             }
 

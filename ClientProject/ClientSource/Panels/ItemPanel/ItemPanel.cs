@@ -12,11 +12,10 @@ using SOS.GUI;
 namespace SOS.Panels.ItemPanel
 {
     // MARK: Item Recipes Tab
-    [AutoRegister]
+    [AutoRegister("SOS.ItemRecipe", 0)]
     public class ItemPanelTab : ISOSTab, IDisposable
     {
-        public string Id => "ItemRecipe";
-        public double Order => 0;
+        public string Id => "SOS.ItemRecipe";
         public string TabName => Texts.Get("sos.tab.recipes", "RECIPES").Value;
         public string ToolTip => Texts.Get("sos.tab.recipes_tooltip").Value;
         private GUIFrame? _container;

@@ -10,11 +10,9 @@ using SOS.GUI;
 
 namespace SOS.Prefabs.Item
 {
-    [AutoRegister]
+    [AutoRegister("ItemPrefab", 1)]
     public sealed class ItemPrefabProvider : ISOSPrefab
     {
-        public string Id => "ItemPrefab";
-        public double Order => 1;
         public Type PrefabType => typeof(ItemPrefab);
         public string Header => Texts.Get("sos.list.header.itemprefab", "Items").Value;
 

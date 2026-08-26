@@ -3,7 +3,7 @@
 <Configuration>
     <Settings>
         <!-- State -->
-        <Setting Name="ActiveProfileId" Type="string" Value="" ShowInMenus="false" />
+        <Setting Name="ActiveProfileId" Type="string" Value="SOS.Default3Column" ShowInMenus="false" />
 
         <!-- Settings Window Dimensions -->
         <Setting Name="SettingsWindowSizeX" Type="int" Value="550" ShowInMenus="false" />

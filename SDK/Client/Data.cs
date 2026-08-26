@@ -14,10 +14,17 @@ namespace SOS
 {
     #region AutoRegister
 
-    public interface IAutoRegister;
-
     [AttributeUsage(AttributeTargets.Class)]
-    public class AutoRegisterAttribute : Attribute;
+    public class AutoRegisterAttribute : Attribute
+    {
+        public readonly string? Id;
+        public readonly double Order;
+        public AutoRegisterAttribute(string? id = null, double order = 0.0)
+        {
+            Id = id;
+            Order = order;
+        }
+    }
 
     #endregion
 
@@ -26,28 +33,17 @@ namespace SOS
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IIdentifier
     {
-        string Id => GetType().FullName ?? GetType().Name;
+        string Id => GetType().FullOrName();
     }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IOrdenable
+    public interface ISingleton<out T> where T : class, new()
     {
-        [DefaultClass<IdentifierOrdenableDefaults>]
-        double Order => 0;
-    }
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IIdentifierOrdenable : IIdentifier, IOrdenable;
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IBaseStatSection
-    {
-        bool Analyze(Prefab item);
-        void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
+        private static T? instance;
+        public static T Instance => instance ??= new();
     }
 
     [EditorBrowsable(EditorBrowsableState.Never), DefaultClass<TabDefaults>]
-    public interface ITab : IIdentifierOrdenable
+    public interface ITab : IIdentifier
     {
         string TabName { get; }
 
@@ -61,13 +57,17 @@ namespace SOS
             => TabDefaults.CreateTabButton(tabName, parent, isActive, onClick, toolTip);
     }
 
-    public interface ISOSStatSection : IIdentifierOrdenable, IBaseStatSection;
+    public interface ISOSStatSection
+    {
+        bool Analyze(Prefab item);
+        void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
+    }
 
 
     public interface ISOSTab : ITab;
 
     [DefaultClass<ConfigDefaults>]
-    public interface ISOSConfig : IIdentifierOrdenable
+    public interface ISOSConfig
     {
         void Load();
         void Save();
@@ -86,7 +86,7 @@ namespace SOS
         List<string> PrefabType { get; }
     }
 
-    public interface ISOSPrefab : IIdentifierOrdenable
+    public interface ISOSPrefab
     {
         Type PrefabType { get; }
         string Header { get; }
@@ -96,7 +96,7 @@ namespace SOS
         List<ContextMenuOption> BuildContextOptions(Prefab prefab) => PrefabDefaults.BuildContextOptions(prefab);
     }
 
-    public interface ISOSWindowProfile : IIdentifierOrdenable, IDisposable
+    public interface ISOSWindowProfile : IIdentifier, IDisposable
     {
         string DisplayName => Texts.Get($"{Id}.DisplayName", Id).Value;
         string Description => Texts.Get($"{Id}.Description", "").Value;

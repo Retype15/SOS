@@ -9,11 +9,9 @@ using Barotrauma;
 
 namespace SOS.Prefabs.Affliction
 {
-    [AutoRegister]
+    [AutoRegister("AfflictionPrefab", 2)]
     public sealed class AfflictionPrefabProvider : ISOSPrefab
     {
-        public string Id => "AfflictionPrefab";
-        public double Order => 2;
         public Type PrefabType => typeof(AfflictionPrefab);
         public string Header => Texts.Get("sos.list.header.afflictionprefab", "Afflictions").Value;
 
@@ -64,11 +62,9 @@ namespace SOS.Prefabs.Affliction
         }
     }
 
-    [AutoRegister]
+    [AutoRegister("AfflictionPrefabHusk", 2.5)]
     public sealed class AfflictionPrefabHuskProvider : ISOSPrefab
     {
-        public string Id => "AfflictionPrefabHusk";
-        public double Order => 2.5;
         public Type PrefabType => typeof(AfflictionPrefabHusk);
         public string Header => Texts.Get("sos.list.header.afflictionprefabhusk", "Husk Afflictions").Value;
         public IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter) => [];

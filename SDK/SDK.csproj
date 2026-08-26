@@ -28,6 +28,7 @@
 
   <PropertyGroup>
     <RootNamespace>$(SolutionName.Replace(" ", "_"))</RootNamespace>
+    <AssemblyName>SOS.SDK</AssemblyName>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
   </PropertyGroup>
 

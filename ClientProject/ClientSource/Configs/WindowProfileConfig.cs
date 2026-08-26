@@ -13,11 +13,9 @@ using SOS.Profiles;
 
 namespace SOS.Configs
 {
+    [AutoRegister("SOS.WindowProfile", 1)]
     internal sealed class WindowProfileConfig : ConfigDirtySaver, ISOSConfig
     {
-        public string Id => "SOS.WindowProfile";
-        public double Order => 1;
-
         private static WindowProfileConfig? _instance;
         public static WindowProfileConfig Instance = _instance ??= new();
 
@@ -47,7 +45,7 @@ namespace SOS.Configs
 
         public void Reset()
         {
-            ActiveProfileId = "SOS.Profile.Default3Column";
+            ActiveProfileId = "SOS.Default3Column";
             _settingsWindowSizeX.SetIfNotEqual(_settingsWindowSizeX.DefaultValue);
             _settingsWindowSizeY.SetIfNotEqual(_settingsWindowSizeY.DefaultValue);
             _settingsWindowPositionX.SetIfNotEqual(_settingsWindowPositionX.DefaultValue);
@@ -101,6 +99,7 @@ namespace SOS.Configs
 
         public WindowProfileConfig()
         {
+            _instance = this;
             var pms = Plugin.Instance.ConfigService;
             var p = Plugin.Instance.Package;
             void TryInitConfig<T>(string name, out T setting) where T : ISettingBase => base.TryInitConfig(name, out setting, pms, p);
