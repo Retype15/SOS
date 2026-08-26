@@ -26,8 +26,10 @@ namespace SOS
         private static readonly SortedFactory<ISOSPrefab> _prefabFactories = new();
         private static readonly SortedFactory<ISOSWindowProfile> _profileFactories = new();
 
-        // Cached Instances
-        private static readonly Dictionary<string, ISOSConfig> _cachedConfigs = [];
+        //Global cached Instances
+        private static readonly Dictionary<string, ISOSConfig> _instancedConfigs = [];
+
+        // Temporal Cached Instances
         private static readonly Dictionary<string, ISOSPrefab> _cachedPrefabProviders = [];
 
         private static bool _scanned = false;
@@ -250,31 +252,33 @@ namespace SOS
 
         public static IEnumerable<ISOSConfig> GetAllConfigs(bool refresh = false)
         {
-            lock (_cachedConfigs)
+            lock (_instancedConfigs)
             {
-                if (refresh || _cachedConfigs.Count == 0)
+                if (refresh || _instancedConfigs.Count == 0)
                 {
-                    _cachedConfigs.Clear();
+                    _instancedConfigs.Clear();
                     foreach (var (Id, Instance) in _configFactories.Create())
-                        _cachedConfigs[Id] = Instance;
+                        _instancedConfigs[Id] = Instance;
                 }
-                return [.. _cachedConfigs.Values];
+                return [.. _instancedConfigs.Values];
             }
         }
 
         public static ISOSConfig? GetConfig(string id, bool refresh = false)
         {
-            lock (_cachedConfigs)
+            lock (_instancedConfigs)
             {
-                if (refresh || !_cachedConfigs.TryGetValue(id, out var config))
+                if (refresh || !_instancedConfigs.TryGetValue(id, out var config))
                 {
                     config = _configFactories.Get(id);
                     if (config != null)
-                        _cachedConfigs[id] = config;
+                        _instancedConfigs[id] = config;
                 }
                 return config;
             }
         }
+
+        public static void ClearCachedConfigs() { lock (_instancedConfigs) _instancedConfigs.Clear(); }
 
         #endregion
 
@@ -311,6 +315,8 @@ namespace SOS
                 return prefab;
             }
         }
+
+        public static void ClearCachedPrefabProviders() { lock (_cachedPrefabProviders) _cachedPrefabProviders.Clear(); }
 
         #endregion
 
@@ -503,10 +509,18 @@ namespace SOS
 
         #endregion
 
-        public static void ClearCache()
+        internal static void ClearAllCache()
         {
-            lock (_cachedConfigs) _cachedConfigs.Clear();
-            lock (_cachedPrefabProviders) _cachedPrefabProviders.Clear();
+            // Global cache
+            ClearCachedConfigs();
+
+            // Temporal cache
+            ClearTemporalCache();
+        }
+
+        internal static void ClearTemporalCache()
+        {
+            ClearCachedPrefabProviders();
         }
 
         internal static void Clear()
@@ -517,7 +531,7 @@ namespace SOS
             _prefabFactories.Clear();
             _profileFactories.Clear();
             _scanned = false;
-            ClearCache();
+            ClearAllCache();
             lock (_delegates) _delegates.Clear();
             lock (_state) _state.Clear();
         }
