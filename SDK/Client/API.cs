@@ -33,13 +33,11 @@ namespace SOS
         private static bool _scanned = false;
 
         //MARK: SortedFactory
-        private sealed class SortedFactory<T> where T : class, IIdentifierOrdenable
+        private sealed class SortedFactory<T> where T : class
         {
             private readonly Dictionary<string, (double Order, Func<T?> Factory)> _dict = [];
             private (string Id, double Order, Func<T?> Factory)[] _cache = [];
             private bool _isDirty = false;
-
-            private void Add(T instance) => Add(instance.Id, instance.Order, () => instance);
 
             private void Add(string id, double order, Func<T?> Factory)
             {
@@ -60,21 +58,24 @@ namespace SOS
                 }
             }
 
-            public bool Register(object obj)
+            public bool Register(object obj, string? id, double order)
             {
                 bool isSuccess = obj switch
                 {
                     null => false,
-                    Type type => RegisterType(type),
-                    Func<T?> func => RegisterFunc(func),
-                    Func<object> func => RegisterFunc(func),
-                    _ => RegisterInstance(obj)
+                    Type type => RegisterType(type, id, order),
+                    Func<T?> func => RegisterFunc(func, id, order),
+                    Func<object> func => RegisterFunc(func, id, order),
+                    _ => RegisterInstance(obj, id, order)
                 };
-                if (isSuccess) Logger.LogDebug($"[SOS.API] Registered '{obj?.GetType().FullOrName()}' type.", level: LogLevel.Trace);
+
+                if (isSuccess) Logger.LogDebug($"[SOS.API] Registered '{id}' of type '{obj?.GetType().FullOrName()}' as '{typeof(T).Name}'.", level: LogLevel.Trace);
+                else Logger.LogError($"[SOS.API] Failed to register '{id}' of type '{obj?.GetType().FullOrName()}' as '{typeof(T).Name}'.");
+
                 return isSuccess;
             }
 
-            private bool RegisterType(Type type)
+            private bool RegisterType(Type type, string? id, double order)
             {
                 if (type.IsAbstract || type.IsInterface || type.GetConstructor(Type.EmptyTypes) == null)
                 {
@@ -82,19 +83,10 @@ namespace SOS
                     return false;
                 }
 
+                id ??= type.FullOrName();
+
                 try
                 {
-                    var dummy = Activator.CreateInstance(type)?.Cast<T>();
-
-                    if (dummy == null)
-                    {
-                        Logger.LogWarning($"[SOS.API] Failed to instantiate dummy for type '{type.FullName}' as '{typeof(T).Name}'.");
-                        return false;
-                    }
-
-                    string id = dummy.Id;
-                    double order = dummy.Order;
-
                     Add(id, order, () => Activator.CreateInstance(type)?.Cast<T>());
 
                     return true;
@@ -106,39 +98,29 @@ namespace SOS
                 }
             }
 
-            private bool RegisterFunc(Func<T?> func)
+            private bool RegisterFunc(Func<T?> func, string? id, double order)
             {
-                var dummy = func();
-                if (dummy == null)
-                {
-                    Logger.LogWarning($"[SOS.API] Failed to register method. Returned Type on register has been Null.");
-                    return false;
-                }
-                Add(dummy.Id, dummy.Order, func);
+                id ??= func.Method.ReturnType.FullOrName();
+
+                Add(id, order, func);
                 return true;
             }
 
-            private bool RegisterFunc(Func<object> func)
+            private bool RegisterFunc(Func<object> func, string? id, double order)
             {
-                try
-                {
-                    var dummy = func().Cast<T>();
-                    Add(dummy.Id, dummy.Order, () => func().Cast<T>());
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogWarning($"[SOS.API] Failed to register method. Returned Type does not satisfy contract. \nException: {ex.Message}");
-                    return false;
-                }
+                id ??= func.Method.ReturnType.FullOrName();
+
+                Add(id, order, () => func().Cast<T>());
+                return true;
             }
 
-            private bool RegisterInstance(object obj)
+            private bool RegisterInstance(object obj, string? id, double order)
             {
+                id ??= obj.GetType().FullOrName();
+
                 try
                 {
-                    var section = obj.Cast<T>();
-                    Add(section);
+                    Add(id, order, () => obj.Cast<T>());
                     return true;
                 }
                 catch (Exception ex)
@@ -156,8 +138,12 @@ namespace SOS
 
                 if (result.IsSuccess)
                     foreach (Type t in result.Value)
-                        if (typeof(IAutoRegister).IsAssignableFrom(t) || t.GetCustomAttribute<AutoRegisterAttribute>() != null)
-                            anySuccess |= RegisterType(t);
+                    {
+                        var attr = t.GetCustomAttribute<AutoRegisterAttribute>();
+                        if (attr != null)
+                            anySuccess |= RegisterType(t, attr.Id ?? t.FullOrName(), attr.Order);
+                    }
+
 
                 return anySuccess;
             }
@@ -179,7 +165,7 @@ namespace SOS
                 return _cache;
             }
 
-            public IEnumerable<T> Create()
+            public IEnumerable<(string Id, T Instance)> Create()
             {
                 foreach (var (Id, _, factory) in GetSorted())
                 {
@@ -195,7 +181,7 @@ namespace SOS
                     }
 
                     if (instance != null)
-                        yield return instance;
+                        yield return (Id, instance);
                 }
             }
 
@@ -242,25 +228,25 @@ namespace SOS
 
         #region Lateral Sections
 
-        public static bool RegisterSection(object obj) => _sectionFactories.Register(obj);
+        public static bool RegisterSection(object obj, string? id = null, double order = 0.0) => _sectionFactories.Register(obj, id, order);
 
-        internal static IEnumerable<ISOSStatSection> CreateSections() => _sectionFactories.Create();
+        internal static IEnumerable<ISOSStatSection> CreateSections() => _sectionFactories.Create().Select(t => t.Instance);
 
         #endregion
 
         #region Tabs
 
-        public static bool RegisterTab(object obj) => _tabFactories.Register(obj);
+        public static bool RegisterTab(object obj, string? id = null, double order = 0.0) => _tabFactories.Register(obj, id, order);
 
-        internal static IEnumerable<ISOSTab> CreateTabs() => _tabFactories.Create();
+        internal static IEnumerable<ISOSTab> CreateTabs() => _tabFactories.Create().Select(t => t.Instance);
 
         #endregion
 
         #region Configs
 
-        public static bool RegisterConfig(object obj) => _configFactories.Register(obj);
+        public static bool RegisterConfig(object obj, string? id = null, double order = 0.0) => _configFactories.Register(obj, id, order);
 
-        internal static IEnumerable<ISOSConfig> CreateConfigs() => _configFactories.Create();
+        internal static IEnumerable<ISOSConfig> CreateConfigs() => _configFactories.Create().Select(t => t.Instance);
 
         public static IEnumerable<ISOSConfig> GetAllConfigs(bool refresh = false)
         {
@@ -269,8 +255,8 @@ namespace SOS
                 if (refresh || _cachedConfigs.Count == 0)
                 {
                     _cachedConfigs.Clear();
-                    foreach (var config in CreateConfigs())
-                        _cachedConfigs[config.Id] = config;
+                    foreach (var (Id, Instance) in _configFactories.Create())
+                        _cachedConfigs[Id] = Instance;
                 }
                 return [.. _cachedConfigs.Values];
             }
@@ -294,9 +280,9 @@ namespace SOS
 
         #region Prefab Providers
 
-        public static bool RegisterPrefabProvider(object obj) => _prefabFactories.Register(obj);
+        public static bool RegisterPrefabProvider(object obj, string? id = null, double order = 0.0) => _prefabFactories.Register(obj, id, order);
 
-        internal static IEnumerable<ISOSPrefab> CreatePrefabProviders() => _prefabFactories.Create();
+        internal static IEnumerable<ISOSPrefab> CreatePrefabProviders() => _prefabFactories.Create().Select(t => t.Instance);
 
         public static IEnumerable<ISOSPrefab> GetAllPrefabProviders(bool refresh = false)
         {
@@ -305,8 +291,8 @@ namespace SOS
                 if (refresh || _cachedPrefabProviders.Count == 0)
                 {
                     _cachedPrefabProviders.Clear();
-                    foreach (var prefab in CreatePrefabProviders())
-                        _cachedPrefabProviders[prefab.Id] = prefab;
+                    foreach (var (Id, Instance) in _prefabFactories.Create())
+                        _cachedPrefabProviders[Id] = Instance;
                 }
                 return [.. _cachedPrefabProviders.Values];
             }
@@ -330,9 +316,9 @@ namespace SOS
 
         #region Window Profiles
 
-        public static bool RegisterWindowProfile(object obj) => _profileFactories.Register(obj);
+        public static bool RegisterWindowProfile(object obj, string? id = null, double order = 0.0) => _profileFactories.Register(obj, id, order);
 
-        internal static IEnumerable<ISOSWindowProfile> CreateWindowProfiles() => _profileFactories.Create();
+        internal static IEnumerable<ISOSWindowProfile> CreateWindowProfiles() => _profileFactories.Create().Select(t => t.Instance);
 
         internal static ISOSWindowProfile? GetWindowProfile(string? id)
         {

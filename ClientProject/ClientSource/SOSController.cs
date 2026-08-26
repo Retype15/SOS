@@ -22,6 +22,8 @@ namespace SOS
 
         internal ISOSWindowProfile? ActiveProfile = null;
 
+        private bool _sosStarted = false;
+
         public bool HaveOldConfigFile = false;
 
         private GUIRecipeTracker? _tracker;
@@ -90,6 +92,7 @@ namespace SOS
 
         public void ToggleUI(Prefab? prefab = null)
         {
+            _sosStarted = true;
             ProfileHelper.OnTargetSelected(prefab);
 
             if (ActiveProfile == null)
@@ -198,19 +201,27 @@ namespace SOS
             foreach (var config in API.GetAllConfigs())
             {
                 try { config.Save(); }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    Logger.LogError(e.Message);
+                    Logger.LogError(ex.Message);
                     continue;
                 }
-                Logger.LogDebug($"Saving config : '{config.Id}'", level: LogLevel.Trace);
+                Logger.LogDebug($"Saved config : '{config.GetType().FullOrName()}'", level: LogLevel.Trace);
             }
         }
 
         public static void LoadSettings()
         {
             foreach (var config in API.GetAllConfigs())
-                config.Load();
+            {
+                try { config.Load(); }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex.Message);
+                    continue;
+                }
+                Logger.LogDebug($"Loaded config : '{config.GetType().FullOrName()}'", level: LogLevel.Trace);
+            }
         }
 
         private static Prefab? GetPrefabUnderMouse()
@@ -264,7 +275,7 @@ namespace SOS
 
         public void Dispose()
         {
-            SaveSettings();
+            if (_sosStarted && !IsSOSBlocked) SaveSettings();
 
             GUIAnimSequence.ClearAll();
 

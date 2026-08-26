@@ -24,8 +24,8 @@ namespace SOS
             try
             {
                 controller = SOSController.Instance;
-                API.RegisterConfig(() => ClientConfig.Instance);
-                API.RegisterConfig(() => WindowProfileConfig.Instance);
+
+                SOSController.LoadSettings();
 
                 ConsoleCommandsService.RegisterCommand(
                         name: "sos",
