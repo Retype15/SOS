@@ -36,12 +36,6 @@ namespace SOS
         string Id => GetType().FullOrName();
     }
 
-    public interface ISingleton<out T> where T : class, new()
-    {
-        private static T? instance;
-        public static T Instance => instance ??= new();
-    }
-
     [EditorBrowsable(EditorBrowsableState.Never), DefaultClass<TabDefaults>]
     public interface ITab : IIdentifier
     {
