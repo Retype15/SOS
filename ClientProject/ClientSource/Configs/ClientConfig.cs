@@ -162,12 +162,8 @@ namespace SOS.Configs
 
         // ─── Constructor ───
 
-        public ClientConfig()
+        private ClientConfig()
         {
-            if (_instance != null)
-                _instance = this;
-
-
             var pms = Plugin.Instance.ConfigService;
             var p = Plugin.Instance.Package;
             void TryInitConfig<T>(string name, out T setting) where T : ISettingBase => base.TryInitConfig(name, out setting, pms, p);
