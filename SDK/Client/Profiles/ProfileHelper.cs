@@ -329,14 +329,13 @@ namespace SOS.Profiles
 
         public static void DrawSettings(GUIListBox targetList, IReadOnlyList<ISOSConfig> configs) => DrawSettings([targetList], configs);
 
-        public static void DrawSettings(IEnumerable<GUIListBox> targetLists, IEnumerable<ISOSConfig> configs)
+        public static void DrawSettings(IReadOnlyList<GUIListBox> targetLists, IEnumerable<ISOSConfig> configs)
         {
-            var lists = targetLists as IList<GUIListBox> ?? [.. targetLists];
             var configList = configs.ToList();
-            if (lists.Count == 0 || configList.Count == 0) return;
+            if (targetLists.Count == 0 || configList.Count == 0) return;
             try
             {
-                int listCount = lists.Count;
+                int listCount = targetLists.Count;
                 int totalConfigs = configList.Count;
                 int chunkSize = (int)Math.Ceiling((double)totalConfigs / listCount);
                 for (int listIndex = 0; listIndex < listCount; listIndex++)
@@ -344,7 +343,7 @@ namespace SOS.Profiles
                     int startIndex = listIndex * chunkSize;
                     int count = Math.Min(chunkSize, totalConfigs - startIndex);
                     if (count <= 0) break;
-                    var targetList = lists[listIndex];
+                    var targetList = targetLists[listIndex];
                     for (int i = 0; i < count; i++)
                     {
                         var config = configList[startIndex + i];

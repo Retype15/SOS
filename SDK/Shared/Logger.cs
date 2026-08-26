@@ -41,10 +41,10 @@ namespace SOS
         public static void LogDebug(string? message, Color? color = null, ILoggerService? logger = null, LogLevel level = LogLevel.Debug) => Log(message, color, logger, level);
 
         [Conditional("DEBUG")]
-        public static void LogDebugError(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Debug | LogLevel.Error) => LogError(message, logger, level);
+        public static void LogDebugError(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Error) => LogError(message, logger, level);
 
         [Conditional("DEBUG")]
-        public static void LogDebugWarning(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Debug | LogLevel.Warning) => LogWarning(message, logger, level);
+        public static void LogDebugWarning(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Warning) => LogWarning(message, logger, level);
 
         [Conditional("RELEASE")]
         public static void LogRelease(string? message, Color? color = null, ILoggerService? logger = null, LogLevel level = LogLevel.Information) => Log(message, color, logger, level);

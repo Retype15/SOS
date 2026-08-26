@@ -58,7 +58,7 @@ namespace SOS.Configs
             using var l = new GUILayoutBuilder(container);
             l.Header("ACTIVE VISUAL PROFILE", Color.Gold);
 
-            var profiles = API.CreateWindowProfiles().ToList();
+            var profiles = API.GetAllWindowProfiles().ToList();
             var profileNames = profiles.Select(p => p.DisplayName);
             var currentProfile = profiles.FirstOrDefault(p => p.Id == ActiveProfileId)?.DisplayName ?? profiles.FirstOrDefault()?.DisplayName ?? throw new KeyNotFoundException($"Not match Profile ID: '{ActiveProfileId}'");
 

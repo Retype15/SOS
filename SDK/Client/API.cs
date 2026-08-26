@@ -26,18 +26,13 @@ namespace SOS
         private static readonly SortedFactory<ISOSPrefab> _prefabFactories = new();
         private static readonly SortedFactory<ISOSWindowProfile> _profileFactories = new();
 
-        //Global cached Instances
-        private static readonly Dictionary<string, ISOSConfig> _instancedConfigs = [];
-
-        // Temporal Cached Instances
-        private static readonly Dictionary<string, ISOSPrefab> _cachedPrefabProviders = [];
-
         private static bool _scanned = false;
 
         //MARK: SortedFactory
         private sealed class SortedFactory<T> where T : class
         {
             private readonly Dictionary<string, (double Order, Func<T?> Factory)> _dict = [];
+            private readonly Dictionary<string, T> _instances = [];
             private (string Id, double Order, Func<T?> Factory)[] _cache = [];
             private bool _isDirty = false;
 
@@ -46,16 +41,18 @@ namespace SOS
                 lock (_dict)
                 {
                     _dict[id] = (order, Factory);
+                    _instances.Remove(id);
                     _isDirty = true;
                 }
             }
 
-            private bool Remove(string key)
+            public bool Remove(string key, bool onlyInstance = false)
             {
                 lock (_dict)
                 {
-                    var isSuccess = _dict.Remove(key);
-                    if (isSuccess) _isDirty = true;
+                    var isSuccess = !onlyInstance && _dict.Remove(key);
+                    _instances.Remove(key);
+                    _isDirty |= isSuccess;
                     return isSuccess;
                 }
             }
@@ -167,11 +164,20 @@ namespace SOS
                 return _cache;
             }
 
-            public IEnumerable<(string Id, T Instance)> Create()
+            public IEnumerable<(string Id, T Instance)> Create(bool keepInstance = true)
             {
                 foreach (var (Id, _, factory) in GetSorted())
                 {
-                    T? instance;
+                    T? instance = null;
+                    lock (_dict)
+                    {
+                        if (_instances.TryGetValue(Id, out instance))
+                        {
+                            yield return (Id, instance);
+                            continue;
+                        }
+                    }
+
                     try
                     {
                         instance = factory();
@@ -183,31 +189,58 @@ namespace SOS
                     }
 
                     if (instance != null)
+                    {
+                        if (keepInstance)
+                            lock (_dict)
+                                _instances[Id] = instance;
                         yield return (Id, instance);
+
+                    }
                 }
             }
 
-            public T? Get(string id)
+            public T? Get(string id, bool keepInstance = true)
             {
                 lock (_dict)
+                {
+                    if (_instances.TryGetValue(id, out var cached))
+                        return cached;
+
                     if (_dict.TryGetValue(id, out var entry))
-                        return entry.Factory();
+                    {
+                        var instance = entry.Factory();
+                        if (keepInstance && instance != null)
+                            _instances[id] = instance;
+
+                        return instance;
+                    }
+                }
                 return null;
             }
 
-            public T? First()
+            public T? First(bool keepInstance = true)
             {
                 var sorted = GetSorted();
-                return sorted.Length > 0 ? sorted[0].Factory() : null;
+                return sorted.Length > 0 ? Get(sorted[0].Id, keepInstance) : null;
             }
 
-            public T? GetOrFirst(string? id) => (id != null) ? Get(id) ?? First() : First();
-            public T? GetOrFirst() => First();
+            public T? GetOrFirst(string? id, bool keepInstance = true)
+                => (id != null && Get(id, keepInstance) is { } instance) ? instance : First(keepInstance);
 
-            public void Clear()
+            public void Clear(bool onlyInstances = false)
             {
                 lock (_dict)
-                    _dict.Clear();
+                {
+                    if (!onlyInstances)
+                    {
+                        _dict.Clear();
+                        _cache = [];
+                        Logger.LogDebugWarning($"Limpiado factory para tipo: '{nameof(T)}'");
+                    }
+                    foreach (var kv in _instances)
+                        if (kv.Value is IDisposable i) i.Dispose();
+                    _instances.Clear();
+                }
                 _cache = [];
                 _isDirty = false;
             }
@@ -230,122 +263,117 @@ namespace SOS
 
         #region Lateral Sections
 
-        public static bool RegisterSection(object obj, string? id = null, double order = 0.0) => _sectionFactories.Register(obj, id, order);
+        public static bool RegisterSection(object obj, string? id = null, double order = 0.0)
+            => _sectionFactories.Register(obj, id, order);
 
-        internal static IEnumerable<ISOSStatSection> CreateSections() => _sectionFactories.Create().Select(t => t.Instance);
+        public static T? GetSection<T>(string id, bool keepInstance = true)
+            => GetSection(id, keepInstance) is T t ? t : default;
+
+        public static ISOSStatSection? GetSection(string id, bool keepInstance = true)
+            => _sectionFactories.Get(id, keepInstance);
+
+        public static IEnumerable<ISOSStatSection> GetAllSections(bool keepInstance = true)
+            => _sectionFactories.Create(keepInstance).Select(t => t.Instance);
+
+        public static bool RemoveSection(string id, bool onlyInstance = false)
+            => _sectionFactories.Remove(id, onlyInstance);
 
         #endregion
 
         #region Tabs
 
-        public static bool RegisterTab(object obj, string? id = null, double order = 0.0) => _tabFactories.Register(obj, id, order);
+        public static bool RegisterTab(object obj, string? id = null, double order = 0.0)
+            => _tabFactories.Register(obj, id, order);
 
-        internal static IEnumerable<ISOSTab> CreateTabs() => _tabFactories.Create().Select(t => t.Instance);
+        public static T? GetTab<T>(string id, bool keepInstance = true)
+            => GetTab(id, keepInstance) is T t ? t : default;
+
+        public static ISOSTab? GetTab(string id, bool keepInstance = true)
+            => _tabFactories.Get(id, keepInstance);
+
+        public static IEnumerable<ISOSTab> GetAllTabs(bool keepInstance = true)
+            => _tabFactories.Create(keepInstance).Select(t => t.Instance);
+
+        public static bool RemoveTab(string id, bool onlyInstance = false)
+            => _tabFactories.Remove(id, onlyInstance);
 
         #endregion
 
         #region Configs
 
-        public static bool RegisterConfig(object obj, string? id = null, double order = 0.0) => _configFactories.Register(obj, id, order);
+        public static bool RegisterConfig(object obj, string? id = null, double order = 0.0)
+            => _configFactories.Register(obj, id, order);
 
-        internal static IEnumerable<ISOSConfig> CreateConfigs() => _configFactories.Create().Select(t => t.Instance);
+        public static T? GetConfig<T>(string id, bool keepInstance = true)
+            => GetConfig(id, keepInstance) is T t ? t : default;
 
-        public static IEnumerable<ISOSConfig> GetAllConfigs(bool refresh = false)
-        {
-            lock (_instancedConfigs)
-            {
-                if (refresh || _instancedConfigs.Count == 0)
-                {
-                    _instancedConfigs.Clear();
-                    foreach (var (Id, Instance) in _configFactories.Create())
-                        _instancedConfigs[Id] = Instance;
-                }
-                return [.. _instancedConfigs.Values];
-            }
-        }
+        public static ISOSConfig? GetConfig(string id, bool keepInstance = true)
+            => _configFactories.Get(id, keepInstance);
 
-        public static ISOSConfig? GetConfig(string id, bool refresh = false)
-        {
-            lock (_instancedConfigs)
-            {
-                if (refresh || !_instancedConfigs.TryGetValue(id, out var config))
-                {
-                    config = _configFactories.Get(id);
-                    if (config != null)
-                        _instancedConfigs[id] = config;
-                }
-                return config;
-            }
-        }
+        public static IEnumerable<ISOSConfig> GetAllConfigs(bool keepInstance = true)
+            => _configFactories.Create(keepInstance).Select(t => t.Instance);
 
-        public static void ClearCachedConfigs() { lock (_instancedConfigs) _instancedConfigs.Clear(); }
+        public static bool RemoveConfig(string id, bool onlyInstance = false)
+            => _configFactories.Remove(id, onlyInstance);
 
         #endregion
 
         #region Prefab Providers
 
-        public static bool RegisterPrefabProvider(object obj, string? id = null, double order = 0.0) => _prefabFactories.Register(obj, id, order);
+        public static bool RegisterPrefabProvider(object obj, string? id = null, double order = 0.0)
+            => _prefabFactories.Register(obj, id, order);
 
-        internal static IEnumerable<ISOSPrefab> CreatePrefabProviders() => _prefabFactories.Create().Select(t => t.Instance);
+        public static T? GetPrefabProvider<T>(string id, bool refresh = true)
+            => GetPrefabProvider(id, refresh) is T t ? t : default;
 
-        public static IEnumerable<ISOSPrefab> GetAllPrefabProviders(bool refresh = false)
-        {
-            lock (_cachedPrefabProviders)
-            {
-                if (refresh || _cachedPrefabProviders.Count == 0)
-                {
-                    _cachedPrefabProviders.Clear();
-                    foreach (var (Id, Instance) in _prefabFactories.Create())
-                        _cachedPrefabProviders[Id] = Instance;
-                }
-                return [.. _cachedPrefabProviders.Values];
-            }
-        }
+        public static ISOSPrefab? GetPrefabProvider(string id, bool keepInstance = true)
+            => _prefabFactories.Get(id, keepInstance);
 
-        public static ISOSPrefab? GetPrefabProvider(string id, bool refresh = false)
-        {
-            lock (_cachedPrefabProviders)
-            {
-                if (refresh || !_cachedPrefabProviders.TryGetValue(id, out var prefab))
-                {
-                    prefab = _prefabFactories.Get(id);
-                    if (prefab != null)
-                        _cachedPrefabProviders[id] = prefab;
-                }
-                return prefab;
-            }
-        }
+        public static IEnumerable<ISOSPrefab> GetAllPrefabProviders(bool keepInstance = true)
+            => _prefabFactories.Create(keepInstance).Select(t => t.Instance);
 
-        public static void ClearCachedPrefabProviders() { lock (_cachedPrefabProviders) _cachedPrefabProviders.Clear(); }
+        public static bool RemovePrefabProvider(string id, bool onlyInstance = false)
+            => _prefabFactories.Remove(id, onlyInstance);
 
         #endregion
 
         #region Window Profiles
 
-        public static bool RegisterWindowProfile(object obj, string? id = null, double order = 0.0) => _profileFactories.Register(obj, id, order);
+        public static bool RegisterWindowProfile(object obj, string? id = null, double order = 0.0)
+            => _profileFactories.Register(obj, id, order);
 
-        internal static IEnumerable<ISOSWindowProfile> CreateWindowProfiles() => _profileFactories.Create().Select(t => t.Instance);
 
-        internal static ISOSWindowProfile? GetWindowProfile(string? id)
+        public static T? GetWindowProfile<T>(string id, bool keepInstance = false)
+            => GetWindowProfile(id, keepInstance) is T t ? t : default;
+
+        public static ISOSWindowProfile? GetWindowProfile(string? id, bool keepInstance = false)
         {
             ISOSWindowProfile? v;
-            if (string.IsNullOrEmpty(id)) v = _profileFactories.First();
+            if (string.IsNullOrEmpty(id)) v = _profileFactories.First(keepInstance);
             else
             {
-                v = _profileFactories.Get(id);
+                Logger.LogDebug($"GetWindowProfile >> id: '{id}'", level: LogLevel.Trace);
+                v = _profileFactories.Get(id, keepInstance);
                 if (v == null)
                 {
                     Logger.LogWarning("[SOS] Profile not encountered. Trying to use default profile.");
                     v = _profileFactories.First();
                 }
+                Logger.LogDebug($"GetWindowProfile >> Name: '{v?.DisplayName ?? "null"}'", level: LogLevel.Trace);
             }
             if (v == null)
             {
                 var color = Microsoft.Xna.Framework.Color.LightSkyBlue;
+                Logger.LogDebugError($"[SOS] No one profile encountered.\n => Profile list: {string.Join(',', GetAllWindowProfiles().ToList().Select(p => p.DisplayName))}\n => Profile _dict => {string.Join(',', _profileFactories.GetSorted().Select(f => $"[{f.Id}, {f.Order}]"))}");
                 Logger.LogError($"[SOS] No one profile encountered. Try reinstall 'S.O.S - Standard Operation Schematics' Mod, report that in steam mod page or create an issue on Git project(‖color:{color.R},{color.G},{color.B}‖https://github.com/retype15/SOS‖end‖).");
             }
             return v;
         }
+
+        public static IEnumerable<ISOSWindowProfile> GetAllWindowProfiles(bool keepInstance = false) => _profileFactories.Create(keepInstance).Select(t => t.Instance);
+
+        public static bool RemoveWindowProfile(string id, bool onlyInstance = false)
+                => _profileFactories.Remove(id, onlyInstance);
         #endregion
 
         #endregion
@@ -421,24 +449,24 @@ namespace SOS
 
         public static void Emit<T>(string key, T value, bool setState = true)
         {
-            Delegate? d;
             lock (_delegates)
-                _delegates.TryGetValue(key, out d);
+            {
+                _delegates.TryGetValue(key, out var d);
 
-            if (d != null)
-                foreach (var handler in d.GetInvocationList())
-                {
-                    try
+                if (d != null)
+                    foreach (var handler in d.GetInvocationList())
                     {
-                        switch (handler)
+                        try
                         {
-                            case Action<T> h1: h1(value); break;
-                            case Action h2: h2(); break;
+                            switch (handler)
+                            {
+                                case Action<T> h1: h1(value); break;
+                                case Action h2: h2(); break;
+                            }
                         }
+                        catch (Exception ex) { Logger.LogError($"[SOS] Observer error in key:'{key}'  method:'{handler.Method.Name}' Exception: {ex.Message}"); }
                     }
-                    catch (Exception ex) { Logger.LogError($"[SOS] Observer error in key:'{key}'  method:'{handler.Method.Name}' Exception: {ex.Message}"); }
-                }
-
+            }
             if (setState) SetState(key, value, false);
 
             Logger.LogDebug($"EMIT CALLED '{key}' with type: {nameof(T)}", level: LogLevel.Trace);
@@ -446,17 +474,17 @@ namespace SOS
 
         public static void Emit(string key)
         {
-            Delegate? d;
             lock (_delegates)
-                _delegates.TryGetValue(key, out d);
+            {
+                _delegates.TryGetValue(key, out var d);
 
-            if (d != null)
-                foreach (var handler in d.GetInvocationList())
-                {
-                    try { if (handler is Action handler1) handler1(); }
-                    catch (Exception ex) { Logger.LogError($"[SOS] Observer error in key: '{key}'\nException: '{ex.Message}'"); }
-                }
-
+                if (d != null)
+                    foreach (var handler in d.GetInvocationList())
+                    {
+                        try { if (handler is Action handler1) handler1(); }
+                        catch (Exception ex) { Logger.LogError($"[SOS] Observer error in key: '{key}'\nException: '{ex.Message}'"); }
+                    }
+            }
             Logger.LogDebug($"EMIT CALLED '{key}'.", level: LogLevel.Trace);
         }
 
@@ -509,18 +537,12 @@ namespace SOS
 
         #endregion
 
-        internal static void ClearAllCache()
+        internal static void ClearTemporaryInstances()
         {
-            // Global cache
-            ClearCachedConfigs();
-
-            // Temporal cache
-            ClearTemporalCache();
-        }
-
-        internal static void ClearTemporalCache()
-        {
-            ClearCachedPrefabProviders();
+            _sectionFactories.Clear(true);
+            _tabFactories.Clear(true);
+            _prefabFactories.Clear(true);
+            _profileFactories.Clear(true);
         }
 
         internal static void Clear()
@@ -531,7 +553,6 @@ namespace SOS
             _prefabFactories.Clear();
             _profileFactories.Clear();
             _scanned = false;
-            ClearAllCache();
             lock (_delegates) _delegates.Clear();
             lock (_state) _state.Clear();
         }
