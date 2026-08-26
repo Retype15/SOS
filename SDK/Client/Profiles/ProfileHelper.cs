@@ -181,7 +181,7 @@ namespace SOS.Profiles
                         style: "DeviceButton")
                     {
                         Color = Color.IndianRed * 0.9f,
-                        ToolTip = Texts.Get("sos.config.reset_all_tooltip", "Resets all S.O.S. configurations to factory defaults.").Value,
+                        ToolTip = Texts.Get("sos.config.reset_all_tooltip", "Resets all S.O.S. configurations to their default values.").Value,
                         OnClicked = (_, _) =>
                         {
                             foreach (var config in API.GetAllConfigs())
