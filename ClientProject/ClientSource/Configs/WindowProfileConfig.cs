@@ -96,9 +96,8 @@ namespace SOS.Configs
         private readonly ISettingBase<int> _settingsWindowPositionX;
         private readonly ISettingBase<int> _settingsWindowPositionY;
 
-        public WindowProfileConfig()
+        private WindowProfileConfig()
         {
-            _instance = this;
             var pms = Plugin.Instance.ConfigService;
             var p = Plugin.Instance.Package;
             void TryInitConfig<T>(string name, out T setting) where T : ISettingBase => base.TryInitConfig(name, out setting, pms, p);
