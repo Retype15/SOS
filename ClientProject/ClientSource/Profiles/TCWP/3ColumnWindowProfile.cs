@@ -254,7 +254,7 @@ namespace SOS.Profiles.TCWP
 
             ProfileHelper.UpdateTabWidget(centerTabWidget, target, OnPrimary, OnSecondary);
 
-            foreach (var section in API.CreateSections())
+            foreach (var section in API.GetAllSections())
             {
                 try
                 {
@@ -452,7 +452,7 @@ namespace SOS.Profiles.TCWP
                 RectTransform = { MinSize = new Point(0, 65), MaxSize = new Point(int.MaxValue, 65) }
             };
 
-            centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform), API.CreateTabs());
+            centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform), API.GetAllTabs());
 
             prefabProviders = [.. API.GetAllPrefabProviders()];
             prefabHeaders = prefabProviders.ToDictionary(p => p.PrefabType, p => p.Header);
