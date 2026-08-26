@@ -13,7 +13,6 @@ using SOS.Profiles;
 
 namespace SOS.Configs
 {
-    [AutoRegister("SOS.WindowProfile", 1)]
     internal sealed class WindowProfileConfig : ConfigDirtySaver, ISOSConfig
     {
         private static WindowProfileConfig? _instance;
