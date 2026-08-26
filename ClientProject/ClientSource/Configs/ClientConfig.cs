@@ -13,11 +13,10 @@ using SOS.Profiles;
 
 namespace SOS.Configs
 {
-    [AutoRegister("SOS.Core", 0)]
     public sealed class ClientConfig : ConfigDirtySaver, ISOSConfig
     {
         private static ClientConfig? _instance;
-        public static ClientConfig Instance => _instance ??= new ClientConfig();
+        public static ClientConfig Instance => _instance ??= new();
 
         private bool _loaded = false;
         public void Load()
@@ -165,7 +164,10 @@ namespace SOS.Configs
 
         public ClientConfig()
         {
-            _instance = this;
+            if (_instance != null)
+                _instance = this;
+
+
             var pms = Plugin.Instance.ConfigService;
             var p = Plugin.Instance.Package;
             void TryInitConfig<T>(string name, out T setting) where T : ISettingBase => base.TryInitConfig(name, out setting, pms, p);
