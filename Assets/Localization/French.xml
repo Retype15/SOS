@@ -105,8 +105,6 @@ Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.tab.recipes>RECETTES</sos.tab.recipes>
 	<sos.tab.recipes_tooltip>Affiche les recettes de fabrication, les sources et l'utilisation de l'objet.</sos.tab.recipes_tooltip>
 	<sos.tab.recipes.analyzing>Analyse du graphique de dépendance des recettes...</sos.tab.recipes.analyzing>
-	<sos.tab.simulator>SIMULATEUR</sos.tab.simulator>
-	<sos.tab.simulator_tooltip>Ouvre le simulateur clinique pour tester traitements et affections sur un patient factice.</sos.tab.simulator_tooltip>
 	<sos.tab.preview>APERÇU</sos.tab.preview>
 	<sos.tab.preview_tooltip>Affiche le sprite visuel du prefab sélectionné.</sos.tab.preview_tooltip>
 
@@ -208,17 +206,6 @@ Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.affliction.visual_distortions>Distorsions visuelles</sos.affliction.visual_distortions>
 	<sos.affliction.worsens>Aggrave :</sos.affliction.worsens>
 
-	<!-- Simulator -->
-	<sos.aff.speedDropdown>Plus de x1 sont encore en cours. \nFonctionne correctement en solo, mais pas du tout en multijoueur.</sos.aff.speedDropdown>
-	<sos.sim.play_tooltip>Démarre la simulation clinique.</sos.sim.play_tooltip>
-	<sos.sim.pause_tooltip>Met en pause la simulation clinique.</sos.sim.pause_tooltip>
-	<sos.sim.reset_tooltip>Réinitialise la santé du patient à son état initial.</sos.sim.reset_tooltip>
-	<sos.sim.drop_tooltip>Abandonne le patient actuel.</sos.sim.drop_tooltip>
-	<sos.sim.set_max_tooltip>Définit la force de cette affection au maximum.</sos.sim.set_max_tooltip>
-	<sos.sim.remove_tooltip>Retire cette affection du patient.</sos.sim.remove_tooltip>
-	<sos.sim.apply_item_tooltip>Simule l'utilisation de cet objet sur le patient pour voir ses effets.</sos.sim.apply_item_tooltip>
-	<sos.misc.close_button>Ferme ce menu.</sos.misc.close_button>
-
 	<!-- Utility -->
 	<sos.util.light_range>Portée de la lumière</sos.util.light_range>
 	<sos.util.pump_flow>Débit max de la pompe</sos.util.pump_flow>
@@ -258,16 +245,6 @@ Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.layout.save_tooltip>Enregistre la disposition actuelle des panneaux comme nouveau préréglage.</sos.layout.save_tooltip>
 	<sos.layout.apply_tooltip>Applique ce préréglage de disposition des panneaux.</sos.layout.apply_tooltip>
 	<sos.layout.delete_tooltip>Supprime ce préréglage de disposition.</sos.layout.delete_tooltip>
-
-	<!-- Dummie Names -->
-	<sos.dummyname.rand.1>Sujet Factice #[id]</sos.dummyname.rand.1>
-	<sos.dummyname.rand.2>Pas Une Vraie Personne #[id]</sos.dummyname.rand.2>
-	<sos.dummyname.rand.3>Probablement Doué de Sensibilité #[id]</sos.dummyname.rand.3>
-	<sos.dummyname.rand.4>N'y Pensez Pas #[id]</sos.dummyname.rand.4>
-	<sos.dummyname.rand.5>Ne Faites Pas Attention Aux Cris #[id]</sos.dummyname.rand.5>
-	<sos.dummyname.rand.6>Probablement En Vie #[id]</sos.dummyname.rand.6>
-	<sos.dummyname.rand.7>A Une Famille #[id]</sos.dummyname.rand.7>
-	<sos.dummyname.rand.8>Sait Ce Que Vous Avez Fait</sos.dummyname.rand.8>
 
 	<!-- Migration -->
 	<sos.migration.title>SOS — Migration de Configuration</sos.migration.title>

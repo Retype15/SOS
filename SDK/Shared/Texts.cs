@@ -9,7 +9,7 @@ using Barotrauma;
 
 namespace SOS
 {
-    internal static class Texts
+    public static class Texts
     {
         private static readonly Dictionary<string, Dictionary<Identifier, string>> prefixCache = [];
         public static LocalizedString Get(string key, string fallback = "", bool forceFallback = false)

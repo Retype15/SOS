@@ -17,57 +17,57 @@ namespace SOS
     {
         public static RichString Rich(this string text) => RichString.Rich(text);
 
-        internal static string SetHyperlink(this string text, Color? color = null)
+        public static string SetHyperlink(this string text, Color? color = null)
             => text.SetColor(color ?? Color.LightSkyBlue);
 
-        internal static LocalizedString SetHyperlink(this LocalizedString text, Color? color = null)
+        public static LocalizedString SetHyperlink(this LocalizedString text, Color? color = null)
             => text.SetColor(color ?? Color.LightSkyBlue);
 
-        internal static string SetColor(this string text, string colorName)
+        public static string SetColor(this string text, string colorName)
         => $"‖color:{colorName}‖{text}‖end‖";
 
         public static string SetColor(this string text, Color color)
             => $"‖color:{color.R},{color.G},{color.B}‖{text}‖end‖";
 
-        internal static string SetColorHex(this string text, string hexCode)
+        public static string SetColorHex(this string text, string hexCode)
             => $"‖color:{hexCode}‖{text}‖end‖";
 
-        internal static string SetBold(this string text)
+        public static string SetBold(this string text)
             => $"‖bold‖{text}‖end‖";
 
-        internal static string SetItalic(this string text)
+        public static string SetItalic(this string text)
             => $"‖italic‖{text}‖end‖";
 
-        internal static string SetUnderline(this string text)
+        public static string SetUnderline(this string text)
             => $"‖underline‖{text}‖end‖";
 
-        internal static string SetStrikethrough(this string text)
+        public static string SetStrikethrough(this string text)
             => $"‖strikethrough‖{text}‖end‖";
 
-        internal static LocalizedString SetColor(this LocalizedString text, string colorName)
+        public static LocalizedString SetColor(this LocalizedString text, string colorName)
         => $"‖color:{colorName}‖{text}‖end‖";
 
-        internal static LocalizedString SetColor(this LocalizedString text, Color color)
+        public static LocalizedString SetColor(this LocalizedString text, Color color)
             => $"‖color:{color.R},{color.G},{color.B}‖{text}‖end‖";
 
-        internal static LocalizedString SetColorHex(this LocalizedString text, string hexCode)
+        public static LocalizedString SetColorHex(this LocalizedString text, string hexCode)
             => $"‖color:{hexCode}‖{text}‖end‖";
 
-        internal static LocalizedString SetBold(this LocalizedString text)
+        public static LocalizedString SetBold(this LocalizedString text)
             => $"‖bold‖{text}‖end‖";
 
-        internal static LocalizedString SetItalic(this LocalizedString text)
+        public static LocalizedString SetItalic(this LocalizedString text)
             => $"‖italic‖{text}‖end‖";
 
-        internal static LocalizedString SetUnderline(this LocalizedString text)
+        public static LocalizedString SetUnderline(this LocalizedString text)
             => $"‖underline‖{text}‖end‖";
 
-        internal static LocalizedString SetStrikethrough(this LocalizedString text)
+        public static LocalizedString SetStrikethrough(this LocalizedString text)
             => $"‖strikethrough‖{text}‖end‖";
 
     }
 
-    internal static class HyperlinkExtensions
+    public static class HyperlinkExtensions
     {
         public static RichString JoinToRichString<T>(
             this IEnumerable<T> items,
@@ -255,20 +255,20 @@ namespace SOS
         internal static string FullOrName(this Type type) => type.FullName ?? type.Name;
     }
 
-    internal static class IEnumerableExt
+    public static class IEnumerableExt
     {
-        internal static string ToCsv(this IEnumerable<string> collection)
+        public static string ToCsv<T>(this IEnumerable<T> collection, char separator = ',')
         {
-            return string.Join(",", collection);
+            return string.Join(separator, collection);
         }
     }
 
-    internal static class ISettingBaseExt
+    public static class ISettingBaseExt
     {
-        internal static bool SetIfNotEqual<T>([NotNullWhen(false)] this ISettingBase<T> setting, T value) where T : IEquatable<T>, IConvertible
+        public static bool SetIfNotEqual<T>([NotNullWhen(false)] this ISettingBase<T> setting, T value) where T : IEquatable<T>, IConvertible
             => (!setting.Value?.Equals(value) ?? true) && setting.TrySetValue(value);
 
-        internal static bool SetIfNotEqual([NotNullWhen(false)] this ISettingControl setting, KeyOrMouse value)
+        public static bool SetIfNotEqual([NotNullWhen(false)] this ISettingControl setting, KeyOrMouse value)
             => (!setting.Value?.Equals(value) ?? true) && setting.TrySetValue(value);
     }
 }

@@ -105,8 +105,6 @@
 	<sos.tab.recipes>РЕЦЕПТЫ</sos.tab.recipes>
 	<sos.tab.recipes_tooltip>Показывает рецепты создания, источники и использование предмета.</sos.tab.recipes_tooltip>
 	<sos.tab.recipes.analyzing>Анализ зависимой граф рецептов...</sos.tab.recipes.analyzing>
-	<sos.tab.simulator>СИМУЛЯТОР</sos.tab.simulator>
-	<sos.tab.simulator_tooltip>Открывает клинический симулятор для тестирования лечения и недугов на манекене.</sos.tab.simulator_tooltip>
 	<sos.tab.preview>ПРЕДПРОСМОТР</sos.tab.preview>
 	<sos.tab.preview_tooltip>Показывает визуальный спрайт выбранного префаба.</sos.tab.preview_tooltip>
 
@@ -208,17 +206,6 @@
 	<sos.affliction.visual_distortions>Визуальные искажения</sos.affliction.visual_distortions>
 	<sos.affliction.worsens>Ухудшается:</sos.affliction.worsens>
 
-	<!-- Simulator -->
-	<sos.aff.speedDropdown>Более x1 все еще в разработке. \nРаботает в одиночной игре, но не в многопользовательской.</sos.aff.speedDropdown>
-	<sos.sim.play_tooltip>Запускает клиническую симуляцию.</sos.sim.play_tooltip>
-	<sos.sim.pause_tooltip>Приостанавливает клиническую симуляцию.</sos.sim.pause_tooltip>
-	<sos.sim.reset_tooltip>Сбрасывает здоровье пациента до начального состояния.</sos.sim.reset_tooltip>
-	<sos.sim.drop_tooltip>Отбрасывает текущего пациента.</sos.sim.drop_tooltip>
-	<sos.sim.set_max_tooltip>Устанавливает силу этого недуга на максимум.</sos.sim.set_max_tooltip>
-	<sos.sim.remove_tooltip>Удаляет этот недуг у пациента.</sos.sim.remove_tooltip>
-	<sos.sim.apply_item_tooltip>Симулирует использование этого предмета на пациенте.</sos.sim.apply_item_tooltip>
-	<sos.misc.close_button>Закрывает это меню.</sos.misc.close_button>
-
 	<!-- Utility -->
 	<sos.util.light_range>Дальность света</sos.util.light_range>
 	<sos.util.pump_flow>Макс. поток насоса</sos.util.pump_flow>
@@ -258,16 +245,6 @@
 	<sos.layout.save_tooltip>Сохраняет текущую раскладку панелей как новый пресет.</sos.layout.save_tooltip>
 	<sos.layout.apply_tooltip>Применяет этот пресет раскладки панелей.</sos.layout.apply_tooltip>
 	<sos.layout.delete_tooltip>Удаляет этот пресет раскладки.</sos.layout.delete_tooltip>
-
-	<!-- Dummie Names -->
-	<sos.dummyname.rand.1>Подопытный #[id]</sos.dummyname.rand.1>
-	<sos.dummyname.rand.2>Не Настоящий Человек #[id]</sos.dummyname.rand.2>
-	<sos.dummyname.rand.3>Вероятно Чувствующий #[id]</sos.dummyname.rand.3>
-	<sos.dummyname.rand.4>Не Думайте Об Этом #[id]</sos.dummyname.rand.4>
-	<sos.dummyname.rand.5>Не Обращайте Внимания На Крики #[id]</sos.dummyname.rand.5>
-	<sos.dummyname.rand.6>Вероятно В Порядке #[id]</sos.dummyname.rand.6>
-	<sos.dummyname.rand.7>У Него Есть Семья #[id]</sos.dummyname.rand.7>
-	<sos.dummyname.rand.8>Знает Что Вы Сделали</sos.dummyname.rand.8>
 
 	<!-- Migration -->
 	<sos.migration.title>SOS — Миграция Настроек</sos.migration.title>
