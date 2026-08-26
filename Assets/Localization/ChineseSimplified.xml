@@ -105,8 +105,6 @@
 	<sos.tab.recipes>配方</sos.tab.recipes>
 	<sos.tab.recipes_tooltip>显示物品的制作配方、来源和用途。</sos.tab.recipes_tooltip>
 	<sos.tab.recipes.analyzing>正在分析配方依赖图...</sos.tab.recipes.analyzing>
-	<sos.tab.simulator>模拟器</sos.tab.simulator>
-	<sos.tab.simulator_tooltip>打开临床模拟器，在假人患者身上测试治疗和病症。</sos.tab.simulator_tooltip>
 	<sos.tab.preview>预览</sos.tab.preview>
 	<sos.tab.preview_tooltip>显示所选预制体的视觉精灵图。</sos.tab.preview_tooltip>
 
@@ -208,17 +206,6 @@
 	<sos.affliction.visual_distortions>视觉扭曲</sos.affliction.visual_distortions>
 	<sos.affliction.worsens>恶化：</sos.affliction.worsens>
 
-	<!-- Simulator -->
-	<sos.aff.speedDropdown>x1 以上仍在开发中。\n在单人游戏中运行良好，但在多人游戏中完全不行。</sos.aff.speedDropdown>
-	<sos.sim.play_tooltip>开始临床模拟。</sos.sim.play_tooltip>
-	<sos.sim.pause_tooltip>暂停临床模拟。</sos.sim.pause_tooltip>
-	<sos.sim.reset_tooltip>将患者的健康重置为初始状态。</sos.sim.reset_tooltip>
-	<sos.sim.drop_tooltip>丢弃当前患者。</sos.sim.drop_tooltip>
-	<sos.sim.set_max_tooltip>将此病症强度设置为最大值。</sos.sim.set_max_tooltip>
-	<sos.sim.remove_tooltip>从患者身上移除这种病症。</sos.sim.remove_tooltip>
-	<sos.sim.apply_item_tooltip>模拟在患者身上使用此物品以查看其效果。</sos.sim.apply_item_tooltip>
-	<sos.misc.close_button>关闭此菜单。</sos.misc.close_button>
-
 	<!-- Utility -->
 	<sos.util.light_range>光照范围</sos.util.light_range>
 	<sos.util.pump_flow>泵最大流量</sos.util.pump_flow>
@@ -258,16 +245,6 @@
 	<sos.layout.save_tooltip>将当前面板布局保存为新预设。</sos.layout.save_tooltip>
 	<sos.layout.apply_tooltip>应用此面板布局预设。</sos.layout.apply_tooltip>
 	<sos.layout.delete_tooltip>删除此布局预设。</sos.layout.delete_tooltip>
-
-	<!-- Dummie Names -->
-	<sos.dummyname.rand.1>假人对象 #[id]</sos.dummyname.rand.1>
-	<sos.dummyname.rand.2>并非真人 #[id]</sos.dummyname.rand.2>
-	<sos.dummyname.rand.3>或许有感知 #[id]</sos.dummyname.rand.3>
-	<sos.dummyname.rand.4>别去想它 #[id]</sos.dummyname.rand.4>
-	<sos.dummyname.rand.5>别在意那些尖叫声 #[id]</sos.dummyname.rand.5>
-	<sos.dummyname.rand.6>大概还好 #[id]</sos.dummyname.rand.6>
-	<sos.dummyname.rand.7>有家室的人 #[id]</sos.dummyname.rand.7>
-	<sos.dummyname.rand.8>知道你做了什么</sos.dummyname.rand.8>
 
 	<!-- Migration -->
 	<sos.migration.title>SOS — 设置迁移</sos.migration.title>

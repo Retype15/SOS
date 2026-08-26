@@ -105,8 +105,6 @@ Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.tab.recipes>RECETAS</sos.tab.recipes>
 	<sos.tab.recipes_tooltip>Muestra recetas de fabricación, fuentes y usos del objeto.</sos.tab.recipes_tooltip>
 	<sos.tab.recipes.analyzing>Analizando gráfico de dependencia de recetas...</sos.tab.recipes.analyzing>
-	<sos.tab.simulator>SIMULADOR</sos.tab.simulator>
-	<sos.tab.simulator_tooltip>Abre el simulador clínico para probar tratamientos y aflicciones en un paciente ficticio.</sos.tab.simulator_tooltip>
 	<sos.tab.preview>VISTA PREVIA</sos.tab.preview>
 	<sos.tab.preview_tooltip>Muestra el sprite del visual seleccionado del prefab.</sos.tab.preview_tooltip>
 
@@ -208,17 +206,6 @@ Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.affliction.visual_distortions>Distorsiones Visuales</sos.affliction.visual_distortions>
 	<sos.affliction.worsens>Empeora:</sos.affliction.worsens>
 
-	<!-- Simulator -->
-	<sos.aff.speedDropdown>Más de x1 aún están en progreso. \nFunciona bien en un jugador, pero no en multijugador.</sos.aff.speedDropdown>
-	<sos.sim.play_tooltip>Inicia la simulación clínica.</sos.sim.play_tooltip>
-	<sos.sim.pause_tooltip>Pausa la simulación clínica.</sos.sim.pause_tooltip>
-	<sos.sim.reset_tooltip>Restablece la salud del paciente a su estado inicial.</sos.sim.reset_tooltip>
-	<sos.sim.drop_tooltip>Descarta al paciente actual.</sos.sim.drop_tooltip>
-	<sos.sim.set_max_tooltip>Establece la fuerza de esta aflicción al máximo.</sos.sim.set_max_tooltip>
-	<sos.sim.remove_tooltip>Elimina esta aflicción del paciente.</sos.sim.remove_tooltip>
-	<sos.sim.apply_item_tooltip>Simula el uso de este objeto en el paciente para ver sus efectos.</sos.sim.apply_item_tooltip>
-	<sos.misc.close_button>Cierra este menú.</sos.misc.close_button>
-
 	<!-- Utility -->
 	<sos.util.light_range>Rango de Luz</sos.util.light_range>
 	<sos.util.pump_flow>Flujo Máx de Bomba</sos.util.pump_flow>
@@ -258,16 +245,6 @@ Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.layout.save_tooltip>Guarda la distribución actual de paneles como un nuevo preset.</sos.layout.save_tooltip>
 	<sos.layout.apply_tooltip>Aplica este preset de distribución de paneles.</sos.layout.apply_tooltip>
 	<sos.layout.delete_tooltip>Elimina este preset de distribución.</sos.layout.delete_tooltip>
-
-	<!-- Dummie Names -->
-	<sos.dummyname.rand.1>Sujeto de Prueba #[id]</sos.dummyname.rand.1>
-	<sos.dummyname.rand.2>No Es Una Persona Real #[id]</sos.dummyname.rand.2>
-	<sos.dummyname.rand.3>Probablemente Siente #[id]</sos.dummyname.rand.3>
-	<sos.dummyname.rand.4>No Pienses En Ello #[id]</sos.dummyname.rand.4>
-	<sos.dummyname.rand.5>No Prestes Atención A Los Gritos #[id]</sos.dummyname.rand.5>
-	<sos.dummyname.rand.6>Probablemente Está Bien #[id]</sos.dummyname.rand.6>
-	<sos.dummyname.rand.7>#[id] Tiene Una Familia</sos.dummyname.rand.7>
-	<sos.dummyname.rand.8>#[id] Sabe Lo Que Hiciste</sos.dummyname.rand.8>
 
 	<!-- Migration -->
 	<sos.migration.title>SOS — Migración de Configuración</sos.migration.title>
