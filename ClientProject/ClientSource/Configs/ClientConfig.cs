@@ -13,11 +13,9 @@ using SOS.Profiles;
 
 namespace SOS.Configs
 {
+    [AutoRegister("SOS.Core", 0)]
     public sealed class ClientConfig : ConfigDirtySaver, ISOSConfig
     {
-        public string Id => "SOS.Core";
-        public double Order => 0;
-
         private static ClientConfig? _instance;
         public static ClientConfig Instance => _instance ??= new ClientConfig();
 
@@ -165,8 +163,9 @@ namespace SOS.Configs
 
         // ─── Constructor ───
 
-        private ClientConfig()
+        public ClientConfig()
         {
+            _instance = this;
             var pms = Plugin.Instance.ConfigService;
             var p = Plugin.Instance.Package;
             void TryInitConfig<T>(string name, out T setting) where T : ISettingBase => base.TryInitConfig(name, out setting, pms, p);

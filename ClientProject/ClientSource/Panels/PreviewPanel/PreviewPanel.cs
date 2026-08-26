@@ -12,10 +12,10 @@ namespace SOS.Panels.PreviewPanel
 {
 
     // MARK: Preview Tab
-    [AutoRegister]
+    [AutoRegister("SOS.PreviewPanel", 10)]
     public class PreviewPanelTab : ISOSTab, IDisposable
     {
-        public double Order => 10;
+        public string Id => "SOS.PreviewPanel";
         public string TabName => Texts.Get("sos.tab.preview", "PREVIEW").Value;
         public string ToolTip => Texts.Get("sos.tab.preview_tooltip", "Shows the visual sprite of the selected prefab.").Value;
 

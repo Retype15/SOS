@@ -12,13 +12,11 @@ using SOS.GUI;
 
 namespace SOS.StatSections
 {
-    internal interface ISOSStatSectionAuto : ISOSStatSection, IAutoRegister;
-
     // MARK: General
-    public class GeneralSection : ISOSStatSectionAuto
+    [AutoRegister(order: 0)]
+    public class GeneralSection : ISOSStatSection
     {
         private Prefab? prefab;
-        public double Order => 0;
 
         private string cargoBox = "";
         private readonly List<string> hazards = [];
@@ -116,15 +114,14 @@ namespace SOS.StatSections
     }
 
     // MARK: Economy
-    public class EconomySection : ISOSStatSectionAuto
+    [AutoRegister(order: 1)]
+    public class EconomySection : ISOSStatSection
     {
         private int price;
         private bool canBuy;
         private bool canSell;
         private int minDifficulty;
         private Identifier requiredFaction = Identifier.Empty;
-
-        public double Order => 1;
 
         public bool Analyze(Prefab prefab)
         {
@@ -170,7 +167,8 @@ namespace SOS.StatSections
     }
 
     // MARK: weapons
-    public class WeaponSection : ISOSStatSectionAuto
+    [AutoRegister(order: 2)]
+    public class WeaponSection : ISOSStatSection
     {
         private float penetration = 0f;
         private int maxTargets = 1;
@@ -196,8 +194,6 @@ namespace SOS.StatSections
             internal float Strength;
             internal float Probability;
         }
-
-        public double Order => 2;
 
         public bool Analyze(Prefab prefab)
         {
@@ -319,7 +315,8 @@ namespace SOS.StatSections
     }
 
     // MARK: equipements
-    public class EquipmentSection : ISOSStatSectionAuto
+    [AutoRegister(order: 3)]
+    public class EquipmentSection : ISOSStatSection
     {
         private readonly List<string> equipSlots = [];
         private readonly List<string> statModifiers = [];
@@ -328,8 +325,6 @@ namespace SOS.StatSections
         private float maxPressure = 0f;
         private bool deflectsProjectiles = false;
         private int durability = 0;
-
-        public double Order => 3;
 
         public bool Analyze(Prefab prefab)
         {
@@ -429,7 +424,8 @@ namespace SOS.StatSections
     }
 
     // MARK: Medical
-    public class MedicalSection : ISOSStatSectionAuto
+    [AutoRegister(order: 4)]
+    public class MedicalSection : ISOSStatSection
     {
         private int medicalSkillReq = 0;
         private readonly List<(string Identifier, string DisplayName)> suitableTreatments = [];
@@ -440,8 +436,6 @@ namespace SOS.StatSections
         private readonly Dictionary<string, (string Name, float Amount)> successCauses = [];
         private readonly Dictionary<string, (string Name, float Amount)> failureHeals = [];
         private readonly Dictionary<string, (string Name, float Amount)> failureCauses = [];
-
-        public double Order => 4;
 
         public bool Analyze(Prefab prefab)
         {
@@ -569,11 +563,10 @@ namespace SOS.StatSections
     }
 
     // MARK: utility
-    public class UtilitySection : ISOSStatSectionAuto
+    [AutoRegister(order: 5)]
+    public class UtilitySection : ISOSStatSection
     {
         private readonly Dictionary<string, string> deviceProperties = [];
-
-        public double Order => 5;
 
         public bool Analyze(Prefab prefab)
         {
@@ -611,14 +604,13 @@ namespace SOS.StatSections
     }
 
     // MARK: container
-    public class ContainerSection : ISOSStatSectionAuto
+    [AutoRegister(order: 6)]
+    public class ContainerSection : ISOSStatSection
     {
         private string capacity = "";
         private readonly HashSet<string> acceptedTags = [];
         private readonly List<string> spawnLocations = [];
         private List<Prefab> compatibleItems = [];
-
-        public double Order => 6;
 
         public bool Analyze(Prefab prefab)
         {
@@ -700,7 +692,8 @@ namespace SOS.StatSections
     }
 
     // MARK: Affliction effects
-    public class AfflictionEffectsSection : ISOSStatSectionAuto
+    [AutoRegister(order: 7)]
+    public class AfflictionEffectsSection : ISOSStatSection
     {
         private class PhaseData
         {
@@ -714,8 +707,6 @@ namespace SOS.StatSections
 
         private readonly List<PhaseData> phases = [];
         private readonly List<PhaseData> periodicPhases = [];
-
-        public double Order => 7;
 
         public bool Analyze(Prefab prefab)
         {
@@ -923,7 +914,8 @@ namespace SOS.StatSections
     }
 
     // MARK: Affliction Treatments
-    public class AfflictionTreatmentSection : ISOSStatSectionAuto
+    [AutoRegister(order: 8)]
+    public class AfflictionTreatmentSection : ISOSStatSection
     {
         private AfflictionPrefab? aff;
 
@@ -933,8 +925,6 @@ namespace SOS.StatSections
         private readonly List<ItemPrefab> harmful = [];
 
         private readonly List<string> blockers = [];
-
-        public double Order => 8;
 
         public bool Analyze(Prefab prefab)
         {
@@ -1026,10 +1016,10 @@ namespace SOS.StatSections
     }
 
     // MARK: Description
-    public class DescriptionSection : ISOSStatSectionAuto
+    [AutoRegister(order: 9)]
+    public class DescriptionSection : ISOSStatSection
     {
         private string? text;
-        public double Order => 9;
 
         public bool Analyze(Prefab prefab)
         {
