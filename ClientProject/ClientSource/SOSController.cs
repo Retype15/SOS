@@ -133,7 +133,7 @@ namespace SOS
             SaveSettings();
             ActiveProfile.Dispose();
             ActiveProfile = null;
-            API.ClearCache();
+            API.ClearTemporalCache();
             GUIAnimSequence.ClearAll();
         }
 
