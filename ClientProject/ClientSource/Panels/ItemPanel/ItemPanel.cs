@@ -15,6 +15,7 @@ namespace SOS.Panels.ItemPanel
     [AutoRegister]
     public class ItemPanelTab : ISOSTab, IDisposable
     {
+        public string Id => "ItemRecipe";
         public double Order => 0;
         public string TabName => Texts.Get("sos.tab.recipes", "RECIPES").Value;
         public string ToolTip => Texts.Get("sos.tab.recipes_tooltip").Value;

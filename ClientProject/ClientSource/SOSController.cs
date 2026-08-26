@@ -196,7 +196,15 @@ namespace SOS
         public static void SaveSettings()
         {
             foreach (var config in API.GetAllConfigs())
-                config.Save();
+            {
+                try { config.Save(); }
+                catch (Exception e)
+                {
+                    Logger.LogError(e.Message);
+                    continue;
+                }
+                Logger.LogDebug($"Saving config : '{config.Id}'", level: LogLevel.Trace);
+            }
         }
 
         public static void LoadSettings()

@@ -5,11 +5,9 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
-using System.Xml.Linq;
 using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework.Input;
-using SOS.Panels.AfflictionPanel;
 using SOS.Prefabs;
 using SOS.Profiles;
 
@@ -48,15 +46,6 @@ namespace SOS.Configs
         public void Save()
         {
             var ctr = SOSController.Instance;
-            //TODO: Pendiente de pasar a mod separado, esto no debería manejarse aquí...
-            if (ClinicalSimulatorManager.Patient != null)
-            {
-                DummyDeathCount = ClinicalSimulatorManager.DeathCount;
-                var dummyCharacterXML = ClinicalSimulatorManager.ExportSaveData();
-                if (dummyCharacterXML != null) DummyCharacterXML = dummyCharacterXML;
-                DummySimulated = !ClinicalSimulatorManager.HasStarted;
-                _dummyCharacterXMLRaw.SetIfNotEqual(DummyCharacterXML.ToString());
-            }
 
             var prefab = API.GetState<Prefab?>(CommKeys.SelectTarget);
             if (prefab != null)
@@ -83,14 +72,10 @@ namespace SOS.Configs
             XmlFontScale = 1.0f;
             TrackedRecipesRaw = "";
             TrackerVisible = true;
-            DummyDeathCount = 0;
-            DummySimulated = false;
-            DummyCharacterXML = XElement.Parse("<Character />");
             ProfileHelper.ClearTabHistory();
             TabHistoryRaw = "";
 
             _currentTarget = null;
-            _dummyCharacterXML = null;
             _favoritesRaw.SetIfNotEqual(_favoritesRaw.DefaultValue);
 
             var ctr = SOSController.Instance;
@@ -171,30 +156,6 @@ namespace SOS.Configs
             remove => _trackerVisible.OnValueChanged -= value;
         }
 
-        // TODO: Pendient to move into another mod.
-        private readonly ISettingBase<int> _dummyDeathCount;
-        public int DummyDeathCount
-        {
-            get => _dummyDeathCount.Value;
-            set => _dummyDeathCount.SetIfNotEqual(value);
-        }
-
-        private readonly ISettingBase<bool> _dummySimulated;
-        public bool DummySimulated
-        {
-            get => _dummySimulated.Value;
-            set => _dummySimulated.SetIfNotEqual(value);
-        }
-
-        private readonly ISettingBase<string> _dummyCharacterXMLRaw;
-        private XElement? _dummyCharacterXML = null;
-        public XElement DummyCharacterXML
-        {
-            get => _dummyCharacterXML ??= XElement.Parse(_dummyCharacterXMLRaw.Value);
-            set => _dummyCharacterXML = value;
-        }
-        //END: Pendient to move into another mod.
-
         // ─── Batch-save (complex serialized) ───
 
         private readonly ISettingBase<string> _favoritesRaw;
@@ -219,9 +180,6 @@ namespace SOS.Configs
             TryInitConfig("TabHistory", out _tabHistoryRaw);
             TryInitConfig("TrackedRecipes", out _trackedRecipesRaw);
             TryInitConfig("TrackerVisible", out _trackerVisible);
-            TryInitConfig("DummyDeathCount", out _dummyDeathCount);
-            TryInitConfig("DummySimulated", out _dummySimulated);
-            TryInitConfig("DummyCharacterXML", out _dummyCharacterXMLRaw);
         }
 
         public static void Destroy()

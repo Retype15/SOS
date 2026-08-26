@@ -70,13 +70,17 @@ namespace SOS
                     Func<object> func => RegisterFunc(func),
                     _ => RegisterInstance(obj)
                 };
+                if (isSuccess) Logger.LogDebug($"[SOS.API] Registered '{obj?.GetType().FullOrName()}' type.", level: LogLevel.Trace);
                 return isSuccess;
             }
 
             private bool RegisterType(Type type)
             {
                 if (type.IsAbstract || type.IsInterface || type.GetConstructor(Type.EmptyTypes) == null)
+                {
+                    Logger.LogError($"[SOS.API] Register failed for type: '{type.FullName}', not be an interface, abstract object, and non-void constructor.");
                     return false;
+                }
 
                 try
                 {

@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
-    internal enum LogLevel
+    public enum LogLevel
     {
         None,
         Critical,
@@ -27,7 +27,7 @@ namespace SOS
         internal static string[] Strings = ["none", "critical", "error", "warning", "info", "debug", "trace"];
     }
 
-    internal static class Logger
+    public static class Logger
     {
         internal static ILoggerService? LoggerService = null;
 #if DEBUG
