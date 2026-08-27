@@ -251,7 +251,7 @@ namespace SOS
             return proxy;
         }
 
-        internal static bool TryCast<T>(this object target, out T a) where T : class
+        internal static bool TryCast<T>(this object target, out T? a) where T : class
         {
             try
             {
@@ -260,7 +260,7 @@ namespace SOS
             }
             catch
             {
-                a = null!;
+                a = null;
                 return false;
             }
         }
