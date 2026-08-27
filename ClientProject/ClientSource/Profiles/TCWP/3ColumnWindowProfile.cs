@@ -54,7 +54,6 @@ namespace SOS.Profiles.TCWP
         private int itemsLoaded = 0;
         private const int ChunkSize = 50;
         private bool isUpdating = false;
-        private ISOSPrefab[]? prefabProviders;
         private Dictionary<Type, string>? prefabHeaders;
         private Type? lastTypeInList;
 
@@ -266,7 +265,6 @@ namespace SOS.Profiles.TCWP
                     Logger.LogError($"[SOS] Exception in section '{section.GetType().FullOrName()}': {ex.Message}");
                     continue;
                 }
-                finally { if (section is IDisposable d) d.Dispose(); }
             }
 
             if (xmlContentText != null)
@@ -454,7 +452,7 @@ namespace SOS.Profiles.TCWP
 
             centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform), API.GetAllTabs());
 
-            prefabProviders = [.. API.GetAllPrefabProviders()];
+            ISOSPrefab[] prefabProviders = [.. API.GetAllPrefabProviders()];
             prefabHeaders = prefabProviders.ToDictionary(p => p.PrefabType, p => p.Header);
 
             // Right panel
@@ -536,7 +534,7 @@ namespace SOS.Profiles.TCWP
 
         private void UpdateSearch(string query)
         {
-            if (itemList == null || prefabProviders == null) return;
+            if (itemList == null) return;
             var filter = new SearchFilter(query);
 
             allFilteredTargets.Clear();
@@ -544,7 +542,7 @@ namespace SOS.Profiles.TCWP
 
             var candidates = new List<Prefab>();
 
-            foreach (var provider in prefabProviders)
+            foreach (var provider in API.GetAllPrefabProviders())
             {
                 try
                 {

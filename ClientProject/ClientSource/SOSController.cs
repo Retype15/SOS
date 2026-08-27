@@ -124,16 +124,16 @@ namespace SOS
 
             ActiveProfile = API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
 
-            LoadSettings();
+            ConfigHelper.LoadConfigs();
         }
 
         private void CloseSOS()
         {
             if (ActiveProfile == null) return;
-            SaveSettings();
+            ConfigHelper.SaveConfigs();
             ActiveProfile.Dispose();
             ActiveProfile = null;
-            //API.ClearTemporaryInstances();
+            API.ClearTemporaryInstances();
             GUIAnimSequence.ClearAll();
         }
 
@@ -196,34 +196,6 @@ namespace SOS
             ProfileHelper.Update();
         }
 
-        public static void SaveSettings()
-        {
-            foreach (var config in API.GetAllConfigs())
-            {
-                try { config.Save(); }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex.Message);
-                    continue;
-                }
-                Logger.LogDebug($"Saved config : '{config.GetType().FullOrName()}'", level: LogLevel.Trace);
-            }
-        }
-
-        public static void LoadSettings()
-        {
-            foreach (var config in API.GetAllConfigs())
-            {
-                try { config.Load(); }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex.Message);
-                    continue;
-                }
-                Logger.LogDebug($"Loaded config : '{config.GetType().FullOrName()}'", level: LogLevel.Trace);
-            }
-        }
-
         private static Prefab? GetPrefabUnderMouse()
         {
             // 1. World
@@ -275,7 +247,7 @@ namespace SOS
 
         public void Dispose()
         {
-            if (_sosStarted && !IsSOSBlocked) SaveSettings();
+            if (_sosStarted && !IsSOSBlocked) ConfigHelper.SaveConfigs();
 
             GUIAnimSequence.ClearAll();
 

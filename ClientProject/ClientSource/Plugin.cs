@@ -27,7 +27,7 @@ namespace SOS
                 API.RegisterConfig(() => ClientConfig.Instance, "SOS.Core", 0);
                 API.RegisterConfig(() => WindowProfileConfig.Instance, "SOS.WindowProfile", 0);
 
-                SOSController.LoadSettings();
+                Configs.ConfigHelper.LoadConfigs();
 
                 ConsoleCommandsService.RegisterCommand(
                         name: "sos",

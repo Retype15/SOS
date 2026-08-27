@@ -7,6 +7,7 @@
 using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using SOS.Configs;
 using SOS.Prefabs;
 using BGUI = Barotrauma.GUI;
 
@@ -211,7 +212,7 @@ namespace SOS
                 }
 
                 // save
-                SOSController.SaveSettings();
+                ConfigHelper.SaveConfigs();
 
                 Logger.Log(Texts.Get("sos.migration.success", "[SOS] Previous configuration imported successfully.").Value);
             }

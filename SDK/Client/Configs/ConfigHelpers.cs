@@ -40,7 +40,53 @@ namespace SOS.Configs
 
     public static class ConfigHelper
     {
-        // 
+        #region Loader configs
+
+        public static void LoadConfigs()
+        {
+            foreach (var config in API.GetAllConfigs())
+            {
+                try { config.Load(); }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex.Message);
+                    continue;
+                }
+                Logger.LogDebug($"Loaded config : '{config.GetType().FullOrName()}'", level: LogLevel.Trace);
+            }
+        }
+
+        public static void SaveConfigs()
+        {
+            foreach (var config in API.GetAllConfigs())
+            {
+                try { config.Save(); }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex.Message);
+                    continue;
+                }
+                Logger.LogDebug($"Saved config : '{config.GetType().FullOrName()}'", level: LogLevel.Trace);
+            }
+        }
+
+        public static void ResetConfigs()
+        {
+            foreach (var config in API.GetAllConfigs())
+            {
+                try { config.Reset(); }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex.Message);
+                    continue;
+                }
+                Logger.LogDebug($"Reseted config to defaults : '{config.GetType().FullOrName()}'", level: LogLevel.Trace);
+            }
+        }
+
+        #endregion
+
+        #region General Helpers
 
         public static void ButtonToResetSection(this GUILayoutBuilder l, ISOSConfig cfg, string? text = null, Action? onClick = null, string? tooltip = null, Color? color = null, string? style = null)
         {
@@ -61,8 +107,6 @@ namespace SOS.Configs
             );
         }
 
-        // ─── CSV Serialization Helpers ───
-
         public static HashSet<string> CsvToHashSet(string? csv)
         {
             if (string.IsNullOrEmpty(csv)) return [];
@@ -74,8 +118,6 @@ namespace SOS.Configs
             if (string.IsNullOrEmpty(csv)) return [];
             return [.. csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
         }
-
-        // TryInitConfig
 
         public static bool TryInitConfig<T>(string name, [NotNullWhen(true)] out T setting, IConfigService configService, ContentPackage package, Action<ISettingBase>? onValueChanged = null)
                 where T : ISettingBase
@@ -91,5 +133,7 @@ namespace SOS.Configs
 #endif
             return true;
         }
+
+        #endregion
     }
 }

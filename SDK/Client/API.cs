@@ -170,17 +170,11 @@ namespace SOS
                 {
                     T? instance = null;
                     lock (_dict)
-                    {
-                        if (_instances.TryGetValue(Id, out instance))
-                        {
-                            yield return (Id, instance);
-                            continue;
-                        }
-                    }
+                        _instances.TryGetValue(Id, out instance);
 
                     try
                     {
-                        instance = factory();
+                        instance ??= factory();
                     }
                     catch (Exception ex)
                     {
@@ -194,7 +188,6 @@ namespace SOS
                             lock (_dict)
                                 _instances[Id] = instance;
                         yield return (Id, instance);
-
                     }
                 }
             }
@@ -235,14 +228,14 @@ namespace SOS
                     {
                         _dict.Clear();
                         _cache = [];
+                        _isDirty = false;
                         Logger.LogDebugWarning($"Limpiado factory para tipo: '{nameof(T)}'");
                     }
                     foreach (var kv in _instances)
                         if (kv.Value is IDisposable i) i.Dispose();
+
                     _instances.Clear();
                 }
-                _cache = [];
-                _isDirty = false;
             }
         }
 

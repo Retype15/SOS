@@ -7,6 +7,7 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using SOS.Configs;
 using SOS.GUI;
 
 using BGUI = Barotrauma.GUI;
@@ -158,13 +159,12 @@ namespace SOS.Profiles
                         : new Point(550, 600);
 
                     _settingsWindow = new GUIWindow(
-                        new RectTransform(initialSize, BGUI.Canvas, Anchor.Center),
+                        new RectTransform(initialSize, BGUI.Canvas, Anchor.Center) { MinSize = new Point(450, 400) },
                         Texts.Get("sos.window.settings", "Settings"),
                         style: "InnerFrame",
                         color: Color.Black * 0.95f,
                         buttons: WindowButtons.Close)
                     {
-                        RectTransform = { MinSize = new Point(450, 400) },
                         ClampToParentBounds = true,
                         AllowedDirections = ResizeDirection.All
                     };
@@ -184,11 +184,7 @@ namespace SOS.Profiles
                         ToolTip = Texts.Get("sos.config.reset_all_tooltip", "Resets all S.O.S. configurations to their default values.").Value,
                         OnClicked = (_, _) =>
                         {
-                            foreach (var config in API.GetAllConfigs())
-                            {
-                                config.Reset();
-                                config.Save();
-                            }
+                            ConfigHelper.ResetConfigs();
                             ProfileHelper.RefreshSettings();
                             return true;
                         }
@@ -213,6 +209,7 @@ namespace SOS.Profiles
                 SettingsWindowSize = _settingsWindow.NormalSize;
                 SettingsWindowPosition = _settingsWindow.NormalOffset;
 
+                //TODO: Revisar si vale la pena un GetCountConfigs() más eficiente...
                 var configs = API.GetAllConfigs();
                 int targetColumns = CalculateColumnCount(_contentContainer.Rect.Width, configs.Count(), MinColumnWidth);
                 if (targetColumns != _currentColumnCount)
@@ -249,7 +246,7 @@ namespace SOS.Profiles
             {
                 Logger.LogDebugError($"[SOS] ProfileHelper.CloseSettings failed\n{ex}", level: LogLevel.Error);
             }
-            foreach (var c in API.GetAllConfigs()) c.Save();
+            ConfigHelper.SaveConfigs();
         }
 
         public static void RefreshSettings()
@@ -257,17 +254,16 @@ namespace SOS.Profiles
             Logger.LogDebug("ProfileHelper.RefreshSettings: start in-place refresh", level: LogLevel.Trace);
             try
             {
-                var configs = API.GetAllConfigs();
                 if (_contentContainer != null)
                 {
                     _contentContainer.ClearChildren();
-                    DrawSettings(_contentContainer, configs, MinColumnWidth);
+                    DrawSettings(_contentContainer, API.GetAllConfigs(), MinColumnWidth);
                 }
                 else if (_contentLists != null)
                 {
                     foreach (var list in _contentLists)
                         list.Content.ClearChildren();
-                    DrawSettings(_contentLists, configs);
+                    DrawSettings(_contentLists, API.GetAllConfigs());
                 }
             }
             catch (Exception ex)
