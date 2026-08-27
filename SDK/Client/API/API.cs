@@ -1,0 +1,168 @@
+// Copyright (c) 2026 Retype15
+// This file is licensed under the GNU GPLv3.
+// See the LICENSE file in the project root for details.
+
+#pragma warning disable IDE0130
+#pragma warning disable IDE0290
+
+using Barotrauma.LuaCs;
+
+namespace SOS
+{
+    public static partial class API
+    {
+
+        #region Info Sections
+
+        public static bool RegisterSection(object obj, string? id = null, double order = 0.0)
+            => _sectionFactories.Register(obj, id, order);
+
+        public static T? GetSection<T>(string id, bool keepInstance = true)
+            => GetSection(id, keepInstance) is T t ? t : default;
+
+        public static ISOSStatSection? GetSection(string id, bool keepInstance = true)
+            => _sectionFactories.Get(id, keepInstance);
+
+        public static IEnumerable<ISOSStatSection> GetAllSections(bool keepInstance = true)
+            => _sectionFactories.Create(keepInstance).Select(t => t.Instance);
+
+        public static bool RemoveSection(string id, bool onlyInstance = false)
+            => _sectionFactories.Remove(id, onlyInstance);
+
+        #endregion
+
+        #region Tabs
+
+        public static bool RegisterTab(object obj, string? id = null, double order = 0.0)
+            => _tabFactories.Register(obj, id, order);
+
+        public static T? GetTab<T>(string id, bool keepInstance = true)
+            => GetTab(id, keepInstance) is T t ? t : default;
+
+        public static ISOSTab? GetTab(string id, bool keepInstance = true)
+            => _tabFactories.Get(id, keepInstance);
+
+        public static IEnumerable<ISOSTab> GetAllTabs(bool keepInstance = true)
+            => _tabFactories.Create(keepInstance).Select(t => t.Instance);
+
+        public static bool RemoveTab(string id, bool onlyInstance = false)
+            => _tabFactories.Remove(id, onlyInstance);
+
+        #endregion
+
+        #region Configs
+
+        public static bool RegisterConfig(object obj, string? id = null, double order = 0.0)
+            => _configFactories.Register(obj, id, order);
+
+        public static T? GetConfig<T>(string id, bool keepInstance = true)
+            => GetConfig(id, keepInstance) is T t ? t : default;
+
+        public static ISOSConfig? GetConfig(string id, bool keepInstance = true)
+            => _configFactories.Get(id, keepInstance);
+
+        public static IEnumerable<ISOSConfig> GetAllConfigs(bool keepInstance = true)
+            => _configFactories.Create(keepInstance).Select(t => t.Instance);
+
+        public static bool RemoveConfig(string id, bool onlyInstance = false)
+            => _configFactories.Remove(id, onlyInstance);
+
+        #endregion
+
+        #region Prefab Providers
+
+        public static bool RegisterPrefabProvider(object obj, string? id = null, double order = 0.0)
+            => _prefabFactories.Register(obj, id, order);
+
+        public static T? GetPrefabProvider<T>(string id, bool refresh = true)
+            => GetPrefabProvider(id, refresh) is T t ? t : default;
+
+        public static ISOSPrefab? GetPrefabProvider(string id, bool keepInstance = true)
+            => _prefabFactories.Get(id, keepInstance);
+
+        public static IEnumerable<ISOSPrefab> GetAllPrefabProviders(bool keepInstance = true)
+            => _prefabFactories.Create(keepInstance).Select(t => t.Instance);
+
+        public static bool RemovePrefabProvider(string id, bool onlyInstance = false)
+            => _prefabFactories.Remove(id, onlyInstance);
+
+        #endregion
+
+        #region Window Profiles
+
+        public static bool RegisterWindowProfile(object obj, string? id = null, double order = 0.0)
+            => _profileFactories.Register(obj, id, order);
+
+
+        public static T? GetWindowProfile<T>(string id, bool keepInstance = false)
+            => GetWindowProfile(id, keepInstance) is T t ? t : default;
+
+        public static ISOSWindowProfile? GetWindowProfile(string? id, bool keepInstance = false)
+        {
+            ISOSWindowProfile? v;
+            if (string.IsNullOrEmpty(id)) v = _profileFactories.First(keepInstance);
+            else
+            {
+                Logger.LogDebug($"GetWindowProfile >> id: '{id}'", level: LogLevel.Trace);
+                v = _profileFactories.Get(id, keepInstance);
+                if (v == null)
+                {
+                    Logger.LogWarning("[SOS] Profile not encountered. Trying to use default profile.");
+                    v = _profileFactories.First();
+                }
+                Logger.LogDebug($"GetWindowProfile >> Name: '{v?.DisplayName ?? "null"}'", level: LogLevel.Trace);
+            }
+            if (v == null)
+            {
+                var color = Microsoft.Xna.Framework.Color.LightSkyBlue;
+                Logger.LogDebugError($"[SOS] No one profile encountered.\n => Profile list: {string.Join(',', GetAllWindowProfiles().ToList().Select(p => p.DisplayName))}\n => Profile _dict => {string.Join(',', _profileFactories.GetSorted().Select(f => $"[{f.Id}, {f.Order}]"))}");
+                Logger.LogReleaseError($"[SOS] No one profile encountered. Try reinstall 'S.O.S - Standard Operation Schematics' Mod, report that in steam mod page or create an issue on Git project(‖color:{color.R},{color.G},{color.B}‖https://github.com/retype15/SOS‖end‖).");
+            }
+            return v;
+        }
+
+        public static IEnumerable<ISOSWindowProfile> GetAllWindowProfiles(bool keepInstance = false) => _profileFactories.Create(keepInstance).Select(t => t.Instance);
+
+        public static bool RemoveWindowProfile(string id, bool onlyInstance = false)
+                => _profileFactories.Remove(id, onlyInstance);
+
+        #endregion
+
+        #region Internal helpers
+
+        internal static void Initialize(IPluginManagementService pluginManagementService)
+        {
+            if (_scanned) return;
+
+            _sectionFactories.AutoRegister(pluginManagementService);
+            _tabFactories.AutoRegister(pluginManagementService);
+            _configFactories.AutoRegister(pluginManagementService);
+            _prefabFactories.AutoRegister(pluginManagementService);
+            _profileFactories.AutoRegister(pluginManagementService);
+
+            _scanned = true;
+        }
+
+        internal static void ClearTemporaryInstances()
+        {
+            _sectionFactories.Clear(true);
+            _tabFactories.Clear(true);
+            _prefabFactories.Clear(true);
+            _profileFactories.Clear(true);
+        }
+
+        internal static void Clear()
+        {
+            _sectionFactories.Clear();
+            _tabFactories.Clear();
+            _configFactories.Clear();
+            _prefabFactories.Clear();
+            _profileFactories.Clear();
+            _scanned = false;
+            lock (_delegates) _delegates.Clear();
+            lock (_state) _state.Clear();
+        }
+
+        #endregion
+    }
+}
