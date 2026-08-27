@@ -11,6 +11,16 @@ namespace SOS
 {
     public static partial class API
     {
+        private static EventBus eventBus = new();
+
+        // Factories  
+        private static readonly SortedFactory<ISOSStatSection> _sectionFactories = new();
+        private static readonly SortedFactory<ISOSTab> _tabFactories = new();
+        private static readonly SortedFactory<ISOSConfig> _configFactories = new();
+        private static readonly SortedFactory<ISOSPrefab> _prefabFactories = new();
+        private static readonly SortedFactory<ISOSWindowProfile> _profileFactories = new();
+
+        private static bool _scanned = false;
 
         #region Info Sections
 
@@ -24,7 +34,7 @@ namespace SOS
             => _sectionFactories.Get(id, keepInstance);
 
         public static IEnumerable<ISOSStatSection> GetAllSections(bool keepInstance = true)
-            => _sectionFactories.Create(keepInstance).Select(t => t.Instance);
+            => _sectionFactories.GetAll(keepInstance).Select(t => t.Instance);
 
         public static bool RemoveSection(string id, bool onlyInstance = false)
             => _sectionFactories.Remove(id, onlyInstance);
@@ -43,7 +53,7 @@ namespace SOS
             => _tabFactories.Get(id, keepInstance);
 
         public static IEnumerable<ISOSTab> GetAllTabs(bool keepInstance = true)
-            => _tabFactories.Create(keepInstance).Select(t => t.Instance);
+            => _tabFactories.GetAll(keepInstance).Select(t => t.Instance);
 
         public static bool RemoveTab(string id, bool onlyInstance = false)
             => _tabFactories.Remove(id, onlyInstance);
@@ -62,7 +72,7 @@ namespace SOS
             => _configFactories.Get(id, keepInstance);
 
         public static IEnumerable<ISOSConfig> GetAllConfigs(bool keepInstance = true)
-            => _configFactories.Create(keepInstance).Select(t => t.Instance);
+            => _configFactories.GetAll(keepInstance).Select(t => t.Instance);
 
         public static bool RemoveConfig(string id, bool onlyInstance = false)
             => _configFactories.Remove(id, onlyInstance);
@@ -81,7 +91,7 @@ namespace SOS
             => _prefabFactories.Get(id, keepInstance);
 
         public static IEnumerable<ISOSPrefab> GetAllPrefabProviders(bool keepInstance = true)
-            => _prefabFactories.Create(keepInstance).Select(t => t.Instance);
+            => _prefabFactories.GetAll(keepInstance).Select(t => t.Instance);
 
         public static bool RemovePrefabProvider(string id, bool onlyInstance = false)
             => _prefabFactories.Remove(id, onlyInstance);
@@ -121,10 +131,35 @@ namespace SOS
             return v;
         }
 
-        public static IEnumerable<ISOSWindowProfile> GetAllWindowProfiles(bool keepInstance = false) => _profileFactories.Create(keepInstance).Select(t => t.Instance);
+        public static IEnumerable<ISOSWindowProfile> GetAllWindowProfiles(bool keepInstance = false)
+            => _profileFactories.GetAll(keepInstance).Select(t => t.Instance);
 
         public static bool RemoveWindowProfile(string id, bool onlyInstance = false)
-                => _profileFactories.Remove(id, onlyInstance);
+            => _profileFactories.Remove(id, onlyInstance);
+
+        #endregion
+
+        #region EventBus Facade
+
+        public static void On<T>(string key, Action<T> handler, double order = 0) => eventBus.On<T>(key, handler, order);
+
+        public static void On(string key, Action handler, double order = 0) => eventBus.On(key, handler, order);
+
+        public static void Off<T>(string key, Action<T> handler, double? order = null, bool removeState = false) => eventBus.Off<T>(key, handler, order, removeState);
+
+        public static void Off(string key, Action handler, double? order = null, bool removeState = false) => eventBus.Off(key, handler, order, removeState);
+
+        public static bool Emit<T>(string key, T value, bool setState = true) => eventBus.Emit<T>(key, value, setState);
+
+        public static bool Emit(string key) => eventBus.Emit(key);
+
+        public static void SetState<T>(string key, T value, bool emit = false) => eventBus.SetState<T>(key, value, emit);
+
+        public static void SetState<T>(string key, Func<T> method, bool emit = false) => eventBus.SetState<T>(key, method, emit);
+
+        public static T? GetState<T>(string key) => eventBus.GetState<T>(key);
+
+        public static bool RemoveState(string key) => eventBus.RemoveState(key);
 
         #endregion
 
@@ -159,8 +194,7 @@ namespace SOS
             _prefabFactories.Clear();
             _profileFactories.Clear();
             _scanned = false;
-            lock (_delegates) _delegates.Clear();
-            lock (_state) _state.Clear();
+            eventBus = null!;
         }
 
         #endregion
