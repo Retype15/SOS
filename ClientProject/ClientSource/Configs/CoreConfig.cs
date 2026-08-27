@@ -13,10 +13,12 @@ using SOS.Profiles;
 
 namespace SOS.Configs
 {
-    public sealed class ClientConfig : ConfigDirtySaver, ISOSConfig
+    public sealed class CoreConfig : ConfigDirtySaver, ISOSConfig
     {
-        private static ClientConfig? _instance;
-        public static ClientConfig Instance => _instance ??= new();
+        public const string ID = "SOS.Core";
+
+        private static CoreConfig? _instance;
+        public static CoreConfig Instance => _instance ??= new();
 
         private bool _loaded = false;
         public void Load()
@@ -162,7 +164,7 @@ namespace SOS.Configs
 
         // ─── Constructor ───
 
-        private ClientConfig()
+        private CoreConfig()
         {
             var pms = Plugin.Instance.ConfigService;
             var p = Plugin.Instance.Package;

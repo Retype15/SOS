@@ -38,7 +38,7 @@ namespace SOS
             CoroutineManager.IsCoroutineRunning("LevelTransition");
 
         //MARK: Config delegates
-        public ClientConfig cfg = ClientConfig.Instance;
+        public CoreConfig cfg = CoreConfig.Instance;
 
         private Keys ToggleKey => cfg.SOSOpenKey.Key;
 
@@ -256,9 +256,9 @@ namespace SOS
             API.Off<string>(CommKeys.ChangeProfile, ChangeProfile);
             API.Off(CommKeys.CloseWindow, CloseSOS);
 
-            ClientConfig.Destroy();
+            CoreConfig.Destroy();
             cfg = null!;
-            ClientConfig.Destroy();
+            CoreConfig.Destroy();
             _windowProfileConfig = null!;
 
             SOS.Prefabs.Item.ItemPrefabProvider.Destroy();

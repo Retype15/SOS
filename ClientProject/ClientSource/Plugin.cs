@@ -24,8 +24,8 @@ namespace SOS
             try
             {
                 controller = SOSController.Instance;
-                API.RegisterConfig(() => ClientConfig.Instance, "SOS.Core", 0);
-                API.RegisterConfig(() => WindowProfileConfig.Instance, "SOS.WindowProfile", 0);
+                API.RegisterConfig(() => CoreConfig.Instance, CoreConfig.ID, 0);
+                API.RegisterConfig(() => WindowProfileConfig.Instance, WindowProfileConfig.ID, 0);
 
                 Configs.ConfigHelper.LoadConfigs();
 
@@ -63,7 +63,7 @@ namespace SOS
 
             ConsoleCommandsService.RemoveCommand("sos");
 
-            ClientConfig.Destroy();
+            CoreConfig.Destroy();
             WindowProfileConfig.Destroy();
             SOSController.Instance.Destroy();
             controller = null!;

@@ -15,6 +15,8 @@ namespace SOS.Configs
 {
     internal sealed class WindowProfileConfig : ConfigDirtySaver, ISOSConfig
     {
+        public const string ID = "SOS.WindowProfile";
+
         private static WindowProfileConfig? _instance;
         public static WindowProfileConfig Instance = _instance ??= new();
 

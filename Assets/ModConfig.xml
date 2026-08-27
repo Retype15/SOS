@@ -8,10 +8,10 @@
     <Assembly File="%ModDir%/bin/Client/Windows/SOS.dll" Target="Client" Platform="Windows" />
 
     <!-- Internal Settings -->
-    <Config File="%ModDir%/Config/SettingsClient.xml" Target="Client" />
+    <Config File="%ModDir%/Config/SettingsCore.xml" Target="Client" />
     <Config File="%ModDir%/Config/SettingsWindowConfigClient.xml" Target="Client" />
 
-    <!-- Profile Settings -->
+    <!-- Per-Profile Settings -->
     <Config File="%ModDir%/Config/SettingsTCPClient.xml" Target="Client" />
     
 </ModConfig>
