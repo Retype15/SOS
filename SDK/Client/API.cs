@@ -229,7 +229,7 @@ namespace SOS
                         _dict.Clear();
                         _cache = [];
                         _isDirty = false;
-                        Logger.LogDebugWarning($"Limpiado factory para tipo: '{nameof(T)}'");
+                        Logger.LogDebugWarning($"Cleaning factory to type: '{nameof(T)}'");
                     }
                     foreach (var kv in _instances)
                         if (kv.Value is IDisposable i) i.Dispose();
@@ -358,7 +358,7 @@ namespace SOS
             {
                 var color = Microsoft.Xna.Framework.Color.LightSkyBlue;
                 Logger.LogDebugError($"[SOS] No one profile encountered.\n => Profile list: {string.Join(',', GetAllWindowProfiles().ToList().Select(p => p.DisplayName))}\n => Profile _dict => {string.Join(',', _profileFactories.GetSorted().Select(f => $"[{f.Id}, {f.Order}]"))}");
-                Logger.LogError($"[SOS] No one profile encountered. Try reinstall 'S.O.S - Standard Operation Schematics' Mod, report that in steam mod page or create an issue on Git project(‖color:{color.R},{color.G},{color.B}‖https://github.com/retype15/SOS‖end‖).");
+                Logger.LogReleaseError($"[SOS] No one profile encountered. Try reinstall 'S.O.S - Standard Operation Schematics' Mod, report that in steam mod page or create an issue on Git project(‖color:{color.R},{color.G},{color.B}‖https://github.com/retype15/SOS‖end‖).");
             }
             return v;
         }
