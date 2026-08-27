@@ -265,7 +265,7 @@ namespace SOS
 
     public static class IDictionaryExt
     {
-        public static T? GetValueThreadSafe<S, T>(this IDictionary<S, T> dict, S key) where S : notnull
+        public static T? GetValueLocked<S, T>(this IDictionary<S, T> dict, S key) where S : notnull
         {
             lock (dict)
                 if (dict.TryGetValue(key, out var value))
