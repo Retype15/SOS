@@ -263,6 +263,17 @@ namespace SOS
         }
     }
 
+    public static class IDictionaryExt
+    {
+        public static T? GetValueThreadSafe<S, T>(this IDictionary<S, T> dict, S key) where S : notnull
+        {
+            lock (dict)
+                if (dict.TryGetValue(key, out var value))
+                    return value;
+            return default;
+        }
+    }
+
     public static class ISettingBaseExt
     {
         public static bool SetIfNotEqual<T>([NotNullWhen(false)] this ISettingBase<T> setting, T value) where T : IEquatable<T>, IConvertible
