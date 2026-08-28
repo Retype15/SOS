@@ -247,7 +247,7 @@ namespace SOS
             lock (_channels)
             {
                 if (_channels.TryGetValue(key, out var channel))
-                    channel.Remove(handler, order);
+                    result = channel.Remove(handler, order);
             }
 
             if (removeState) RemoveState(key);
@@ -307,7 +307,7 @@ namespace SOS
 
         public bool Emit(string key, double min = double.MinValue, double max = double.MaxValue)
         {
-            var result = _channels.GetValueLocked(key)?.Call(min, max) ?? false;
+            var result = _channels.GetValueLocked(key)?.CallRange(min, max) ?? false;
 
             Logger.LogDebug($"EMIT'{key}' called.", level: LogLevel.Trace);
 
