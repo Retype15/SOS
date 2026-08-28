@@ -96,6 +96,7 @@ namespace SOS
         private static bool ImportAction(GUIButton button, object userdata)
         {
             var controller = SOSController.Instance;
+            var cfg = CoreConfig.Instance;
 
             try
             {
@@ -130,15 +131,15 @@ namespace SOS
                 if (state != null)
                 {
                     lastItemId = state.Attribute("lastItem")?.Value ?? "";
-                    controller.cfg.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
+                    cfg.LastSearchQuery = state.Attribute("lastSearch")?.Value ?? "";
                     string historyStr = state.Attribute("tabHistory")?.Value ?? "";
                     if (!string.IsNullOrEmpty(historyStr))
                     {
                         Profiles.ProfileHelper.TabHistory.Clear();
                         Profiles.ProfileHelper.TabHistory.AddRange(historyStr.Split(',', StringSplitOptions.RemoveEmptyEntries));
                     }
-                    controller.cfg.RawXmlMode = ParseBool(state.Attribute("rawXml")?.Value);
-                    controller.cfg.XmlFontScale = ParseFloat(state.Attribute("xmlScale")?.Value, 0.9f);
+                    cfg.RawXmlMode = ParseBool(state.Attribute("rawXml")?.Value);
+                    cfg.XmlFontScale = ParseFloat(state.Attribute("xmlScale")?.Value, 0.9f);
                 }
 
                 // MedicalSim
@@ -205,7 +206,7 @@ namespace SOS
                 // Restore last selected item
                 if (!string.IsNullOrEmpty(lastItemId))
                 {
-                    controller.CurrentTarget = (Prefab?)ItemPrefab.Prefabs
+                    cfg.CurrentTarget = (Prefab?)ItemPrefab.Prefabs
                         .FirstOrDefault(p => p.Identifier.Value == lastItemId)
                         ?? (Prefab?)AfflictionPrefab.List
                             .FirstOrDefault(a => a.Identifier.Value == lastItemId);

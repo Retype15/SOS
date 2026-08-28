@@ -37,43 +37,19 @@ namespace SOS
             migrationPending ||
             CoroutineManager.IsCoroutineRunning("LevelTransition");
 
-        //MARK: Config delegates
-        public CoreConfig cfg = CoreConfig.Instance;
-
-        private Keys ToggleKey => cfg.SOSOpenKey.Key;
-
-        public string LastSearchQuery => cfg.LastSearchQuery;
-
-        public Prefab? CurrentTarget
-        {
-            get => cfg.CurrentTarget;
-            internal set => cfg.CurrentTarget = value;
-        }
-
-        public bool RawXmlMode => cfg.RawXmlMode;
-
-        public float XmlFontScale => cfg.XmlFontScale;
-
-        private WindowProfileConfig _windowProfileConfig = WindowProfileConfig.Instance;
+        private static CoreConfig Cfg => CoreConfig.Instance;
 
         private SOSController()
         {
             API.On(CommKeys.CloseWindow, CloseSOS);
             API.On<string>(CommKeys.ChangeProfile, ChangeProfile);
-            API.On<Prefab?>(CommKeys.SelectTarget, OnSelectTarget);
             Profiles.ProfileHelper.Subscribe();
-        }
-
-        private void OnSelectTarget(Prefab? prefab)
-        {
-            if (prefab == null) return;
-            cfg.CurrentTarget = prefab;
         }
 
         public void ChangeProfile(string profileId)
         {
             ProfileHelper.CloseWindow();
-            _windowProfileConfig.ActiveProfileId = profileId;
+            WindowProfileConfig.Instance.ActiveProfileId = profileId;
             ToggleUI();
         }
 
@@ -92,6 +68,7 @@ namespace SOS
 
         public void ToggleUI(Prefab? prefab = null)
         {
+            if (!_sosStarted) ConfigHelper.LoadConfigs();
             _sosStarted = true;
             ProfileHelper.OnTargetSelected(prefab);
 
@@ -143,7 +120,7 @@ namespace SOS
 
             if (canHandleInputs)
             {
-                if (cfg.SOSOpenKeyHit)
+                if (Cfg.SOSOpenKeyHit)
                 {
                     if (PlayerInput.IsCtrlDown() && !IsSOSBlocked)
                     {
@@ -251,15 +228,11 @@ namespace SOS
 
             GUIAnimSequence.ClearAll();
 
-            API.Off<Prefab?>(CommKeys.SelectTarget, OnSelectTarget);
             Profiles.ProfileHelper.Unsubscribe();
             API.Off<string>(CommKeys.ChangeProfile, ChangeProfile);
             API.Off(CommKeys.CloseWindow, CloseSOS);
 
-            CoreConfig.Destroy();
-            cfg = null!;
-            CoreConfig.Destroy();
-            _windowProfileConfig = null!;
+            CoreConfig.Instance.Destroy();
 
             SOS.Prefabs.Item.ItemPrefabProvider.Destroy();
             ProfileHelper.CloseWindow();
