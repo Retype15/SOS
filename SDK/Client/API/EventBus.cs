@@ -36,41 +36,65 @@ namespace SOS
             }
 
             public bool Remove(Delegate handler, double? order = null)
+                => order.HasValue ?
+                    Remove(handler, order.Value) :
+                    Remove(handler);
+
+            public bool Remove(Delegate handler, double order)
             {
+                double key = Normalize(order);
                 bool removed = false;
 
-                if (order.HasValue)
-                {
-                    double key = Normalize(order.Value);
-                    lock (buckets)
-                        if (buckets.TryGetValue(key, out var list))
-                        {
-                            removed = list.Remove(handler);
-                            if (list.Count == 0) buckets.Remove(key);
-                        }
-                }
-                else
-                {
-                    List<double> emptybuckets = [];
-
-                    lock (buckets)
+                lock (buckets)
+                    if (buckets.TryGetValue(key, out var list))
                     {
-                        foreach (var (prio, list) in buckets)
-                        {
-                            if (list.Remove(handler))
-                            {
-                                removed = true;
-                                if (list.Count == 0)
-                                    emptybuckets.Add(prio);
-                            }
-                        }
-
-                        foreach (var prio in emptybuckets)
-                            buckets.Remove(prio);
+                        removed = list.Remove(handler);
+                        if (list.Count == 0) buckets.Remove(key);
                     }
+
+                return removed;
+            }
+            public bool Remove(Delegate handler)
+            {
+                List<double> emptybuckets = [];
+                bool removed = false;
+
+                lock (buckets)
+                {
+                    foreach (var (prio, list) in buckets)
+                    {
+                        if (list.Remove(handler))
+                        {
+                            removed = true;
+                            if (list.Count == 0)
+                                emptybuckets.Add(prio);
+                        }
+                    }
+
+                    foreach (var prio in emptybuckets)
+                        buckets.Remove(prio);
                 }
 
                 return removed;
+            }
+
+            private double[] GetKeyCopy()
+            {
+                lock (buckets) return [.. Keys];
+            }
+
+            private List<double> GetKeyCopy(double min = double.MinValue, double max = double.MaxValue)
+            {
+                min = Normalize(min);
+                max = Normalize(max);
+
+                List<double> keys = [];
+
+                lock (buckets)
+                    foreach (var k in Keys)
+                        if (k >= min && k <= max) keys.Add(k);
+
+                return keys;
             }
 
             private Delegate[]? GetValueCopy(double order)
@@ -83,13 +107,16 @@ namespace SOS
                 return null;
             }
 
+            public bool Call(double? order = null)
+                => order.HasValue ?
+                    Call(order: order.Value) :
+                    Call();
+
             public bool Call()
             {
-                double[]? channels;
-                lock (buckets) channels = [.. Keys];
                 var result = false;
 
-                foreach (var order in channels)
+                foreach (var order in GetKeyCopy())
                     result |= Call(order);
 
                 return result;
@@ -118,6 +145,11 @@ namespace SOS
                 }
                 return result;
             }
+
+            public bool Call<T>(T value, double? order = null)
+                => order.HasValue ?
+                    Call(value: value, order: order.Value) :
+                    Call(value: value);
 
             public bool Call<T>(T value)
             {
@@ -156,6 +188,27 @@ namespace SOS
                 return result;
             }
 
+            public bool CallRange(double min = double.MinValue, double max = double.MaxValue)
+            {
+                bool result = false;
+
+                foreach (var order in GetKeyCopy(min, max))
+                    result |= Call(order);
+
+                return result;
+            }
+
+            public bool CallRange<T>(T value, double min = double.MinValue, double max = double.MaxValue)
+            {
+                List<double> channels = GetKeyCopy(min, max);
+                bool result = false;
+
+                foreach (var order in channels)
+                    result |= Call<T>(order, value);
+
+                return result;
+            }
+
             public void Clear()
             {
                 lock (buckets) buckets.Clear();
@@ -188,8 +241,9 @@ namespace SOS
             Logger.LogDebug($"ON '{key}' registered at order {order}.", level: LogLevel.Trace);
         }
 
-        public void Off<T>(string key, Action<T> handler, double? order = null, bool removeState = false)
+        public bool Off<T>(string key, Action<T> handler, double? order = null, bool removeState = false)
         {
+            var result = false;
             lock (_channels)
             {
                 if (_channels.TryGetValue(key, out var channel))
@@ -199,23 +253,30 @@ namespace SOS
             if (removeState) RemoveState(key);
 
             Logger.LogDebug($"OFF '{key}' (T:{typeof(T).FullOrName()}) removed {(order.HasValue ? $"at order {order}" : "on all")}.", level: LogLevel.Trace);
+
+            return result;
         }
 
-        public void Off(string key, Action handler, double? order = null, bool removeState = false)
+        public bool Off(string key, Action handler, double? order = null, bool removeState = false)
         {
+            bool result = false;
             lock (_channels)
             {
                 if (_channels.TryGetValue(key, out var channel))
-                    channel.Remove(handler, order);
+                    result = (order.HasValue) ?
+                        channel.Remove(handler, order.Value) :
+                        channel.Remove(handler);
             }
             if (removeState) RemoveState(key);
 
             Logger.LogDebug($"OFF '{key}' removed {(order.HasValue ? $"at order {order}" : "on all")}.", level: LogLevel.Trace);
+
+            return result;
         }
 
-        public bool Emit<T>(string key, T value, bool setState = true)
+        public bool Emit<T>(string key, T value, double? order = null, bool setState = true)
         {
-            var result = _channels.GetValueLocked(key)?.Call<T>(value) ?? false;
+            var result = _channels.GetValueLocked(key)?.Call<T>(value: value, order: order) ?? false;
 
             if (setState) SetState<T>(key, value, false);
 
@@ -224,9 +285,29 @@ namespace SOS
             return result;
         }
 
-        public bool Emit(string key)
+        public bool Emit<T>(string key, T value, double min = double.MinValue, double max = double.MaxValue, bool setState = true)
         {
-            var result = _channels.GetValueLocked(key)?.Call() ?? false;
+            var result = _channels.GetValueLocked(key)?.CallRange<T>(value, min, max) ?? false;
+
+            if (setState) SetState<T>(key, value, false);
+
+            Logger.LogDebug($"EMIT '{key}' called with value '{value}' (T:{typeof(T).FullOrName()})", level: LogLevel.Trace);
+
+            return result;
+        }
+
+        public bool Emit(string key, double? order = null)
+        {
+            var result = _channels.GetValueLocked(key)?.Call(order) ?? false;
+
+            Logger.LogDebug($"EMIT'{key}' called.", level: LogLevel.Trace);
+
+            return result;
+        }
+
+        public bool Emit(string key, double min = double.MinValue, double max = double.MaxValue)
+        {
+            var result = _channels.GetValueLocked(key)?.Call(min, max) ?? false;
 
             Logger.LogDebug($"EMIT'{key}' called.", level: LogLevel.Trace);
 
@@ -238,7 +319,7 @@ namespace SOS
             lock (_state)
                 _state[key] = value;
 
-            if (emit) Emit(key, value, false);
+            if (emit) Emit<T>(key, value, null, setState: false);
 
             Logger.LogDebug($"SET_STATE CALLED '{key}' with type: {typeof(T).FullOrName()}.", level: LogLevel.Trace);
         }
@@ -248,7 +329,7 @@ namespace SOS
             lock (_state)
                 _state[key] = method;
 
-            if (emit) Emit(key, method(), false);
+            if (emit) Emit(key, method(), null, false);
 
             Logger.LogDebug($"SET_STATE CALLED '{key}' with a delegate function: 'Func<{typeof(T).FullOrName()}>'.", level: LogLevel.Trace);
         }

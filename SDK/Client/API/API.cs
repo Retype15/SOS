@@ -141,17 +141,22 @@ namespace SOS
 
         #region EventBus Facade
 
-        public static void On<T>(string key, Action<T> handler, double order = 0) => eventBus.On<T>(key, handler, order);
 
         public static void On(string key, Action handler, double order = 0) => eventBus.On(key, handler, order);
 
-        public static void Off<T>(string key, Action<T> handler, double? order = null, bool removeState = false) => eventBus.Off<T>(key, handler, order, removeState);
+        public static void On<T>(string key, Action<T> handler, double order = 0) => eventBus.On<T>(key, handler, order);
 
         public static void Off(string key, Action handler, double? order = null, bool removeState = false) => eventBus.Off(key, handler, order, removeState);
 
-        public static bool Emit<T>(string key, T value, bool setState = true) => eventBus.Emit<T>(key, value, setState);
+        public static void Off<T>(string key, Action<T> handler, double? order = null, bool removeState = false) => eventBus.Off<T>(key, handler, order, removeState);
 
-        public static bool Emit(string key) => eventBus.Emit(key);
+        public static bool Emit(string key, double? order = null) => eventBus.Emit(key, order);
+
+        public static bool Emit<T>(string key, T value, double? order = null, bool setState = true) => eventBus.Emit<T>(key, value, order, setState);
+
+        public static bool EmitRange(string key, double min = double.MinValue, double max = double.MaxValue) => eventBus.Emit(key, min, max);
+
+        public static bool EmitRange<T>(string key, T value, double min = double.MinValue, double max = double.MaxValue, bool setState = true) => eventBus.Emit<T>(key, value, min, max, setState);
 
         public static void SetState<T>(string key, T value, bool emit = false) => eventBus.SetState<T>(key, value, emit);
 

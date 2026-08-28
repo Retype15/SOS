@@ -75,7 +75,7 @@ namespace SOS.Profiles.TCWP
 
         // Misc
         private GUIFrame? layoutMenuFrame;
-        private Prefab? _currentItem;
+        private Prefab? _lastTarget;
         private static bool needsShowLogo = true;
 
         #endregion
@@ -95,12 +95,12 @@ namespace SOS.Profiles.TCWP
         {
             if (!_windowEventsRegistered)
             {
-                API.On(CommKeys.ToggleWindow, OnToggleWindow);
-                API.On(CommKeys.OpenWindow, OnOpenWindow);
-                API.On<Prefab?>(CommKeys.SelectTarget, OnTargetChangedHandler);
-                API.On<string>(CommKeys.SetSearchFilter, OnSetSearchFilter);
-                API.On<TPLayout>(CommKeys.ApplyLayout, OnApplyLayout);
-                API.On(CommKeys.RefreshSearch, RefreshSearch);
+                API.On(CommKeys.ToggleWindow, OnToggleWindow, EventPriority.UI);
+                API.On(CommKeys.OpenWindow, OnOpenWindow, EventPriority.UI);
+                API.On<Prefab?>(CommKeys.SelectTarget, OnTargetChangedHandler, EventPriority.UI);
+                API.On<string>(CommKeys.SetSearchFilter, OnSetSearchFilter, EventPriority.UI);
+                API.On<TPLayout>(CommKeys.ApplyLayout, OnApplyLayout, EventPriority.UI);
+                API.On(CommKeys.RefreshSearch, RefreshSearch, EventPriority.UI);
 
                 _windowEventsRegistered = true;
             }
@@ -172,14 +172,14 @@ namespace SOS.Profiles.TCWP
         public void Dispose()
         {
             Logger.LogDebug("EXECUTING PROFILE DISPOSE...", level: LogLevel.Trace);
-            API.Off(CommKeys.ToggleWindow, OnToggleWindow);
-            API.Off(CommKeys.OpenWindow, OnOpenWindow);
+            API.Off(CommKeys.ToggleWindow, OnToggleWindow, EventPriority.UI);
+            API.Off(CommKeys.OpenWindow, OnOpenWindow, EventPriority.UI);
             _windowEventsRegistered = false;
 
-            API.Off<Prefab?>(CommKeys.SelectTarget, OnTargetChangedHandler);
-            API.Off<string>(CommKeys.SetSearchFilter, OnSetSearchFilter);
-            API.Off<TPLayout>(CommKeys.ApplyLayout, OnApplyLayout);
-            API.Off(CommKeys.RefreshSearch, RefreshSearch);
+            API.Off<Prefab?>(CommKeys.SelectTarget, OnTargetChangedHandler, EventPriority.UI);
+            API.Off<string>(CommKeys.SetSearchFilter, OnSetSearchFilter, EventPriority.UI);
+            API.Off<TPLayout>(CommKeys.ApplyLayout, OnApplyLayout, EventPriority.UI);
+            API.Off(CommKeys.RefreshSearch, RefreshSearch, EventPriority.UI);
 
             SaveSettings();
 
@@ -213,7 +213,7 @@ namespace SOS.Profiles.TCWP
         private void OnTargetChangedHandler(Prefab? target)
         {
             if (target == null) return;
-            _currentItem = target;
+            _lastTarget = target;
             if (detailsHeader == null || centerTabWidget == null || metaPanel == null) return;
 
             metaPanel.Content.ClearChildren();
@@ -740,8 +740,8 @@ namespace SOS.Profiles.TCWP
             bool needsRightRefresh = newRightMode != rightPanelMode;
 
             if (needsLeftRefresh) { leftPanelMode = newLeftMode; lastLeftWForReflow = leftW; if (leftContainer != null) leftContainer.Visible = leftPanelMode != DisplayMode.Hidden; RefreshSearch(); }
-            if (needsCenterRefresh) { centerPanelMode = newCenterMode; lastCenterWForReflow = centerWidth; if (_currentItem != null) OnTargetChangedHandler(_currentItem); }
-            if (needsRightRefresh) { rightPanelMode = newRightMode; if (rightContainer != null) rightContainer.Visible = rightPanelMode != DisplayMode.Hidden; if (_currentItem != null) OnTargetChangedHandler(_currentItem); }
+            if (needsCenterRefresh) { centerPanelMode = newCenterMode; lastCenterWForReflow = centerWidth; if (_lastTarget != null) OnTargetChangedHandler(_lastTarget); }
+            if (needsRightRefresh) { rightPanelMode = newRightMode; if (rightContainer != null) rightContainer.Visible = rightPanelMode != DisplayMode.Hidden; if (_lastTarget != null) OnTargetChangedHandler(_lastTarget); }
 
             AddToGUIUpdateList(order: 1);
         }

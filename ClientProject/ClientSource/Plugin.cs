@@ -63,7 +63,7 @@ namespace SOS
 
             ConsoleCommandsService.RemoveCommand("sos");
 
-            CoreConfig.Instance.Destroy();
+            CoreConfig.Destroy();
             WindowProfileConfig.Destroy();
             SOSController.Instance.Destroy();
             controller = null!;
