@@ -189,6 +189,7 @@ namespace SOS.GUI
 
         public void ToggleTracker()
         {
+            if (SOSController.IsSOSBlocked) return;
             if (Visible) HideTracker();
             else ShowTracker();
         }
@@ -285,7 +286,7 @@ namespace SOS.GUI
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (Screen.Selected is not GameScreen) return;
+            if (SOSController.IsSOSBlocked || Screen.Selected is not GameScreen) return;
             base.Draw(spriteBatch);
         }
 
@@ -297,7 +298,7 @@ namespace SOS.GUI
 
         private void RefreshIfVisible()
         {
-            if (!Visible || Screen.Selected is not GameScreen) return;
+            if (SOSController.IsSOSBlocked || !Visible || Screen.Selected is not GameScreen) return;
 
             if (timeCache > TIMECACHERESET) { timeCache = 0; cache.Clear(); }
             else timeCache++;
