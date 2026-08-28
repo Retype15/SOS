@@ -82,7 +82,7 @@ namespace SOS.Profiles
         public static void NavigateBack() => API.Emit(CommKeys.NavigateBack);
         public static void NavigateForward() => API.Emit(CommKeys.NavigateForward);
 
-        private static void HistoryPush(Prefab? prefab)
+        internal static void HistoryPush(Prefab? prefab)
         {
             if (prefab == null || _isNavigating) return;
 
@@ -118,8 +118,8 @@ namespace SOS.Profiles
         public static void SelectTarget(Prefab target)
         {
             var cur = API.GetState<Prefab?>(CommKeys.SelectTarget);
-            if (cur == target) return;
-            API.Emit(CommKeys.SelectTarget, target);
+            if (cur != target)
+                API.Emit(CommKeys.SelectTarget, target);
         }
 
         public static Point SettingsWindowSize { get; set; } = new(550, 600);

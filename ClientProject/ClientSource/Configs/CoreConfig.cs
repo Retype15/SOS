@@ -38,6 +38,7 @@ namespace SOS.Configs
             ctr.Tracker.Visible = TrackerVisible;
 
             API.SetState<Prefab?>(CommKeys.SelectTarget, CurrentTarget);
+            ProfileHelper.HistoryPush(CurrentTarget);
 
             _loaded = true;
         }
@@ -122,6 +123,8 @@ namespace SOS.Configs
             set => _currentTarget = value;
         }
 
+        private void SetCurrentTarget(Prefab? prefab) => CurrentTarget = prefab;
+
         private readonly ISettingBase<bool> _rawXmlMode;
         public bool RawXmlMode
         {
@@ -179,10 +182,14 @@ namespace SOS.Configs
             TryInitConfig("TabHistory", out _tabHistoryRaw);
             TryInitConfig("TrackedRecipes", out _trackedRecipesRaw);
             TryInitConfig("TrackerVisible", out _trackerVisible);
+
+            API.On<Prefab?>(CommKeys.SelectTarget, SetCurrentTarget);
         }
 
-        public static void Destroy()
+
+        public void Destroy()
         {
+            API.Off<Prefab?>(CommKeys.SelectTarget, SetCurrentTarget);
             _instance = null;
         }
     }

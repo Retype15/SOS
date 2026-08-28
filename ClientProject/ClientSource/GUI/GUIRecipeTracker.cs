@@ -10,7 +10,7 @@ using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using SOS.Configs;
 using BGUI = Barotrauma.GUI;
 
 namespace SOS.GUI
@@ -97,7 +97,7 @@ namespace SOS.GUI
                 font: GUIStyle.SmallFont, textColor: Color.Gray)
             { CanBeFocused = false };
 
-            SOSController.Instance.cfg.OnTrackerVisibleValueChanged += RegisterIfChange;
+            CoreConfig.Instance.OnTrackerVisibleValueChanged += RegisterIfChange;
         }
 
         public bool AddRecipe(FabricationRecipe? recipe)
@@ -192,8 +192,8 @@ namespace SOS.GUI
             if (Visible) HideTracker();
             else ShowTracker();
         }
-        public static void ShowTracker() => SOSController.Instance.cfg.TrackerVisible = true;
-        public static void HideTracker() => SOSController.Instance.cfg.TrackerVisible = false;
+        public static void ShowTracker() => CoreConfig.Instance.TrackerVisible = true;
+        public static void HideTracker() => CoreConfig.Instance.TrackerVisible = false;
 
         public List<ContextMenuOption> GetManageHudContextMenuOptions()
         {
@@ -328,7 +328,7 @@ namespace SOS.GUI
             if (layoutDirty) RecalculateSize();
         }
 
-        private void RegisterIfChange(ISettingBase _) => Visible = SOSController.Instance.cfg.TrackerVisible;
+        private void RegisterIfChange(ISettingBase _) => Visible = CoreConfig.Instance.TrackerVisible;
 
         public void Destroy()
         {
@@ -336,7 +336,7 @@ namespace SOS.GUI
             emptyLabel.RectTransform.Parent = null;
             emptyLabel.RemoveFromGUIUpdateList();
             RemoveRecipes();
-            SOSController.Instance.cfg.OnTrackerVisibleValueChanged -= RegisterIfChange;
+            CoreConfig.Instance.OnTrackerVisibleValueChanged -= RegisterIfChange;
         }
 
         private void RecalculateSize()

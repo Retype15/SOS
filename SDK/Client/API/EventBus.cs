@@ -155,6 +155,11 @@ namespace SOS
 
                 return result;
             }
+
+            public void Clear()
+            {
+                lock (buckets) buckets.Clear();
+            }
         }
 
         public void On<T>(string key, Action<T> handler, double order = 0)
@@ -273,6 +278,12 @@ namespace SOS
         {
             lock (_state)
                 return _state.Remove(key);
+        }
+
+        public void Clear()
+        {
+            lock (_channels) _channels.Clear();
+            lock (_state) _state.Clear();
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
 using MonoMod.Utils;
+using SOS.Configs;
 using SOS.GUI;
 using SOS.Panels.ItemPanel;
 using SOS.Prefabs;
@@ -361,10 +362,12 @@ namespace SOS.Profiles.TCWP
             searchExecutionTime = 0;
             layoutMenuFrame = null;
 
+            var ctrl = SOSController.Instance;
+            var cfg = CoreConfig.Instance;
+
             btnSettings = ProfileHelper.CreateSettingsButton(ToolBox.RectTransform);
             (btnBack, btnForward) = ProfileHelper.CreateNavigationButtons(ToolBox.RectTransform);
 
-            var ctrl = SOSController.Instance;
             var text = Texts.Get("sos.window.manage_hud", "MANAGE HUD");
             _ = new GUIButton(new RectTransform(new Point(text.Length * 12, 32), ControlBox.RectTransform, isFixedSize: true), text, style: "DeviceButton")
             {
@@ -380,7 +383,7 @@ namespace SOS.Profiles.TCWP
             _ = new GUIButton(new RectTransform(new Point(32, 32), ControlBox.RectTransform, isFixedSize: true), "o", style: "DeviceButton")
             {
                 OnClicked = (_, _) => { ctrl.Tracker.ToggleTracker(); return true; },
-                ToolTip = Texts.Get("sos.window.toggle_tracker_tooltip", "Toggle HUD tracker (Ctrl+[key])").Value.Replace("[key]", ctrl.cfg.SOSOpenKey.Key.ToString())
+                ToolTip = Texts.Get("sos.window.toggle_tracker_tooltip", "Toggle HUD tracker (Ctrl+[key])").Value.Replace("[key]", cfg.SOSOpenKey.Key.ToString())
             };
 
             SetControlBoxContentWidth();
@@ -407,7 +410,7 @@ namespace SOS.Profiles.TCWP
                 RectTransform = { MinSize = new Point(0, 35), MaxSize = new Point(int.MaxValue, 35) }
             };
 
-            searchBox = BGUI.CreateTextBoxWithPlaceholder(new RectTransform(Vector2.One, searchContainer.RectTransform), ctrl.LastSearchQuery, Texts.Get("sos.window.search_placeholder", "Search item..."));
+            searchBox = BGUI.CreateTextBoxWithPlaceholder(new RectTransform(Vector2.One, searchContainer.RectTransform), cfg.LastSearchQuery, Texts.Get("sos.window.search_placeholder", "Search item..."));
             searchBox.ToolTip = Texts.Get("sos.window.search_tooltip",
                 "Search by Name, ID, Category, Tags, ModName, ItemType, Prefab, etc.\n" +
                 "  Advanced Filters:\n" +
@@ -475,7 +478,7 @@ namespace SOS.Profiles.TCWP
 
             rawXmlTickBox = new GUITickBox(new RectTransform(new Vector2(1f, 0.45f), rightHeaderArea.RectTransform, Anchor.CenterLeft), Texts.Get("sos.window.raw_xml", "RAW XML").Value, font: GUIStyle.SmallFont)
             {
-                Selected = ctrl.RawXmlMode,
+                Selected = cfg.RawXmlMode,
                 ToolTip = Texts.Get("sos.window.raw_xml_tooltip", "Toggles between metadata view and raw XML view of the item.").Value
             };
 
@@ -491,25 +494,25 @@ namespace SOS.Profiles.TCWP
 
             xmlContentText = new GUITextViewer(new RectTransform(Vector2.One, rightContentArea.RectTransform), style: "GUITextBlock")
             {
-                Visible = ctrl.RawXmlMode,
+                Visible = cfg.RawXmlMode,
                 Font = GUIStyle.SmallFont,
-                TextScale = ctrl.XmlFontScale,
-                OnScaleChanged = (scale) => ctrl.cfg.XmlFontScale = scale,
+                TextScale = cfg.XmlFontScale,
+                OnScaleChanged = (scale) => cfg.XmlFontScale = scale,
                 ContentMenu = ProfileHelper.XmlContextMenu
             };
 
-            metaPanel.Visible = !ctrl.RawXmlMode;
+            metaPanel.Visible = !cfg.RawXmlMode;
             if (metaPanel.ContentBackground != null) metaPanel.ContentBackground.Color = Color.Transparent;
 
             rawXmlTickBox.OnSelected = (tick) =>
             {
-                ctrl.cfg.RawXmlMode = tick.Selected;
+                cfg.RawXmlMode = tick.Selected;
                 metaPanel.Visible = !tick.Selected;
                 if (xmlContentText != null) xmlContentText.Visible = tick.Selected;
                 return true;
             };
 
-            UpdateSearch(ctrl.LastSearchQuery);
+            UpdateSearch(cfg.LastSearchQuery);
             UpdateLayout();
 
             OnTargetChangedHandler(API.GetState<Prefab?>(CommKeys.SelectTarget));
@@ -523,8 +526,7 @@ namespace SOS.Profiles.TCWP
         {
             if (pendingSearchQuery != null && Timing.TotalTime >= searchExecutionTime)
             {
-                var ctrl = SOSController.Instance;
-                ctrl.cfg.LastSearchQuery = pendingSearchQuery;
+                CoreConfig.Instance.LastSearchQuery = pendingSearchQuery;
                 UpdateSearch(pendingSearchQuery);
                 pendingSearchQuery = null;
             }
@@ -671,7 +673,8 @@ namespace SOS.Profiles.TCWP
 
         //MARK: Navigation
 
-        private void UpdateNavigationButtonStates()
+        //TODO: Pasar al Helper.
+        private void UpdateNavigationButtonStates() //TODO: Añadir texto default para cuando el botón está Disabled(sin ningun item para moverse).
         {
             if (btnBack != null)
             {
