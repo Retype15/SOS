@@ -9,7 +9,7 @@ using Barotrauma.LuaCs;
 
 namespace SOS
 {
-    public static partial class API
+    public static class API
     {
         private static EventBus eventBus = new();
 
