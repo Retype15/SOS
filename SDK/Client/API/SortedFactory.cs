@@ -176,21 +176,35 @@ namespace SOS
 
         public T? Get(string id, bool keepInstance = true)
         {
+            Func<T?>? factory;
             lock (_dict)
             {
                 if (_instances.TryGetValue(id, out var cached))
                     return cached;
 
-                if (_dict.TryGetValue(id, out var entry))
-                {
-                    var instance = entry.Factory();
-                    if (keepInstance && instance != null)
-                        _instances[id] = instance;
+                if (!_dict.TryGetValue(id, out var entry))
+                    return null;
 
-                    return instance;
-                }
+                factory = entry.Factory;
             }
-            return null;
+
+            T? instance;
+
+            try
+            {
+                instance = factory();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"[SOS.API] Failed to instantiate factory of Id '{id}'. \nException: {ex.Message}");
+                return null;
+            }
+
+            lock (_instances)
+                if (keepInstance && instance != null)
+                    _instances[id] = instance;
+
+            return instance;
         }
 
         public T? First(bool keepInstance = true)

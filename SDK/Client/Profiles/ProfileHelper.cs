@@ -49,21 +49,23 @@ namespace SOS.Profiles
         private static bool _isNavigating = false;
         private static bool _subscribed = false;
 
+        private const double HistoryOrder = EventPriority.State + 0.5;
+
         public static void Subscribe()
         {
             if (_subscribed) return;
-            API.On<Prefab?>(CommKeys.SelectTarget, HistoryPush);
-            API.On(CommKeys.NavigateBack, HistoryBack);
-            API.On(CommKeys.NavigateForward, HistoryForward);
+            API.On<Prefab?>(CommKeys.SelectTarget, HistoryPush, HistoryOrder);
+            API.On(CommKeys.NavigateBack, HistoryBack, HistoryOrder);
+            API.On(CommKeys.NavigateForward, HistoryForward, HistoryOrder);
             _subscribed = true;
         }
 
         public static void Unsubscribe()
         {
             if (!_subscribed) return;
-            API.Off<Prefab?>(CommKeys.SelectTarget, HistoryPush);
-            API.Off(CommKeys.NavigateBack, HistoryBack);
-            API.Off(CommKeys.NavigateForward, HistoryForward);
+            API.Off<Prefab?>(CommKeys.SelectTarget, HistoryPush, HistoryOrder);
+            API.Off(CommKeys.NavigateBack, HistoryBack, HistoryOrder);
+            API.Off(CommKeys.NavigateForward, HistoryForward, HistoryOrder);
             _subscribed = false;
         }
 

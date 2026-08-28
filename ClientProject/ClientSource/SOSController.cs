@@ -41,8 +41,8 @@ namespace SOS
 
         private SOSController()
         {
-            API.On(CommKeys.CloseWindow, CloseSOS);
-            API.On<string>(CommKeys.ChangeProfile, ChangeProfile);
+            API.On(CommKeys.CloseWindow, CloseSOS, EventPriority.System);
+            API.On<string>(CommKeys.ChangeProfile, ChangeProfile, EventPriority.System);
             Profiles.ProfileHelper.Subscribe();
         }
 
@@ -229,10 +229,8 @@ namespace SOS
             GUIAnimSequence.ClearAll();
 
             Profiles.ProfileHelper.Unsubscribe();
-            API.Off<string>(CommKeys.ChangeProfile, ChangeProfile);
-            API.Off(CommKeys.CloseWindow, CloseSOS);
-
-            CoreConfig.Instance.Destroy();
+            API.Off<string>(CommKeys.ChangeProfile, ChangeProfile, EventPriority.System);
+            API.Off(CommKeys.CloseWindow, CloseSOS, EventPriority.System);
 
             SOS.Prefabs.Item.ItemPrefabProvider.Destroy();
             ProfileHelper.CloseWindow();

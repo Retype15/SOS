@@ -183,14 +183,17 @@ namespace SOS.Configs
             TryInitConfig("TrackedRecipes", out _trackedRecipesRaw);
             TryInitConfig("TrackerVisible", out _trackerVisible);
 
-            API.On<Prefab?>(CommKeys.SelectTarget, SetCurrentTarget);
+            API.On<Prefab?>(CommKeys.SelectTarget, SetCurrentTarget, EventPriority.State);
         }
 
 
-        public void Destroy()
+        public static void Destroy()
         {
-            API.Off<Prefab?>(CommKeys.SelectTarget, SetCurrentTarget);
-            _instance = null;
+            if (_instance != null)
+            {
+                API.Off<Prefab?>(CommKeys.SelectTarget, Instance.SetCurrentTarget, EventPriority.State);
+                _instance = null;
+            }
         }
     }
 }
