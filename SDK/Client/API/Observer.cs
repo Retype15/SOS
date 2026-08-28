@@ -86,7 +86,7 @@ namespace SOS
             public bool Call()
             {
                 double[]? channels;
-                lock (buckets) channels = [.. buckets.Keys];
+                lock (buckets) channels = [.. Keys];
                 var result = false;
 
                 foreach (var order in channels)
@@ -122,7 +122,7 @@ namespace SOS
             public bool Call<T>(T value)
             {
                 double[]? channels;
-                lock (buckets) channels = [.. buckets.Keys];
+                lock (buckets) channels = [.. Keys];
                 var result = false;
 
                 foreach (var order in channels)

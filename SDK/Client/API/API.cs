@@ -194,7 +194,7 @@ namespace SOS
             _prefabFactories.Clear();
             _profileFactories.Clear();
             _scanned = false;
-            eventBus = null!;
+            eventBus = new();
         }
 
         #endregion
