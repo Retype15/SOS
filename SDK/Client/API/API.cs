@@ -24,8 +24,11 @@ namespace SOS
 
         #region Info Sections
 
-        public static bool RegisterSection(object obj, string? id = null, double order = 0.0)
-            => _sectionFactories.Register(obj, id, order);
+        public static bool RegisterSection(object obj, string? id = null, double order = 0.0, bool active = true)
+            => _sectionFactories.Register(obj, id, order, active);
+
+        public static bool ActivateSection(string id) => _sectionFactories.SetActive(id, true);
+        public static bool DeactivateSection(string id) => _sectionFactories.SetActive(id, false);
 
         public static T? GetSection<T>(string id, bool keepInstance = true)
             => GetSection(id, keepInstance) is T t ? t : default;
@@ -43,8 +46,11 @@ namespace SOS
 
         #region Tabs
 
-        public static bool RegisterTab(object obj, string? id = null, double order = 0.0)
-            => _tabFactories.Register(obj, id, order);
+        public static bool RegisterTab(object obj, string? id = null, double order = 0.0, bool active = true)
+            => _tabFactories.Register(obj, id, order, active);
+
+        public static bool ActivateTab(string id) => _tabFactories.SetActive(id, true);
+        public static bool DeactivateTab(string id) => _tabFactories.SetActive(id, false);
 
         public static T? GetTab<T>(string id, bool keepInstance = true)
             => GetTab(id, keepInstance) is T t ? t : default;
@@ -62,8 +68,11 @@ namespace SOS
 
         #region Configs
 
-        public static bool RegisterConfig(object obj, string? id = null, double order = 0.0)
-            => _configFactories.Register(obj, id, order);
+        public static bool RegisterConfig(object obj, string? id = null, double order = 0.0, bool active = true)
+            => _configFactories.Register(obj, id, order, active);
+
+        public static bool ActivateConfig(string id) => _configFactories.SetActive(id, true);
+        public static bool DeactivateConfig(string id) => _configFactories.SetActive(id, false);
 
         public static T? GetConfig<T>(string id, bool keepInstance = true)
             => GetConfig(id, keepInstance) is T t ? t : default;
@@ -81,8 +90,11 @@ namespace SOS
 
         #region Prefab Providers
 
-        public static bool RegisterPrefabProvider(object obj, string? id = null, double order = 0.0)
-            => _prefabFactories.Register(obj, id, order);
+        public static bool RegisterPrefabProvider(object obj, string? id = null, double order = 0.0, bool active = true)
+            => _prefabFactories.Register(obj, id, order, active);
+
+        public static bool ActivatePrefabProvider(string id) => _prefabFactories.SetActive(id, true);
+        public static bool DeactivatePrefabProvider(string id) => _prefabFactories.SetActive(id, false);
 
         public static T? GetPrefabProvider<T>(string id, bool refresh = true)
             => GetPrefabProvider(id, refresh) is T t ? t : default;
@@ -100,9 +112,11 @@ namespace SOS
 
         #region Window Profiles
 
-        public static bool RegisterWindowProfile(object obj, string? id = null, double order = 0.0)
-            => _profileFactories.Register(obj, id, order);
+        public static bool RegisterWindowProfile(object obj, string? id = null, double order = 0.0, bool active = true)
+            => _profileFactories.Register(obj, id, order, active);
 
+        public static bool ActivateWindowProfile(string id) => _profileFactories.SetActive(id, true);
+        public static bool DeactivateWindowProfile(string id) => _profileFactories.SetActive(id, false);
 
         public static T? GetWindowProfile<T>(string id, bool keepInstance = false)
             => GetWindowProfile(id, keepInstance) is T t ? t : default;

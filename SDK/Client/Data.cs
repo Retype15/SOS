@@ -19,10 +19,12 @@ namespace SOS
     {
         public readonly string? Id;
         public readonly double Order;
-        public AutoRegisterAttribute(string? id = null, double order = 0.0)
+        public readonly bool Active;
+        public AutoRegisterAttribute(string? id = null, double order = 0.0, bool active = true)
         {
             Id = id;
             Order = order;
+            Active = active;
         }
     }
 
