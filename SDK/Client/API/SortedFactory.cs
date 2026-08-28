@@ -200,7 +200,7 @@ namespace SOS
                 return null;
             }
 
-            lock (_instances)
+            lock (_dict)
                 if (keepInstance && instance != null)
                     _instances[id] = instance;
 
