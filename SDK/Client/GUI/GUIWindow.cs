@@ -33,17 +33,17 @@ namespace SOS.GUI
 
         private const int SystemButtonSize = 32;
 
-        public GUIFrame TopBar { get; } = null!;
-        public GUITextBlock Title { get; } = null!;
-        public GUILayoutGroup ToolBox { get; } = null!;
-        public GUILayoutGroup RightArea { get; } = null!;
-        public GUILayoutGroup ControlBox { get; } = null!;
-        public GUILayoutGroup SystemBox { get; } = null!;
-        public GUIFrame ContentArea { get; } = null!;
+        public readonly GUIFrame TopBar;
+        public readonly GUITextBlock Title;
+        public readonly GUILayoutGroup ToolBox;
+        public readonly GUILayoutGroup RightArea;
+        public readonly GUILayoutGroup ControlBox;
+        public readonly GUILayoutGroup SystemBox;
+        public readonly GUIFrame ContentArea;
 
-        public GUIButton? MinimizeButton { get; }
-        public GUIButton? MaximizeButton { get; }
-        public GUIButton? CloseButton { get; }
+        public readonly GUIButton? MinimizeButton;
+        public readonly GUIButton? MaximizeButton;
+        public readonly GUIButton? CloseButton;
 
         public Point NormalSize { get; protected set; }
         public Point NormalOffset { get; protected set; }
@@ -73,81 +73,74 @@ namespace SOS.GUI
             NormalOffset = RectTransform.AbsoluteOffset;
             Mode = mode;
 
-            try
+            TopBar = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform, Anchor.TopCenter)
             {
-                TopBar = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform, Anchor.TopCenter)
-                {
-                    MinSize = new Point(0, DefaultHeaderHeight),
-                    MaxSize = new Point(int.MaxValue, DefaultHeaderHeight)
-                }, style: "GUIFrameBottom")
-                {
-                    CanBeFocused = false
-                };
-
-                Title = new GUITextBlock(new RectTransform(Vector2.One, TopBar.RectTransform), titleText, font: GUIStyle.LargeFont, textAlignment: Alignment.Center)
-                {
-                    CanBeFocused = false,
-                    Wrap = false
-                };
-
-                ToolBox = new GUILayoutGroup(new RectTransform(new Vector2(0.32f, 0.8f), TopBar.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true)
-                {
-                    Stretch = false,
-                    AbsoluteSpacing = 5,
-                    CanBeFocused = false
-                };
-
-                RightArea = new GUILayoutGroup(new RectTransform(new Vector2(0.2f, 0.8f), TopBar.RectTransform, Anchor.CenterRight) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true)
-                {
-                    Stretch = false,
-                    AbsoluteSpacing = 5,
-                    ChildAnchor = Anchor.CenterRight,
-                    CanBeFocused = false
-                };
-
-                SystemBox = new GUILayoutGroup(new RectTransform(new Vector2(0.4f, 1f), RightArea.RectTransform), isHorizontal: true, childAnchor: Anchor.CenterRight)
-                {
-                    Stretch = false,
-                    AbsoluteSpacing = 4,
-                    CanBeFocused = false
-                };
-
-                ControlBox = new GUILayoutGroup(new RectTransform(new Vector2(0.6f, 1f), RightArea.RectTransform), isHorizontal: true, childAnchor: Anchor.CenterRight)
-                {
-                    Stretch = false,
-                    AbsoluteSpacing = 5,
-                    CanBeFocused = false
-                };
-
-                if (buttons.HasFlag(WindowButtons.Close))
-                {
-                    CloseButton = CreateSystemButton("", "GUICancelButton", "sos.gen.close", "Close [Esc]", Close);
-                }
-
-                if (buttons.HasFlag(WindowButtons.Maximize))
-                {
-                    MaximizeButton = CreateSystemButton("M", "DeviceButton", "sos.window.maximize", "Maximize", ToggleMaximize);
-                }
-
-                if (buttons.HasFlag(WindowButtons.Minimize))
-                {
-                    MinimizeButton = CreateSystemButton("-", "DeviceButton", "sos.window.minimize", "Minimize", Minimize);
-                }
-
-                UpdateSystemBoxSize();
-
-                ContentArea = new GUIFrame(new RectTransform(new Point(0, 0), RectTransform, Anchor.TopLeft, isFixedSize: true)
-                {
-                    AbsoluteOffset = new Point(0, DefaultHeaderHeight)
-                }, style: null);
-
-                RectTransform.SizeChanged += ResizeContentArea;
-                ResizeContentArea();
-            }
-            catch (Exception ex)
+                MinSize = new Point(0, DefaultHeaderHeight),
+                MaxSize = new Point(int.MaxValue, DefaultHeaderHeight)
+            }, style: "GUIFrameBottom")
             {
-                Logger.LogDebugError($"[SOS] GUIWindow constructor failed\n{ex}", level: LogLevel.Error);
+                CanBeFocused = false
+            };
+
+            Title = new GUITextBlock(new RectTransform(Vector2.One, TopBar.RectTransform), titleText, font: GUIStyle.LargeFont, textAlignment: Alignment.Center)
+            {
+                CanBeFocused = false,
+                Wrap = false
+            };
+
+            ToolBox = new GUILayoutGroup(new RectTransform(new Vector2(0.32f, 0.8f), TopBar.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true)
+            {
+                Stretch = false,
+                AbsoluteSpacing = 5,
+                CanBeFocused = false
+            };
+
+            RightArea = new GUILayoutGroup(new RectTransform(new Vector2(0.2f, 0.8f), TopBar.RectTransform, Anchor.CenterRight) { AbsoluteOffset = new Point(10, 0) }, isHorizontal: true)
+            {
+                Stretch = false,
+                AbsoluteSpacing = 5,
+                ChildAnchor = Anchor.CenterRight,
+                CanBeFocused = false
+            };
+
+            SystemBox = new GUILayoutGroup(new RectTransform(new Vector2(0.4f, 1f), RightArea.RectTransform), isHorizontal: true, childAnchor: Anchor.CenterRight)
+            {
+                Stretch = false,
+                AbsoluteSpacing = 4,
+                CanBeFocused = false
+            };
+
+            ControlBox = new GUILayoutGroup(new RectTransform(new Vector2(0.6f, 1f), RightArea.RectTransform), isHorizontal: true, childAnchor: Anchor.CenterRight)
+            {
+                Stretch = false,
+                AbsoluteSpacing = 5,
+                CanBeFocused = false
+            };
+
+            if (buttons.HasFlag(WindowButtons.Close))
+            {
+                CloseButton = CreateSystemButton("", "GUICancelButton", "sos.gen.close", "Close [Esc]", Close);
             }
+
+            if (buttons.HasFlag(WindowButtons.Maximize))
+            {
+                MaximizeButton = CreateSystemButton("M", "DeviceButton", "sos.window.maximize", "Maximize", ToggleMaximize);
+            }
+
+            if (buttons.HasFlag(WindowButtons.Minimize))
+            {
+                MinimizeButton = CreateSystemButton("-", "DeviceButton", "sos.window.minimize", "Minimize", Minimize);
+            }
+
+            UpdateSystemBoxSize();
+
+            ContentArea = new GUIFrame(new RectTransform(new Point(0, 0), RectTransform, Anchor.TopLeft, isFixedSize: true)
+            {
+                AbsoluteOffset = new Point(0, DefaultHeaderHeight)
+            }, style: null);
+
+            RectTransform.SizeChanged += ResizeContentArea;
+            ResizeContentArea();
         }
 
         private GUIButton CreateSystemButton(string text, string style, string tooltipKey, string tooltipFallback, Action onClick)
