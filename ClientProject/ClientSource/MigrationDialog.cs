@@ -143,7 +143,6 @@ namespace SOS
                 }
 
                 // MedicalSim
-                // TODO: Agregar revisión sobre el config LuaCs del core sobre Dummy*, notificar migración pendiente, eliminar y transferir.
                 var simulator = root.Element("MedicalSim");
                 if (simulator != null)
                 {
@@ -162,46 +161,6 @@ namespace SOS
                     _ = uint.TryParse(tracker.Attribute("recipeHash")?.Value, out uint hash);
                     controller.Tracker.AddRecipe(targetId, hash);
                 }
-
-                //TODO: Layout [DEPRECATED]
-                /*var layout = root.Element("Layout");
-                if (layout != null)
-                {
-                    int winX = ParseInt(layout.Attribute("winX")?.Value, -1);
-                    int winY = ParseInt(layout.Attribute("winY")?.Value, -1);
-                    if (winX >= 0 && winY >= 0)
-                        controller.WindowPosition = new Point(winX, winY);
-
-                    int winW = ParseInt(layout.Attribute("winW")?.Value);
-                    int winH = ParseInt(layout.Attribute("winH")?.Value);
-                    if (winW > 0 && winH > 0)
-                        controller.WindowSize = new Point(winW, winH);
-
-                    int leftW = ParseInt(layout.Attribute("leftW")?.Value);
-                    if (leftW > 0) controller.LeftPanelWidth = leftW;
-
-                    int rightW = ParseInt(layout.Attribute("rightW")?.Value);
-                    if (rightW > 0) controller.RightPanelWidth = rightW;
-                }
-
-                // Layouts
-                var layouts = root.Element("Layouts")?.Elements("Preset");
-                if (layouts != null)
-                {
-                    controller.CustomLayouts.Clear();
-                    foreach (var l in layouts)
-                    {
-                        string name = l.Attribute("name")?.Value ?? "Unnamed";
-                        controller.CustomLayouts[name] = new SavedLayout
-                        {
-                            WindowSize = new Point(
-                                ParseInt(l.Attribute("winW")?.Value),
-                                ParseInt(l.Attribute("winH")?.Value)),
-                            LeftPanelWidth = ParseInt(l.Attribute("leftW")?.Value),
-                            RightPanelWidth = ParseInt(l.Attribute("rightW")?.Value)
-                        };
-                    }
-                }*/
 
                 // Restore last selected item
                 if (!string.IsNullOrEmpty(lastItemId))

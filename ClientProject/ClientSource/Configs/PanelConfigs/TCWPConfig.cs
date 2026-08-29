@@ -19,12 +19,10 @@ namespace SOS.Configs.TCWP
     //MARK: TCWPConfig
     internal sealed class TCWPConfig : ConfigDirtySaver, ISOSConfig
     {
-        public string Id => "SOS.Profile.Default3Column.Config";
-        public double Order => 0;
-
         internal readonly SortedDictionary<string, TPLayout> CustomLayouts = new(new Comparers.NaturalStringComparer());
 
-        private bool _presetsCollapsed = true; //TODO: Convertir a una opción de guardado oficial(Quizás?)
+        private bool _presetsCollapsed = false;
+        private bool _userPresetsCollapsed = true;
 
         private bool _loaded = false;
 
@@ -70,8 +68,9 @@ namespace SOS.Configs.TCWP
 
         public bool DrawSettings(GUIListBox container)
         {
-            using var l = new GUILayoutBuilder(container); // TODO: Convert to Accordion.
-            l.Header("LAYOUT PRESETS", Color.Gold);
+            using var a = new GUILayoutBuilder(container);
+            using var l = a.Accordion(a.Header("LAYOUT PRESETS", Color.Gold), collapsed: _presetsCollapsed, onToggle: (c) => _presetsCollapsed = c);
+
             l.Button("Minimal", () => ApplyPreset(500, 600, 0, 0));
             l.Button("Medium-List", () => ApplyPreset(850, 650, 220, 0));
             l.Button("Medium-Desc", () => ApplyPreset(850, 650, 0, 250));
@@ -80,7 +79,7 @@ namespace SOS.Configs.TCWP
             if (CustomLayouts.Count > 0)
             {
                 l.Separator();
-                using var acc = l.Accordion(l.Header("MY PRESETS", Color.Gold), collapsed: _presetsCollapsed, onToggle: (c) => _presetsCollapsed = c);
+                using var acc = l.Accordion(l.Header("MY PRESETS", Color.Gold), collapsed: _userPresetsCollapsed, onToggle: (c) => _userPresetsCollapsed = c);
                 foreach (var (k, v) in CustomLayouts)
                 {
                     acc.Button(k,

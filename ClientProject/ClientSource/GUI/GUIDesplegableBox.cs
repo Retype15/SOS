@@ -12,7 +12,6 @@ using SOS.Prefabs;
 
 namespace SOS.GUI
 {
-    //TODO: Generado por AI, sin revisar (WIP)
     public class GUIDesplegableBox
     {
         public GUIDesplegableBox(GUIComponent parent, Action<string> onBadgeClick, string labelText, IEnumerable<string> tags, IEnumerable<Prefab> items, Action<Prefab> onPrimary, Action<Prefab> onSecondary)

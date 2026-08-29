@@ -65,7 +65,7 @@ namespace SOS.GUI
             Visible = !_collapsed;
         }
 
-        public GUIAccordion(string title, RectTransform parent, string? tooltip, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
+        public GUIAccordion(string title, RectTransform parent, string? tooltip = null, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
             : this(CreateHeader(parent, title), parent, collapsed, onToggle, iconAnchor)
         {
             if (tooltip != null) _headerButton.ToolTip = tooltip.Rich();
