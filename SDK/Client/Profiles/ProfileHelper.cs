@@ -38,9 +38,9 @@ namespace SOS.Profiles
         public static void ClearTabHistory() => TabHistory.Clear();
 
         private static readonly List<Prefab> _history = [];
-        private static int _historyIndex = -1;
+        private static int _historyIndex = 0;
 
-        public static bool CanNavigateBack => _historyIndex > 0;
+        public static bool CanNavigateBack => _historyIndex > 0 && _historyIndex < _history.Count;
         public static bool CanNavigateForward => _historyIndex >= 0 && _historyIndex < _history.Count - 1;
 
         public static Prefab? PeekBack() => CanNavigateBack ? _history[_historyIndex - 1] : null;
@@ -86,15 +86,18 @@ namespace SOS.Profiles
 
         internal static void HistoryPush(Prefab? prefab)
         {
-            if (prefab == null || _isNavigating) return;
-
-            _history.Remove(prefab);
+            if (prefab == null || _isNavigating ||
+                (_historyIndex >= 0 && _historyIndex < _history.Count && _history[_historyIndex] == prefab)) return;
 
             if (CanNavigateForward)
                 _history.RemoveRange(_historyIndex + 1, _history.Count - _historyIndex - 1);
 
+            _history.Remove(prefab);
+
             _history.Add(prefab);
-            _historyIndex++;
+            _historyIndex = _history.Count - 1;
+
+            Logger.LogDebug($"Pushed '{prefab.Name()}' to History.", level: LogLevel.Trace);
         }
 
         private static void HistoryBack()
