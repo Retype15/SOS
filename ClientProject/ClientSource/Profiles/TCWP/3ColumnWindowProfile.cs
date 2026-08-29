@@ -674,7 +674,7 @@ namespace SOS.Profiles.TCWP
         //MARK: Navigation
 
         //TODO: Pasar al Helper.
-        private void UpdateNavigationButtonStates() //TODO: Añadir texto default para cuando el botón está Disabled(sin ningun item para moverse).
+        private void UpdateNavigationButtonStates()
         {
             if (btnBack != null)
             {
@@ -682,8 +682,9 @@ namespace SOS.Profiles.TCWP
                 if (btnBack.Enabled && ProfileHelper.PeekBack() is { } prevItem)
                 {
                     var (navBackName, _) = prevItem.SafeName(Color.White);
-                    btnBack.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.back", "Back")}: {navBackName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}".Rich();
+                    btnBack.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.back", "Back").SetColor(Color.Gold)}: {navBackName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}".Rich();
                 }
+                else btnBack.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.back", "Back").SetColor(Color.Gray)}\n{Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}".Rich();
             }
 
             if (btnForward != null)
@@ -692,8 +693,9 @@ namespace SOS.Profiles.TCWP
                 if (btnForward.Enabled && ProfileHelper.PeekForward() is { } nextItem)
                 {
                     var (navForwardName, _) = nextItem.SafeName(Color.White);
-                    btnForward.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.forward", "Forward")}: {navForwardName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}".Rich();
+                    btnForward.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.forward", "Forward").SetColor(Color.Gold)}: {navForwardName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}".Rich();
                 }
+                else btnForward.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.forward", "Forward").SetColor(Color.Gray)}\n{Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}".Rich();
             }
         }
 

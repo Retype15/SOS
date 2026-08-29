@@ -369,13 +369,13 @@ namespace SOS.Profiles
         {
             var back = new GUIButton(new RectTransform(new Point(32, 32), parent, isFixedSize: true), "", style: "GUIButtonToggleLeft")
             {
-                ToolTip = Texts.Get("sos.window.back", "Back").Value,
+                ToolTip = $"{Texts.Get("sos.window.back", "Back").SetColor(Color.Gray)}\n{Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}".Rich(),
                 OnClicked = (_, _) => { API.Emit(CommKeys.NavigateBack); return true; }
             };
             if (back.Children.FirstOrDefault() is GUIImage imgB) imgB.SpriteEffects = Microsoft.Xna.Framework.Graphics.SpriteEffects.FlipHorizontally;
             var forward = new GUIButton(new RectTransform(new Point(32, 32), parent, isFixedSize: true), "", style: "GUIButtonToggleRight")
             {
-                ToolTip = Texts.Get("sos.window.forward", "Forward").Value,
+                ToolTip = $"{Texts.Get("sos.window.forward", "Forward").SetColor(Color.Gray)}\n{Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}".Rich(),
                 OnClicked = (_, _) => { API.Emit(CommKeys.NavigateForward); return true; }
             };
             return (back, forward);
