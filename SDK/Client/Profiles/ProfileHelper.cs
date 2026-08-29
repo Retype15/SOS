@@ -176,6 +176,8 @@ namespace SOS.Profiles
                         ClampToParentBounds = true,
                         AllowedDirections = ResizeDirection.All
                     };
+                    _settingsWindow.Title.TextAlignment = Alignment.CenterLeft;
+                    _settingsWindow.Title.Padding = new Vector4(32, 0, 32, 0);
 
                     if (SettingsWindowPosition.X >= 0 && SettingsWindowPosition.Y >= 0)
                         _settingsWindow.RectTransform.AbsoluteOffset = SettingsWindowPosition;
@@ -183,9 +185,12 @@ namespace SOS.Profiles
                     _settingsWindow.OnClose += CloseSettings;
                     _settingsWindow.RectTransform.SizeChanged += OnSettingsWindowResized;
 
+                    var resetAllText = Texts.Get("sos.config.reset_all", "RESET ALL");
+                    int btnWidth = Math.Max(110, (int)GUIStyle.LargeFont.MeasureString(resetAllText).X);
+
                     var resetAllBtn = new GUIButton(
-                        new RectTransform(new Point(120, 32), _settingsWindow.ControlBox.RectTransform, isFixedSize: true), // TODO: Añadir medida automática por cantidad de caracteres.
-                        Texts.Get("sos.config.reset_all", "RESET ALL"),
+                        new RectTransform(new Point(btnWidth, 32), _settingsWindow.ControlBox.RectTransform, isFixedSize: true),
+                        resetAllText,
                         style: "DeviceButton")
                     {
                         Color = Color.IndianRed * 0.9f,
