@@ -38,7 +38,8 @@ namespace SOS.Configs
             ctr.Tracker.Visible = TrackerVisible;
 
             API.SetState<Prefab?>(CommKeys.SelectTarget, CurrentTarget);
-            ProfileHelper.HistoryPush(CurrentTarget);
+            if (CurrentTarget != null)
+                ProfileHelper.NavigationHistory.Push(CurrentTarget);
 
             _loaded = true;
         }

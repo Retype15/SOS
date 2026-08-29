@@ -157,13 +157,13 @@ namespace SOS
                         (PlayerInput.KeyHit(Keys.Right) && PlayerInput.IsAltDown()) ||
                         (PlayerInput.KeyHit(Keys.Back) && PlayerInput.IsShiftDown()) ||
                         PlayerInput.Mouse5ButtonClicked()
-                    ) CrossThread.RequestExecutionOnMainThread(() => ProfileHelper.NavigateForward());
+                    ) CrossThread.RequestExecutionOnMainThread(() => ProfileHelper.NavigationHistory.NavigateForward());
                     else if
                     (
                         (PlayerInput.KeyHit(Keys.Left) && PlayerInput.IsAltDown()) ||
                         PlayerInput.KeyHit(Keys.Back) ||
                         PlayerInput.Mouse4ButtonClicked()
-                    ) CrossThread.RequestExecutionOnMainThread(() => ProfileHelper.NavigateBack());
+                    ) CrossThread.RequestExecutionOnMainThread(() => ProfileHelper.NavigationHistory.NavigateBack());
                 }
 
                 ActiveProfile?.Update();

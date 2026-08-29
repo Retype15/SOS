@@ -37,16 +37,8 @@ namespace SOS.Profiles
 
         public static void ClearTabHistory() => TabHistory.Clear();
 
-        private static readonly List<Prefab> _history = [];
-        private static int _historyIndex = 0;
+        public static GUINavigationHistory<Prefab> NavigationHistory { get; private set; } = new(BGUI.Canvas);
 
-        public static bool CanNavigateBack => _historyIndex > 0 && _historyIndex < _history.Count;
-        public static bool CanNavigateForward => _historyIndex >= 0 && _historyIndex < _history.Count - 1;
-
-        public static Prefab? PeekBack() => CanNavigateBack ? _history[_historyIndex - 1] : null;
-        public static Prefab? PeekForward() => CanNavigateForward ? _history[_historyIndex + 1] : null;
-
-        private static bool _isNavigating = false;
         private static bool _subscribed = false;
 
         private const double HistoryOrder = EventPriority.State + 0.5;
@@ -54,21 +46,68 @@ namespace SOS.Profiles
         public static void Subscribe()
         {
             if (_subscribed) return;
-            API.On<Prefab?>(CommKeys.SelectTarget, HistoryPush, HistoryOrder);
-            API.On(CommKeys.NavigateBack, HistoryBack, HistoryOrder);
-            API.On(CommKeys.NavigateForward, HistoryForward, HistoryOrder);
+            API.On<Prefab?>(CommKeys.SelectTarget, OnSelectTarget, HistoryOrder);
             API.On<string>(CommKeys.ChangeProfile, RefreshSettings, EventPriority.PostUI);
+            API.On(CommKeys.CloseWindow, ClearParentForNavigationHistory, EventPriority.UI);
             _subscribed = true;
         }
 
         public static void Unsubscribe()
         {
             if (!_subscribed) return;
-            API.Off<Prefab?>(CommKeys.SelectTarget, HistoryPush, HistoryOrder);
-            API.Off(CommKeys.NavigateBack, HistoryBack, HistoryOrder);
-            API.Off(CommKeys.NavigateForward, HistoryForward, HistoryOrder);
+            API.Off<Prefab?>(CommKeys.SelectTarget, OnSelectTarget, HistoryOrder);
             API.Off<string>(CommKeys.ChangeProfile, RefreshSettings, EventPriority.PostUI);
+            API.Off(CommKeys.CloseWindow, ClearParentForNavigationHistory, EventPriority.UI);
             _subscribed = false;
+        }
+
+        public static GUIComponent CreateNavigationHistory(RectTransform parent)
+        {
+            var history = NavigationHistory.History;
+            var historyIndex = NavigationHistory.Index;
+
+            NavigationHistory = new(new(new(68, 32), parent, isFixedSize: true), history, historyIndex);
+
+            NavigationHistory.OnNavigateBack += SelectTarget;
+            NavigationHistory.OnNavigateForward += SelectTarget;
+
+            NavigationHistory.OnChangeToolTipBack = static (prefab) =>
+            {
+                var text = Texts.Get("sos.window.back", "Back");
+                var info = Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4");
+                if (prefab == null)
+                    return $"{text.SetColor(Color.Gray)}\n{info}".Rich();
+
+                var (name, color) = prefab.SafeName(Color.BlueViolet);
+                return $"{text.SetColor(Color.Gold)}: {name.SetColor(color)}\n{info}".Rich();
+
+            };
+
+            NavigationHistory.OnChangeToolTipForward = static (prefab) =>
+            {
+                var text = Texts.Get("sos.window.forward", "Forward");
+                var info = Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5");
+                if (prefab == null)
+                    return $"{text.SetColor(Color.Gray)}\n{info}".Rich();
+
+                var (name, color) = prefab.SafeName(Color.BlueViolet);
+                return $"{text.SetColor(Color.Gold)}: {name.SetColor(color)}\n{info}".Rich();
+            };
+
+            NavigationHistory.UpdateButtonStates();
+
+            Logger.LogDebug($"New instance for NavigationHistory created.", level: LogLevel.Trace);
+            return NavigationHistory;
+        }
+
+        public static void ClearParentForNavigationHistory()
+        {
+            NavigationHistory.RectTransform = BGUI.Canvas;
+        }
+
+        private static void OnSelectTarget(Prefab? prefab)
+        {
+            NavigationHistory?.Push(prefab);
         }
 
         public static void Update()
@@ -83,46 +122,8 @@ namespace SOS.Profiles
             if (cur == item) return;
             API.Emit(CommKeys.SelectTarget, item);
         }
-        public static void NavigateBack() => API.Emit(CommKeys.NavigateBack);
-        public static void NavigateForward() => API.Emit(CommKeys.NavigateForward);
 
-        internal static void HistoryPush(Prefab? prefab)
-        {
-            if (prefab == null || _isNavigating ||
-                (_historyIndex >= 0 && _historyIndex < _history.Count && _history[_historyIndex] == prefab)) return;
-
-            if (CanNavigateForward)
-                _history.RemoveRange(_historyIndex + 1, _history.Count - _historyIndex - 1);
-
-            _history.Remove(prefab);
-
-            _history.Add(prefab);
-            _historyIndex = _history.Count - 1;
-
-            Logger.LogDebug($"Pushed '{prefab.Name()}' to History.", level: LogLevel.Trace);
-        }
-
-        private static void HistoryBack()
-        {
-            if (!CanNavigateBack) return;
-            _historyIndex--;
-            var prev = _history[_historyIndex];
-            _isNavigating = true;
-            API.Emit(CommKeys.SelectTarget, prev);
-            _isNavigating = false;
-        }
-
-        private static void HistoryForward()
-        {
-            if (!CanNavigateForward) return;
-            _historyIndex++;
-            var next = _history[_historyIndex];
-            _isNavigating = true;
-            API.Emit(CommKeys.SelectTarget, next);
-            _isNavigating = false;
-        }
-
-        public static void SelectTarget(Prefab target)
+        public static void SelectTarget(Prefab? target)
         {
             var cur = API.GetState<Prefab?>(CommKeys.SelectTarget);
             if (cur != target)
@@ -366,22 +367,6 @@ namespace SOS.Profiles
             if (availableWidth <= 0 || configCount <= 0) return 1;
             int maxColumnsByWidth = (int)Math.Floor(availableWidth / minColumnWidth);
             return Math.Max(1, Math.Min(configCount, maxColumnsByWidth));
-        }
-
-        public static (GUIButton back, GUIButton forward) CreateNavigationButtons(RectTransform parent)
-        {
-            var back = new GUIButton(new RectTransform(new Point(32, 32), parent, isFixedSize: true), "", style: "GUIButtonToggleLeft")
-            {
-                ToolTip = $"{Texts.Get("sos.window.back", "Back").SetColor(Color.Gray)}\n{Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}".Rich(),
-                OnClicked = (_, _) => { API.Emit(CommKeys.NavigateBack); return true; }
-            };
-            if (back.Children.FirstOrDefault() is GUIImage imgB) imgB.SpriteEffects = Microsoft.Xna.Framework.Graphics.SpriteEffects.FlipHorizontally;
-            var forward = new GUIButton(new RectTransform(new Point(32, 32), parent, isFixedSize: true), "", style: "GUIButtonToggleRight")
-            {
-                ToolTip = $"{Texts.Get("sos.window.forward", "Forward").SetColor(Color.Gray)}\n{Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}".Rich(),
-                OnClicked = (_, _) => { API.Emit(CommKeys.NavigateForward); return true; }
-            };
-            return (back, forward);
         }
 
         public static GUITabWidget CreateTabWidget(RectTransform parent, IEnumerable<ITab> tabs)

@@ -34,9 +34,6 @@ namespace SOS.Profiles.TCWP
         private GUIFrame? leftContainer;
         private GUIListBox? itemList;
         private GUITextBox? searchBox;
-        private GUIButton? btnBack;
-        private GUIButton? btnForward;
-        private GUIButton? btnSettings;
 
         // Center panel
         private GUIFrame? centerPanel;
@@ -271,8 +268,6 @@ namespace SOS.Profiles.TCWP
 
             if (xmlContentText != null)
                 xmlContentText.Text = ProfileHelper.GetRawXMLSafe(target).FormatToXMLCode();
-
-            UpdateNavigationButtonStates();
         }
 
         private void OnSetSearchFilter(string tag)
@@ -366,8 +361,8 @@ namespace SOS.Profiles.TCWP
             var ctrl = SOSController.Instance;
             var cfg = CoreConfig.Instance;
 
-            btnSettings = ProfileHelper.CreateSettingsButton(ToolBox.RectTransform);
-            (btnBack, btnForward) = ProfileHelper.CreateNavigationButtons(ToolBox.RectTransform);
+            ProfileHelper.CreateSettingsButton(ToolBox.RectTransform);
+            ProfileHelper.CreateNavigationHistory(ToolBox.RectTransform);
 
             var text = Texts.Get("sos.window.manage_hud", "MANAGE HUD");
             _ = new GUIButton(new RectTransform(new Point(text.Length * 12, 32), ControlBox.RectTransform, isFixedSize: true), text, style: "DeviceButton")
@@ -671,34 +666,6 @@ namespace SOS.Profiles.TCWP
         }
 
         #endregion
-
-        //MARK: Navigation
-
-        //TODO: Pasar al Helper.
-        private void UpdateNavigationButtonStates()
-        {
-            if (btnBack != null)
-            {
-                btnBack.Enabled = ProfileHelper.CanNavigateBack;
-                if (btnBack.Enabled && ProfileHelper.PeekBack() is { } prevItem)
-                {
-                    var (navBackName, _) = prevItem.SafeName(Color.White);
-                    btnBack.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.back", "Back").SetColor(Color.Gold)}: {navBackName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}".Rich();
-                }
-                else btnBack.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.back", "Back").SetColor(Color.Gray)}\n{Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4")}".Rich();
-            }
-
-            if (btnForward != null)
-            {
-                btnForward.Enabled = ProfileHelper.CanNavigateForward;
-                if (btnForward.Enabled && ProfileHelper.PeekForward() is { } nextItem)
-                {
-                    var (navForwardName, _) = nextItem.SafeName(Color.White);
-                    btnForward.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.forward", "Forward").SetColor(Color.Gold)}: {navForwardName.SetColor(Color.BlueViolet)}\n{Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}".Rich();
-                }
-                else btnForward.OnDrawToolTip = component => component.ToolTip = $"{Texts.Get("sos.window.forward", "Forward").SetColor(Color.Gray)}\n{Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5")}".Rich();
-            }
-        }
 
         #region Layout
 

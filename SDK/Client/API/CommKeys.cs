@@ -16,8 +16,6 @@ namespace SOS
         public static string SelectTarget => "SelectTarget";
         public static string ChangeProfile => "ChangeProfile";
         public static string ApplyLayout => "ApplyLayout";
-        public static string NavigateBack => "NavigateBack";
-        public static string NavigateForward => "NavigateForward";
         public static string RefreshSearch => "RefreshSearch";
         public static string ToggleWindow => "ToggleWindow";
         public static string OpenWindow => "OpenWindow";
