@@ -10,7 +10,7 @@ using SOS.GUI;
 
 namespace SOS.Prefabs.Item
 {
-    [AutoRegister("ItemPrefab", 1)]
+    [AutoRegister("SOS.ItemPrefab", 1)]
     public sealed class ItemPrefabProvider : ISOSPrefab
     {
         public Type PrefabType => typeof(ItemPrefab);

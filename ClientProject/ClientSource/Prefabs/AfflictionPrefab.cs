@@ -9,7 +9,7 @@ using Barotrauma;
 
 namespace SOS.Prefabs.Affliction
 {
-    [AutoRegister("AfflictionPrefab", 2)]
+    [AutoRegister("SOS.AfflictionPrefab", 2)]
     public sealed class AfflictionPrefabProvider : ISOSPrefab
     {
         public Type PrefabType => typeof(AfflictionPrefab);
@@ -62,7 +62,7 @@ namespace SOS.Prefabs.Affliction
         }
     }
 
-    [AutoRegister("AfflictionPrefabHusk", 2.5)]
+    [AutoRegister("SOS.AfflictionPrefabHusk", 2.5)]
     public sealed class AfflictionPrefabHuskProvider : ISOSPrefab
     {
         public Type PrefabType => typeof(AfflictionPrefabHusk);
