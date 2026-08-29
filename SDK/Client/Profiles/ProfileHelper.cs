@@ -57,6 +57,7 @@ namespace SOS.Profiles
             API.On<Prefab?>(CommKeys.SelectTarget, HistoryPush, HistoryOrder);
             API.On(CommKeys.NavigateBack, HistoryBack, HistoryOrder);
             API.On(CommKeys.NavigateForward, HistoryForward, HistoryOrder);
+            API.On<string>(CommKeys.ChangeProfile, RefreshSettings, EventPriority.PostUI);
             _subscribed = true;
         }
 
@@ -66,6 +67,7 @@ namespace SOS.Profiles
             API.Off<Prefab?>(CommKeys.SelectTarget, HistoryPush, HistoryOrder);
             API.Off(CommKeys.NavigateBack, HistoryBack, HistoryOrder);
             API.Off(CommKeys.NavigateForward, HistoryForward, HistoryOrder);
+            API.Off<string>(CommKeys.ChangeProfile, RefreshSettings, EventPriority.PostUI);
             _subscribed = false;
         }
 
@@ -254,8 +256,9 @@ namespace SOS.Profiles
             ConfigHelper.SaveConfigs();
         }
 
-        public static void RefreshSettings()
+        public static void RefreshSettings(string profile = "")
         {
+            if (!IsSettingsOpen) return;
             Logger.LogDebug("ProfileHelper.RefreshSettings: start in-place refresh", level: LogLevel.Trace);
             try
             {
