@@ -37,41 +37,61 @@ namespace SOS.Profiles
 
         public static void ClearTabHistory() => TabHistory.Clear();
 
-        public static GUINavigationHistory<Prefab> NavigationHistory { get; private set; } = new(BGUI.Canvas);
+        private static GUINavigationHistory<Prefab> navigationHistory = new(BGUI.Canvas);
 
         private static bool _subscribed = false;
 
         private const double HistoryOrder = EventPriority.State + 0.5;
 
+        #region Subscribers
+
         public static void Subscribe()
         {
             if (_subscribed) return;
-            API.On<Prefab?>(CommKeys.SelectTarget, OnSelectTarget, HistoryOrder);
-            API.On<string>(CommKeys.ChangeProfile, RefreshSettings, EventPriority.PostUI);
+
+            // Navigation History
+            API.On<Prefab?>(CommKeys.SelectTarget, PushNavigationHistory, HistoryOrder);
+            API.On(CommKeys.NavigateBack, NavigateBack, HistoryOrder);
+            API.On(CommKeys.NavigateForward, NavigateForward, HistoryOrder);
             API.On(CommKeys.CloseWindow, ClearParentForNavigationHistory, EventPriority.UI);
+
+            // Settings
+            API.On<string>(CommKeys.ChangeProfile, RefreshSettings, EventPriority.PostUI);
+
             _subscribed = true;
         }
 
         public static void Unsubscribe()
         {
             if (!_subscribed) return;
-            API.Off<Prefab?>(CommKeys.SelectTarget, OnSelectTarget, HistoryOrder);
-            API.Off<string>(CommKeys.ChangeProfile, RefreshSettings, EventPriority.PostUI);
+
+            // Navigation History
+            API.Off<Prefab?>(CommKeys.SelectTarget, PushNavigationHistory, HistoryOrder);
+            API.Off(CommKeys.NavigateBack, NavigateBack, HistoryOrder);
+            API.Off(CommKeys.NavigateForward, NavigateForward, HistoryOrder);
             API.Off(CommKeys.CloseWindow, ClearParentForNavigationHistory, EventPriority.UI);
+
+            // Settings
+            API.Off<string>(CommKeys.ChangeProfile, RefreshSettings, EventPriority.PostUI);
+
             _subscribed = false;
         }
 
-        public static GUIComponent CreateNavigationHistory(RectTransform parent)
+        #endregion
+
+        #region Navigation History
+
+        public static GUIComponent CreateNavigationHistoryButtons(RectTransform parent)
         {
-            var history = NavigationHistory.History;
-            var historyIndex = NavigationHistory.Index;
+            var history = navigationHistory.History;
+            var historyIndex = navigationHistory.Index;
 
-            NavigationHistory = new(new(new(68, 32), parent, isFixedSize: true), history, historyIndex);
+            navigationHistory = new(new(new(68, 32), parent, isFixedSize: true), history, historyIndex);
 
-            NavigationHistory.OnNavigateBack += SelectTarget;
-            NavigationHistory.OnNavigateForward += SelectTarget;
+            navigationHistory.OnNavigateBack += SelectTarget;
+            navigationHistory.OnNavigateForward += SelectTarget;
 
-            NavigationHistory.OnChangeToolTipBack = static (prefab) =>
+            navigationHistory.OnChangeToolTipBack = static (prefab) =>
             {
                 var text = Texts.Get("sos.window.back", "Back");
                 var info = Texts.Get("sos.window.back.shortcuts", "Shortcuts:\n- Alt + Left Arrow\n- Backspace\n- Mouse 4");
@@ -83,7 +103,7 @@ namespace SOS.Profiles
 
             };
 
-            NavigationHistory.OnChangeToolTipForward = static (prefab) =>
+            navigationHistory.OnChangeToolTipForward = static (prefab) =>
             {
                 var text = Texts.Get("sos.window.forward", "Forward");
                 var info = Texts.Get("sos.window.forward.shortcuts", "Shortcuts:\n- Alt + Right Arrow\n- Shift + Backspace\n- Mouse 5");
@@ -94,21 +114,24 @@ namespace SOS.Profiles
                 return $"{text.SetColor(Color.Gold)}: {name.SetColor(color)}\n{info}".Rich();
             };
 
-            NavigationHistory.UpdateButtonStates();
+            navigationHistory.UpdateButtonStates();
 
-            Logger.LogDebug($"New instance for NavigationHistory created.", level: LogLevel.Trace);
-            return NavigationHistory;
+            Logger.LogDebug($"New instance for navigationHistory created.", level: LogLevel.Trace);
+            return navigationHistory;
         }
 
-        public static void ClearParentForNavigationHistory()
+        private static void PushNavigationHistory(Prefab? prefab) => navigationHistory.Push(prefab);
+
+        private static void NavigateBack() => navigationHistory.NavigateBack();
+
+        private static void NavigateForward() => navigationHistory.NavigateForward();
+
+        private static void ClearParentForNavigationHistory()
         {
-            NavigationHistory.RectTransform = BGUI.Canvas;
+            navigationHistory.RectTransform = null;
         }
 
-        private static void OnSelectTarget(Prefab? prefab)
-        {
-            NavigationHistory?.Push(prefab);
-        }
+        #endregion
 
         public static void Update()
         {

@@ -37,9 +37,7 @@ namespace SOS.Configs
             ctr.Tracker.FromCsv(TrackedRecipesRaw);
             ctr.Tracker.Visible = TrackerVisible;
 
-            API.SetState<Prefab?>(CommKeys.SelectTarget, CurrentTarget);
-            if (CurrentTarget != null)
-                ProfileHelper.NavigationHistory.Push(CurrentTarget);
+            API.Emit<Prefab?>(CommKeys.SelectTarget, CurrentTarget);
 
             _loaded = true;
         }

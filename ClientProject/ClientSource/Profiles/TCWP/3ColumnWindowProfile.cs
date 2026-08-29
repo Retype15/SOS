@@ -362,7 +362,7 @@ namespace SOS.Profiles.TCWP
             var cfg = CoreConfig.Instance;
 
             ProfileHelper.CreateSettingsButton(ToolBox.RectTransform);
-            ProfileHelper.CreateNavigationHistory(ToolBox.RectTransform);
+            ProfileHelper.CreateNavigationHistoryButtons(ToolBox.RectTransform);
 
             var text = Texts.Get("sos.window.manage_hud", "MANAGE HUD");
             _ = new GUIButton(new RectTransform(new Point(text.Length * 12, 32), ControlBox.RectTransform, isFixedSize: true), text, style: "DeviceButton")
