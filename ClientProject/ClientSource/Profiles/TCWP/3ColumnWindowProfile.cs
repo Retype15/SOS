@@ -254,12 +254,13 @@ namespace SOS.Profiles.TCWP
 
             ProfileHelper.UpdateTabWidget(centerTabWidget, target, OnPrimary, OnSecondary);
 
+            bool hasDrawed = false;
+
             foreach (var section in API.GetAllSections())
             {
                 try
                 {
-                    if (section.Analyze(target))
-                        section.Draw(metaPanel, OnPrimary, OnSecondary);
+                    hasDrawed |= section.Draw(metaPanel, target, OnPrimary, OnSecondary);
                 }
                 catch (Exception ex)
                 {

@@ -16,60 +16,9 @@ namespace SOS.StatSections
     [AutoRegister(order: 0)]
     public class GeneralSection : ISOSStatSection
     {
-        private Prefab? prefab;
-
-        private string cargoBox = "";
-        private readonly List<string> hazards = [];
-
-        private bool isBuff;
-        private float activationThreshold;
-        private float treatmentThreshold;
-        private float scannerThreshold;
-        private float iconThreshold;
-        private float baseHealCost;
-        private float healMultiplier;
-        private float medSkillGain;
-        private string causeOfDeath = "";
-
-        public bool Analyze(Prefab prefab)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            this.prefab = prefab;
-            switch (prefab)
-            {
-                case ItemPrefab item:
-                    if (item.ConfigElement != null)
-                    {
-                        cargoBox = item.ConfigElement.GetAttributeString("cargocontaineridentifier", "");
-                        foreach (var child in item.ConfigElement.Descendants())
-                        {
-                            string n = child.Name.ToString().ToLowerInvariant();
-                            if (n == "fire") hazards.Add(Texts.Get("sos.item.causes_fire", "Causes Fire").Value);
-                            if (n == "statuseffect" && child.GetAttributeFloat("oxygen", 0f) < -100f) hazards.Add(Texts.Get("sos.item.drains_oxygen", "Drains Oxygen").Value);
-                        }
-                    }
-                    break;
-                case AfflictionPrefab affliction:
-                    isBuff = affliction.IsBuff;
-                    scannerThreshold = affliction.ShowInHealthScannerThreshold;
-                    iconThreshold = affliction.ShowIconThreshold;
-                    baseHealCost = affliction.BaseHealCost;
-                    healMultiplier = affliction.HealCostMultiplier;
-                    medSkillGain = affliction.MedicalSkillGain;
-
-                    if (affliction.configElement != null)
-                    {
-                        activationThreshold = affliction.configElement.GetAttributeFloat("activationthreshold", 0f);
-                        treatmentThreshold = affliction.configElement.GetAttributeFloat("treatmentthreshold", 0f);
-                        causeOfDeath = affliction.configElement.GetAttributeString("causeofdeathdescription", "");
-                    }
-                    break;
-            }
-            return prefab != null;
-        }
-
-        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
-            if (prefab == null) return;
+            if (prefab == null) return false;
 
             using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_general", "GENERAL").Value, Color.Gold);
@@ -83,13 +32,46 @@ namespace SOS.StatSections
             {
                 if (!item.Aliases.IsEmpty) l.BadgeRow(Texts.Get("sos.item.aliases", "Aliases:").Value, item.Aliases, onSearchFilter: SectionHelper.SetSearchFilter);
                 l.BadgeRow(Texts.Get("sos.item.category", "Category:").Value, item.Category.ToString().Split(','), filterPrefix: '#', onSearchFilter: SectionHelper.SetSearchFilter);
-                if (!string.IsNullOrEmpty(cargoBox)) l.SelectorRow(Texts.Get("sos.item.cargo_box", "Cargo Box:").Value, [cargoBox], onPrimary: onPrimary, onSecondary: onSecondary, onSearchFilter: SectionHelper.SetSearchFilter);
+
+                if (item.ConfigElement != null)
+                {
+                    string cargoBox = item.ConfigElement.GetAttributeString("cargocontaineridentifier", "");
+                    if (!string.IsNullOrEmpty(cargoBox))
+                        l.SelectorRow(Texts.Get("sos.item.cargo_box", "Cargo Box:").Value, [cargoBox], onPrimary: onPrimary, onSecondary: onSecondary, onSearchFilter: SectionHelper.SetSearchFilter);
+
+                    var hazards = new List<string>();
+                    foreach (var child in item.ConfigElement.Descendants())
+                    {
+                        string n = child.Name.ToString().ToLowerInvariant();
+                        if (n == "fire") hazards.Add(Texts.Get("sos.item.causes_fire", "Causes Fire").Value);
+                        if (n == "statuseffect" && child.GetAttributeFloat("oxygen", 0f) < -100f) hazards.Add(Texts.Get("sos.item.drains_oxygen", "Drains Oxygen").Value);
+                    }
+                    if (hazards.Count > 0) l.BadgeRow(Texts.Get("sos.item.hazards", "Hazards:").Value, hazards, onSearchFilter: SectionHelper.SetSearchFilter);
+                }
+
                 l.Row(Texts.Get("sos.item.max_stack", "Max Stack:").Value, item.MaxStackSize.ToString(), Color.White);
-                if (hazards.Count > 0) l.BadgeRow(Texts.Get("sos.item.hazards", "Hazards:").Value, hazards, onSearchFilter: SectionHelper.SetSearchFilter);
                 l.BadgeRow(Texts.Get("sos.item.tags", "TAGS:").Value, item.Tags.Select(t => t.Value), filterPrefix: '$', onSearchFilter: SectionHelper.SetSearchFilter);
             }
             else if (prefab is AfflictionPrefab aff)
             {
+                bool isBuff = aff.IsBuff;
+                float scannerThreshold = aff.ShowInHealthScannerThreshold;
+                float iconThreshold = aff.ShowIconThreshold;
+                float baseHealCost = aff.BaseHealCost;
+                float healMultiplier = aff.HealCostMultiplier;
+                float medSkillGain = aff.MedicalSkillGain;
+
+                float activationThreshold = 0f;
+                float treatmentThreshold = 0f;
+                string causeOfDeath = "";
+
+                if (aff.configElement != null)
+                {
+                    activationThreshold = aff.configElement.GetAttributeFloat("activationthreshold", 0f);
+                    treatmentThreshold = aff.configElement.GetAttributeFloat("treatmentthreshold", 0f);
+                    causeOfDeath = aff.configElement.GetAttributeString("causeofdeathdescription", "");
+                }
+
                 l.Row(Texts.Get("sos.affliction.classification", "Classification:").Value, isBuff ? Texts.Get("sos.affliction.buff", "Buff").Value : Texts.Get("sos.affliction.debuff", "Debuff").Value, isBuff ? Color.LightGreen : Color.Salmon);
                 l.BadgeRow(Texts.Get("sos.affliction.type", "Type:").Value, [aff.AfflictionType.ToString()], filterPrefix: '#', onSearchFilter: SectionHelper.SetSearchFilter);
                 l.Row(Texts.Get("sos.affliction.max_strength", "Max Strength:").Value, aff.MaxStrength.ToValue(), Color.White);
@@ -110,6 +92,7 @@ namespace SOS.StatSections
                 if (!string.IsNullOrEmpty(causeOfDeath))
                     l.RichText($"{Texts.Get("sos.affliction.death_cause", "Death Cause:").Value} {causeOfDeath}".SetColor(Color.Crimson));
             }
+            return true;
         }
     }
 
@@ -117,31 +100,21 @@ namespace SOS.StatSections
     [AutoRegister(order: 1)]
     public class EconomySection : ISOSStatSection
     {
-        private int price;
-        private bool canBuy;
-        private bool canSell;
-        private int minDifficulty;
-        private Identifier requiredFaction = Identifier.Empty;
-
-        public bool Analyze(Prefab prefab)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            if (prefab is ItemPrefab item)
-            {
-                var priceInfo = item.DefaultPrice;
-                if (priceInfo != null)
-                {
-                    price = priceInfo.Price;
-                    canBuy = item.CanBeBought;
-                    canSell = item.CanBeSold;
-                    minDifficulty = priceInfo.MinLevelDifficulty;
-                    requiredFaction = priceInfo.RequiredFaction;
-                }
-            }
-            return price > 0 || canBuy;
-        }
+            if (prefab is not ItemPrefab item) return false;
 
-        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
+            var priceInfo = item.DefaultPrice;
+            if (priceInfo == null) return false;
+
+            int price = priceInfo.Price;
+            bool canBuy = item.CanBeBought;
+            bool canSell = item.CanBeSold;
+            int minDifficulty = priceInfo.MinLevelDifficulty;
+            Identifier requiredFaction = priceInfo.RequiredFaction;
+
+            if (price <= 0 && !canBuy) return false;
+
             using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_economy", "ECONOMY").Value, Color.Gold);
 
@@ -163,6 +136,7 @@ namespace SOS.StatSections
                 string factionName = TextManager.Get("FactionName." + requiredFaction).Fallback(requiredFaction.Value).Value;
                 l.BadgeRow(Texts.Get("sos.item.required_faction", "Required Faction:").Value, [factionName], onSearchFilter: SectionHelper.SetSearchFilter);
             }
+            return true;
         }
     }
 
@@ -170,120 +144,92 @@ namespace SOS.StatSections
     [AutoRegister(order: 2)]
     public class WeaponSection : ISOSStatSection
     {
-        private float penetration = 0f;
-        private int maxTargets = 1;
-        private int projectileCount = 1;
-        private float structureDamage = 0f;
-        private float itemDamage = 0f;
-        private float reload = 0f;
-        private float range = 0f;
-        private float explosionRange = 0f;
-        private float powerUse = 0f;
-        private bool isAutomatic = false;
-        private float spread = 0f;
-        private float dmgModifier = 1f;
-        private float severProb = 0f;
-        private bool isThrowable = false;
-
-        private readonly List<AfflictionData> afflictions = [];
-
-        private class AfflictionData
+        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            internal string Identifier = "";
-            internal string Name = "";
-            internal float Strength;
-            internal float Probability;
-        }
+            if (prefab is not ItemPrefab item || item.ConfigElement == null) return false;
 
-        public bool Analyze(Prefab prefab)
-        {
-            if (prefab is ItemPrefab item)
+            float penetration = 0f;
+            int maxTargets = 1;
+            int projectileCount = 1;
+            float structureDamage = 0f;
+            float itemDamage = 0f;
+            float reload = 0f;
+            float range = 0f;
+            float explosionRange = 0f;
+            float powerUse = 0f;
+            bool isAutomatic = false;
+            float spread = 0f;
+            float dmgModifier = 1f;
+            float severProb = 0f;
+            bool isThrowable = false;
+
+            var afflictions = new List<AfflictionData>();
+
+            foreach (var element in item.ConfigElement.Descendants())
             {
+                string n = element.Name.ToString().ToLowerInvariant();
 
-                if (item.ConfigElement == null) return false;
-
-                foreach (var element in item.ConfigElement.Descendants())
+                if (n == "rangedweapon" || n == "meleeweapon" || n == "meleehandheld" || n == "projectile" || n == "weapon")
                 {
-                    string n = element.Name.ToString().ToLowerInvariant();
+                    reload = element.GetAttributeFloat("reload", reload);
+                    range = element.GetAttributeFloat("range", range);
+                    powerUse = element.GetAttributeFloat("powerconsumption", powerUse);
+                    spread = Math.Max(spread, element.GetAttributeFloat("spread", 0f));
+                    dmgModifier = element.GetAttributeFloat("weapondamagemodifier", dmgModifier);
+                    penetration = Math.Max(penetration, element.GetAttributeFloat("penetration", 0f));
 
-                    if (n == "rangedweapon" || n == "meleeweapon" || n == "meleehandheld" || n == "projectile" || n == "weapon")
+                    if (n == "projectile")
                     {
-                        reload = element.GetAttributeFloat("reload", reload);
-                        range = element.GetAttributeFloat("range", range);
-                        powerUse = element.GetAttributeFloat("powerconsumption", powerUse);
-                        spread = Math.Max(spread, element.GetAttributeFloat("spread", 0f));
-                        dmgModifier = element.GetAttributeFloat("weapondamagemodifier", dmgModifier);
-                        penetration = Math.Max(penetration, element.GetAttributeFloat("penetration", 0f));
-
-                        if (n == "projectile")
-                        {
-                            maxTargets = Math.Max(maxTargets, element.GetAttributeInt("maxtargetstohit", 1));
-                            int pCount = element.GetAttributeInt("projectilecount", 1);
-                            if (pCount == 1) pCount = element.GetAttributeInt("hitscancount", 1);
-                            projectileCount = Math.Max(projectileCount, pCount);
-                        }
-
-                        if (element.GetAttributeBool("holdtrigger", false)) isAutomatic = true;
+                        maxTargets = Math.Max(maxTargets, element.GetAttributeInt("maxtargetstohit", 1));
+                        int pCount = element.GetAttributeInt("projectilecount", 1);
+                        if (pCount == 1) pCount = element.GetAttributeInt("hitscancount", 1);
+                        projectileCount = Math.Max(projectileCount, pCount);
                     }
 
-                    if (n == "explosion")
-                    {
-                        explosionRange = Math.Max(explosionRange, element.GetAttributeFloat("range", 0f));
-                        structureDamage = Math.Max(structureDamage, element.GetAttributeFloat("structuredamage", 0f));
-                        itemDamage = Math.Max(itemDamage, element.GetAttributeFloat("itemdamage", 0f));
-                        severProb = Math.Max(severProb, element.GetAttributeFloat("severlimbsprobability", 0f));
-
-                        foreach (var aff in element.Elements().Where(e => e.Name.ToString().Equals("affliction", StringComparison.OrdinalIgnoreCase)))
-                        {
-                            ParseAffliction(aff, 1.0f);
-                        }
-                    }
-
-                    if (n == "attack")
-                    {
-                        structureDamage = Math.Max(structureDamage, element.GetAttributeFloat("structuredamage", 0f));
-                        itemDamage = Math.Max(itemDamage, element.GetAttributeFloat("itemdamage", 0f));
-                        severProb = Math.Max(severProb, element.GetAttributeFloat("severlimbsprobability", 0f));
-                        penetration = Math.Max(penetration, element.GetAttributeFloat("penetration", 0f));
-
-                        foreach (var aff in element.Elements().Where(e => e.Name.ToString().Equals("affliction", StringComparison.OrdinalIgnoreCase)))
-                        {
-                            ParseAffliction(aff, 1.0f);
-                        }
-                    }
-
-                    if (n == "statuseffect")
-                    {
-                        float prob = element.GetAttributeFloat("probability", 1.0f);
-                        foreach (var aff in element.Elements().Where(e => e.Name.ToString().Equals("affliction", StringComparison.OrdinalIgnoreCase)))
-                        {
-                            ParseAffliction(aff, prob);
-                        }
-                    }
-
-                    if (n == "throwable") isThrowable = true;
+                    if (element.GetAttributeBool("holdtrigger", false)) isAutomatic = true;
                 }
+
+                if (n == "explosion")
+                {
+                    explosionRange = Math.Max(explosionRange, element.GetAttributeFloat("range", 0f));
+                    structureDamage = Math.Max(structureDamage, element.GetAttributeFloat("structuredamage", 0f));
+                    itemDamage = Math.Max(itemDamage, element.GetAttributeFloat("itemdamage", 0f));
+                    severProb = Math.Max(severProb, element.GetAttributeFloat("severlimbsprobability", 0f));
+
+                    foreach (var aff in element.Elements().Where(e => e.Name.ToString().Equals("affliction", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        ParseAffliction(aff, 1.0f, afflictions);
+                    }
+                }
+
+                if (n == "attack")
+                {
+                    structureDamage = Math.Max(structureDamage, element.GetAttributeFloat("structuredamage", 0f));
+                    itemDamage = Math.Max(itemDamage, element.GetAttributeFloat("itemdamage", 0f));
+                    severProb = Math.Max(severProb, element.GetAttributeFloat("severlimbsprobability", 0f));
+                    penetration = Math.Max(penetration, element.GetAttributeFloat("penetration", 0f));
+
+                    foreach (var aff in element.Elements().Where(e => e.Name.ToString().Equals("affliction", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        ParseAffliction(aff, 1.0f, afflictions);
+                    }
+                }
+
+                if (n == "statuseffect")
+                {
+                    float prob = element.GetAttributeFloat("probability", 1.0f);
+                    foreach (var aff in element.Elements().Where(e => e.Name.ToString().Equals("affliction", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        ParseAffliction(aff, prob, afflictions);
+                    }
+                }
+
+                if (n == "throwable") isThrowable = true;
             }
-            return afflictions.Count > 0 || penetration > 0 || structureDamage > 0 || itemDamage > 0 || reload > 0 || isThrowable || explosionRange > 0;
-        }
 
-        private void ParseAffliction(XElement element, float prob)
-        {
-            string id = element.GetAttributeString("identifier", "");
-            float strength = element.GetAttributeFloat("strength", 0f);
-            if (strength <= 0 || string.IsNullOrEmpty(id)) return;
+            if (afflictions.Count == 0 && penetration <= 0 && structureDamage <= 0 && itemDamage <= 0 && reload <= 0 && !isThrowable && explosionRange <= 0)
+                return false;
 
-            afflictions.Add(new AfflictionData
-            {
-                Identifier = id,
-                Name = TextManager.Get("AfflictionName." + id).Fallback(id).Value,
-                Strength = strength,
-                Probability = prob
-            });
-        }
-
-        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
             using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_weapon", "AS WEAPON").Value, Color.Gold);
 
@@ -311,6 +257,30 @@ namespace SOS.StatSections
 
                 l.BadgeRow(label, ids, displayNames, linkColor: Color.Salmon, onSearchFilter: SectionHelper.SetSearchFilter);
             }
+            return true;
+        }
+
+        private class AfflictionData
+        {
+            internal string Identifier = "";
+            internal string Name = "";
+            internal float Strength;
+            internal float Probability;
+        }
+
+        private static void ParseAffliction(XElement element, float prob, List<AfflictionData> list)
+        {
+            string id = element.GetAttributeString("identifier", "");
+            float strength = element.GetAttributeFloat("strength", 0f);
+            if (strength <= 0 || string.IsNullOrEmpty(id)) return;
+
+            list.Add(new AfflictionData
+            {
+                Identifier = id,
+                Name = TextManager.Get("AfflictionName." + id).Fallback(id).Value,
+                Strength = strength,
+                Probability = prob
+            });
         }
     }
 
@@ -318,23 +288,23 @@ namespace SOS.StatSections
     [AutoRegister(order: 3)]
     public class EquipmentSection : ISOSStatSection
     {
-        private readonly List<string> equipSlots = [];
-        private readonly List<string> statModifiers = [];
-        private readonly Dictionary<string, List<string>> aggregatedResistances = [];
-
-        private float maxPressure = 0f;
-        private bool deflectsProjectiles = false;
-        private int durability = 0;
-
-        public bool Analyze(Prefab prefab)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            if (prefab is ItemPrefab item)
+            if (prefab is not ItemPrefab item) return false;
+
+            var equipSlots = new List<string>();
+            var statModifiers = new List<string>();
+            var aggregatedResistances = new Dictionary<string, List<string>>();
+
+            float maxPressure = 0f;
+            bool deflectsProjectiles = false;
+            int durability = 0;
+
+            int health = (int)Math.Floor(item.Health);
+            if (health > 0 && health != 100 && health < 100000) durability = health;
+
+            if (item.ConfigElement != null)
             {
-                int health = (int)Math.Floor(item.Health);
-                if (health > 0 && health != 100 && health < 100000) durability = health;
-
-                if (item.ConfigElement == null) return false;
-
                 foreach (var element in item.ConfigElement.Descendants())
                 {
                     string n = element.Name.ToString().ToLowerInvariant();
@@ -383,11 +353,10 @@ namespace SOS.StatSections
                     }
                 }
             }
-            return equipSlots.Count > 0 || statModifiers.Count > 0 || aggregatedResistances.Count > 0 || maxPressure > 0 || durability > 0;
-        }
 
-        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
+            if (equipSlots.Count == 0 && statModifiers.Count == 0 && aggregatedResistances.Count == 0 && maxPressure <= 0 && durability <= 0)
+                return false;
+
             using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_equipment", "EQUIPMENT").Value, Color.Gold);
 
@@ -420,6 +389,7 @@ namespace SOS.StatSections
 
                 l.BadgeRow(Texts.Get("sos.equip.equips_in", "Equips In:").Value, uniqueSlots, filterPrefix: '&', onSearchFilter: SectionHelper.SetSearchFilter);
             }
+            return true;
         }
     }
 
@@ -427,103 +397,81 @@ namespace SOS.StatSections
     [AutoRegister(order: 4)]
     public class MedicalSection : ISOSStatSection
     {
-        private int medicalSkillReq = 0;
-        private readonly List<(string Identifier, string DisplayName)> suitableTreatments = [];
-
-        private readonly Dictionary<string, (string Name, float Amount)> alwaysHeals = [];
-        private readonly Dictionary<string, (string Name, float Amount)> alwaysCauses = [];
-        private readonly Dictionary<string, (string Name, float Amount)> successHeals = [];
-        private readonly Dictionary<string, (string Name, float Amount)> successCauses = [];
-        private readonly Dictionary<string, (string Name, float Amount)> failureHeals = [];
-        private readonly Dictionary<string, (string Name, float Amount)> failureCauses = [];
-
-        public bool Analyze(Prefab prefab)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            if (prefab is ItemPrefab item)
+            if (prefab is not ItemPrefab item || item.ConfigElement == null) return false;
+
+            int medicalSkillReq = 0;
+            var suitableTreatments = new List<(string Identifier, string DisplayName)>();
+
+            var alwaysHeals = new Dictionary<string, (string Name, float Amount)>();
+            var alwaysCauses = new Dictionary<string, (string Name, float Amount)>();
+            var successHeals = new Dictionary<string, (string Name, float Amount)>();
+            var successCauses = new Dictionary<string, (string Name, float Amount)>();
+            var failureHeals = new Dictionary<string, (string Name, float Amount)>();
+            var failureCauses = new Dictionary<string, (string Name, float Amount)>();
+
+            foreach (var element in item.ConfigElement.Descendants())
             {
-                if (item.ConfigElement == null) return false;
+                string n = element.Name.ToString().ToLowerInvariant();
 
-                foreach (var element in item.ConfigElement.Descendants())
+                if (n == "suitabletreatment")
                 {
-                    string n = element.Name.ToString().ToLowerInvariant();
-
-                    if (n == "suitabletreatment")
+                    string idOrType = element.GetAttributeString("identifier", element.GetAttributeString("type", ""));
+                    float suit = element.GetAttributeFloat("suitability", 0f);
+                    if (!string.IsNullOrEmpty(idOrType))
                     {
-                        string idOrType = element.GetAttributeString("identifier", element.GetAttributeString("type", ""));
-                        float suit = element.GetAttributeFloat("suitability", 0f);
-                        if (!string.IsNullOrEmpty(idOrType))
-                        {
-                            string sign = suit > 0 ? "+" : "";
-                            suitableTreatments.Add((idOrType, $"{GetAfflictionName(idOrType)} ({sign}{suit})"));
-                        }
+                        string sign = suit > 0 ? "+" : "";
+                        suitableTreatments.Add((idOrType, $"{GetAfflictionName(idOrType)} ({sign}{suit})"));
                     }
+                }
 
-                    else if (n == "requiredskill" && element.GetAttributeString("identifier", "") == "medical")
+                else if (n == "requiredskill" && element.GetAttributeString("identifier", "") == "medical")
+                {
+                    medicalSkillReq = Math.Max(medicalSkillReq, element.GetAttributeInt("level", 0));
+                }
+
+                else if (n == "statuseffect")
+                {
+                    string type = element.GetAttributeString("type", "").ToLowerInvariant();
+                    string target = element.GetAttributeString("target", "").ToLowerInvariant();
+
+                    if (!target.Contains("usetarget") && !target.Contains("character") && !target.Contains("limb")) continue;
+
+                    bool isFailure = type == "onfailure";
+                    bool isSuccess = type == "onsuccess";
+                    bool isAlways = !isFailure && !isSuccess;
+
+                    float duration = element.GetAttributeFloat("duration", 1f);
+
+                    foreach (var sub in element.Elements())
                     {
-                        medicalSkillReq = Math.Max(medicalSkillReq, element.GetAttributeInt("level", 0));
-                    }
-
-                    else if (n == "statuseffect")
-                    {
-                        string type = element.GetAttributeString("type", "").ToLowerInvariant();
-                        string target = element.GetAttributeString("target", "").ToLowerInvariant();
-
-                        if (!target.Contains("usetarget") && !target.Contains("character") && !target.Contains("limb")) continue;
-
-                        bool isFailure = type == "onfailure";
-                        bool isSuccess = type == "onsuccess";
-                        bool isAlways = !isFailure && !isSuccess;
-
-                        float duration = element.GetAttributeFloat("duration", 1f);
-
-                        foreach (var sub in element.Elements())
+                        string subName = sub.Name.ToString().ToLowerInvariant();
+                        if (subName == "affliction" || subName == "reduceaffliction")
                         {
-                            string subName = sub.Name.ToString().ToLowerInvariant();
-                            if (subName == "affliction" || subName == "reduceaffliction")
-                            {
-                                string idOrType = sub.GetAttributeString("identifier", sub.GetAttributeString("type", ""));
-                                if (string.IsNullOrEmpty(idOrType)) continue;
+                            string idOrType = sub.GetAttributeString("identifier", sub.GetAttributeString("type", ""));
+                            if (string.IsNullOrEmpty(idOrType)) continue;
 
-                                float rawAmount = sub.GetAttributeFloat("amount", sub.GetAttributeFloat("strength", 0f));
-                                float totalAmount = rawAmount * duration;
+                            float rawAmount = sub.GetAttributeFloat("amount", sub.GetAttributeFloat("strength", 0f));
+                            float totalAmount = rawAmount * duration;
 
-                                bool isHeal = subName == "reduceaffliction" || totalAmount < 0;
-                                totalAmount = Math.Abs(totalAmount);
+                            bool isHeal = subName == "reduceaffliction" || totalAmount < 0;
+                            totalAmount = Math.Abs(totalAmount);
 
-                                string affName = GetAfflictionName(idOrType);
+                            string affName = GetAfflictionName(idOrType);
 
-                                if (isHeal)
-                                    AddStat(isFailure ? failureHeals : (isSuccess ? successHeals : alwaysHeals), idOrType, affName, totalAmount);
-                                else
-                                    AddStat(isFailure ? failureCauses : (isSuccess ? successCauses : alwaysCauses), idOrType, affName, totalAmount);
-                            }
+                            if (isHeal)
+                                AddStat(isFailure ? failureHeals : (isSuccess ? successHeals : alwaysHeals), idOrType, affName, totalAmount);
+                            else
+                                AddStat(isFailure ? failureCauses : (isSuccess ? successCauses : alwaysCauses), idOrType, affName, totalAmount);
                         }
                     }
                 }
             }
-            return suitableTreatments.Count > 0 || alwaysHeals.Count > 0 || successHeals.Count > 0 || alwaysCauses.Count > 0 || successCauses.Count > 0;
-        }
 
-        private static void AddStat(Dictionary<string, (string Name, float Amount)> dict, string id, string name, float amount)
-        {
-            if (dict.TryGetValue(id, out (string Name, float Amount) current))
-            {
-                dict[id] = (current.Name, current.Amount + amount);
-            }
-            else dict[id] = (name, amount);
-        }
+            if (suitableTreatments.Count == 0 && alwaysHeals.Count == 0 && successHeals.Count == 0 && alwaysCauses.Count == 0 && successCauses.Count == 0)
+                return false;
 
-        private static string GetAfflictionName(string idOrType)
-        {
-            var loc = TextManager.Get("AfflictionName." + idOrType);
-            if (loc.Loaded && !loc.Value.Contains("AfflictionName.")) return loc.Value;
-
-            if (idOrType.Length > 0) return char.ToUpper(idOrType[0]) + idOrType[1..];
-            return idOrType;
-        }
-
-        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
             using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_medical", "MEDICAL").Value, Color.Gold);
 
@@ -559,6 +507,25 @@ namespace SOS.StatSections
 
             DrawHyperlinkEffect(Texts.Get("sos.med.failure_heals", "On Failure Heals:").Value, failureHeals, Color.DarkSeaGreen);
             DrawHyperlinkEffect(Texts.Get("sos.med.failure_causes", "On Failure Applies:").Value, failureCauses, Color.Crimson);
+            return true;
+        }
+
+        private static void AddStat(Dictionary<string, (string Name, float Amount)> dict, string id, string name, float amount)
+        {
+            if (dict.TryGetValue(id, out (string Name, float Amount) current))
+            {
+                dict[id] = (current.Name, current.Amount + amount);
+            }
+            else dict[id] = (name, amount);
+        }
+
+        private static string GetAfflictionName(string idOrType)
+        {
+            var loc = TextManager.Get("AfflictionName." + idOrType);
+            if (loc.Loaded && !loc.Value.Contains("AfflictionName.")) return loc.Value;
+
+            if (idOrType.Length > 0) return char.ToUpper(idOrType[0]) + idOrType[1..];
+            return idOrType;
         }
     }
 
@@ -566,40 +533,37 @@ namespace SOS.StatSections
     [AutoRegister(order: 5)]
     public class UtilitySection : ISOSStatSection
     {
-        private readonly Dictionary<string, string> deviceProperties = [];
-
-        public bool Analyze(Prefab prefab)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            if (prefab is ItemPrefab item)
+            if (prefab is not ItemPrefab item || item.ConfigElement == null) return false;
+
+            var deviceProperties = new Dictionary<string, string>();
+
+            foreach (var child in item.ConfigElement.Descendants())
             {
-                if (item.ConfigElement == null) return false;
-                foreach (var child in item.ConfigElement.Descendants())
-                {
-                    string n = child.Name.ToString().ToLowerInvariant();
+                string n = child.Name.ToString().ToLowerInvariant();
 
-                    if (n == "wificomponent" && child.GetAttribute("range") != null)
-                        deviceProperties[Texts.Get("sos.util.radio_range", "Radio Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
+                if (n == "wificomponent" && child.GetAttribute("range") != null)
+                    deviceProperties[Texts.Get("sos.util.radio_range", "Radio Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
 
-                    if (n == "lightcomponent" && child.GetAttribute("range") != null)
-                        deviceProperties[Texts.Get("sos.util.light_range", "Light Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
+                if (n == "lightcomponent" && child.GetAttribute("range") != null)
+                    deviceProperties[Texts.Get("sos.util.light_range", "Light Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
 
-                    if (n == "pump" && child.GetAttribute("maxflow") != null)
-                        deviceProperties[Texts.Get("sos.util.pump_flow", "Pump Max Flow").Value] = child.GetAttributeFloat("maxflow", 0).ToMeters();
+                if (n == "pump" && child.GetAttribute("maxflow") != null)
+                    deviceProperties[Texts.Get("sos.util.pump_flow", "Pump Max Flow").Value] = child.GetAttributeFloat("maxflow", 0).ToMeters();
 
-                    if (n == "sonar" && child.GetAttribute("range") != null)
-                        deviceProperties[Texts.Get("sos.util.sonar_range", "Sonar Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
-                }
+                if (n == "sonar" && child.GetAttribute("range") != null)
+                    deviceProperties[Texts.Get("sos.util.sonar_range", "Sonar Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
             }
-            return deviceProperties.Count > 0;
-        }
 
-        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
+            if (deviceProperties.Count == 0) return false;
+
             using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_utility", "UTILITY").Value, Color.Gold);
 
             foreach (var prop in deviceProperties)
                 l.Row(prop.Key + ":", prop.Value, Color.Cyan);
+            return true;
         }
     }
 
@@ -607,67 +571,65 @@ namespace SOS.StatSections
     [AutoRegister(order: 6)]
     public class ContainerSection : ISOSStatSection
     {
-        private string capacity = "";
-        private readonly HashSet<string> acceptedTags = [];
-        private readonly List<string> spawnLocations = [];
-        private List<Prefab> compatibleItems = [];
-
-        public bool Analyze(Prefab prefab)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            if (prefab is ItemPrefab item)
+            if (prefab is not ItemPrefab item) return false;
+
+            string capacity = "";
+            var acceptedTags = new HashSet<string>();
+            var spawnLocations = new List<string>();
+            var compatibleItems = new List<Prefab>();
+
+            if (item.ConfigElement != null)
             {
-                if (item.ConfigElement != null)
+                foreach (var child in item.ConfigElement.Descendants())
                 {
-                    foreach (var child in item.ConfigElement.Descendants())
+                    string n = child.Name.ToString().ToLowerInvariant();
+
+                    if (n == "itemcontainer" || n == "magazine")
                     {
-                        string n = child.Name.ToString().ToLowerInvariant();
+                        string cap = child.GetAttributeString("capacity", "");
+                        if (!string.IsNullOrEmpty(cap)) capacity = cap;
+                    }
 
-                        if (n == "itemcontainer" || n == "magazine")
+                    if (n == "containable")
+                    {
+                        string itemsAttr = child.GetAttributeString("items", "");
+                        if (!string.IsNullOrEmpty(itemsAttr))
                         {
-                            string cap = child.GetAttributeString("capacity", "");
-                            if (!string.IsNullOrEmpty(cap)) capacity = cap;
-                        }
-
-                        if (n == "containable")
-                        {
-                            string itemsAttr = child.GetAttributeString("items", "");
-                            if (!string.IsNullOrEmpty(itemsAttr))
+                            foreach (var tag in itemsAttr.Split(','))
                             {
-                                foreach (var tag in itemsAttr.Split(','))
-                                {
-                                    string trimmed = tag.Trim();
-                                    if (!string.IsNullOrEmpty(trimmed)) acceptedTags.Add(trimmed);
-                                }
+                                string trimmed = tag.Trim();
+                                if (!string.IsNullOrEmpty(trimmed)) acceptedTags.Add(trimmed);
                             }
                         }
                     }
                 }
+            }
 
-                if (item.PreferredContainers != null && !item.PreferredContainers.IsDefaultOrEmpty)
+            if (item.PreferredContainers != null && !item.PreferredContainers.IsDefaultOrEmpty)
+            {
+                foreach (var container in item.PreferredContainers)
                 {
-                    foreach (var container in item.PreferredContainers)
+                    foreach (var primary in container.Primary)
                     {
-                        foreach (var primary in container.Primary)
-                        {
-                            string locName = TextManager.Get("EntityName." + primary).Fallback(primary.Value).Value;
-                            if (!spawnLocations.Contains(locName)) spawnLocations.Add(locName);
-                        }
+                        string locName = TextManager.Get("EntityName." + primary).Fallback(primary.Value).Value;
+                        if (!spawnLocations.Contains(locName)) spawnLocations.Add(locName);
                     }
                 }
+            }
 
-                if (acceptedTags.Count > 0)
-                {
-                    compatibleItems = [.. ItemPrefab.Prefabs.Where(p =>
+            if (acceptedTags.Count > 0)
+            {
+                compatibleItems = [.. ItemPrefab.Prefabs.Where(p =>
                     acceptedTags.Contains(p.Identifier.Value) ||
                     p.Tags.Any(t => acceptedTags.Contains(t.Value))
                 ).OrderBy(p => p.Name.Value)];
-                }
             }
-            return !string.IsNullOrEmpty(capacity) || compatibleItems.Count > 0 || spawnLocations.Count > 0;
-        }
 
-        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
+            if (string.IsNullOrEmpty(capacity) && compatibleItems.Count == 0 && spawnLocations.Count == 0)
+                return false;
+
             using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_container", "CONTAINER").Value, Color.Gold);
 
@@ -688,6 +650,7 @@ namespace SOS.StatSections
             {
                 l.BadgeRow(Texts.Get("sos.container.contained", "Contained by:").Value, spawnLocations, onSearchFilter: SectionHelper.SetSearchFilter);
             }
+            return true;
         }
     }
 
@@ -695,24 +658,12 @@ namespace SOS.StatSections
     [AutoRegister(order: 7)]
     public class AfflictionEffectsSection : ISOSStatSection
     {
-        private class PhaseData
-        {
-            public string Range = "";
-            public float StrengthChange;
-            public List<string> Stats = [];
-            public List<string> Resistances = [];
-            public List<string> Events = [];
-            public List<(string ID, string Name, Color Theme)> LinkedAfflictions = [];
-        }
-
-        private readonly List<PhaseData> phases = [];
-        private readonly List<PhaseData> periodicPhases = [];
-
-        public bool Analyze(Prefab prefab)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             if (prefab is not AfflictionPrefab aff || aff.configElement == null) return false;
-            phases.Clear();
-            periodicPhases.Clear();
+
+            var phases = new List<PhaseData>();
+            var periodicPhases = new List<PhaseData>();
 
             foreach (var element in aff.configElement.GetChildElements("Effect"))
             {
@@ -792,7 +743,86 @@ namespace SOS.StatSections
                 if (phase.LinkedAfflictions.Count > 0 || phase.Events.Count > 0)
                     periodicPhases.Add(phase);
             }
-            return phases.Count > 0 || periodicPhases.Count > 0;
+
+            if (phases.Count == 0 && periodicPhases.Count == 0)
+                return false;
+
+            if (phases.Count > 0)
+            {
+                using var l = new GUILayoutBuilder(contentPanel);
+                l.Header(Texts.Get("sos.affliction.effects_header", "EFFECTS BY STRENGTH PHASE").Value, Color.Gold);
+
+                foreach (var phase in phases)
+                {
+                    l.RichText($"{Texts.Get("sos.affliction.strength_range", "Strength Range:").Value} {phase.Range.SetColor(Color.Orange)}");
+
+                    if (phase.StrengthChange != 0)
+                    {
+                        string trend = phase.StrengthChange > 0
+                            ? $"{Texts.Get("sos.affliction.worsens", "Worsens:").Value} +{phase.StrengthChange}/s".SetColor(Color.Salmon)
+                            : $"{Texts.Get("sos.affliction.natural_healing", "Natural Healing:").Value} {phase.StrengthChange}/s".SetColor(Color.LightGreen);
+                        l.RichText($"  -> {trend}");
+                    }
+
+                    if (phase.Stats.Count > 0)
+                        l.RichText($"  -> {string.Join(" | ", phase.Stats)}");
+
+                    if (phase.Resistances.Count > 0)
+                        l.RichText($"  -> {Texts.Get("sos.affliction.resistances", "Resistances:").Value} {string.Join(" | ", phase.Resistances)}");
+
+                    if (phase.Events.Count > 0)
+                        l.RichText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
+
+                    if (phase.LinkedAfflictions.Count > 0)
+                    {
+                        l.SelectorRow($"  -> {Texts.Get("sos.affliction.triggers", "Triggers:").Value}",
+                            phase.LinkedAfflictions.Select(a => a.ID),
+                            phase.LinkedAfflictions.Select(a => a.Name.SetColor(a.Theme)),
+                            fallbackFilterPrefix: '!',
+                            onPrimary: onPrimary,
+                            onSecondary: onSecondary,
+                            onSearchFilter: SectionHelper.SetSearchFilter);
+                    }
+
+                    l.RichText(" ");
+                }
+            }
+
+            if (periodicPhases.Count > 0)
+            {
+                using var l = new GUILayoutBuilder(contentPanel);
+                l.Header(Texts.Get("sos.affliction.periodic_header", "PERIODIC EVENTS").Value, Color.MediumPurple);
+                foreach (var phase in periodicPhases)
+                {
+                    l.RichText($"{Texts.Get("sos.affliction.frequency", "Frequency:").Value} {phase.Range.SetColor(Color.Cyan)}");
+
+                    if (phase.Events.Count > 0)
+                        l.RichText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
+
+                    if (phase.LinkedAfflictions.Count > 0)
+                    {
+                        l.SelectorRow($"  -> {Texts.Get("sos.affliction.triggers", "Triggers:").Value}",
+                            phase.LinkedAfflictions.Select(a => a.ID),
+                            phase.LinkedAfflictions.Select(a => a.Name.SetColor(a.Theme)),
+                            fallbackFilterPrefix: '!',
+                            onPrimary: onPrimary,
+                            onSecondary: onSecondary,
+                            onSearchFilter: SectionHelper.SetSearchFilter);
+                    }
+                    l.RichText(" ");
+                }
+            }
+            return true;
+        }
+
+        private class PhaseData
+        {
+            public string Range = "";
+            public float StrengthChange;
+            public List<string> Stats = [];
+            public List<string> Resistances = [];
+            public List<string> Events = [];
+            public List<(string ID, string Name, Color Theme)> LinkedAfflictions = [];
         }
 
         private static void ParseStatusEffects(Barotrauma.ContentXElement parentElement, PhaseData phase)
@@ -840,106 +870,31 @@ namespace SOS.StatSections
             if (hasExplosion) phase.Events.Add(Texts.Get("sos.affliction.event_explosion", "Causes Explosion").Value);
             if (hasAnimations) phase.Events.Add(Texts.Get("sos.affliction.event_animations", "Forces Animations").Value);
         }
-
-        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
-            if (phases.Count > 0)
-            {
-                using var l = new GUILayoutBuilder(contentPanel);
-                l.Header(Texts.Get("sos.affliction.effects_header", "EFFECTS BY STRENGTH PHASE").Value, Color.Gold);
-
-                foreach (var phase in phases)
-                {
-                    l.RichText($"{Texts.Get("sos.affliction.strength_range", "Strength Range:").Value} {phase.Range.SetColor(Color.Orange)}");
-
-                    if (phase.StrengthChange != 0)
-                    {
-                        string trend = phase.StrengthChange > 0
-                            ? $"{Texts.Get("sos.affliction.worsens", "Worsens:").Value} +{phase.StrengthChange}/s".SetColor(Color.Salmon)
-                            : $"{Texts.Get("sos.affliction.natural_healing", "Natural Healing:").Value} {phase.StrengthChange}/s".SetColor(Color.LightGreen);
-                        l.RichText($"  -> {trend}");
-                    }
-
-                    if (phase.Stats.Count > 0)
-                        l.RichText($"  -> {string.Join(" | ", phase.Stats)}");
-
-                    if (phase.Resistances.Count > 0)
-                        l.RichText($"  -> {Texts.Get("sos.affliction.resistances", "Resistances:").Value} {string.Join(" | ", phase.Resistances)}");
-
-                    if (phase.Events.Count > 0)
-                        l.RichText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
-
-                    if (phase.LinkedAfflictions.Count > 0)
-                    {
-                        l.SelectorRow($"  -> {Texts.Get("sos.affliction.triggers", "Triggers:").Value}",
-                            phase.LinkedAfflictions.Select(a => a.ID),
-                            phase.LinkedAfflictions.Select(a => a.Name.SetColor(a.Theme)),
-                            fallbackFilterPrefix: '!',
-                            onPrimary: onPrimary,
-                            onSecondary: onSecondary,
-                            onSearchFilter: SectionHelper.SetSearchFilter);
-                    }
-
-                    l.RichText(" ");
-
-                }
-            }
-
-            if (periodicPhases.Count > 0)
-            {
-                using var l = new GUILayoutBuilder(contentPanel);
-                l.Header(Texts.Get("sos.affliction.periodic_header", "PERIODIC EVENTS").Value, Color.MediumPurple);
-                foreach (var phase in periodicPhases)
-                {
-                    l.RichText($"{Texts.Get("sos.affliction.frequency", "Frequency:").Value} {phase.Range.SetColor(Color.Cyan)}");
-
-                    if (phase.Events.Count > 0)
-                        l.RichText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
-
-                    if (phase.LinkedAfflictions.Count > 0)
-                    {
-                        l.SelectorRow($"  -> {Texts.Get("sos.affliction.triggers", "Triggers:").Value}",
-                            phase.LinkedAfflictions.Select(a => a.ID),
-                            phase.LinkedAfflictions.Select(a => a.Name.SetColor(a.Theme)),
-                            fallbackFilterPrefix: '!',
-                            onPrimary: onPrimary,
-                            onSecondary: onSecondary,
-                            onSearchFilter: SectionHelper.SetSearchFilter);
-                    }
-                    l.RichText(" ");
-
-                }
-            }
-        }
     }
 
     // MARK: Affliction Treatments
     [AutoRegister(order: 8)]
     public class AfflictionTreatmentSection : ISOSStatSection
     {
-        private AfflictionPrefab? aff;
-
-        private readonly List<ItemPrefab> highEff = [];
-        private readonly List<ItemPrefab> medEff = [];
-        private readonly List<ItemPrefab> lowEff = [];
-        private readonly List<ItemPrefab> harmful = [];
-
-        private readonly List<string> blockers = [];
-
-        public bool Analyze(Prefab prefab)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
             if (prefab is not AfflictionPrefab affliction) return false;
-            aff = affliction;
 
-            if (aff.IgnoreTreatmentIfAfflictedBy != null)
+            var highEff = new List<ItemPrefab>();
+            var medEff = new List<ItemPrefab>();
+            var lowEff = new List<ItemPrefab>();
+            var harmful = new List<ItemPrefab>();
+            var blockers = new List<string>();
+
+            if (affliction.IgnoreTreatmentIfAfflictedBy != null)
             {
-                foreach (var blockerId in aff.IgnoreTreatmentIfAfflictedBy)
+                foreach (var blockerId in affliction.IgnoreTreatmentIfAfflictedBy)
                     blockers.Add(blockerId.Value);
             }
 
-            if (aff.TreatmentSuitabilities != null)
+            if (affliction.TreatmentSuitabilities != null)
             {
-                foreach (var kvp in aff.TreatmentSuitabilities)
+                foreach (var kvp in affliction.TreatmentSuitabilities)
                 {
                     var item = ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier == kvp.Key);
                     if (item == null) continue;
@@ -957,21 +912,18 @@ namespace SOS.StatSections
                 }
             }
 
-            if (aff.TreatmentSuitabilities != null)
+            if (affliction.TreatmentSuitabilities != null)
             {
-                int CompareSuitDesc(ItemPrefab a, ItemPrefab b) => aff.TreatmentSuitabilities[b.Identifier].CompareTo(aff.TreatmentSuitabilities[a.Identifier]);
-                int CompareSuitAsc(ItemPrefab a, ItemPrefab b) => aff.TreatmentSuitabilities[a.Identifier].CompareTo(aff.TreatmentSuitabilities[b.Identifier]);
+                int CompareSuitDesc(ItemPrefab a, ItemPrefab b) => affliction.TreatmentSuitabilities[b.Identifier].CompareTo(affliction.TreatmentSuitabilities[a.Identifier]);
+                int CompareSuitAsc(ItemPrefab a, ItemPrefab b) => affliction.TreatmentSuitabilities[a.Identifier].CompareTo(affliction.TreatmentSuitabilities[b.Identifier]);
                 highEff.Sort(CompareSuitDesc);
                 medEff.Sort(CompareSuitDesc);
                 lowEff.Sort(CompareSuitDesc);
                 harmful.Sort(CompareSuitAsc);
             }
-            return highEff.Count > 0 || medEff.Count > 0 || lowEff.Count > 0 || harmful.Count > 0 || blockers.Count > 0;
-        }
 
-        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
-            if (aff == null) return;
+            if (highEff.Count == 0 && medEff.Count == 0 && lowEff.Count == 0 && harmful.Count == 0 && blockers.Count == 0)
+                return false;
 
             using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_treatments", "TREATMENTS & MEDICATION").Value, Color.SpringGreen);
@@ -993,7 +945,7 @@ namespace SOS.StatSections
                 if (items.Count == 0) return;
 
                 var ids = items.Select(i => i.Identifier.Value);
-                var names = items.Select(i => $"{i.Name.Value} ({aff.TreatmentSuitabilities[i.Identifier]:0})");
+                var names = items.Select(i => $"{i.Name.Value} ({affliction.TreatmentSuitabilities?[i.Identifier]:0})");
 
                 l.SelectorRow(label, ids, names,
                     fallbackFilterPrefix: '!',
@@ -1012,6 +964,7 @@ namespace SOS.StatSections
                 l.RichText(Texts.Get("sos.affliction.contraindicated_warn", "WARNING: The following items worsen the condition!").Value.SetColor(Color.Salmon));
                 DrawRow(Texts.Get("sos.affliction.contraindicated", "Contraindicated:").Value, harmful, labelColor: Color.Salmon);
             }
+            return true;
         }
     }
 
@@ -1019,26 +972,21 @@ namespace SOS.StatSections
     [AutoRegister(order: 9)]
     public class DescriptionSection : ISOSStatSection
     {
-        private string? text;
-
-        public bool Analyze(Prefab prefab)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
-            text = prefab switch
+            string? text = prefab switch
             {
                 ItemPrefab item => item.Description?.Value ?? "",
                 AfflictionPrefab affliction => string.Join("\n\n", affliction.Descriptions.Select(d => $"({d.MinStrength.ToString().SetColor(Color.Orange)}-{d.MaxStrength.ToString().SetColor(Color.OrangeRed)}) {d.Target.ToString().SetColor(Color.BlueViolet)}: {d.Text}")),
                 _ => null
             };
-            return !string.IsNullOrEmpty(text);
-        }
 
-        public void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
-        {
-            if (text == null) return;
+            if (string.IsNullOrEmpty(text)) return false;
 
             using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
             l.RichText(RichString.Rich(text));
+            return true;
         }
     }
 

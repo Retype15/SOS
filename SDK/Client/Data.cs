@@ -55,8 +55,15 @@ namespace SOS
 
     public interface ISOSStatSection
     {
-        bool Analyze(Prefab item);
-        void Draw(GUIListBox contentPanel, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
+        /// <summary>
+        /// Analyzes and renders the specified prefab into the GUI list container.
+        /// </summary>
+        /// <param name="contentPanel">The GUI list container to draw into.</param>
+        /// <param name="prefab">The prefab to analyze and render.</param>
+        /// <param name="onPrimary">Primary click handler for the prefab.</param>
+        /// <param name="onSecondary">Secondary click handler for the prefab.</param>
+        /// <returns>True if this section has valid data to display; otherwise, false.</returns>
+        bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
     }
 
 
