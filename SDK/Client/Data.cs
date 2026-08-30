@@ -99,11 +99,11 @@ namespace SOS
         List<ContextMenuOption> BuildContextOptions(Prefab prefab) => PrefabDefaults.BuildContextOptions(prefab);
     }
 
+    [DefaultClass<WindowProfileDefaults>]
     public interface ISOSWindowProfile : IIdentifier, IDisposable
     {
-        string DisplayName => Texts.Get($"{Id}.DisplayName", Id).Value;
-        string Description => Texts.Get($"{Id}.Description", "").Value;
-        Sprite? ProfileIcon => null;
+        string DisplayName { get; }
+        string Description { get; }
         ISOSConfig? ProfileConfig => null;
         void Init();
         void Update();
@@ -161,6 +161,11 @@ namespace SOS
 
             return options;
         }
+    }
+
+    internal sealed class WindowProfileDefaults
+    {
+        public static ISOSConfig? ProfileConfig => null;
     }
 
     #endregion
