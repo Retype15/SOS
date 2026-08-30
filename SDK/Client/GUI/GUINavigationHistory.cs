@@ -18,10 +18,15 @@ namespace SOS.GUI
     /// <remarks>
     /// Provides a UI with back and forward buttons, keyboard shortcuts (Alt+Left/Right, Backspace, Mouse 4/5),
     /// and events for navigation actions. The history is maintained as a list with a current index pointer.
+    /// Thread-safe: this component is not thread-safe; all operations must be called from the UI thread.
     /// </remarks>
     public sealed class GUINavigationHistory<T> : GUICustomComponent where T : notnull
     {
-        public readonly List<T> _history = [];
+        /// <summary>
+        /// The history list storing all navigated items.
+        /// </summary>
+        private readonly List<T> _history = [];
+
         /// <summary>
         /// Flag indicating whether a navigation action is in progress.
         /// </summary>
@@ -72,7 +77,7 @@ namespace SOS.GUI
         public bool CanNavigateBack => Index > 0;
 
         /// <summary>
-        /// Gets whether navigation forward is possible (index < history count - 1).
+        /// Gets whether navigation forward is possible (index >= 0 and index < history count - 1).
         /// </summary>
         public bool CanNavigateForward => Index >= 0 && Index < _history.Count - 1;
 

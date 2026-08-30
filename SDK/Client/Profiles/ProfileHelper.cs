@@ -32,24 +32,30 @@ namespace SOS.Profiles
         private static List<GUIListBox>? _contentLists;
         private static int _currentColumnCount = 0;
 
-        /// <summary>Gets whether settings are open.</summary>
+        /// <summary>Gets whether any settings UI is currently open.</summary>
+        /// <returns><c>true</c> if the settings window, content container, or content lists are active.</returns>
         public static bool IsSettingsOpen => _settingsWindow != null || _contentContainer != null || _contentLists != null;
 
+        /// <summary>Stack of tab identifiers for navigation history.</summary>
         internal static readonly List<string> TabHistory = [];
 
-        /// <summary>Pushes a tab UID to history.</summary>
-        /// <param name="uid">The tab identifier.</param>
+        /// <summary>Pushes a tab identifier to the top of the history stack, removing any prior occurrence.</summary>
+        /// <param name="uid">The tab identifier to push.</param>
+        /// <remarks>
+        /// If <paramref name="uid"/> already exists in <see cref="TabHistory"/>, it is removed from its current
+        /// position before being re-inserted at index 0 (most recent).
+        /// </remarks>
         public static void PushTabHistory(string uid)
         {
             TabHistory.Remove(uid);
             TabHistory.Insert(0, uid);
         }
 
-        /// <summary>Gets the tab history.</summary>
-        /// <returns>Read-only tab history.</returns>
+        /// <summary>Gets a read-only snapshot of the tab history stack.</summary>
+        /// <returns>Read-only list of tab identifiers ordered from most recent to oldest.</returns>
         public static IReadOnlyList<string> GetTabHistory() => TabHistory;
 
-        /// <summary>Clears tab history.</summary>
+        /// <summary>Clears all entries from <see cref="TabHistory"/>.</summary>
         public static void ClearTabHistory() => TabHistory.Clear();
 
         private static GUINavigationHistory<Prefab> navigationHistory = new(BGUI.Canvas);
@@ -60,6 +66,15 @@ namespace SOS.Profiles
 
         #region Subscribers
 
+        /// <summary>
+        /// Subscribes to all relevant API events for navigation history and settings management.
+        /// </summary>
+        /// <remarks>
+        /// Subscribes to <see cref="CommKeys.SelectTarget"/>, <see cref="CommKeys.NavigateBack"/>,
+        /// <see cref="CommKeys.NavigateForward"/>, <see cref="CommKeys.CloseWindow"/>, and <see cref="CommKeys.ChangeProfile"/>.
+        /// Idempotent: does nothing if already subscribed.
+        /// </remarks>
+        /// <seealso cref="Unsubscribe"/>
         public static void Subscribe()
         {
             if (_subscribed) return;
@@ -76,6 +91,13 @@ namespace SOS.Profiles
             _subscribed = true;
         }
 
+        /// <summary>
+        /// Unsubscribes from all API events registered by <see cref="Subscribe"/>.
+        /// </summary>
+        /// <remarks>
+        /// Idempotent: does nothing if not currently subscribed.
+        /// </remarks>
+        /// <seealso cref="Subscribe"/>
         public static void Unsubscribe()
         {
             if (!_subscribed) return;
@@ -96,6 +118,17 @@ namespace SOS.Profiles
 
         #region Navigation History
 
+        /// <summary>
+        /// Creates a navigation history widget with back/forward buttons in the given parent rect.
+        /// </summary>
+        /// <param name="parent">The parent rectangle transform for the history widget.</param>
+        /// <returns>The created <see cref="GUINavigationHistory{Prefab}"/> component.</returns>
+        /// <remarks>
+        /// Initializes a fresh <see cref="GUINavigationHistory{Prefab}"/> instance with the current history
+        /// and index, sets up tooltip callbacks for back/forward navigation, and subscribes to the
+        /// <see cref="GUINavigationHistory{Prefab}.OnNavigateBack"/> and
+        /// <see cref="GUINavigationHistory{Prefab}.OnNavigateForward"/> events.
+        /// </remarks>
         public static GUIComponent CreateNavigationHistoryButtons(RectTransform parent)
         {
             var history = navigationHistory.History;
@@ -145,11 +178,26 @@ namespace SOS.Profiles
 
         #endregion
 
+        /// <summary>
+        /// Updates the settings window state each frame.
+        /// </summary>
+        /// <remarks>
+        /// Ensures <see cref="_settingsWindow"/> is added to the GUI update list with order 1.
+        /// Does nothing if no settings window is open.
+        /// </remarks>
         public static void Update()
         {
             _settingsWindow?.AddToGUIUpdateList(order: 1);
         }
 
+        /// <summary>
+        /// Handles target selection by emitting <see cref="CommKeys.SelectTarget"/>.
+        /// </summary>
+        /// <param name="item">The prefab item to select.</param>
+        /// <remarks>
+        /// If <paramref name="item"/> is <c>null</c>, this method returns immediately without action.
+        /// If the current API state already matches <paramref name="item"/>, no emission occurs.
+        /// </remarks>
         public static void OnTargetSelected(Prefab? item)
         {
             if (item == null) return;
@@ -158,6 +206,13 @@ namespace SOS.Profiles
             API.Emit(CommKeys.SelectTarget, item);
         }
 
+        /// <summary>
+        /// Selects a target prefab by emitting <see cref="CommKeys.SelectTarget"/>.
+        /// </summary>
+        /// <param name="target">The prefab target to select, or <c>null</c> to clear selection.</param>
+        /// <remarks>
+        /// Emits <see cref="CommKeys.SelectTarget"/> only if the target differs from the current API state.
+        /// </remarks>
         public static void SelectTarget(Prefab? target)
         {
             var cur = API.GetState<Prefab?>(CommKeys.SelectTarget);
@@ -165,9 +220,25 @@ namespace SOS.Profiles
                 API.Emit(CommKeys.SelectTarget, target);
         }
 
+        /// <summary>
+        /// Gets or sets the saved window size for settings.
+        /// </summary>
         public static Point SettingsWindowSize { get; set; } = new(550, 600);
+
+        /// <summary>
+        /// Gets or sets the saved window offset for settings.
+        /// </summary>
         public static Point SettingsWindowPosition { get; set; } = new(-1, -1);
 
+        /// <summary>
+        /// Creates a settings gear button in the given parent rect.
+        /// </summary>
+        /// <param name="parent">The parent rectangle transform for the button.</param>
+        /// <param name="configHost">Optional configuration host component.</param>
+        /// <returns>The created settings <see cref="GUIButton"/>.</returns>
+        /// <remarks>
+        /// Clicking the button toggles the settings window: closes it if open, opens it otherwise.
+        /// </remarks>
         public static GUIButton CreateSettingsButton(RectTransform parent, GUIComponent? configHost = null)
         {
             var btn = new GUIButton(new RectTransform(new Point(32, 32), parent, isFixedSize: true), "\u2699", style: "GUIButtonSettings")
@@ -183,6 +254,17 @@ namespace SOS.Profiles
             return btn;
         }
 
+        /// <summary>
+        /// Opens the settings window, either using an existing host component or creating a new window.
+        /// </summary>
+        /// <param name="host">Optional host component to use as content container. If <c>null</c>, a new <see cref="GUIWindow"/> is created.</param>
+        /// <remarks>
+        /// If settings are already open, they are closed first. When <paramref name="host"/> is provided,
+        /// it becomes the <see cref="_contentContainer"/> directly. Otherwise, a new
+        /// <see cref="GUIWindow"/> is created with a close button, and its <see cref="GUIWindow.ContentArea"/>
+        /// becomes the content container.
+        /// </remarks>
+        /// <seealso cref="CloseSettings"/>
         public static void OpenSettings(GUIComponent? host = null)
         {
             Logger.LogDebug("ProfileHelper.OpenSettings: start", level: LogLevel.Trace);
@@ -269,6 +351,15 @@ namespace SOS.Profiles
             }
         }
 
+        /// <summary>
+        /// Closes the settings window and persists configuration state.
+        /// </summary>
+        /// <remarks>
+        /// Removes the settings window from the GUI update list, removes it from its parent,
+        /// clears all references (<see cref="_settingsWindow"/>, <see cref="_contentContainer"/>,
+        /// <see cref="_contentLists"/>), resets <see cref="_currentColumnCount"/>, and calls
+        /// <see cref="ConfigHelper.SaveConfigs"/> to persist settings to disk.
+        /// </remarks>
         public static void CloseSettings()
         {
             if (!IsSettingsOpen) return;
@@ -297,6 +388,14 @@ namespace SOS.Profiles
             ConfigHelper.SaveConfigs();
         }
 
+        /// <summary>
+        /// Refreshes the settings display with the current configuration data.
+        /// </summary>
+        /// <param name="profile">Optional profile name for filtering (currently unused in implementation).</param>
+        /// <remarks>
+        /// Clears and redraws settings into the existing <see cref="_contentContainer"/> or
+        /// <see cref="_contentLists"/> depending on which is active.
+        /// </remarks>
         public static void RefreshSettings(string profile = "")
         {
             if (!IsSettingsOpen) return;
@@ -322,6 +421,17 @@ namespace SOS.Profiles
             Logger.LogDebug("ProfileHelper.RefreshSettings: end in-place refresh", level: LogLevel.Trace);
         }
 
+        /// <summary>
+        /// Draws configuration settings into a single container component.
+        /// </summary>
+        /// <param name="container">The parent GUI component to draw settings into.</param>
+        /// <param name="configs">The configuration items to draw.</param>
+        /// <param name="minColumnWidth">Minimum column width in pixels. Defaults to <see cref="MinColumnWidth"/>.</param>
+        /// <remarks>
+        /// Calculates the column count based on <paramref name="container"/> width and <paramref name="minColumnWidth"/>,
+        /// then lays out <see cref="GUIListBox"/> instances horizontally with the computed column distribution.
+        /// Empty lists are removed and remaining columns are resized to fill the space evenly.
+        /// </remarks>
         public static void DrawSettings(GUIComponent container, IEnumerable<ISOSConfig> configs, float minColumnWidth = MinColumnWidth)
         {
             if (container == null || !configs.Any()) return;
@@ -372,8 +482,23 @@ namespace SOS.Profiles
             }
         }
 
+        /// <summary>
+        /// Draws configuration settings into a single list box.
+        /// </summary>
+        /// <param name="targetList">The target list box to draw settings into.</param>
+        /// <param name="configs">The configuration items to draw.</param>
+        /// <seealso cref="DrawSettings(IReadOnlyList{GUIListBox}, IEnumerable{ISOSConfig})"/>
         public static void DrawSettings(GUIListBox targetList, IReadOnlyList<ISOSConfig> configs) => DrawSettings([targetList], configs);
 
+        /// <summary>
+        /// Distributes configuration settings across multiple list boxes.
+        /// </summary>
+        /// <param name="targetLists">The list boxes to distribute configs into.</param>
+        /// <param name="configs">The configuration items to distribute.</param>
+        /// <remarks>
+        /// Chunks <paramref name="configs"/> evenly across <paramref name="targetLists"/> based on ceiling division.
+        /// Each chunk is drawn sequentially into its corresponding list box.
+        /// </remarks>
         public static void DrawSettings(IReadOnlyList<GUIListBox> targetLists, IEnumerable<ISOSConfig> configs)
         {
             var configList = configs.ToList();
@@ -409,9 +534,33 @@ namespace SOS.Profiles
             return Math.Max(1, Math.Min(configCount, maxColumnsByWidth));
         }
 
+        /// <summary>
+        /// Selects the target prefab on primary action.
+        /// </summary>
+        /// <param name="p">The prefab to select.</param>
+        /// <seealso cref="SelectTarget"/>
         public static void OnPrimary(Prefab p) => ProfileHelper.SelectTarget(p);
+
+        /// <summary>
+        /// Opens the context menu on secondary action.
+        /// </summary>
+        /// <param name="p">The prefab to open context menu for.</param>
+        /// <seealso cref="OpenContextMenu"/>
         public static void OnSecondary(Prefab p) => ProfileHelper.OpenContextMenu(p);
 
+        /// <summary>
+        /// Creates a tab widget for the given tabs.
+        /// </summary>
+        /// <typeparam name="Prefab">The prefab type for the tabs.</typeparam>
+        /// <param name="parent">The parent rectangle transform.</param>
+        /// <param name="tabs">The tabs to register in the widget.</param>
+        /// <param name="onPrimary">Optional primary action handler. Defaults to <see cref="OnPrimary"/>.</param>
+        /// <param name="onSecondary">Optional secondary action handler. Defaults to <see cref="OnSecondary"/>.</param>
+        /// <returns>The created <see cref="GUITab{Prefab}"/> widget.</returns>
+        /// <remarks>
+        /// Registers each <paramref name="tab"/> and sets <see cref="GUITab{Prefab}.OnTabSelected"/>
+        /// to push the tab ID onto the history stack.
+        /// </remarks>
         public static GUITab<Prefab> CreateTabWidget(RectTransform parent, IEnumerable<ITab<Prefab>> tabs, Action<Prefab>? onPrimary = null, Action<Prefab>? onSecondary = null)
         {
             var widget = new GUITab<Prefab>(parent, onPrimary ?? OnPrimary, onSecondary ?? OnSecondary);
@@ -421,6 +570,15 @@ namespace SOS.Profiles
             return widget;
         }
 
+        /// <summary>
+        /// Updates the tab widget to reflect the current target and history selection.
+        /// </summary>
+        /// <param name="widget">The tab widget to update.</param>
+        /// <param name="target">The current target prefab.</param>
+        /// <remarks>
+        /// Calls <see cref="GUITab{Prefab}.UpdateTabs"/> and then iterates <see cref="TabHistory"/>
+        /// to select the first matching tab.
+        /// </remarks>
         public static void UpdateTabWidget(GUITab<Prefab> widget, Prefab target)
         {
             widget.UpdateTabs(target);
@@ -428,6 +586,17 @@ namespace SOS.Profiles
                 if (widget.TrySelectTab(id)) break;
         }
 
+        /// <summary>
+        /// Opens a context menu for the target prefab.
+        /// </summary>
+        /// <param name="target">The prefab to open the context menu for.</param>
+        /// <param name="position">Optional mouse position. Defaults to <see cref="PlayerInput.MousePosition"/>.</param>
+        /// <remarks>
+        /// Collects context options from all <see cref="ISOSPrefabProvider"/> instances whose
+        /// <see cref="ISOSPrefabProvider.PrefabType"/> is assignable from <paramref name="target"/>'s type,
+        /// then creates a <see cref="GUIContextMenu"/> with those options.
+        /// Returns immediately if no options are available.
+        /// </remarks>
         public static void OpenContextMenu(Prefab target, Vector2? position = null)
         {
             if (target == null) return;
@@ -441,6 +610,23 @@ namespace SOS.Profiles
         }
 
         #region XML
+
+        /// <summary>
+        /// Gets the raw XML string from a prefab's config element safely.
+        /// </summary>
+        /// <param name="item">The prefab to extract XML from.</param>
+        /// <returns>
+        /// The raw XML string, or an error comment if no XML data is found or parsing fails.
+        /// </returns>
+        /// <remarks>
+        /// Handles special cases for Barotrauma's <c>ContentXElement</c> type by attempting to access
+        /// the underlying XElement via reflection. Returns descriptive comment strings for error conditions:
+        /// <list type="bullet">
+        /// <item>"<!-- No XML data found for this item -->" when config element is <c>null</c>.</item>
+        /// <item>"<!-- Empty XML -->" when config element string is empty.</item>
+        /// <item>"<!-- Error parsing XML data -->" on any exception.</item>
+        /// </list>
+        /// </remarks>
         public static string GetRawXMLSafe(Prefab item)
         {
             var configElement = item.ConfigElement();
@@ -461,6 +647,17 @@ namespace SOS.Profiles
             catch { return "<!-- Error parsing XML data -->"; }
         }
 
+        /// <summary>
+        /// Opens an XML context menu with zoom reset and copy options for the given viewer.
+        /// </summary>
+        /// <param name="viewer">The text viewer to apply actions to.</param>
+        /// <remarks>
+        /// Creates a context menu with two options:
+        /// <list type="bullet">
+        /// <item><b>Reset Zoom</b>: Sets <see cref="GUITextViewer.TextScale"/> to 0.8f and triggers scale recalculation.</item>
+        /// <item><b>Copy XML</b>: Copies the viewer's current text to the system clipboard.</item>
+        /// </list>
+        /// </remarks>
         public static void XmlContextMenu(GUITextViewer viewer)
         {
             var options = new List<ContextMenuOption>
@@ -477,8 +674,19 @@ namespace SOS.Profiles
         }
         #endregion
 
+        /// <summary>
+        /// Emits <see cref="CommKeys.ToggleWindow"/> to toggle the settings window visibility.
+        /// </summary>
         public static void ToggleWindow() => API.Emit(CommKeys.ToggleWindow);
+
+        /// <summary>
+        /// Emits <see cref="CommKeys.OpenWindow"/> to request opening a window.
+        /// </summary>
         public static void OpenWindow() => API.Emit(CommKeys.OpenWindow);
+
+        /// <summary>
+        /// Emits <see cref="CommKeys.CloseWindow"/> to request closing a window.
+        /// </summary>
         public static void CloseWindow() => API.Emit(CommKeys.CloseWindow);
     }
 }

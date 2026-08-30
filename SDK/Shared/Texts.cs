@@ -30,6 +30,22 @@ namespace SOS
     public static class Texts
     {
         private static readonly Dictionary<string, Dictionary<Identifier, string>> prefixCache = [];
+
+        /// <summary>
+        /// Gets a localized string by key with an optional fallback.
+        /// </summary>
+        /// <param name="key">The localization key to look up.</param>
+        /// <param name="fallback">The fallback string to use if the key is not found.</param>
+        /// <param name="forceFallback">If <c>true</c>, returns <paramref name="fallback"/> directly without lookup.</param>
+        /// <returns>
+        /// The localized string if found; otherwise <paramref name="fallback"/> (prefixed with "[NT]" in DEBUG).
+        /// </returns>
+        /// <remarks>
+        /// In DEBUG builds, missing translations are prefixed with "[NT]" to highlight untranslated content.
+        /// In RELEASE builds, the raw fallback is returned without the prefix.
+        /// If <paramref name="fallback"/> is <c>null</c> or empty, returns the result from
+        /// <see cref="TextManager.Get(string)"/> directly.
+        /// </remarks>
         public static LocalizedString Get(string key, string fallback = "", bool forceFallback = false)
         {
             var text = TextManager.Get(key);
@@ -46,6 +62,19 @@ namespace SOS
             return text;
         }
 
+        /// <summary>
+        /// Gets all translations matching the specified prefix, with caching.
+        /// </summary>
+        /// <param name="prefix">The key prefix to filter translations by.</param>
+        /// <returns>
+        /// A dictionary mapping localization keys (<see cref="Identifier"/>) to their translated values,
+        /// filtered to keys that start with <paramref name="prefix"/>.
+        /// </returns>
+        /// <remarks>
+        /// Results are cached in <see cref="prefixCache"/> for subsequent calls with the same prefix.
+        /// The cache is populated by querying <see cref="TextManager.GetAllTagTextPairs"/> on first access.
+        /// Returns an empty dictionary if no translations match the prefix.
+        /// </remarks>
         public static Dictionary<Identifier, string> GetTranslationsByPrefix(string prefix)
         {
             if (prefixCache.TryGetValue(prefix, out var cached)) return cached;

@@ -12,33 +12,42 @@ using Microsoft.Xna.Framework;
 namespace SOS.GUI
 {
     /// <summary>
-    /// A layout group that automatically recalculates its height based on visible children.
+    /// A layout group that automatically recalculates its preferred height based on its visible children.
     /// </summary>
     /// <remarks>
-    /// Overrides <see cref="Update"/> to call <see cref="Recalculate"/> when <see cref="GUILayoutGroup.NeedsToRecalculate"/>
-    /// is true, and then refreshes ancestor list boxes. The <see cref="Recalculate"/> method sums the heights
-    /// of visible children plus spacing, and updates the MinSize/MaxSize accordingly.
+    /// This <see cref="GUILayoutGroup"/> arranges its children in a vertical flow, summing the heights of all
+    /// visible children plus the absolute spacing between them, plus a 10-pixel bottom padding. The <see cref="Recalculate"/>
+    /// method is called whenever <see cref="GUILayoutGroup.NeedsToRecalculate"/> is true, typically after a child's state changes.
+    /// <para>
+    /// <b>Lifecycle:</b> Recalculation occurs during <see cref="Update"/>; this component is not thread-safe and
+    /// should only be used on the GUI thread.
+    /// </para>
     /// </remarks>
     public class GUILayoutGroupAuto : GUILayoutGroup
     {
         /// <summary>
         /// Creates a new auto-recalculating layout group.
         /// </summary>
-        /// <param name="rectT">The rectangle transform for positioning and sizing.</param>
-        /// <param name="isHorizontal">Whether the layout is horizontal. Defaults to false (vertical).</param>
-        /// <param name="childAnchor">The anchor for child elements. Defaults to TopLeft.</param>
+        /// <param name="rectT">The rectangle transform used for positioning and sizing the layout group. Must not be null.</param>
+        /// <param name="isHorizontal">Whether the layout is oriented horizontally. Defaults to <c>false</c> (vertical layout).</param>
+        /// <param name="childAnchor">The anchor position for child elements. Defaults to <see cref="Anchor.TopLeft"/>.</param>
         /// <remarks>
-        /// Passes parameters to the base <see cref="GUILayoutGroup"/> constructor.
+        /// Initializes the base <see cref="GUILayoutGroup"/> with the provided parameters. The layout group will automatically
+        /// recalculate its preferred height based on visible children during updates.
         /// </remarks>
         public GUILayoutGroupAuto(RectTransform rectT, bool isHorizontal = false, Anchor childAnchor = Anchor.TopLeft) : base(rectT, isHorizontal: isHorizontal, childAnchor: childAnchor) { }
 
         /// <summary>
-        /// Updates the layout group, recalculating if needed and refreshing ancestor list boxes.
+        /// Updates the layout group, triggering recalculation if needed and refreshing ancestor list boxes.
         /// </summary>
-        /// <param name="deltaTime">Time elapsed since the last update in seconds.</param>
+        /// <param name="deltaTime">The number of seconds that have elapsed since the last frame.</param>
         /// <remarks>
-        /// If <see cref="GUILayoutGroup.NeedsToRecalculate"/> is true, calls <see cref="Recalculate"/> and then
-        /// <see cref="RefreshAncestors"/> to notify parent list boxes of size changes.
+        /// If <see cref="GUILayoutGroup.NeedsToRecalculate"/> is <c>true</c>, the <see cref="Recalculate"/> method is invoked
+        /// and then <see cref="RefreshAncestors"/> is called to update any parent <see cref="GUIListBox"/> components.
+        /// This method is called automatically by the GUI framework each frame and should not be called manually.
+        /// <para>
+        /// <b>Thread safety:</b> Must only be called from the GUI thread; this component is not thread-safe.
+        /// </para>
         /// </remarks>
         public override void Update(float deltaTime)
         {
@@ -47,13 +56,16 @@ namespace SOS.GUI
         }
 
         /// <summary>
-        /// Recalculates the layout group's height based on visible children.
+        /// Recalculates the layout group's preferred height based on visible children.
         /// </summary>
-        /// <returns><c>true</c> if the MinSize changed; <c>false</c> otherwise.</returns>
+        /// <returns><c>true</c> if the preferred MinSize changed; <c>false</c> otherwise.</returns>
         /// <remarks>
         /// Sums the heights of all visible children plus <see cref="GUILayoutGroup.AbsoluteSpacing"/> between them,
         /// plus 10 pixels of bottom padding. Updates <see cref="RectTransform.MinSize"/> and <see cref="RectTransform.MaxSize"/>.
         /// If the size changed and the parent is a <see cref="GUILayoutGroup"/>, marks it as needing recalculation.
+        /// <para>
+        /// <b>Thread safety:</b> Must only be called from the GUI thread; this component is not thread-safe.
+        /// </para>
         /// </remarks>
         public new bool Recalculate()
         {
