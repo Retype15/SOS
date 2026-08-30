@@ -61,7 +61,8 @@ namespace SOS.Configs
             l.Header("ACTIVE VISUAL PROFILE", Color.Gold);
 
             var profiles = API.GetAllWindowProfiles().ToList();
-            var profileNames = profiles.Select(p => p.DisplayName);
+            var profileNames = profiles.Select(p => p.DisplayName).ToList();
+            var profileDesc = profiles.Select(p => p.Description).ToList();
             var currentProfile = profiles.FirstOrDefault(p => p.Id == ActiveProfileId)?.DisplayName ?? profiles.FirstOrDefault()?.DisplayName ?? throw new KeyNotFoundException($"Not match Profile ID: '{ActiveProfileId}'");
 
             l.Dropdown("Profile:", profileNames, currentProfile, selectedName =>
@@ -71,7 +72,7 @@ namespace SOS.Configs
                 {
                     API.Emit<string>(CommKeys.ChangeProfile, targetProfile.Id);
                 }
-            });
+            }, profileDesc);
 
             l.Separator();
 

@@ -21,8 +21,8 @@ namespace SOS.Profiles.TCWP
     internal sealed class ThreeColumnWindowProfile : GUIWindow, ISOSWindowProfile
     {
         public string Id => "SOS.Default3Column";
-        public string DisplayName => Texts.Get("sos.profile.3CWP.name", "Minimal (Single Column)").Value;
-        public string Description => Texts.Get("sos.profile.3CWP.desc", "Compact single-column view focusing purely on content tabs.").Value;
+        public string DisplayName => Texts.Get("sos.profile.3CWP.name", "Three Column Window (Default)").Value;
+        public string Description => Texts.Get("sos.profile.3CWP.desc", "Classic profile divided with tree columns: \nLeft: List of all game objects.\nCenter:Tab panel with advanced content.\nRight:Detailed Info about selected item.").Value;
 
         private Configs.TCWP.TCWPConfig? config;
         public ISOSConfig ProfileConfig => config ??= new();

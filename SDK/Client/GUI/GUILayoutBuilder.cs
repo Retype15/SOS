@@ -326,16 +326,17 @@ namespace SOS.GUI
             return textBox;
         }
 
-        public GUIDropDown Dropdown(string label, IEnumerable<string> items, string? selected, Action<string> onSelect)
+        public GUIDropDown Dropdown(string label, IReadOnlyList<string> items, string? selected, Action<string> onSelect, IReadOnlyList<string?>? tooltips = null)
         {
-            var itemList = items.ToList();
             var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
             _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
 
-            var dropdown = new GUIDropDown(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), text: "", elementCount: itemList.Count) { CanBeFocused = true, Font = GUIStyle.SmallFont };
-            foreach (var item in itemList)
+            var dropdown = new GUIDropDown(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), text: "", elementCount: items.Count) { CanBeFocused = true, Font = GUIStyle.SmallFont };
+            for (var i = 0; i < items.Count; i++)
             {
-                dropdown.AddItem(item, item);
+                string tooltipText = (tooltips?.Count >= i) ? tooltips?[i] ?? "" : "";
+                var item = items[i];
+                dropdown.AddItem(item, item, tooltipText);
                 if (item == selected) dropdown.SelectItem(item);
             }
             dropdown.OnSelected = (comp, obj) =>
