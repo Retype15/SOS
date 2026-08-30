@@ -39,14 +39,14 @@ namespace SOS
     }
 
     [EditorBrowsable(EditorBrowsableState.Never), DefaultClass<TabDefaults>]
-    public interface ITab : IIdentifier
+    public interface ITab<T> : IIdentifier
     {
         string TabName { get; }
 
         string ToolTip => "";
-        bool CanHandle(Prefab item);
+        bool CanHandle(T item);
         void Init(GUIComponent contentContainer);
-        void Show(Prefab item, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
+        void Show(T item, Action<T> onPrimary, Action<T> onSecondary);
         void Hide();
 
         GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string toolTip = "")
@@ -67,7 +67,7 @@ namespace SOS
     }
 
 
-    public interface ISOSTab : ITab;
+    public interface ISOSTab : ITab<Prefab>;
 
     [DefaultClass<ConfigDefaults>]
     public interface ISOSConfig

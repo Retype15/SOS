@@ -126,10 +126,7 @@ namespace SOS.Profiles
 
         private static void NavigateForward() => navigationHistory.NavigateForward();
 
-        private static void ClearParentForNavigationHistory()
-        {
-            navigationHistory.RectTransform = null;
-        }
+        private static void ClearParentForNavigationHistory() => navigationHistory.RectTransform.Parent = null;
 
         #endregion
 
@@ -397,18 +394,21 @@ namespace SOS.Profiles
             return Math.Max(1, Math.Min(configCount, maxColumnsByWidth));
         }
 
-        public static GUITabWidget CreateTabWidget(RectTransform parent, IEnumerable<ITab> tabs)
+        public static void OnPrimary(Prefab p) => ProfileHelper.SelectTarget(p);
+        public static void OnSecondary(Prefab p) => ProfileHelper.OpenContextMenu(p);
+
+        public static GUITab<Prefab> CreateTabWidget(RectTransform parent, IEnumerable<ITab<Prefab>> tabs, Action<Prefab>? onPrimary = null, Action<Prefab>? onSecondary = null)
         {
-            var widget = new GUITabWidget(parent);
+            var widget = new GUITab<Prefab>(parent, onPrimary ?? OnPrimary, onSecondary ?? OnSecondary);
             foreach (var tab in tabs)
                 widget.RegisterTab(tab);
             widget.OnTabSelected = tab => PushTabHistory(tab.Id);
             return widget;
         }
 
-        public static void UpdateTabWidget(GUITabWidget widget, Prefab target, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public static void UpdateTabWidget(GUITab<Prefab> widget, Prefab target)
         {
-            widget.UpdateTabs(target, onPrimary, onSecondary);
+            widget.UpdateTabs(target);
             foreach (var id in TabHistory)
                 if (widget.TrySelectTab(id)) break;
         }

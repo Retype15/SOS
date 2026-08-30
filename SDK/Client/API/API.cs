@@ -164,6 +164,8 @@ namespace SOS
 
         public static void Off<T>(string key, Action<T> handler, double? order = null, bool removeState = false) => eventBus.Off<T>(key, handler, order, removeState);
 
+        public static bool Emit(string key) => eventBus.Emit(key, null);
+
         public static bool Emit(string key, double? order = null) => eventBus.Emit(key, order);
 
         public static bool Emit<T>(string key, T value, double? order = null, bool setState = true) => eventBus.Emit<T>(key, value, order, setState);

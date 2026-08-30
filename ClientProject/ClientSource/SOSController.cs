@@ -70,7 +70,6 @@ namespace SOS
         {
             if (!_sosStarted) ConfigHelper.LoadConfigs();
             _sosStarted = true;
-            ProfileHelper.OnTargetSelected(prefab);
 
             if (ActiveProfile == null)
             {
@@ -100,8 +99,6 @@ namespace SOS
             API.Initialize(Plugin.Instance.PluginManagementService);
 
             ActiveProfile = API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
-
-            ConfigHelper.LoadConfigs();
         }
 
         private void CloseSOS()

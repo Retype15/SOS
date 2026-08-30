@@ -10,23 +10,25 @@ using Microsoft.Xna.Framework;
 
 namespace SOS.GUI
 {
-    public class GUITabWidget : GUIFrame, IDisposable
+    public class GUITab<T> : GUIFrame, IDisposable
     {
         private readonly GUILayoutGroup _verticalLayout;
         private readonly GUIListBox _buttonArea;
         private readonly GUIFrame _contentArea;
-        private readonly List<ITab> _tabs = [];
-        private ITab? _activeTab;
+        private readonly List<ITab<T>> tabs = [];
+        public ITab<T>? ActiveTab { get; private set; }
 
-        public Action<ITab>? OnTabSelected;
+        public Action<ITab<T>>? OnTabSelected;
 
-        private Prefab? _currentTarget;
-        private Action<Prefab>? _onPrimary;
-        private Action<Prefab>? _onSecondary;
+        private T? _currentTarget;
+        public Action<T> OnPrimary;
+        public Action<T> OnSecondary;
 
-        public GUITabWidget(RectTransform rectT) : base(rectT, style: null)
+        public GUITab(RectTransform rectT, Action<T> onPrimary, Action<T> onSecondary) : base(rectT, style: null)
         {
             CanBeFocused = false;
+            OnPrimary = onPrimary;
+            OnSecondary = onSecondary;
 
             _verticalLayout = new GUILayoutGroup(new RectTransform(Vector2.One, RectTransform))
             {
@@ -49,12 +51,12 @@ namespace SOS.GUI
             };
         }
 
-        public void RegisterTab(ITab tab)
+        public void RegisterTab(ITab<T> tab)
         {
             try
             {
                 tab.Init(_contentArea);
-                _tabs.Add(tab);
+                tabs.Add(tab);
             }
             catch (Exception ex)
             {
@@ -63,17 +65,15 @@ namespace SOS.GUI
             }
         }
 
-        public void UpdateTabs(Prefab target, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public void UpdateTabs(T target)
         {
             _currentTarget = target;
-            _onPrimary = onPrimary;
-            _onSecondary = onSecondary;
 
             _buttonArea.Content.ClearChildren();
-            List<ITab> validTabs = [.. _tabs.Where(t => t.CanHandle(target))];
+            List<ITab<T>> validTabs = [.. tabs.Where(t => t.CanHandle(target))];
 
-            if (_activeTab == null || !validTabs.Contains(_activeTab))
-                _activeTab = validTabs.FirstOrDefault();
+            if (ActiveTab == null || !validTabs.Contains(ActiveTab))
+                ActiveTab = validTabs.FirstOrDefault();
 
             if (validTabs.Count > 1)
             {
@@ -83,7 +83,7 @@ namespace SOS.GUI
                 _contentArea.RectTransform.RelativeSize = new Vector2(1f, 0.92f);
 
                 foreach (var tab in validTabs)
-                    _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == _activeTab, () => SelectTab(tab), tab.ToolTip);
+                    _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == ActiveTab, () => SelectTab(tab), tab.ToolTip);
 
                 _buttonArea.RecalculateChildren();
             }
@@ -102,39 +102,33 @@ namespace SOS.GUI
         public bool TrySelectTab(string tabId)
         {
             if (_currentTarget == null) return false;
-            var tab = _tabs.FirstOrDefault(t => t.Id == tabId);
+            var tab = tabs.FirstOrDefault(t => t.Id == tabId);
             if (tab == null) return false;
             if (!tab.CanHandle(_currentTarget)) return false;
-            if (_activeTab == tab) return true;
-            return SelectTabInternal(tab);
+            return SelectTab(tab);
         }
 
-        public bool TrySelectTab(ITab tab)
+        public bool TrySelectTab(ITab<T> tab)
         {
-            if (!_tabs.Contains(tab)) return false;
+            if (!tabs.Contains(tab)) return false;
             if (_currentTarget != null && !tab.CanHandle(_currentTarget)) return false;
-            if (_activeTab == tab) return true;
-            return SelectTabInternal(tab);
+            return SelectTab(tab);
         }
 
-        public void SelectTab(ITab tab)
+        public bool SelectTab(ITab<T> tab)
         {
-            if (_activeTab == tab) return;
-            SelectTabInternal(tab);
-        }
+            if (ActiveTab == tab) return true;
 
-        private bool SelectTabInternal(ITab tab)
-        {
-            _activeTab = tab;
+            ActiveTab = tab;
             OnTabSelected?.Invoke(tab);
-            if (_currentTarget != null && _onPrimary != null && _onSecondary != null)
+            if (_currentTarget != null)
             {
-                var validTabs = _tabs.Where(t => t.CanHandle(_currentTarget));
+                var validTabs = tabs.Where(t => t.CanHandle(_currentTarget));
                 _buttonArea.Content.ClearChildren();
                 if (validTabs.Count() > 1)
                 {
                     foreach (var t in validTabs)
-                        _ = t.CreateTabButton(t.TabName, _buttonArea.Content.RectTransform, t == _activeTab, () => SelectTab(t), t.ToolTip);
+                        _ = t.CreateTabButton(t.TabName, _buttonArea.Content.RectTransform, t == ActiveTab, () => SelectTab(t), t.ToolTip);
                     _buttonArea.RecalculateChildren();
                 }
                 RefreshTabContent();
@@ -148,12 +142,12 @@ namespace SOS.GUI
 
         private void RefreshTabContent()
         {
-            if (_currentTarget == null || _onPrimary == null || _onSecondary == null) return;
+            if (_currentTarget == null) return;
 
-            foreach (var tab in _tabs)
+            foreach (var tab in tabs)
             {
-                if (tab == _activeTab)
-                    tab.Show(_currentTarget, _onPrimary, _onSecondary);
+                if (tab == ActiveTab)
+                    tab.Show(_currentTarget, OnPrimary, OnSecondary);
                 else
                     tab.Hide();
             }
@@ -162,12 +156,12 @@ namespace SOS.GUI
         public void Dispose()
         {
             _buttonArea.Content.ClearChildren();
-            foreach (var tab in _tabs)
+            foreach (var tab in tabs)
                 if (tab is IDisposable d) d.Dispose();
-            _tabs.Clear();
+            tabs.Clear();
             GC.SuppressFinalize(this);
         }
 
-        ~GUITabWidget() => Dispose();
+        ~GUITab() => Dispose();
     }
 }

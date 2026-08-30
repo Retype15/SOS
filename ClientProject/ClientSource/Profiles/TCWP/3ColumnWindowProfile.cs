@@ -40,7 +40,7 @@ namespace SOS.Profiles.TCWP
         // Center panel
         private GUIFrame? centerPanel;
         private GUIFrame? detailsHeader;
-        private GUITabWidget? centerTabWidget;
+        private GUITab<Prefab>? centerTabWidget;
 
         // Right panel
         private GUIResizableFrame? rightPanel;
@@ -251,7 +251,7 @@ namespace SOS.Profiles.TCWP
             };
 
 
-            ProfileHelper.UpdateTabWidget(centerTabWidget, target, OnPrimary, OnSecondary);
+            ProfileHelper.UpdateTabWidget(centerTabWidget, target);
 
             bool hasDrawed = false;
 
@@ -259,7 +259,7 @@ namespace SOS.Profiles.TCWP
             {
                 try
                 {
-                    hasDrawed |= section.Draw(metaPanel, target, OnPrimary, OnSecondary);
+                    hasDrawed |= section.Draw(metaPanel, target, ProfileHelper.OnPrimary, ProfileHelper.OnSecondary);
                 }
                 catch (Exception ex)
                 {
@@ -279,9 +279,6 @@ namespace SOS.Profiles.TCWP
         }
 
         private void OnApplyLayout(TPLayout layout) => ForceLayoutTo(layout);
-
-        private void OnPrimary(Prefab p) => ProfileHelper.SelectTarget(p);
-        private void OnSecondary(Prefab p) => ProfileHelper.OpenContextMenu(p);
 
         #region BuildUI
 
@@ -619,8 +616,8 @@ namespace SOS.Profiles.TCWP
                             itemsInRow = 0;
                         }
                         CardBuilder.DrawMinimalItemRow(currentRow, prefab, 1,
-                            onPrimaryClick: p => OnPrimary(p),
-                            onSecondaryClick: p => OnSecondary(p),
+                            onPrimaryClick: ProfileHelper.OnPrimary,
+                            onSecondaryClick: ProfileHelper.OnSecondary,
                             badgeColor: isFav ? Color.Gold : null);
                         itemsInRow++;
                         break;
@@ -628,8 +625,8 @@ namespace SOS.Profiles.TCWP
                     case DisplayMode.Normal:
                         var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) }, style: "ListBoxElement")
                         {
-                            OnClicked = (_, _) => { OnPrimary(prefab); return true; },
-                            OnSecondaryClicked = (_, _) => { OnSecondary(prefab); return true; },
+                            OnClicked = (_, _) => { ProfileHelper.OnPrimary(prefab); return true; },
+                            OnSecondaryClicked = (_, _) => { ProfileHelper.OnSecondary(prefab); return true; },
                             Selected = false,
                             CanBeFocused = true
                         };
