@@ -36,33 +36,40 @@ namespace SOS.GUI
         /// <summary>
         /// Creates a new layout builder for the specified list box.
         /// </summary>
-        /// <param name="listBox">The list box whose content area will contain the built UI.</param>
+        /// <param name="listBox">The list box whose content area will contain the built UI. Must not be null.</param>
         /// <remarks>
         /// Creates a <see cref="RectTransform"/> anchored to the top center of the list box's content area,
-        /// with full width and auto height.
+        /// with full width (<see cref="Vector2.X"/> = 1) and auto height (<see cref="Vector2.Y"/> = 0).
+        /// The builder becomes a child of the list box's content area and is owned by it.
         /// </remarks>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="listBox"/> is null.</exception>
         public GUILayoutBuilder(GUIListBox listBox)
             : base(new RectTransform(new Vector2(1f, 0f), listBox.Content.RectTransform, Anchor.TopCenter))
         {
         }
 
         /// <summary>
-        /// Creates a new layout builder with a custom rectangle transform.
+        /// Creates a new layout builder with a custom rectangle transform as the parent container.
         /// </summary>
-        /// <param name="rectT">The rectangle transform to use as the parent for built components.</param>
+        /// <param name="rectT">The rectangle transform to use as the parent for built components. Must not be null.</param>
         /// <remarks>
         /// Internal constructor used by <see cref="Accordion"/> methods to create nested builders.
+        /// The <paramref name="rectT"/> becomes the root container for all components added through
+        /// the returned builder instance.
         /// </remarks>
         internal GUILayoutBuilder(RectTransform rectT) : base(rectT) { }
 
         /// <summary>
         /// Adds a header text block with the specified title and color.
         /// </summary>
-        /// <param name="title">The header text.</param>
-        /// <param name="color">The text color.</param>
+        /// <param name="title">The header text to display.</param>
+        /// <param name="color">The text color for the header.</param>
         /// <returns>The created <see cref="GUITextBlock"/> with subheading font, left alignment, and 30px fixed height.</returns>
         /// <remarks>
         /// The header has a left padding of 10 pixels and spans the full width of the builder.
+        /// The block is not focusable (<see cref="GUITextBlock.CanBeFocused"/> = false).
+        /// The height is fixed at 30 pixels via <see cref="RectTransform.MinSize"/> and
+        /// <see cref="RectTransform.MaxSize"/>.
         /// </remarks>
         public GUITextBlock Header(string title, Color color)
         {
@@ -79,14 +86,16 @@ namespace SOS.GUI
         /// <summary>
         /// Adds a label-value row with the specified label, value, and value color.
         /// </summary>
-        /// <param name="label">The label text (left side).</param>
-        /// <param name="value">The value text (right side). If null or empty, returns null.</param>
+        /// <param name="label">The label text displayed on the left side.</param>
+        /// <param name="value">The value text displayed on the right side. If null or empty, the method returns null.</param>
         /// <param name="valueColor">The color of the value text.</param>
-        /// <returns>The created <see cref="GUIButton"/> row, or null if value is empty.</returns>
+        /// <returns>The created <see cref="GUIButton"/> row acting as a label-value pair, or null if <paramref name="value"/> is null or empty.</returns>
         /// <remarks>
         /// Creates a button-style row with a label on the left (gray) and value on the right (colored).
-        /// The label width is automatically calculated based on the label text length, capped at 70% of row width.
-        /// The row height auto-adjusts to fit the taller of the label or value text.
+        /// The label width is automatically calculated based on the label text length, capped at 70% of the row width.
+        /// The row height auto-adjusts to fit the taller of the label or value text, with a minimum of 4 pixels of vertical padding.
+        /// Both the label and value text blocks are not focusable.
+        /// The row listens to <see cref="RectTransform.SizeChanged"/> events on both text blocks to recalculate height dynamically.
         /// </remarks>
         public GUIButton? Row(string label, string value, Color valueColor)
         {
@@ -125,20 +134,29 @@ namespace SOS.GUI
         }
 
         /// <summary>
-        /// Adds a row with a label and multiple badge-style values that act as hyperlinks.
+        /// Adds a row with a label and multiple badge-style values that act as clickable hyperlinks.
         /// </summary>
-        /// <param name="label">The label text (left side).</param>
-        /// <param name="values">The badge values to display. If null or empty, returns null.</param>
-        /// <param name="displayNames">Optional display names for each value. If provided, must match <paramref name="values"/> count.</param>
+        /// <param name="label">The label text displayed on the left side.</param>
+        /// <param name="values">The badge values to display. If null or empty, the method returns null.</param>
+        /// <param name="displayNames">Optional display names for each value. If provided, the count must match <paramref name="values"/>. If null, the raw values are used as display names.</param>
         /// <param name="filterPrefix">Optional prefix to prepend to values when used as search filters.</param>
-        /// <param name="linkColor">Optional color for the badge links. Defaults to LightSkyBlue.</param>
-        /// <param name="onSearchFilter">Optional callback invoked when a badge is clicked, receiving the (prefixed) value.</param>
-        /// <returns>The created <see cref="GUIButton"/> row, or null if no values.</returns>
+        /// <param name="linkColor">Optional color for the badge hyperlinks. Defaults to <see cref="Color.LightSkyBlue"/>.</param>
+        /// <param name="onSearchFilter">Optional callback invoked when a badge is clicked, receiving the prefixed value string.</param>
+        /// <returns>The created <see cref="GUIButton"/> row, or null if <paramref name="values"/> is null or contains no elements.</returns>
         /// <remarks>
-        /// Each badge is formatted as a colored hyperlink using RichText syntax. Badges are comma-separated.
-        /// If only one badge is present, the entire row becomes clickable with hand cursor.
-        /// The row height auto-adjusts to fit the badge text, with a minimum of 24px.
+        /// Each badge is formatted as a colored hyperlink using RichText syntax (<c>‖color:R,G,B‖name‖end‖</c>). Badges are comma-separated.
+        /// If only one badge is present, the entire row becomes clickable with a hand cursor.
+        /// The row height auto-adjusts to fit the badge text, with a minimum of 24 pixels.
+        /// The label occupies 40% of the row width and the badges occupy 60%.
         /// </remarks>
+        /// <example>
+        /// <code>
+        /// builder.BadgeRow("Tags:", new[] { "sword", "shield" },
+        ///     displayNames: new[] { "Weapon", "Armor" },
+        ///     filterPrefix: 'i',
+        ///     onSearchFilter: filter => SearchItems(filter));
+        /// </code>
+        /// </example>
         public GUIButton? BadgeRow(
             string label,
             IEnumerable<string> values,
@@ -215,21 +233,31 @@ namespace SOS.GUI
         /// <summary>
         /// Adds a row with a label and multiple selectable items (prefabs or prefixed strings) acting as hyperlinks.
         /// </summary>
-        /// <param name="label">The label text (left side).</param>
-        /// <param name="ids">The item identifiers to display. If null or empty, returns null.</param>
-        /// <param name="displayNames">Optional display names for each identifier. If provided, must match <paramref name="ids"/> count.</param>
-        /// <param name="fallbackFilterPrefix">Optional prefix for identifiers that don't resolve to a known prefab.</param>
-        /// <param name="labelColor">Optional color for the label. Defaults to Gray.</param>
-        /// <param name="onPrimary">Callback for primary click on a resolved prefab.</param>
-        /// <param name="onSecondary">Callback for secondary click on a resolved prefab.</param>
-        /// <param name="onSearchFilter">Callback for click on a non-prefab identifier (prefixed string).</param>
-        /// <returns>The created <see cref="GUIButton"/> row, or null if no identifiers.</returns>
+        /// <param name="label">The label text displayed on the left side.</param>
+        /// <param name="ids">The item identifiers to display. If null or empty, the method returns null.</param>
+        /// <param name="displayNames">Optional display names for each identifier. If provided, the count must match <paramref name="ids"/>. If null, the raw identifiers are used as display names.</param>
+        /// <param name="fallbackFilterPrefix">Optional prefix for identifiers that do not resolve to a known prefab.</param>
+        /// <param name="labelColor">Optional color for the label. Defaults to <see cref="Color.Gray"/>.</param>
+        /// <param name="onPrimary">Callback invoked on primary click (left mouse button) on a resolved prefab item.</param>
+        /// <param name="onSecondary">Callback invoked on secondary click (right mouse button) on a resolved prefab item.</param>
+        /// <param name="onSearchFilter">Callback invoked on click of a non-prefab identifier (prefixed string).</param>
+        /// <returns>The created <see cref="GUIButton"/> row, or null if <paramref name="ids"/> is null or contains no elements.</returns>
         /// <remarks>
         /// Attempts to resolve each identifier to an <see cref="ItemPrefab"/> or <see cref="AfflictionPrefab"/>.
-        /// Resolved prefabs use their name and icon color; unresolved identifiers use the display name or raw id
-        /// with the fallback prefix and LightSkyBlue color.
-        /// If only one item is present, the row becomes clickable with hand cursor.
+        /// Resolved prefabs use their name and icon color; unresolved identifiers use the display name or raw identifier
+        /// with the fallback prefix and <see cref="Color.LightSkyBlue"/> color.
+        /// If only one item is present, the row becomes clickable with a hand cursor and supports both primary and secondary click handlers.
+        /// The label occupies 40% of the row width and the items occupy 60%.
         /// </remarks>
+        /// <example>
+        /// <code>
+        /// builder.SelectorRow("Material:", new[] { "iron", "copper" },
+        ///     displayNames: new[] { "Iron", "Copper" },
+        ///     fallbackFilterPrefix: 'm',
+        ///     onPrimary: prefab => SelectMaterial(prefab),
+        ///     onSecondary: prefab => ShowInfo(prefab));
+        /// </code>
+        /// </example>
         public GUIButton? SelectorRow(
             string label,
             IEnumerable<string> ids,
@@ -342,14 +370,16 @@ namespace SOS.GUI
         /// <summary>
         /// Adds a rich text block with the specified content.
         /// </summary>
-        /// <param name="text">The rich text to display. If null or empty, returns null.</param>
-        /// <returns>The created <see cref="GUITextBlock"/>, or null if text is empty.</returns>
+        /// <param name="text">The rich text content to display. If null or empty, the method returns null.</param>
+        /// <returns>The created <see cref="GUITextBlock"/>, or null if <paramref name="text"/> is null or empty.</returns>
         /// <remarks>
         /// Uses <see cref="GUIStyle.SmallFont"/> with left alignment and wrapping enabled.
-        /// The block height auto-adjusts to fit the text content with 10px padding.
-        /// Marked TODO for removal in favor of TextBox.
+        /// The block height auto-adjusts to fit the text content with 10 pixels of vertical padding.
+        /// The block listens to <see cref="RectTransform.SizeChanged"/> to recalculate height dynamically.
+        /// Marked for removal in favor of <see cref="TextBox"/>.
         /// </remarks>
-        public GUITextBlock? RichText(RichString text) //TODO: Eliminar en favor de TextBox.    
+        //TODO: Eliminar en favor de TextBox.
+        public GUITextBlock? RichText(RichString text)
         {
             if (text.IsNullOrEmpty()) return null;
 
@@ -374,11 +404,12 @@ namespace SOS.GUI
         #region Hecho por IA, aún no revisado.
 
         /// <summary>
-        /// Adds a horizontal separator line.
+        /// Adds a horizontal separator line spanning the full width of the builder.
         /// </summary>
         /// <returns>A 2px tall <see cref="GUIFrame"/> with a gray color, spanning the full width.</returns>
         /// <remarks>
-        /// Uses the "GUIFrameBottom" style and sets color to 40% gray.
+        /// Uses the "GUIFrameBottom" style and sets the tint color to 40% gray via <see cref="GUIFrame.Color"/>.
+        /// The frame is not focusable and acts as a purely visual divider.
         /// </remarks>
         public GUIFrame Separator()
         {
@@ -392,12 +423,17 @@ namespace SOS.GUI
         /// <summary>
         /// Adds a simple button with the specified text, click handler, and optional tooltip, color, and style.
         /// </summary>
-        /// <param name="text">The button text.</param>
-        /// <param name="onClick">The action to invoke when clicked.</param>
-        /// <param name="tooltip">Optional tooltip text.</param>
-        /// <param name="color">Optional button color.</param>
-        /// <param name="style">The GUI style name. Defaults to "GUIButtonSmall".</param>
-        /// <returns>The created <see cref="GUIButton"/> with 28px minimum height.</returns>
+        /// <param name="text">The text displayed on the button.</param>
+        /// <param name="onClick">The action to invoke when the button is clicked.</param>
+        /// <param name="tooltip">Optional tooltip text displayed when the mouse hovers over the button.</param>
+        /// <param name="color">Optional tint color for the button. If null, the style's default color is used.</param>
+        /// <param name="style">The GUI style name to apply. Defaults to "GUIButtonSmall".</param>
+        /// <returns>The created <see cref="GUIButton"/> with a 28-pixel minimum height.</returns>
+        /// <remarks>
+        /// The button is focusable and invokes <paramref name="onClick"/> when clicked.
+        /// If <paramref name="tooltip"/> is not null, it is assigned to <see cref="GUIButton.ToolTip"/>.
+        /// If <paramref name="color"/> has a value, it is assigned to <see cref="GUIButton.Color"/>.
+        /// </remarks>
         public GUIButton Button(string text, Action onClick, string? tooltip = null, Color? color = null, string style = "GUIButtonSmall")
         {
             var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, text, style: style)
@@ -411,19 +447,20 @@ namespace SOS.GUI
         }
 
         /// <summary>
-        /// Adds a composite button row with an apply button and a delete button.
+        /// Adds a composite button row with an apply button and a red delete button.
         /// </summary>
-        /// <param name="text">The text for the apply button.</param>
+        /// <param name="text">The text displayed on the apply button.</param>
         /// <param name="onClick">The action to invoke when the apply button is clicked.</param>
-        /// <param name="applyTooltip">Tooltip for the apply button.</param>
-        /// <param name="onDeleteClick">Action to invoke when the delete button is clicked.</param>
-        /// <param name="deleteTooltip">Tooltip for the delete button.</param>
-        /// <param name="color">Optional color for the apply button.</param>
+        /// <param name="applyTooltip">Tooltip text for the apply button.</param>
+        /// <param name="onDeleteClick">The action to invoke when the delete button is clicked.</param>
+        /// <param name="deleteTooltip">Tooltip text for the delete button.</param>
+        /// <param name="color">Optional tint color for the apply button. If null, the style's default color is used.</param>
         /// <param name="style">The GUI style name for the apply button. Defaults to "GUIButtonSmall".</param>
-        /// <returns>The apply <see cref="GUIButton"/> (the delete button is created but not returned).</returns>
+        /// <returns>The apply <see cref="GUIButton"/>. The delete button is created as a child of the same row but is not returned.</returns>
         /// <remarks>
-        /// Creates a horizontal row containing the apply button (90% width) and a red "x" delete button (28px).
-        /// The delete button uses "GUICancelButton" style with IndianRed color.
+        /// Creates a horizontal <see cref="GUIFrame"/> row containing the apply button (90% width) and a red "x" delete button (28x28 pixels).
+        /// The delete button uses the "GUICancelButton" style with <see cref="Color.IndianRed"/> tint.
+        /// Both buttons are focusable and invoke their respective callbacks when clicked.
         /// </remarks>
         public GUIButton Button(string text, Action onClick, string applyTooltip, Action onDeleteClick, string deleteTooltip, Color? color = null, string style = "GUIButtonSmall")
         {
@@ -450,12 +487,14 @@ namespace SOS.GUI
         /// <summary>
         /// Adds a labeled text box with an on-change handler.
         /// </summary>
-        /// <param name="label">The label text (left side, gray).</param>
-        /// <param name="initialValue">The initial text box value.</param>
-        /// <param name="onChange">Action invoked when the text changes, receiving the new text.</param>
-        /// <returns>The created <see cref="GUITextBox"/> with small font.</returns>
+        /// <param name="label">The label text displayed on the left side in gray.</param>
+        /// <param name="initialValue">The initial text value to populate the text box with.</param>
+        /// <param name="onChange">Action invoked when the text changes, receiving the new text value as a parameter.</param>
+        /// <returns>The created <see cref="GUITextBox"/> with <see cref="GUIStyle.SmallFont"/>.</returns>
         /// <remarks>
-        /// Creates a row with the label (35% width) and text box (60% width).
+        /// Creates a row with the label occupying 35% of the width and the text box occupying 60%.
+        /// The <see cref="GUITextBox.OnTextChanged"/> event is wired to invoke <paramref name="onChange"/>.
+        /// The row frame is not focusable.
         /// </remarks>
         public GUITextBox TextBox(string label, string initialValue, Action<string> onChange)
         {
@@ -469,15 +508,17 @@ namespace SOS.GUI
         /// <summary>
         /// Adds a labeled dropdown with the specified items and selection handler.
         /// </summary>
-        /// <param name="label">The label text (left side, gray).</param>
+        /// <param name="label">The label text displayed on the left side in gray.</param>
         /// <param name="items">The list of item strings to display in the dropdown.</param>
-        /// <param name="selected">The initially selected item, or null for no selection.</param>
-        /// <param name="onSelect">Action invoked when an item is selected, receiving the selected string.</param>
-        /// <param name="tooltips">Optional tooltips for each item. Must match <paramref name="items"/> count if provided.</param>
-        /// <returns>The created <see cref="GUIDropDown"/> with small font.</returns>
+        /// <param name="selected">The initially selected item string, or null to have no pre-selection.</param>
+        /// <param name="onSelect">Action invoked when an item is selected, receiving the selected string as a parameter.</param>
+        /// <param name="tooltips">Optional tooltips for each item. Must match the count of <paramref name="items"/> if provided.</param>
+        /// <returns>The created <see cref="GUIDropDown"/> with <see cref="GUIStyle.SmallFont"/>.</returns>
         /// <remarks>
-        /// Creates a row with the label (35% width) and dropdown (60% width).
+        /// Creates a row with the label occupying 35% of the width and the dropdown occupying 60%.
         /// The dropdown shows up to the number of items, with each item having an optional tooltip.
+        /// If <paramref name="selected"/> matches an item string, that item is pre-selected.
+        /// The <see cref="GUIDropDown.OnSelected"/> event is wired to invoke <paramref name="onSelect"/> when a string is selected.
         /// </remarks>
         public GUIDropDown Dropdown(string label, IReadOnlyList<string> items, string? selected, Action<string> onSelect, IReadOnlyList<string?>? tooltips = null)
         {
@@ -503,13 +544,15 @@ namespace SOS.GUI
         /// <summary>
         /// Adds a labeled tick box (checkbox) with a toggle handler.
         /// </summary>
-        /// <param name="label">The label text for the tick box.</param>
-        /// <param name="selected">The initial checked state.</param>
-        /// <param name="onToggle">Action invoked when the tick box state changes, receiving the new state.</param>
-        /// <returns>The created <see cref="GUITickBox"/> with small font.</returns>
+        /// <param name="label">The label text displayed on the tick box.</param>
+        /// <param name="selected">The initial checked state of the tick box.</param>
+        /// <param name="onToggle">Action invoked when the tick box state changes, receiving the new checked state as a parameter.</param>
+        /// <returns>The created <see cref="GUITickBox"/> with <see cref="GUIStyle.SmallFont"/>.</returns>
         /// <remarks>
         /// Creates a row with the tick box spanning the full width (100%).
-        /// The label is the tick box's text, not a separate label column.
+        /// The <paramref name="label"/> serves as the tick box's text rather than a separate label column.
+        /// The tick box is focusable and invokes <paramref name="onToggle"/> when the selected state changes.
+        /// The row frame has a minimum height of 26 pixels.
         /// </remarks>
         public GUITickBox TickBox(string label, bool selected, Action<bool> onToggle)
         {
@@ -524,19 +567,25 @@ namespace SOS.GUI
         }
 
         /// <summary>
-        /// Adds a labeled horizontal slider with a value display and change handler.
+        /// Adds a labeled horizontal slider with a live value display and change handler.
         /// </summary>
-        /// <param name="label">The label text (left side, gray).</param>
-        /// <param name="min">The minimum slider value.</param>
-        /// <param name="max">The maximum slider value.</param>
-        /// <param name="value">The initial slider value.</param>
-        /// <param name="onChange">Action invoked when the slider value changes, receiving the new value.</param>
-        /// <returns>The created <see cref="GUIScrollBar"/> styled as a slider.</returns>
+        /// <param name="label">The label text displayed on the left side in gray.</param>
+        /// <param name="min">The minimum value of the slider range.</param>
+        /// <param name="max">The maximum value of the slider range.</param>
+        /// <param name="value">The initial value of the slider.</param>
+        /// <param name="onChange">Action invoked when the slider value changes, receiving the new value as a parameter.</param>
+        /// <returns>The created <see cref="GUIScrollBar"/> styled as a horizontal slider.</returns>
         /// <remarks>
-        /// Creates a row with the label (35% width), slider (55% width), and value display (10% width).
-        /// The slider uses "GUISlider" style with 0.1 bar size.
-        /// The value display shows the value formatted with zero decimal places.
+        /// Creates a row with the label occupying 35% of the width, the slider occupying 55%, and the value display occupying 10%.
+        /// The slider uses the "GUISlider" style with a bar size of 0.1.
+        /// The value display shows the current value formatted with zero decimal places via <see cref="FormatZeroDecimal"/>.
+        /// The <paramref name="onChange"/> callback is invoked on every slider movement with the computed float value.
         /// </remarks>
+        /// <example>
+        /// <code>
+        /// builder.Slider("Volume:", 0f, 100f, 50f, value => SetVolume(value));
+        /// </code>
+        /// </example>
         public GUIScrollBar Slider(string label, float min, float max, float value, Action<float> onChange)
         {
             var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
@@ -568,6 +617,20 @@ namespace SOS.GUI
 
         #endregion
 
+        /// <summary>
+        /// Binds hyperlink click handlers to the clickable areas of a rich text block based on the provided items.
+        /// </summary>
+        /// <typeparam name="T">The type of items in the collection, typically <see cref="Prefab"/> or <see cref="string"/>.</typeparam>
+        /// <param name="textBlock">The text block whose rich text data defines the clickable areas.</param>
+        /// <param name="items">The collection of items mapped to each clickable area in order.</param>
+        /// <param name="onPrimaryClick">Action invoked on primary click, receiving the corresponding item.</param>
+        /// <param name="onSecondaryClick">Optional action invoked on secondary click, receiving the corresponding item.</param>
+        /// <remarks>
+        /// This method is private and intended for internal use by <see cref="BadgeRow"/> and <see cref="SelectorRow"/>.
+        /// It clears existing clickable areas, iterates through <see cref="GUITextBlock.RichTextData"/>, and creates
+        /// a <see cref="GUITextBlock.ClickableArea"/> for each valid colored segment.
+        /// The <see cref="RectTransform.SizeChanged"/> event is subscribed to re-apply links when the text block resizes.
+        /// </remarks>
         private static void BindHyperlinks<T>(
             GUITextBlock textBlock,
             IEnumerable<T> items,
@@ -603,18 +666,26 @@ namespace SOS.GUI
         }
 
         /// <summary>
-        /// Creates an accordion (collapsible section) with a header and returns its content builder.
+        /// Creates an accordion (collapsible section) with a text header and returns its content builder for further composition.
         /// </summary>
-        /// <param name="title">The accordion header title.</param>
-        /// <param name="tooltip">Optional tooltip for the header.</param>
-        /// <param name="collapsed">Whether the accordion starts collapsed. Defaults to false.</param>
+        /// <param name="title">The accordion header title text.</param>
+        /// <param name="tooltip">Optional tooltip text displayed when hovering over the header.</param>
+        /// <param name="collapsed">Whether the accordion starts in a collapsed state. Defaults to false (expanded).</param>
         /// <param name="onToggle">Optional callback invoked when the accordion is toggled, receiving the new collapsed state.</param>
-        /// <param name="iconAnchor">The anchor for the expand/collapse chevron icon. Defaults to CenterRight.</param>
-        /// <returns>A new <see cref="GUILayoutBuilder"/> for the accordion's content area.</returns>
+        /// <param name="iconAnchor">The anchor position for the expand/collapse chevron icon. Defaults to <see cref="Anchor.CenterRight"/>.</param>
+        /// <returns>A new <see cref="GUILayoutBuilder"/> for adding content inside the accordion's content area.</returns>
         /// <remarks>
         /// Creates a <see cref="GUIAccordion"/> with the specified title and settings.
-        /// The returned builder can be used to add content inside the accordion.
+        /// The returned builder can be used to add content inside the accordion using the fluent API.
+        /// The accordion header is rendered within the current builder's <see cref="RectTransform"/>.
         /// </remarks>
+        /// <example>
+        /// <code>
+        /// using var content = builder.Accordion("Settings", tooltip: "Configure options", collapsed: true);
+        /// content.TickBox("Enable Feature:", true, checked => featureEnabled = checked);
+        /// content.Slider("Volume:", 0f, 100f, 80f, value => volume = value);
+        /// </code>
+        /// </example>
         public GUILayoutBuilder Accordion(string title, string? tooltip = null, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
         {
             var accordion = new GUIAccordion(title, RectTransform, tooltip, collapsed, onToggle, iconAnchor);
@@ -624,14 +695,15 @@ namespace SOS.GUI
         /// <summary>
         /// Creates an accordion (collapsible section) with a custom header component and returns its content builder.
         /// </summary>
-        /// <param name="header">The custom header component to use.</param>
-        /// <param name="collapsed">Whether the accordion starts collapsed. Defaults to false.</param>
+        /// <param name="header">The custom <see cref="GUIComponent"/> to use as the accordion header.</param>
+        /// <param name="collapsed">Whether the accordion starts in a collapsed state. Defaults to false (expanded).</param>
         /// <param name="onToggle">Optional callback invoked when the accordion is toggled, receiving the new collapsed state.</param>
-        /// <param name="iconAnchor">The anchor for the expand/collapse chevron icon. Defaults to CenterRight.</param>
-        /// <returns>A new <see cref="GUILayoutBuilder"/> for the accordion's content area.</returns>
+        /// <param name="iconAnchor">The anchor position for the expand/collapse chevron icon. Defaults to <see cref="Anchor.CenterRight"/>.</param>
+        /// <returns>A new <see cref="GUILayoutBuilder"/> for adding content inside the accordion's content area.</returns>
         /// <remarks>
-        /// Creates a <see cref="GUIAccordion"/> with the specified header component and settings.
-        /// The returned builder can be used to add content inside the accordion.
+        /// Creates a <see cref="GUIAccordion"/> with the specified custom header component and settings.
+        /// The returned builder can be used to add content inside the accordion using the fluent API.
+        /// Use this overload when the default text header is insufficient and a custom GUI component is required.
         /// </remarks>
         public GUILayoutBuilder Accordion(GUIComponent header, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
         {
@@ -643,9 +715,14 @@ namespace SOS.GUI
         /// Disposes the layout builder, removing it from its parent if empty or recalculating layout.
         /// </summary>
         /// <remarks>
-        /// If the builder has no children, it is removed from its parent.
-        /// Otherwise, <see cref="Recalculate"/> is called to update the layout.
-        /// Suppresses finalization to prevent the finalizer from running.
+        /// If the builder has no children, it is removed from its parent <see cref="GUIComponent"/> via
+        /// <see cref="GUIComponent.Parent"/>.<see cref="GUIComponent.RemoveChild"/>.
+        /// Otherwise, <see cref="Recalculate"/> is called to update the layout geometry of this builder
+        /// and its ancestors.
+        /// Calls <see cref="GC.SuppressFinalize"/> to prevent the finalizer from running, as disposal
+        /// has already handled all cleanup.
+        /// This method is safe to call multiple times; subsequent calls after the first are no-ops
+        /// because the finalizer suppression prevents re-entry.
         /// </remarks>
         public void Dispose()
         {
@@ -658,7 +735,7 @@ namespace SOS.GUI
         }
 
         /// <summary>
-        /// Finalizer that calls <see cref="Dispose"/>.
+        /// Finalizer that calls <see cref="Dispose"/> to ensure cleanup if the builder was not explicitly disposed.
         /// </summary>
         ~GUILayoutBuilder() => Dispose();
     }

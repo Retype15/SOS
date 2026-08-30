@@ -33,7 +33,7 @@ namespace SOS
                         name: "sos",
                         help: CommandHelp(),
                         onExecute: args => controller?.ResolveCommand(args),
-                        getValidArgs: () => [["log", .. LogLevelStates.Strings], ["help"]]
+                        getValidArgs: () => [["log", .. LogLevelStates.Labels], ["help"]]
                 );
 
                 LuaCsSetup.Instance.EventService.Subscribe<IEventKeyUpdate>(this);
@@ -74,7 +74,7 @@ namespace SOS
         {
             return
                 Texts.Get("sos.command.help", "Open/Close SOS.\nSub-command available:").Value +
-                string.Join("\n", Texts.GetTranslationsByPrefix("sos.command.help")).Replace("{logCommands}", string.Join(", ", LogLevelStates.Strings));
+                string.Join("\n", Texts.GetTranslationsByPrefix("sos.command.help")).Replace("{logCommands}", string.Join(", ", LogLevelStates.Labels));
         }
     }
 }

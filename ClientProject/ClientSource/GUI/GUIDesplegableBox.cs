@@ -13,13 +13,15 @@ using SOS.Prefabs;
 
 namespace SOS.GUI
 {
-    /// <summary>
+/// <summary>
     /// A composite UI element displaying a label, clickable tags, and a dropdown of prefab items.
     /// </summary>
     /// <remarks>
-    /// Creates a row with a label (30% width), clickable tags (55% width), and a dropdown (fixed 36x24px).
-    /// The tags are rendered as hyperlinks using <see cref="RichStringExt.JoinToRichString"/>.
-    /// The dropdown is populated with prefabs, showing a star prefix for favorites.
+    /// Creates a row with a label (30% width), clickable tags as hyperlinks (55% width), and a dropdown
+    /// (fixed 36x24px) on the right. The tags are rendered using <see cref="RichStringExt.JoinToRichString"/>
+    /// with comma separators and LightSkyBlue color. The dropdown is populated with prefabs, showing a
+    /// gold star prefix for favorite items. The height of the row is automatically calculated based on
+    /// the tags text size.
     /// </remarks>
     public class GUIDesplegableBox : GUIFrame
     {
@@ -67,6 +69,14 @@ namespace SOS.GUI
             RectTransform.SizeChanged += UpdateHeight;
         }
 
+        /// <summary>
+        /// Updates the row height to fit the tags text.
+        /// </summary>
+        /// <remarks>
+        /// Sets the minimum and maximum height based on the tags text height plus 4 pixels of padding.
+        /// The minimum height is at least 24 pixels. This is called automatically when the component
+        /// is created and whenever the parent rectangle size changes.
+        /// </remarks>
         public void UpdateHeight()
         {
             int h = Math.Max(24, (int)_tagsText.TextSize.Y + 4);
