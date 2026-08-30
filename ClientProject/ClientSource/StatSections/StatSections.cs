@@ -641,7 +641,9 @@ namespace SOS.StatSections
 
             if (compatibleItems.Count > 0)
             {
-                _ = new GUIDesplegableBox(contentPanel.Content, SectionHelper.SetSearchFilter,
+                _ = new GUIDesplegableBox(new RectTransform(new Vector2(1f, 0f), contentPanel.Content.RectTransform) { MinSize = new Point(0, 24) },
+
+                    SectionHelper.SetSearchFilter,
                     Texts.Get("sos.container.accepts", "Accepts:").Value,
                     acceptedTags, compatibleItems, onPrimary, onSecondary);
             }
