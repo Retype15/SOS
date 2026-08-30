@@ -119,17 +119,17 @@ namespace SOS.GUI
 
             if (buttons.HasFlag(WindowButtons.Close))
             {
-                CloseButton = CreateSystemButton("", "GUICancelButton", "sos.gen.close", "Close [Esc]", Close);
+                CloseButton = CreateSystemButton("", "GUICancelButton", Texts.Get("sos.gen.close", "Close [Esc]"), Close);
             }
 
             if (buttons.HasFlag(WindowButtons.Maximize))
             {
-                MaximizeButton = CreateSystemButton("M", "DeviceButton", "sos.window.maximize", "Maximize", ToggleMaximize);
+                MaximizeButton = CreateSystemButton("M", "DeviceButton", Texts.Get("sos.window.maximize", "Maximize"), ToggleMaximize);
             }
 
             if (buttons.HasFlag(WindowButtons.Minimize))
             {
-                MinimizeButton = CreateSystemButton("-", "DeviceButton", "sos.window.minimize", "Minimize", Minimize);
+                MinimizeButton = CreateSystemButton("-", "DeviceButton", Texts.Get("sos.window.minimize", "Minimize"), Minimize);
             }
 
             UpdateSystemBoxSize();
@@ -143,13 +143,13 @@ namespace SOS.GUI
             ResizeContentArea();
         }
 
-        private GUIButton CreateSystemButton(string text, string style, string tooltipKey, string tooltipFallback, Action onClick)
+        private GUIButton CreateSystemButton(string text, string style, LocalizedString tooltip, Action onClick)
         {
             try
             {
                 var button = new GUIButton(new RectTransform(new Point(SystemButtonSize, SystemButtonSize), SystemBox.RectTransform, isFixedSize: true), text, style: style)
                 {
-                    ToolTip = Texts.Get(tooltipKey, tooltipFallback).Value,
+                    ToolTip = tooltip,
                     OnClicked = (_, _) =>
                     {
                         try
@@ -295,8 +295,8 @@ namespace SOS.GUI
             if (MaximizeButton == null) return;
 
             bool isMaximized = Mode == WindowMode.Fullscreen;
-            MaximizeButton.Text = Texts.Get(isMaximized ? "sos.window.restore_btn" : "sos.window.maximize_btn", isMaximized ? "R" : "M");
-            MaximizeButton.ToolTip = Texts.Get(isMaximized ? "sos.window.restore" : "sos.window.maximize", isMaximized ? "Restore" : "Maximize").Value;
+            MaximizeButton.Text = isMaximized ? Texts.Get("sos.window.restore_btn", "R") : Texts.Get("sos.window.maximize_btn", "M");
+            MaximizeButton.ToolTip = isMaximized ? Texts.Get("sos.window.restore", "Restore") : Texts.Get("sos.window.maximize", "Maximize");
         }
 
         private void ResizeContentArea()
