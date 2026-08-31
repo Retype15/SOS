@@ -77,7 +77,7 @@ namespace SOS.GUI
         public bool CanNavigateBack => Index > 0;
 
         /// <summary>
-        /// Gets whether navigation forward is possible (index >= 0 and index < history count - 1).
+        /// Gets whether navigation forward is possible (index &gt;= 0 and index &lt; history count - 1).
         /// </summary>
         public bool CanNavigateForward => Index >= 0 && Index < _history.Count - 1;
 

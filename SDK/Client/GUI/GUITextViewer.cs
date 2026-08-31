@@ -240,10 +240,10 @@ namespace SOS.GUI
         /// <item>Recalculates scroll bars if needed.</item>
         /// <item>Handles right-click to invoke <see cref="ContentMenu"/>.</item>
         /// <item>Handles Ctrl+Middle Mouse to reset zoom to 0.9x.</item>
-        /// <item>Handles Ctrl+Mouse Wheel for zoom (clamped to <see cref="MinScale"/> and <see cref="MaxScale"/>).</item>
+        /// <item>Handles Ctrl+Mouse Wheel for zoom (clamped to <c>MinScale</c> and <c>MaxScale</c>).</item>
         /// <item>Handles Shift+Mouse Wheel for horizontal scrolling.</item>
         /// <item>Handles Mouse Wheel for vertical scrolling.</item>
-        /// <item>Updates <see cref="TextOffset"/> based on scroll bar positions.</item>
+        /// <item>Updates <c>TextOffset</c> based on scroll bar positions.</item>
         /// </list>
         /// </remarks>
         public override void Update(float deltaTime)

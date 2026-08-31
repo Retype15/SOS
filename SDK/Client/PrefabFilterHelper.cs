@@ -54,7 +54,7 @@ namespace SOS
     /// <item><term>@</term><description>Mod filter (e.g., @MyMod)</description></item>
     /// <item><term>#</term><description>Category filter (e.g., #Weapon)</description></item>
     /// <item><term>$</term><description>Tag filter (e.g., $Radioactive)</description></item>
-    /// <item><term>&</term><description>Slot filter (e.g., &Hand)</description></item>
+    /// <item><term>&amp;</term><description>Slot filter (e.g., &amp;Hand)</description></item>
     /// <item><term>!</term><description>ID filter (e.g., !my_item)</description></item>
     /// <item><term>%</term><description>Prefab type filter (e.g., %Item)</description></item>
     /// <item><term>(none)</term><description>General filter (matches name, identifier, mod name)</description></item>
@@ -76,7 +76,7 @@ namespace SOS
         /// </summary>
         /// <param name="rawQuery">The raw search query string. Can be null or empty.</param>
         /// <remarks>
-        /// The parser detects typed prefixes (@, #, $, &, !, %) and splits the query at each prefix.
+        /// The parser detects typed prefixes (@, #, $, &amp;, !, %) and splits the query at each prefix.
         /// Terms without a prefix are added to the General list. If the query is null or empty,
         /// all filter lists remain empty.
         /// </remarks>

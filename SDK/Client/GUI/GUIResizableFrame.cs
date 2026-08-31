@@ -124,7 +124,7 @@ namespace SOS.GUI
         /// <param name="style">The GUI style name. Defaults to empty string.</param>
         /// <param name="color">The frame color. Defaults to null (uses style default).</param>
         /// <remarks>
-        /// Sets <see cref="CanBeFocused"/> to <c>true</c> to enable mouse interaction.
+        /// Sets <c>CanBeFocused</c> to <c>true</c> to enable mouse interaction.
         /// </remarks>
         public GUIResizableFrame(RectTransform rectT, string style = "", Color? color = null)
             : base(rectT, style, color)

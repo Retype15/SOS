@@ -30,7 +30,7 @@ namespace SOS
         /// <param name="text">The source string to convert.</param>
         /// <returns>A <see cref="RichString"/> instance initialized with the source text.</returns>
         /// <remarks>
-        /// This is an alias for <see cref="RichString.Rich(string)"/>.
+        /// This is an alias for <c>RichString.Rich(string)</c>.
         /// </remarks>
         public static RichString Rich(this string text) => RichString.Rich(text);
 
@@ -239,7 +239,7 @@ namespace SOS
         /// <param name="colorSelector">A function that selects the color for each item.</param>
         /// <returns>A <see cref="RichString"/> containing all items with color formatting applied.</returns>
         /// <remarks>
-        /// Each item's text is formatted with its corresponding color using the <see cref="RichString.SetColor(string)"/>
+        /// Each item's text is formatted with its corresponding color using the <c>RichString.SetColor(string)</c>
         /// pattern. The ‖ symbol is used as the RichText color tag delimiter. The original ‖ characters in the text
         /// are removed (replaced with empty string) to avoid breaking the RichText parser.
         /// </remarks>
@@ -488,7 +488,7 @@ namespace SOS
         /// Gets the display name for a prefab.
         /// </summary>
         /// <param name="prefab">The prefab to get the name for.</param>
-        /// <returns>The name of the prefab, or the identifier as a string if the name is not available.</remarks>
+        /// <returns>The name of the prefab, or the identifier as a string if the name is not available.</returns>
         public static string Name(this Prefab prefab)
         {
             return prefab switch
@@ -594,7 +594,7 @@ namespace SOS
         /// <param name="separator">The separator character to use. Defaults to ','.</param>
         /// <returns>A string containing all elements joined by the separator.</returns>
         /// <remarks>
-        /// Uses <see cref="string.Join(char, IEnumerable{object})"/> internally. Each element's ToString()
+        /// Uses <c>string.Join(char, IEnumerable{object})</c> internally. Each element's ToString()
         /// method is called to get its string representation.
         /// </remarks>
         public static string ToCsv<T>(this IEnumerable<T> collection, char separator = ',')

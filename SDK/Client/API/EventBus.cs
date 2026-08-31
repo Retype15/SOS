@@ -14,7 +14,7 @@ namespace SOS
     /// Internal event bus managing prioritized callback execution channels.
     /// </summary>
     /// <remarks>
-    /// Uses a Red-Black tree (<see cref="SortedDictionary"/>) keyed by normalized priority orders (4 decimal places)
+    /// Uses a Red-Black tree (<c>SortedDictionary</c>) keyed by normalized priority orders (4 decimal places)
     /// to store handler lists per event channel. This ensures O(log n) lookup and insertion while preventing
     /// floating-point lookup misses that could cause handlers to be missed or incorrectly dispatched.
     /// </remarks>
@@ -261,7 +261,7 @@ namespace SOS
         /// </param>
         /// <remarks>
         /// Handlers are executed outside internal synchronization locks, guaranteeing reentrancy safety and zero deadlocks.
-        /// The handler is added to the appropriate priority bucket in the Red-Black tree (<see cref="SortedDictionary double, List{Delegate}"/>).
+        /// The handler is added to the appropriate priority bucket in the Red-Black tree (<c>SortedDictionary&lt;double, List&lt;Delegate&gt;&gt;</c>).
         /// </remarks>
         public void On<T>(string key, Action<T> handler, double order = 0)
         {
@@ -313,10 +313,10 @@ namespace SOS
         /// <returns><c>true</c> if the handler was found and removed; <c>false</c> otherwise.</returns>
         /// <remarks>
         /// <para>
-        /// <c>Off<T>(key, handler)</c>: Removes the handler from <b>all</b> priority levels.
+        /// <c>Off&lt;T&gt;(key, handler)</c>: Removes the handler from <b>all</b> priority levels.
         /// </para>
         /// <para>
-        /// <c>Off<T>(key, handler, order)</c>: Targeted removal from a specific priority level. Only handlers at that exact
+        /// <c>Off&lt;T&gt;(key, handler, order)</c>: Targeted removal from a specific priority level. Only handlers at that exact
         /// normalized order are removed.
         /// </para>
         /// </remarks>

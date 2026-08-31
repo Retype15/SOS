@@ -17,16 +17,12 @@ namespace SOS
 
     /// <summary>
     /// Attribute used to automatically register mod components (sections, tabs, configs, prefab providers, window profiles)
-    /// during SDK initialization via <see cref="IPluginManagementService"/>.
+    /// during SDK initialization via <c>IPluginManagementService</c>.
     /// </summary>
-    /// <param name="id">Optional unique identifier. If <c>null</c>, the type's full name is used.</param>
-    /// <param name="order">Registration order. Lower values appear first in sorted output. Defaults to 0.0.</param>
-    /// <param name="active">Whether the component is initially active. Defaults to true.</param>
     /// <remarks>
-    /// When a type is decorated with this attribute, the SDK will discover it during the <see cref="API.Initialize"/>
-    /// call and register it in the appropriate <see cref="SortedFactory{T}"/> registry using the attribute's values.
-    /// The <see cref="Id"/> property becomes the key in the factory, <see cref="Order"/> determines priority
-    /// (lower values appear first), and <see cref="Active"/> controls whether the component is initially enabled.
+    /// The <see cref="Id"/> property is the optional unique identifier. If <c>null</c>, the type's full name is used.
+    /// The <see cref="Order"/> property determines registration order (lower values appear first, defaulting to 0.0).
+    /// The <see cref="Active"/> property controls whether the component is initially active (defaulting to true).
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]
     public class AutoRegisterAttribute : Attribute
@@ -68,7 +64,7 @@ namespace SOS
     /// Provides a unique identifier for mod components.
     /// </summary>
     /// <remarks>
-    /// The default implementation returns the type's full name (<see cref="Type.FullName"/>) or type name (<see cref="Type.Name"/>)
+    /// The default implementation returns the type's full name (<c>Type.FullName</c>) or type name (<c>Type.Name</c>)
     /// if the full name is null. Implementers can override this property to provide a custom identifier string.
     /// This interface is used by <see cref="ITab{T}"/> and <see cref="ISOSWindowProfile"/> to provide
     /// factory keys in <see cref="SortedFactory{T}"/> registries.
@@ -169,7 +165,7 @@ namespace SOS
     /// [AutoRegister(order: 5.0)]
     /// public class RadiationStatSection : ISOSStatSection
     /// {
-    ///     public bool Draw(GUIListBox contentPanel, Prefab item, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+    ///     public bool Draw(GUIListBox contentPanel, Prefab item, Action&lt;Prefab&gt; onPrimary, Action&lt;Prefab&gt; onSecondary)
     ///     {
     ///         if (item is not ItemPrefab p || !p.Tags.Contains("radioactive")) return false;
     ///
@@ -184,7 +180,7 @@ namespace SOS
     public interface ISOSStatSection
     {
         /// <summary>
-        /// Analyzes the given <paramref name="item"/> and renders visual rows into <paramref name="contentPanel"/> if applicable.
+        /// Analyzes the given <paramref name="prefab"/> and renders visual rows into <paramref name="contentPanel"/> if applicable.
         /// </summary>
         /// <param name="contentPanel">The parent list box container where GUI components will be appended.</param>
         /// <param name="prefab">The target prefab currently being inspected.</param>
@@ -211,8 +207,8 @@ namespace SOS
     /// </summary>
     /// <remarks>
     /// Implementations are registered via <see cref="AutoRegisterAttribute"/> and are managed through the SDK's
-    /// configuration system. The lifecycle methods are called by <see cref="ConfigHelper.LoadConfigs"/>,
-    /// <see cref="ConfigHelper.SaveConfigs"/>, and <see cref="ConfigHelper.ResetConfigs"/>.
+    /// configuration system. The lifecycle methods are called by <c>ConfigHelper.LoadConfigs()</c>,
+    /// <c>ConfigHelper.SaveConfigs()</c>, and <c>ConfigHelper.ResetConfigs()</c>.
     /// <list type="bullet">
     /// <item><term><see cref="Load"/>:</term><description>Load settings from persistent storage. Called on startup.</description></item>
     /// <item><term><see cref="Save"/>:</term><description>Persist current settings to storage. Called on changes.</description></item>

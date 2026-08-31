@@ -18,7 +18,7 @@ namespace SOS.GUI
     /// </summary>
     /// <remarks>
     /// Creates a row with a label (30% width), clickable tags as hyperlinks (55% width), and a dropdown
-    /// (fixed 36x24px) on the right. The tags are rendered using <see cref="RichStringExt.JoinToRichString"/>
+    /// (fixed 36x24px) on the right. The tags are rendered using <c>RichStringExt.JoinToRichString</c>
     /// with comma separators and LightSkyBlue color. The dropdown is populated with prefabs, showing a
     /// gold star prefix for favorite items. The height of the row is automatically calculated based on
     /// the tags text size.
