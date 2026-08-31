@@ -92,7 +92,7 @@ namespace SOS
         /// </summary>
         /// <typeparam name="T">The expected type of the section; must match the registered type.</typeparam>
         /// <param name="id">The unique identifier of the section to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false>, a new instance is created each time via the factory.</param>
+        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false</c>, a new instance is created each time via the factory.</param>
         /// <returns>The section instance if found; otherwise, <c>default</c> (<c>null</c> for reference types).</returns>
         /// <remarks>
         /// The keepInstance flag controls whether the instance is cached in the internal dictionary for faster subsequent access.
@@ -115,7 +115,7 @@ namespace SOS
         /// <summary>
         /// Retrieves all registered stat sections.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false>, each call creates new instances via factories.</param>
+        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false></c>, each call creates new instances via factories.</param>
         /// <returns>An enumerable of all <see cref="ISOSStatSection"/> instances.</returns>
         /// <remarks>
         /// The order of sections follows the registration order within each <see cref="SortedFactory{T}"/>, sorted by their registration order value.
@@ -177,7 +177,7 @@ namespace SOS
         /// </summary>
         /// <typeparam name="T">The expected type of the tab; must match the registered type.</typeparam>
         /// <param name="id">The unique identifier of the tab to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false>, a new instance is created each time via the factory.</param>
+        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false</c>, a new instance is created each time via the factory.</param>
         /// <returns>The tab instance if found; otherwise, <c>default</c> (<c>null</c> for reference types).</returns>
         /// <remarks>
         /// The keepInstance flag controls whether the instance is cached in the internal dictionary for faster subsequent access.
@@ -200,7 +200,7 @@ namespace SOS
         /// <summary>
         /// Retrieves all registered tabs.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false>, each call creates new instances via factories.</param>
+        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false</c>, each call creates new instances via factories.</param>
         /// <returns>An enumerable of all <see cref="ISOSTab"/> instances.</returns>
         /// <remarks>
         /// The order of tabs follows the registration order within the <see cref="SortedFactory{T}"/>, sorted by their registration order value.
@@ -263,7 +263,7 @@ namespace SOS
         /// </summary>
         /// <typeparam name="T">The expected type of the config; must match the registered type.</typeparam>
         /// <param name="id">The unique identifier of the config to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false>, a new instance is created each time via the factory.</param>
+        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false</c>, a new instance is created each time via the factory.</param>
         /// <returns>The config instance if found; otherwise, <c>default</c> (<c>null</c> for reference types).</returns>
         /// <remarks>
         /// The keepInstance flag controls whether the instance is cached in the internal dictionary for faster subsequent access.
@@ -286,7 +286,7 @@ namespace SOS
         /// <summary>
         /// Retrieves all registered configs.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false>, each call creates new instances via factories.</param>
+        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false</c>, each call creates new instances via factories.</param>
         /// <returns>An enumerable of all <see cref="ISOSConfig"/> instances.</returns>
         /// <remarks>
         /// The order of configs follows the registration order within the <see cref="SortedFactory{T}"/>, sorted by their registration order value.
@@ -349,7 +349,7 @@ namespace SOS
         /// </summary>
         /// <typeparam name="T">The expected type of the provider; must match the registered type.</typeparam>
         /// <param name="id">The unique identifier of the provider to retrieve.</param>
-        /// <param name="refresh">If <c>true</c>, forces re-creation of the instance even if cached. If <c=false>, uses cached instance if available.</param>
+        /// <param name="refresh">If <c>true</c>, forces re-creation of the instance even if cached. If <c>false</c>, uses cached instance if available.</param>
         /// <returns>The provider instance if found; otherwise, <c>default</c> (<c>null</c> for reference types).</returns>
         /// <remarks>
         /// Defaults to <c>true</c> to ensure the latest instance is returned, useful when providers may have been modified at runtime.
@@ -361,7 +361,7 @@ namespace SOS
         /// Retrieves a prefab provider by its identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the provider to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false>, a new instance is created each time via the factory.</param>
+        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false</c>, a new instance is created each time via the factory.</param>
         /// <returns>The <see cref="ISOSPrefab"/> instance if found; otherwise, <c>null</c>.</returns>
         /// <remarks>
         /// Uses the internal <see cref="SortedFactory{T}.Get(string, bool)"/> method which may instantiate the provider via its factory if not already cached.
@@ -372,7 +372,7 @@ namespace SOS
         /// <summary>
         /// Retrieves all registered prefab providers.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false>, each call creates new instances via factories.</param>
+        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false</c>, each call creates new instances via factories.</param>
         /// <returns>An enumerable of all <see cref="ISOSPrefab"/> instances.</returns>
         /// <remarks>
         /// The order of providers follows the registration order within the <see cref="SortedFactory{T}"/>, sorted by their registration order value.
@@ -479,7 +479,7 @@ namespace SOS
         /// <summary>
         /// Retrieves all registered window profiles.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false>, each call creates new instances via factories.</param>
+        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false</c>, each call creates new instances via factories.</param>
         /// <returns>An enumerable of all <see cref="ISOSWindowProfile"/> instances.</returns>
         /// <remarks>
         /// The order of profiles follows the registration order within the <see cref="SortedFactory{T}"/>, sorted by their registration order value.
@@ -537,7 +537,7 @@ namespace SOS
         /// <param name="key">The unique event identifier channel.</param>
         /// <param name="handler">The delegate to remove.</param>
         /// <param name="order">Optional. If specified, removes the handler only from the priority level matching <paramref name="order"/>.
-        /// If <c>null</sub>, removes the handler from <b>all</b> priority levels.</param>
+        /// If <c>null</c>, removes the handler from <b>all</b> priority levels.</param>
         /// <param name="removeState">If <c>true</c>, also removes any saved state associated with the key.</param>
         /// <remarks>
         /// <para>
@@ -556,7 +556,7 @@ namespace SOS
         /// <param name="key">The unique event identifier channel.</param>
         /// <param name="handler">The delegate to remove.</param>
         /// <param name="order">Optional. If specified, removes the handler only from the priority level matching <paramref name="order"/>.
-        /// If <c>null</sub>, removes the handler from <b>all</b> priority levels.</param>
+        /// If <c>null</c>, removes the handler from <b>all</b> priority levels.</param>
         /// <param name="removeState">If <c>true</c>, also removes any saved state associated with the key.</param>
         /// <remarks>
         /// <para>
@@ -589,13 +589,13 @@ namespace SOS
         public static bool Emit(string key, double? order = null) => eventBus.Emit(key, order);
 
         /// <summary>
-        /// Emits an event on the specified channel with a typed value and state management.
+        /// Emits an event on the specified channel with a typed value and optional state management.
         /// </summary>
         /// <typeparam name="T">The type of the value to emit.</typeparam>
         /// <param name="key">The unique event identifier channel.</param>
         /// <param name="value">The value to emit.</param>
         /// <param name="order">Optional execution order. If <c>null</c>, uses the handler's registered order.</param>
-        /// <param name="setState">If <c>true</c>, sets the state to the emitted value after firing.</param>
+        /// <param name="setState">If <c>true</c>, sets the state to the emitted value after handlers execute. Handlers execute first, then internal state is updated via <see cref="SetState{T}(string, T, false)"/> if <paramref name="setState"/> is <c>true</c>.</param>
         /// <returns><c>true</c> if the event was emitted to at least one handler; <c>false</c> otherwise.</returns>
         public static bool Emit<T>(string key, T value, double? order = null, bool setState = true) => eventBus.Emit<T>(key, value, order, setState);
 
@@ -616,7 +616,7 @@ namespace SOS
         /// <param name="value">The value to emit.</param>
         /// <param name="min">Minimum order (inclusive). Defaults to <see cref="double.MinValue"/>.</param>
         /// <param name="max">Maximum order (inclusive). Defaults to <see cref="double.MaxValue"/>.</param>
-        /// <param name="setState">If <c>true</c>, sets the state to the emitted value after firing.</param>
+        /// <param name="setState">If <c>true</c>, sets the state to the emitted value after handlers execute. Handlers execute first, then internal state is updated via <see cref="SetState{T}(string, T, false)"/> if <paramref name="setState"/> is <c>true</c>.</param>
         /// <returns><c>true</c> if the event was emitted to at least one handler; <c>false</c> otherwise.</returns>
         public static bool EmitRange<T>(string key, T value, double min = double.MinValue, double max = double.MaxValue, bool setState = true) => eventBus.Emit<T>(key, value, min, max, setState);
 
@@ -692,10 +692,10 @@ namespace SOS
         }
 
         /// <summary>
-        /// Clears temporary instances from all registered factories, keeping only persistent instances.
+        /// Clears cached instances for sections, tabs, prefab providers, and window profiles, while leaving factory registrations intact.
         /// </summary>
         /// <remarks>
-        /// Sections and prefab providers are cleared (instances disposed if <see cref="IDisposable"/>), while tabs are preserved.
+        /// Sections, tabs, prefab providers, and window profiles have their cached instances cleared (instances disposed if <see cref="IDisposable"/>). Factory registrations are left intact.
         /// Useful for cleanup between game rounds or mod reload scenarios.
         /// </remarks>
         internal static void ClearTemporaryInstances()

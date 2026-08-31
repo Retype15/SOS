@@ -157,7 +157,7 @@ namespace SOS.Configs
             {
                 cfg.Reset();
                 cfg.Save();
-                Profiles.ProfileHelper.RefreshSettings(); //TODO: Revisar para hacer esta llamada mÃ¡s limpia.
+                Profiles.ProfileHelper.RefreshSettings(); //TODO: Revisar para hacer esta llamada más limpia.
             };
             l.Button(
                 text: text ?? Texts.Get("sos.config.reset_section", "Reset Section Defaults").Value,
