@@ -27,7 +27,7 @@ namespace SOS
         /// A priority-ordered channel for event handlers, using a SortedDictionary keyed by normalized priority orders.
         /// </summary>
         /// <remarks>
-        /// Handlers are stored in buckets (SortedDictionary<double, List<Delegate>>) where the key is the normalized priority order
+        /// Handlers are stored in buckets (SortedDictionary&lt;double, List&lt;Delegate&gt;&gt;) where the key is the normalized priority order
         /// (rounded to 4 decimal places via <see cref="Normalize(double)"/>). This 4-decimal precision normalization prevents
         /// floating-point lookup misses in the Red-Black tree structure, ensuring handlers are reliably found and executed.
         /// </remarks>
@@ -317,7 +317,7 @@ namespace SOS
         /// </para>
         /// <para>
         /// <c>Off<T>(key, handler, order)</c>: Targeted removal from a specific priority level. Only handlers at that exact
-        /// normalized order are removed.</para>
+        /// normalized order are removed.
         /// </para>
         /// </remarks>
         public bool Off<T>(string key, Action<T> handler, double? order = null, bool removeState = false)
@@ -351,7 +351,7 @@ namespace SOS
         /// </para>
         /// <para>
         /// <c>Off(key, handler, order)</c>: Targeted removal from a specific priority level. Only handlers at that exact
-        /// normalized order are removed.</para>
+        /// normalized order are removed.
         /// </para>
         /// </remarks>
         public bool Off(string key, Action handler, double? order = null, bool removeState = false)
