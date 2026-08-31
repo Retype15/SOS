@@ -406,6 +406,7 @@ namespace SOS
     /// <summary>
     /// Default values for ordenable identifier configurations.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     internal sealed class IdentifierOrdenableDefaults
     {
         private IdentifierOrdenableDefaults() { }
@@ -419,6 +420,7 @@ namespace SOS
     /// <summary>
     /// Default implementation for tab button creation and tool tip provision.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     internal sealed class TabDefaults
     {
         private TabDefaults() { }
@@ -455,6 +457,7 @@ namespace SOS
     /// <summary>
     /// Default implementation for configuration resetting and settings drawing.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     internal sealed class ConfigDefaults
     {
         /// <summary>
@@ -473,6 +476,7 @@ namespace SOS
     /// <summary>
     /// Default implementation for building context menu options for prefabs.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     internal sealed class PrefabDefaults
     {
         /// <summary>
@@ -500,6 +504,7 @@ namespace SOS
     /// <summary>
     /// Default implementation for profile configuration.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     internal sealed class WindowProfileDefaults
     {
         /// <summary>
