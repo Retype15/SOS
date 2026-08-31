@@ -13,7 +13,7 @@ using SOS.Prefabs;
 
 namespace SOS.GUI
 {
-/// <summary>
+    /// <summary>
     /// A composite UI element displaying a label, clickable tags, and a dropdown of prefab items.
     /// </summary>
     /// <remarks>
@@ -29,7 +29,7 @@ namespace SOS.GUI
         /// <summary>
         /// Creates a new desplegable box with tags and a prefab dropdown.
         /// </summary>
-        /// <param name="parent">The parent component to which the row will be added.</param>
+        /// <param name="rectT">The parent component to which the row will be added.</param>
         /// <param name="onBadgeClick">Callback invoked when a tag badge is clicked, receiving the tag string.</param>
         /// <param name="labelText">The label text displayed on the left (30% width, gray).</param>
         /// <param name="tags">The tags to display as clickable hyperlinks (55% width).</param>

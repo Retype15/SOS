@@ -376,9 +376,7 @@ namespace SOS.GUI
         /// Uses <see cref="GUIStyle.SmallFont"/> with left alignment and wrapping enabled.
         /// The block height auto-adjusts to fit the text content with 10 pixels of vertical padding.
         /// The block listens to <see cref="RectTransform.SizeChanged"/> to recalculate height dynamically.
-        /// Marked for removal in favor of <see cref="TextBox"/>.
         /// </remarks>
-        //TODO: Eliminar en favor de TextBox.
         public GUITextBlock? RichText(RichString text)
         {
             if (text.IsNullOrEmpty()) return null;
