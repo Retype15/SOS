@@ -100,7 +100,7 @@ namespace SOS
         /// <remarks>
         /// <list type="bullet">
         /// <item><term>Payload:</term><description>None (event-only signal).</description></item>
-        /// <item><term>Typical emitters:</term><description>Hotkey (default: F1), toolbar button.</description></item>
+        /// <item><term>Typical emitters:</term><description>Hotkey (default: <see cref="Keys.J"/>, defined in CoreConfig), toolbar button.</description></item>
         /// <item><term>Typical subscribers:</term><description>Main window controller.</description></item>
         /// </list>
         /// </remarks>
