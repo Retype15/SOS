@@ -66,7 +66,6 @@ namespace SOS
         public static bool RegisterSection(object obj, string? id = null, double order = 0.0, bool active = true)
             => _sectionFactories.Register(obj, id, order, active);
 
-        public static bool ActivateSection(string id) => _sectionFactories.SetActive(id, true);
         /// <summary>
         /// Activates the stat section identified by <paramref name="id"/>.
         /// </summary>
@@ -75,7 +74,8 @@ namespace SOS
         /// <remarks>
         /// If the section is already active, this method returns <c>true</c> without side effects.
         /// </remarks>
-        public static bool DeactivateSection(string id) => _sectionFactories.SetActive(id, false);
+        public static bool ActivateSection(string id) => _sectionFactories.SetActive(id, true);
+
         /// <summary>
         /// Deactivates the stat section identified by <paramref name="id"/>.
         /// </summary>
@@ -84,9 +84,8 @@ namespace SOS
         /// <remarks>
         /// If the section is already inactive, this method returns <c>true</c> without side effects.
         /// </remarks>
+        public static bool DeactivateSection(string id) => _sectionFactories.SetActive(id, false);
 
-        public static T? GetSection<T>(string id, bool keepInstance = true)
-            => GetSection(id, keepInstance) is T t ? t : default;
         /// <summary>
         /// Retrieves a stat section of type <typeparamref name="T"/> by its identifier.
         /// </summary>
@@ -97,9 +96,9 @@ namespace SOS
         /// <remarks>
         /// The keepInstance flag controls whether the instance is cached in the internal dictionary for faster subsequent access.
         /// </remarks>
+        public static T? GetSection<T>(string id, bool keepInstance = true)
+            => GetSection(id, keepInstance) is T t ? t : default;
 
-        public static ISOSStatSection? GetSection(string id, bool keepInstance = true)
-            => _sectionFactories.Get(id, keepInstance);
         /// <summary>
         /// Retrieves a stat section by its identifier.
         /// </summary>
@@ -109,9 +108,9 @@ namespace SOS
         /// <remarks>
         /// Uses the internal <see cref="SortedFactory{T}.Get(string, bool)"/> method which may instantiate the section via its factory if not already cached.
         /// </remarks>
+        public static ISOSStatSection? GetSection(string id, bool keepInstance = true)
+            => _sectionFactories.Get(id, keepInstance);
 
-        public static IEnumerable<ISOSStatSection> GetAllSections(bool keepInstance = true)
-            => _sectionFactories.GetAll(keepInstance).Select(t => t.Instance);
         /// <summary>
         /// Retrieves all registered stat sections.
         /// </summary>
@@ -120,9 +119,9 @@ namespace SOS
         /// <remarks>
         /// The order of sections follows the registration order within each <see cref="SortedFactory{T}"/>, sorted by their registration order value.
         /// </remarks>
+        public static IEnumerable<ISOSStatSection> GetAllSections(bool keepInstance = true)
+            => _sectionFactories.GetAll(keepInstance).Select(t => t.Instance);
 
-        public static bool RemoveSection(string id, bool onlyInstance = false)
-            => _sectionFactories.Remove(id, onlyInstance);
         /// <summary>
         /// Removes a stat section by its identifier.
         /// </summary>
@@ -133,6 +132,9 @@ namespace SOS
         /// When <paramref name="onlyInstance"/> is <c>false</c> (default), the registration is completely removed from the factory,
         /// and if a cached instance exists, it is disposed (if <see cref="IDisposable"/>).
         /// </remarks>
+        public static bool RemoveSection(string id, bool onlyInstance = false)
+            => _sectionFactories.Remove(id, onlyInstance);
+
 
         #endregion
 

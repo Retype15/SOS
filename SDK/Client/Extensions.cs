@@ -354,9 +354,9 @@ namespace SOS
         /// - ColComment: DarkSeaGreen (for comments)
         /// - ColPunctuation: LightGray (for punctuation)
         /// 
+        /// Example usage:
         /// <code>
-        /// /// Example usage:
-        /// /// var formatted = XMLHighlighter.FormatToXMLCode("<Item identifier=\"test\">value</Item>");
+        /// var formatted = XMLHighlighter.FormatToXMLCode("<Item identifier=\"test\">value</Item>");
         /// </code>
         /// </remarks>
         public static RichString FormatToXMLCode(this string rawXml)

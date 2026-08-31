@@ -38,7 +38,7 @@ namespace SOS.GUI
         /// Indicates whether the scroll bars need to be recalculated on the next update.
         /// </summary>
         /// <remarks>
-        /// Set to <c>true</a> when the content size, scale, or view rect changes.
+        /// Set to <c>true</c> when the content size, scale, or view rect changes.
         /// </remarks>
         public bool scrollBarsNeedsRecalculation = true;
 

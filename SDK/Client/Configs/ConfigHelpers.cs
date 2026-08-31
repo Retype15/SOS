@@ -144,7 +144,6 @@ namespace SOS.Configs
         /// <param name="tooltip">Optional tool tip for the button. If <c>null</c>, no tool tip is set.</param>
         /// <param name="color">Optional button color. If <c>null</c>, uses the default (IndianRed with 0.8 alpha).</param>
         /// <param name="style">Optional button style. If <c>null</c>, uses "GUIButtonSmall".</param>
-        /// <returns>The <see cref="GUIButton"/> added to the layout, or <c>null</c> if the config is null.</returns>
         /// <remarks>
         /// The button click handler calls <see cref="ISOSConfig.Reset"/>, then <see cref="ISOSConfig.Save"/>,
         /// and finally <see cref="Profiles.ProfileHelper.RefreshSettings"/> to refresh the settings UI.
