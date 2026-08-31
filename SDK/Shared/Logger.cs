@@ -17,7 +17,7 @@ namespace SOS
     /// Severity levels for log messages produced by <see cref="Logger"/>.
     /// </summary>
     /// <remarks>
-    /// Log levels determine which messages are actually output based on the active <see cref="ActualLogLevel"/>.
+    /// Log levels determine which messages are actually output based on the active <c>ActualLogLevel</c>.
     /// Lower numeric values include all higher severity messages (e.g., <see cref="Error"/> includes <see cref="Critical"/>).
     /// In DEBUG mode, the default threshold is <see cref="LogLevel.Debug"/>; in RELEASE, it is <see cref="LogLevel.Information"/>.
     /// </remarks>

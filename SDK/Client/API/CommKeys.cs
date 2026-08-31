@@ -12,7 +12,7 @@ namespace SOS
     /// Static class containing all communication key constants used by the S.O.S. event system.
     /// </summary>
     /// <remarks>
-    /// These keys are used with <see cref="API.On"/>, <see cref="API.Off"/>, <see cref="API.Emit"/>, and related methods
+    /// These keys are used with <see cref="API.On"/>, <see cref="API.Off"/>, <c>API.Emit</c>, and related methods
     /// to subscribe to and emit events across the mod. Each key represents a distinct communication channel.
     /// Using these constants ensures type-safe event handling and prevents typos in event names.
     /// </remarks>
@@ -23,7 +23,7 @@ namespace SOS
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload:</term><description><see cref="Prefab"/> or <c>null</c> to clear selection.</description></item>
+        /// <item><term>Payload:</term><description><c>Prefab</c> or <c>null</c> to clear selection.</description></item>
         /// <item><term>Typical emitters:</term><description>Prefab browser clicks, tab selections, navigation history.</description></item>
         /// <item><term>Typical subscribers:</term><description>Detail panels, recipe viewers, context menus, navigation history.</description></item>
         /// </list>
@@ -100,7 +100,7 @@ namespace SOS
         /// <remarks>
         /// <list type="bullet">
         /// <item><term>Payload:</term><description>None (event-only signal).</description></item>
-        /// <item><term>Typical emitters:</term><description>Hotkey (default: <see cref="Keys.J"/>, defined in CoreConfig), toolbar button.</description></item>
+        /// <item><term>Typical emitters:</term><description>Hotkey (default: <c>Keys.J</c>, defined in CoreConfig), toolbar button.</description></item>
         /// <item><term>Typical subscribers:</term><description>Main window controller.</description></item>
         /// </list>
         /// </remarks>

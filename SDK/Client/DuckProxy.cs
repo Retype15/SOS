@@ -67,7 +67,7 @@ namespace SOS
     ///     public static int GetValue() => 42;
     /// }
     ///
-    /// // Usage: DuckProxy<IMyService>.Create(someObject);
+    /// // Usage: DuckProxy&lt;IMyService&gt;.Create(someObject);
     /// </code>
     /// </example>
     public sealed class DefaultClassAttribute : DefaultClassAttributeBase
@@ -111,11 +111,11 @@ namespace SOS
     /// <code>
     /// // Create a proxy for a Lua table
     /// var luaTable = script.GetTable("my_table");
-    /// var service = DuckProxy<IMyService>.Create(luaTable);
+    /// var service = DuckProxy&lt;IMyService&gt;.Create(luaTable);
     ///
     /// // Create a proxy for a CLR object
     /// var clrObject = new MyClrImplementation();
-    /// var service2 = DuckProxy<IMyService>.Create(clrObject);
+    /// var service2 = DuckProxy&lt;IMyService&gt;.Create(clrObject);
     /// </code>
     /// </example>
     internal class DuckProxy<T> : DispatchProxy where T : class

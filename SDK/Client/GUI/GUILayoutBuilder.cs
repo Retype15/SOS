@@ -53,7 +53,7 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="rectT">The rectangle transform to use as the parent for built components. Must not be null.</param>
         /// <remarks>
-        /// Internal constructor used by <see cref="Accordion"/> methods to create nested builders.
+        /// Internal constructor used by <c>Accordion</c> methods to create nested builders.
         /// The <paramref name="rectT"/> becomes the root container for all components added through
         /// the returned builder instance.
         /// </remarks>
@@ -67,7 +67,7 @@ namespace SOS.GUI
         /// <returns>The created <see cref="GUITextBlock"/> with subheading font, left alignment, and 30px fixed height.</returns>
         /// <remarks>
         /// The header has a left padding of 10 pixels and spans the full width of the builder.
-        /// The block is not focusable (<see cref="GUITextBlock.CanBeFocused"/> = false).
+        /// The block is not focusable (<c>CanBeFocused</c> = false).
         /// The height is fixed at 30 pixels via <see cref="RectTransform.MinSize"/> and
         /// <see cref="RectTransform.MaxSize"/>.
         /// </remarks>
@@ -406,7 +406,7 @@ namespace SOS.GUI
         /// </summary>
         /// <returns>A 2px tall <see cref="GUIFrame"/> with a gray color, spanning the full width.</returns>
         /// <remarks>
-        /// Uses the "GUIFrameBottom" style and sets the tint color to 40% gray via <see cref="GUIFrame.Color"/>.
+        /// Uses the "GUIFrameBottom" style and sets the tint color to 40% gray via <c>GUIFrame.Color</c>.
         /// The frame is not focusable and acts as a purely visual divider.
         /// </remarks>
         public GUIFrame Separator()
@@ -576,7 +576,7 @@ namespace SOS.GUI
         /// <remarks>
         /// Creates a row with the label occupying 35% of the width, the slider occupying 55%, and the value display occupying 10%.
         /// The slider uses the "GUISlider" style with a bar size of 0.1.
-        /// The value display shows the current value formatted with zero decimal places via <see cref="FormatZeroDecimal"/>.
+        /// The value display shows the current value formatted with zero decimal places via <c>FormatZeroDecimal</c>.
         /// The <paramref name="onChange"/> callback is invoked on every slider movement with the computed float value.
         /// </remarks>
         /// <example>
@@ -715,7 +715,7 @@ namespace SOS.GUI
         /// <remarks>
         /// If the builder has no children, it is removed from its parent <see cref="GUIComponent"/> via
         /// <see cref="GUIComponent.Parent"/>.<see cref="GUIComponent.RemoveChild"/>.
-        /// Otherwise, <see cref="Recalculate"/> is called to update the layout geometry of this builder
+        /// Otherwise, <c>Recalculate</c> is called to update the layout geometry of this builder
         /// and its ancestors.
         /// Calls <see cref="GC.SuppressFinalize"/> to prevent the finalizer from running, as disposal
         /// has already handled all cleanup.

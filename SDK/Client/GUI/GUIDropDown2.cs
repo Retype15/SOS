@@ -67,6 +67,7 @@ namespace SOS.GUI
         private readonly bool selectMultiple;
 
         private bool dropped;
+        /// <summary>Gets whether the dropdown list is currently dropped open.</summary>
         public bool Dropped
         {
             get => dropped;
@@ -130,12 +131,14 @@ namespace SOS.GUI
         /// <returns>The selected component, or null if none.</returns>
         public GUIComponent? SelectedComponent => listBox.SelectedComponent;
 
+        /// <summary>Gets or sets whether the dropdown is in a dropped/expanded state.</summary>
         public override bool Selected
         {
             get => Dropped;
             set => Dropped = value;
         }
 
+        /// <summary>Gets the <see cref="GUIListBox"/> used by this dropdown.</summary>
         public GUIListBox ListBox => listBox;
 
         /// <summary>
@@ -157,11 +160,23 @@ namespace SOS.GUI
             }
         }
 
+        /// <summary>Processes a character input event.</summary>
+        /// <param name="inputChar">The character typed.</param>
         public void ReceiveTextInput(char inputChar) => BGUI.KeyboardDispatcher.Subscriber = null;
+        /// <summary>Processes a string input event.</summary>
+        /// <param name="text">The text entered.</param>
         public void ReceiveTextInput(string text) { }
+        /// <summary>Processes a command input event.</summary>
+        /// <param name="command">The command character.</param>
         public void ReceiveCommandInput(char command) { }
+        /// <summary>Processes an editing input event.</summary>
+        /// <param name="text">The edited text.</param>
+        /// <param name="start">The start position of the edit.</param>
+        /// <param name="length">The length of the selection.</param>
         public void ReceiveEditingInput(string text, int start, int length) { }
 
+        /// <summary>Processes a special key input event.</summary>
+        /// <param name="key">The key pressed.</param>
         public void ReceiveSpecialInput(Keys key)
         {
             switch (key)
@@ -178,11 +193,14 @@ namespace SOS.GUI
         }
 
         private readonly List<object> selectedDataMultiple = [];
+        /// <summary>Gets the collection of multiple selected data items.</summary>
         public IEnumerable<object> SelectedDataMultiple => selectedDataMultiple;
 
         private readonly List<int> selectedIndexMultiple = [];
+        /// <summary>Gets the collection of multiple selected item indices.</summary>
         public IEnumerable<int> SelectedIndexMultiple => selectedIndexMultiple;
 
+        /// <summary>Gets or sets whether at least one item must be selected.</summary>
         public bool MustSelectAtLeastOne;
 
         /// <summary>
@@ -427,7 +445,7 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="userData">The user data of the item to select.</param>
         /// <remarks>
-        /// In multi-select mode, finds the item by user data and calls <see cref="SelectItem"/>.
+        /// In multi-select mode, finds the item by user data and calls <c>SelectItem</c>.
         /// In single-select mode, uses the list box's built-in selection.
         /// Invokes <see cref="AfterSelected"/> after selection.
         /// </remarks>
@@ -449,7 +467,7 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="index">The index of the item to select.</param>
         /// <remarks>
-        /// In multi-select mode, finds the child at the index and calls <see cref="SelectItem"/>.
+        /// In multi-select mode, finds the child at the index and calls <c>SelectItem</c>.
         /// In single-select mode, uses the list box's built-in selection by index.
         /// Invokes <see cref="AfterSelected"/> after selection.
         /// </remarks>

@@ -551,14 +551,13 @@ namespace SOS.Profiles
         /// <summary>
         /// Creates a tab widget for the given tabs.
         /// </summary>
-        /// <typeparam name="Prefab">The prefab type for the tabs.</typeparam>
         /// <param name="parent">The parent rectangle transform.</param>
         /// <param name="tabs">The tabs to register in the widget.</param>
         /// <param name="onPrimary">Optional primary action handler. Defaults to <see cref="OnPrimary"/>.</param>
         /// <param name="onSecondary">Optional secondary action handler. Defaults to <see cref="OnSecondary"/>.</param>
         /// <returns>The created <see cref="GUITab{Prefab}"/> widget.</returns>
         /// <remarks>
-        /// Registers each <paramref name="tab"/> and sets <see cref="GUITab{Prefab}.OnTabSelected"/>
+        /// Registers each <paramref name="tabs"/> and sets <see cref="GUITab{Prefab}.OnTabSelected"/>
         /// to push the tab ID onto the history stack.
         /// </remarks>
         public static GUITab<Prefab> CreateTabWidget(RectTransform parent, IEnumerable<ITab<Prefab>> tabs, Action<Prefab>? onPrimary = null, Action<Prefab>? onSecondary = null)
@@ -592,8 +591,8 @@ namespace SOS.Profiles
         /// <param name="target">The prefab to open the context menu for.</param>
         /// <param name="position">Optional mouse position. Defaults to <see cref="PlayerInput.MousePosition"/>.</param>
         /// <remarks>
-        /// Collects context options from all <see cref="ISOSPrefabProvider"/> instances whose
-        /// <see cref="ISOSPrefabProvider.PrefabType"/> is assignable from <paramref name="target"/>'s type,
+        /// Collects context options from all <see cref="ISOSPrefab"/> instances whose
+        /// <see cref="ISOSPrefab.PrefabType"/> is assignable from <paramref name="target"/>'s type,
         /// then creates a <see cref="GUIContextMenu"/> with those options.
         /// Returns immediately if no options are available.
         /// </remarks>
@@ -654,7 +653,7 @@ namespace SOS.Profiles
         /// <remarks>
         /// Creates a context menu with two options:
         /// <list type="bullet">
-        /// <item><b>Reset Zoom</b>: Sets <see cref="GUITextViewer.TextScale"/> to 0.8f and triggers scale recalculation.</item>
+        /// <item><b>Reset Zoom</b>: Sets <c>GUITextViewer.TextScale</c> to 0.8f and triggers scale recalculation.</item>
         /// <item><b>Copy XML</b>: Copies the viewer's current text to the system clipboard.</item>
         /// </list>
         /// </remarks>

@@ -27,7 +27,6 @@ namespace SOS
     /// </para>
     /// <para>
     /// <b>Instance Caching:</b> The factory maintains a cache of instantiated instances (dictionary `_instances`).
-    /// The <paramref name="keepInstance"/> flag in retrieval methods controls whether instances are cached after creation.
     /// </para>
     /// <para>
     /// <b>Thread Safety:</b> Registration and state checks occur under a monitor lock on the internal dictionary
@@ -79,7 +78,7 @@ namespace SOS
         /// </summary>
         /// <param name="obj">The object to register. Supports the following types:
         /// <list type="bullet">
-        /// <item><see cref="null"/>: registration fails, returns <c>false</c>.</item>
+        /// <item><c>null</c>: registration fails, returns <c>false</c>.</item>
         /// <item><see cref="Type"/>: registers a type that must be instantiable (not abstract, have a non-void constructor).</item>
         /// <item><see cref="Func{T}"/>: a factory delegate that creates instances of type <typeparamref name="T"/>.</item>
         /// <item>existing <paramref name="obj"/> instance: registers the instance directly.</item>
@@ -90,7 +89,7 @@ namespace SOS
         /// <param name="active">Whether the registration is initially active. Defaults to true.</param>
         /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is <c>null</c> or fails type contract checks.</returns>
         /// <remarks>
-        /// The type contract requires the registered type to be <see cref="class"/>, not abstract, have a non-void parameterless constructor,
+        /// The type contract requires the registered type to be <c>class</c>, not abstract, have a non-void parameterless constructor,
         /// and be castable to <typeparamref name="T"/>. Registration failures are logged via <see cref="Logger"/> at trace level.
         /// </remarks>
         public bool Register(object obj, string? id = null, double order = 0, bool active = true)
@@ -216,7 +215,7 @@ namespace SOS
         /// <param name="pluginManagementService">The service used to discover implementing types.</param>
         /// <returns><c>true</c> if at least one component was successfully registered; <c>false</c> otherwise.</returns>
         /// <remarks>
-        /// Retrieves all implementing types of <typeparamref name="TAuto"/> via <see cref="IPluginManagementService.GetImplementingTypes{T}"/>
+        /// Retrieves all implementing types of <typeparamref name="T"/> via <see cref="IPluginManagementService.GetImplementingTypes{T}"/>
         /// and checks each for the <see cref="AutoRegisterAttribute"/>. If present, the attribute's values (<see cref="AutoRegisterAttribute.Id"/>,
         /// <see cref="AutoRegisterAttribute.Order"/>, <see cref="AutoRegisterAttribute.Active"/>) are used for registration.
         /// </remarks>

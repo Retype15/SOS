@@ -27,13 +27,19 @@ namespace SOS.Configs
     public abstract class ConfigDirtySaver
     {
 
+        /// <summary>Tracks settings that have been modified but not yet persisted.</summary>
         protected readonly HashSet<ISettingBase> _dirtySettings = [];
 
+        /// <summary>Marks a setting as dirty so it will be saved on the next <see cref="SaveChanges"/> call.</summary>
+        /// <param name="setting">The setting that was modified.</param>
         protected void MarkDirty(ISettingBase setting)
             => _dirtySettings.Add(setting);
 
+        /// <summary>Gets whether any settings have been modified but not yet saved.</summary>
         protected bool HasChanges => _dirtySettings.Count > 0;
 
+        /// <summary>Persists all dirty settings to the configuration service.</summary>
+        /// <param name="configService">The configuration service used to save values.</param>
         protected void SaveChanges(IConfigService configService)
         {
             if (!HasChanges) return;
@@ -44,6 +50,13 @@ namespace SOS.Configs
             _dirtySettings.Clear();
         }
 
+        /// <summary>Initializes a configuration setting with a default value if it has not already been set.</summary>
+        /// <typeparam name="T">The type of the setting, must implement <see cref="ISettingBase"/>.</typeparam>
+        /// <param name="name">The name/key of the configuration setting.</param>
+        /// <param name="setting">The setting instance, either retrieved or newly created.</param>
+        /// <param name="configService">The configuration service used to initialize the setting.</param>
+        /// <param name="package">The content package containing the setting definition.</param>
+        /// <returns><c>true</c> if the setting was initialized; <c>false</c> if it already existed.</returns>
         protected bool TryInitConfig<T>(string name, out T setting, IConfigService configService, ContentPackage package) where T : ISettingBase
             => ConfigHelper.TryInitConfig<T>(name, out setting, configService, package, MarkDirty);
     }
@@ -52,7 +65,7 @@ namespace SOS.Configs
     /// Provides helper methods for configuration management, including loading, saving, and resetting configs.
     /// </summary>
     /// <remarks>
-    /// All operations iterate over configs retrieved via <see cref="API.GetAllConfigs()"/>.
+    /// All operations iterate over configs retrieved via <c>API.GetAllConfigs()</c>.
     /// Errors during individual config operations are logged via <see cref="Logger"/> and execution continues
     /// to the next config (no single failure stops the entire operation).
     /// </remarks>
@@ -64,7 +77,7 @@ namespace SOS.Configs
         /// Loads all registered configurations by calling <see cref="ISOSConfig.Load"/> on each one.
         /// </summary>
         /// <remarks>
-        /// Iterates over all configs retrieved via <see cref="API.GetAllConfigs()"/>.
+        /// Iterates over all configs retrieved via <c>API.GetAllConfigs()</c>.
         /// If a config's <see cref="ISOSConfig.Load"/> throws an exception, it is caught, logged via
         /// <see cref="Logger.LogError"/>, and execution continues to the next config.
         /// </remarks>
@@ -86,7 +99,7 @@ namespace SOS.Configs
         /// Saves all registered configurations by calling <see cref="ISOSConfig.Save"/> on each one.
         /// </summary>
         /// <remarks>
-        /// Iterates over all configs retrieved via <see cref="API.GetAllConfigs()"/>.
+        /// Iterates over all configs retrieved via <c>API.GetAllConfigs()</c>.
         /// If a config's <see cref="ISOSConfig.Save"/> throws an exception, it is caught, logged via
         /// <see cref="Logger.LogError"/>, and execution continues to the next config.
         /// </remarks>
@@ -108,7 +121,7 @@ namespace SOS.Configs
         /// Resets all registered configurations by calling <see cref="ISOSConfig.Reset"/> on each one.
         /// </summary>
         /// <remarks>
-        /// Iterates over all configs retrieved via <see cref="API.GetAllConfigs()"/>.
+        /// Iterates over all configs retrieved via <c>API.GetAllConfigs()</c>.
         /// Note: The default implementation of <see cref="ISOSConfig.Reset"/> does nothing and returns <c>false</c>.
         /// If a config overrides this method, it should reset its settings to default values.
         /// If a config's <see cref="ISOSConfig.Reset"/> throws an exception, it is caught, logged via

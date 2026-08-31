@@ -16,23 +16,16 @@ namespace SOS
     /// <remarks>
     /// Provides registration, retrieval, and removal mechanisms for mod components including sections, tabs, configs,
     /// prefab providers, and window profiles. Uses <see cref="SortedFactory{T}"/> for ordered discovery and instance caching.
-    /// Event-related methods (<see cref="On"/>, <see cref="Off"/>, <see cref="Emit"/>, <see cref="SetState"/>,
+    /// Event-related methods (<see cref="API.On"/>, <see cref="API.Off"/>, <c>API.Emit</c>, <c>API.SetState</c>,
     /// <see cref="GetState"/>) utilize the internal <see cref="EventBus"/> with priority-based execution ordering via
     /// <see cref="EventPriority"/>. Thread-safety: registry dictionaries are protected by monitor locks; event handlers
     /// execute outside locks, guaranteeing reentrancy safety and zero deadlocks.
     /// </remarks>
     /// <example>
     /// <code>
-    /// // Register a custom stat section
     /// API.RegisterSection(new MyStatSection(), "my-section", 5.0);
-    ///
-    /// // Get a registered section
-    /// var section = API.GetSection<MyStatSection>("my-section");
-    ///
-    /// // Subscribe to an event
+    /// var section = API.GetSection&lt;MyStatSection&gt;("my-section");
     /// API.On("key", () => Console.WriteLine("event fired"), EventPriority.UI);
-    ///
-    /// // Emit an event
     /// API.Emit("key");
     /// </code>
     /// </example>
@@ -61,7 +54,7 @@ namespace SOS
         /// <returns><c>true</c> if registration succeeded; otherwise, <c>false</c> if <paramref name="obj"/> is null or fails type checks.</returns>
         /// <remarks>
         /// Registered sections are discoverable via <see cref="GetSection"/> or <see cref="GetAllSections"/>.
-        /// Instances are cached based on the <paramref name="keepInstance"/> flag in retrieval methods.
+        /// Instances are cached based on the <paramref name="obj"/> flag in retrieval methods.
         /// </remarks>
         public static bool RegisterSection(object obj, string? id = null, double order = 0.0, bool active = true)
             => _sectionFactories.Register(obj, id, order, active);
@@ -150,7 +143,7 @@ namespace SOS
         /// <returns><c>true</c> if registration succeeded; otherwise, <c>false</c> if <paramref name="obj"/> is null or fails type checks.</returns>
         /// <remarks>
         /// Registered tabs are discoverable via <see cref="GetTab"/> or <see cref="GetAllTabs"/>.
-        /// Instances are cached based on the <paramref name="keepInstance"/> flag in retrieval methods.
+        /// Instances are cached based on the <paramref name="obj"/> flag in retrieval methods.
         /// </remarks>
         public static bool RegisterTab(object obj, string? id = null, double order = 0.0, bool active = true)
             => _tabFactories.Register(obj, id, order, active);
@@ -561,10 +554,10 @@ namespace SOS
         /// <param name="removeState">If <c>true</c>, also removes any saved state associated with the key.</param>
         /// <remarks>
         /// <para>
-        /// <c>Off<T>(key, handler)</c>: Removes the handler from all priority levels where it was subscribed.
+        /// <c>Off&lt;T&gt;(key, handler)</c>: Removes the handler from all priority levels where it was subscribed.
         /// </para>
         /// <para>
-        /// <c>Off<T>(key, handler, order)</c>: Targeted removal from a specific priority level.
+        /// <c>Off&lt;T&gt;(key, handler, order)</c>: Targeted removal from a specific priority level.
         /// </para>
         /// </remarks>
         public static void Off<T>(string key, Action<T> handler, double? order = null, bool removeState = false) => eventBus.Off<T>(key, handler, order, removeState);
@@ -576,7 +569,7 @@ namespace SOS
         /// <remarks>
         /// <para><c>Emit(key)</c>: Emits with no value and no state change.</para>
         /// <para><c>Emit(key, order)</c>: Emits with an optional order parameter.</para>
-        /// <para><c>Emit<T>(key, value)</c>: Emits a typed value.</para>
+        /// <para><c>Emit&lt;T&gt;(key, value)</c>: Emits a typed value.</para>
         /// <para><c>EmitRange(key, min, max)</c>: Emits within a range.</para>
         /// </remarks>
         public static bool Emit(string key) => eventBus.Emit(key, null);
