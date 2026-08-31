@@ -52,7 +52,7 @@ namespace SOS
         #region Info Sections
 
         /// <summary>
-        /// Registers a <paramref name="obj"/> as a stat section of type <typeparamref name="T"/> managed by <see cref="SortedFactory{T}"/>.
+        /// Registers a <paramref name="obj"/> as a stat section of type <see cref="ISOSStatSection"/> managed by <see cref="SortedFactory{T}"/>.
         /// </summary>
         /// <param name="obj">The instance or factory delegate to register. Can be an object, a <see cref="Type"/>, a <see cref="Func{T}"/> factory, or an existing instance.</param>
         /// <param name="id">Optional unique identifier. If null, the type's full name is used.</param>
@@ -141,7 +141,7 @@ namespace SOS
         #region Tabs
 
         /// <summary>
-        /// Registers a <paramref name="obj"/> as a tab of type <typeparamref name="T"/> managed by <see cref="SortedFactory{T}"/>.
+        /// Registers a <paramref name="obj"/> as a tab of type <see cref="ISOSTab"/> managed by <see cref="SortedFactory{T}"/>.
         /// </summary>
         /// <param name="obj">The instance or factory delegate to register. Can be an object, a <see cref="Type"/>, a <see cref="Func{T}"/> factory, or an existing instance.</param>
         /// <param name="id">Optional unique identifier. If null, the type's full name is used.</param>
@@ -228,7 +228,7 @@ namespace SOS
         #region Configs
 
         /// <summary>
-        /// Registers a <paramref name="obj"/> as a config of type <typeparamref name="T"/> managed by <see cref="SortedFactory{T}"/>.
+        /// Registers a <paramref name="obj"/> as a config of type <see cref="ISOSConfig"/> managed by <see cref="SortedFactory{T}"/>.
         /// </summary>
         /// <param name="obj">The instance or factory delegate to register. Can be an object, a <see cref="Type"/>, a <see cref="Func{T}"/> factory, or an existing instance.</param>
         /// <param name="id">Optional unique identifier. If null, the type's full name is used.</param>
@@ -314,7 +314,7 @@ namespace SOS
         #region Prefab Providers
 
         /// <summary>
-        /// Registers a <paramref name="obj"/> as a prefab provider of type <typeparamref name="T"/> managed by <see cref="SortedFactory{T}"/>.
+        /// Registers a <paramref name="obj"/> as a prefab provider of type <see cref="ISOSPrefab"/> managed by <see cref="SortedFactory{T}"/>.
         /// </summary>
         /// <param name="obj">The instance or factory delegate to register. Can be an object, a <see cref="Type"/>, a <see cref="Func{T}"/> factory, or an existing instance.</param>
         /// <param name="id">Optional unique identifier. If null, the type's full name is used.</param>
@@ -400,7 +400,7 @@ namespace SOS
         #region Window Profiles
 
         /// <summary>
-        /// Registers a <paramref name="obj"/> as a window profile of type <typeparamref name="T"/> managed by <see cref="SortedFactory{T}"/>.
+        /// Registers a <paramref name="obj"/> as a window profile of type <see cref="ISOSWindowProfile"/> managed by <see cref="SortedFactory{T}"/>.
         /// </summary>
         /// <param name="obj">The instance or factory delegate to register. Can be an object, a <see cref="Type"/>, a <see cref="Func{T}"/> factory, or an existing instance.</param>
         /// <param name="id">Optional unique identifier. If null, the type's full name is used.</param>
@@ -509,7 +509,6 @@ namespace SOS
         /// <summary>
         /// Subscribes a callback to the specified event channel with priority-based execution ordering.
         /// </summary>
-        /// <typeparam name="T">The payload type associated with the event (use <c>Action</c> for event-only signals).</typeparam>
         /// <param name="key">The unique event identifier channel (see <see cref="CommKeys"/>).</param>
         /// <param name="handler">The delegate to invoke when the event is emitted.</param>
         /// <param name="order">The execution priority weight. Lower values execute earlier (see <see cref="EventPriority"/>).
@@ -597,7 +596,7 @@ namespace SOS
         /// <param name="key">The unique event identifier channel.</param>
         /// <param name="value">The value to emit.</param>
         /// <param name="order">Optional execution order. If <c>null</c>, uses the handler's registered order.</param>
-        /// <param name="setState">If <c>true</c>, sets the state to the emitted value after handlers execute. Handlers execute first, then internal state is updated via <see cref="SetState{T}(string, T, false)"/> if <paramref name="setState"/> is <c>true</c>.</param>
+        /// <param name="setState">If <c>true</c>, sets the state to the emitted value after handlers execute. Handlers execute first, then internal state is updated via <see cref="SetState{T}(string, T, bool)"/> if <paramref name="setState"/> is <c>true</c>.</param>
         /// <returns><c>true</c> if the event was emitted to at least one handler; <c>false</c> otherwise.</returns>
         public static bool Emit<T>(string key, T value, double? order = null, bool setState = true) => eventBus.Emit<T>(key, value, order, setState);
 
@@ -618,7 +617,7 @@ namespace SOS
         /// <param name="value">The value to emit.</param>
         /// <param name="min">Minimum order (inclusive). Defaults to <see cref="double.MinValue"/>.</param>
         /// <param name="max">Maximum order (inclusive). Defaults to <see cref="double.MaxValue"/>.</param>
-        /// <param name="setState">If <c>true</c>, sets the state to the emitted value after handlers execute. Handlers execute first, then internal state is updated via <see cref="SetState{T}(string, T, false)"/> if <paramref name="setState"/> is <c>true</c>.</param>
+        /// <param name="setState">If <c>true</c>, sets the state to the emitted value after handlers execute. Handlers execute first, then internal state is updated via <see cref="SetState{T}(string, T, bool)"/> if <paramref name="setState"/> is <c>true</c>.</param>
         /// <returns><c>true</c> if the event was emitted to at least one handler; <c>false</c> otherwise.</returns>
         public static bool EmitRange<T>(string key, T value, double min = double.MinValue, double max = double.MaxValue, bool setState = true) => eventBus.Emit<T>(key, value, min, max, setState);
 

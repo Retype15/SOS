@@ -88,7 +88,7 @@ namespace SOS
         /// <param name="id">Optional unique identifier. If <c>null</c>, the type's full name is used as the ID.</param>
         /// <param name="order">Registration order. Determines position in sorted output. Lower values appear first. Defaults to 0.</param>
         /// <param name="active">Whether the registration is initially active. Defaults to true.</param>
-        /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is null or fails type contract checks.</returns>
+        /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is <c>null</c> or fails type contract checks.</returns>
         /// <remarks>
         /// The type contract requires the registered type to be <see cref="class"/>, not abstract, have a non-void parameterless constructor,
         /// and be castable to <typeparamref name="T"/>. Registration failures are logged via <see cref="Logger"/> at trace level.

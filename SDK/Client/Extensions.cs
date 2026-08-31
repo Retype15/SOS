@@ -342,10 +342,10 @@ namespace SOS
         /// 1. Escapes the ‖ RichText character to || to avoid parser conflicts.
         /// 2. Highlights string values (text between quotes) using the ColValue color.
         /// 3. Highlights attributes (identifier=) using the ColAttr color.
-        /// 4. Highlights node names (<Node>) using the ColNode color.
-        /// 5. Highlights punctuation (< > / =) using the ColPunctuation color.
+        /// 4. Highlights node names (&lt;Node&gt;) using the ColNode color.
+        /// 5. Highlights punctuation (&lt; &gt; / =) using the ColPunctuation color.
         ///     - Note: To avoid replacing our own color tags (‖color:Hex‖), the regex will not touch anything between ‖ symbols.
-        /// 6. Highlights comments (<!-- ... -->) using the ColComment color, overwriting any internal colors.
+        /// 6. Highlights comments (&lt;!-- ... --&gt;) using the ColComment color, overwriting any internal colors.
         /// 
         /// The coloring uses a "Dark Theme" style palette defined as private static readonly fields:
         /// - ColNode: CornflowerBlue (for node names)
@@ -356,7 +356,7 @@ namespace SOS
         /// 
         /// Example usage:
         /// <code>
-        /// var formatted = XMLHighlighter.FormatToXMLCode("<Item identifier=\"test\">value</Item>");
+        /// var formatted = XMLHighlighter.FormatToXMLCode("&lt;Item identifier=\"test\"&gt;value&lt;/Item&gt;");
         /// </code>
         /// </remarks>
         public static RichString FormatToXMLCode(this string rawXml)
