@@ -9,51 +9,89 @@
 namespace SOS
 {
     /// <summary>
-    /// Priority constants for event execution ordering in the S.O.S event pipeline.
+    /// Defines canonical priority constants for deterministic execution ordering within the S.O.S. event bus (<see cref="API"/>).
     /// </summary>
     /// <remarks>
-    /// Events are processed through five priority tiers, ordered from lowest to highest execution priority:
-    /// <list type="bullet">
-    /// <item><term>System</term><description>(-2) System-level events, processed first (e.g., internal shutdown hooks).</description></item>
-    /// <item><term>State</term><description>(-1) State-related events, processed after system events.</description></item>
-    /// <item><term>Default</term><description>(0) Default priority, the baseline for most mod events.</description></item>
-    /// <item><term>UI</term><description>(1) User interface events, processed after default events.</description></item>
-    /// <item><term>PostUI</term><description>(2) Post-user-interface events, processed after UI updates (e.g., post-render callbacks, animations).</description></item>
+    /// <para>
+    /// <b>Pipeline Execution Order:</b>
+    /// Event handlers are dispatched in ascending order of their numerical priority weight:
+    /// <list type="table">
+    /// <listheader><term>Priority Tier</term><description>Weight &amp; Recommended Purpose</description></listheader>
+    /// <item><term><see cref="System"/></term><description><c>-2.0</c> — Low-level lifecycle orchestration, window closing, and profile tearing down.</description></item>
+    /// <item><term><see cref="State"/></term><description><c>-1.0</c> — Data store synchronization and model mutations before views react.</description></item>
+    /// <item><term><see cref="Default"/></term><description><c>0.0</c> — Standard domain logic and general third-party mod event listeners.</description></item>
+    /// <item><term><see cref="UI"/></term><description><c>1.0</c> — Primary GUI reconstruction, widget refreshes, and layout reflows.</description></item>
+    /// <item><term><see cref="PostUI"/></term><description><c>2.0</c> — Post-render effects, animation sequence triggers, telemetry, and diagnostics.</description></item>
     /// </list>
+    /// </para>
+    /// <para>
+    /// <b>Fractional In-Between Prioritization:</b>
+    /// Because priorities are represented as normalized double-precision floating-point numbers (rounded to 4 decimal places),
+    /// developers can insert handlers between standard tiers (e.g., <c>EventPriority.State + 0.5</c> for history navigation stacks,
+    /// or <c>EventPriority.UI - 0.1</c> for pre-render setup) without risking key collisions or precision drift in the underlying Red-Black tree.
+    /// </para>
     /// </remarks>
+    /// <example>
+    /// <code>
+    /// // Subscribing a state mutator to run before the UI renders:
+    /// API.On&lt;Prefab&gt;(CommKeys.SelectTarget, prefab => 
+    /// {
+    ///     UpdateDataModel(prefab);
+    /// }, EventPriority.State);
+    ///
+    /// // Subscribing a UI panel that relies on the updated data model:
+    /// API.On&lt;Prefab&gt;(CommKeys.SelectTarget, prefab => 
+    /// {
+    ///     RefreshCustomPanel(prefab);
+    /// }, EventPriority.UI);
+    /// </code>
+    /// </example>
     public static class EventPriority
     {
         /// <summary>
-        /// System priority tier. Events at this level execute first, typically for internal system operations.
+        /// System priority tier (<c>-2.0</c>). Dispatched first to handle critical infrastructure, lifecycle termination, and profile switching.
         /// </summary>
-        /// <remarks>Use for critical infrastructure events that must run before any other priority tier.</remarks>
+        /// <remarks>
+        /// Handlers registered at this tier run before any data state mutations occur. Reserved primarily for internal controller
+        /// cleanup and low-level system coordination.
+        /// </remarks>
         public const double System = -2;
 
         /// <summary>
-        /// State priority tier. Events at this level execute after system events but before default events,
-        /// typically for game state management.
+        /// State priority tier (<c>-1.0</c>). Dispatched to synchronize configurations, caches, and data stores before visual components react.
         /// </summary>
-        /// <remarks>Use for events related to game state changes, transitions, or modifications.</remarks>
+        /// <remarks>
+        /// Handlers at this level update data models, selected targets, and active configs. Guaranteed to execute before
+        /// <see cref="Default"/> domain listeners and <see cref="UI"/> layout renderers.
+        /// </remarks>
         public const double State = -1;
 
         /// <summary>
-        /// Default priority tier. The baseline priority for most mod events.
+        /// Default priority tier (<c>0.0</c>). The neutral baseline tier for standard domain logic and general mod event handlers.
         /// </summary>
-        /// <remarks>Use for general-purpose events that execute in a non matter order relative to other tiers.</remarks>
+        /// <remarks>
+        /// Used when no explicit priority order is specified in <see cref="API.On(string, Action, double)"/> or <see cref="API.On{T}(string, Action{T}, double)"/>.
+        /// Suitable for standard game logic that does not require specialized pre- or post-processing guarantees.
+        /// </remarks>
         public const double Default = 0;
 
         /// <summary>
-        /// UI priority tier. Events at this level execute after default events, typically for user interface interactions.
+        /// UI priority tier (<c>1.0</c>). Dispatched to update, construct, or re-render graphical user interface components.
         /// </summary>
-        /// <remarks>Use for UI-related events such as button clicks, menu selections, or HUD updates.</remarks>
+        /// <remarks>
+        /// Handlers at this level are guaranteed to run <i>after</i> <see cref="System"/> and <see cref="State"/> handlers have
+        /// fully committed their changes. Visual controls reading from the state store (such as <see cref="API.GetState{T}(string)"/>)
+        /// will always receive freshly updated data.
+        /// </remarks>
         public const double UI = 1;
 
         /// <summary>
-        /// Post-UI priority tier. Events at this level execute after UI events, typically for post-render callbacks,
-        /// asynchronous post-processing or Animation executions.
+        /// Post-UI priority tier (<c>2.0</c>). Dispatched after primary visual components have completed their layout and drawing passes.
         /// </summary>
-        /// <remarks>Use for events that need to run after the UI has been updated, such as performance monitoring or
-        /// post-processing effects.</remarks>
+        /// <remarks>
+        /// Ideal for initiating visual transitions, triggering <see cref="GUI.GUIAnimSequence"/> animations, executing diagnostics,
+        /// or logging telemetry where visual elements must already be present in the active hierarchy.
+        /// </remarks>
         public const double PostUI = 2;
     }
 }

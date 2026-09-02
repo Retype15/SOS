@@ -9,135 +9,146 @@
 namespace SOS
 {
     /// <summary>
-    /// Static class containing all communication key constants used by the S.O.S. event system.
+    /// Centralized registry of standardized communication channel identifiers for the decoupled S.O.S. event bus (<see cref="API"/>).
     /// </summary>
     /// <remarks>
-    /// These keys are used with <see cref="API.On"/>, <see cref="API.Off"/>, <c>API.Emit</c>, and related methods
-    /// to subscribe to and emit events across the mod. Each key represents a distinct communication channel.
-    /// Using these constants ensures type-safe event handling and prevents typos in event names.
+    /// <para>
+    /// Using these standardized constants with <see cref="API.On(string, Action, double)"/>, <see cref="API.Off(string, Action, double?, bool)"/>,
+    /// and <see cref="API.Emit(string, double?)"/> eliminates magic strings, guarantees compile-time safety, and allows third-party
+    /// mods to react to or drive the primary lifecycle of the S.O.S. interface.
+    /// </para>
     /// </remarks>
+    /// <example>
+    /// <code>
+    /// // Subscribing to target selection changes with typed payload:
+    /// API.On&lt;Prefab?&gt;(CommKeys.SelectTarget, targetPrefab =>
+    /// {
+    ///     if (targetPrefab != null)
+    ///         Logger.LogDebug($"Target selected: {targetPrefab.Identifier}");
+    /// }, EventPriority.UI);
+    /// 
+    /// // Emitting an explicit request to open the browser:
+    /// API.Emit(CommKeys.OpenWindow);
+    /// </code>
+    /// </example>
     public static class CommKeys
     {
         /// <summary>
-        /// Emitted when a prefab target is selected or changed in the UI.
+        /// Channel emitted when the active target entity changes or is cleared in the inspector.
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload:</term><description><c>Prefab</c> or <c>null</c> to clear selection.</description></item>
-        /// <item><term>Typical emitters:</term><description>Prefab browser clicks, tab selections, navigation history.</description></item>
-        /// <item><term>Typical subscribers:</term><description>Detail panels, recipe viewers, context menus, navigation history.</description></item>
+        /// <item><term>Payload Type:</term><description><see cref="Barotrauma.Prefab"/> (or <c>null</c> to clear selection).</description></item>
+        /// <item><term>Typical Emitters:</term><description>Left sidebar search list clicks, history navigation buttons, item context actions, or external mod triggers.</description></item>
+        /// <item><term>Typical Subscribers:</term><description><c>CoreConfig</c> (updates state store at <see cref="EventPriority.State"/>), <c>ProfileHelper</c> (pushes to history stack at <c>-0.5</c>), and active window profiles (re-renders views and tabs at <see cref="EventPriority.UI"/>).</description></item>
         /// </list>
-        /// <para>
-        /// Use <see cref="API.On{Prefab}(string, Action{Prefab}, double)"/> to subscribe with a typed handler,
-        /// or <see cref="API.On(string, Action, double)"/> for the raw event.
-        /// </para>
         /// </remarks>
         public static string SelectTarget => "SelectTarget";
 
         /// <summary>
-        /// Emitted when the active profile is changed.
+        /// Channel emitted to request switching the active visual presentation profile.
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload:</term><description><see cref="string"/> containing the profile identifier.</description></item>
-        /// <item><term>Typical emitters:</term><description>Profile selector UI, profile import/export.</description></item>
-        /// <item><term>Typical subscribers:</term><description>Settings window, profile-dependent components.</description></item>
+        /// <item><term>Payload Type:</term><description><see cref="string"/> (the unique identifier of the target <see cref="ISOSWindowProfile"/>).</description></item>
+        /// <item><term>Typical Emitters:</term><description>Profile selection dropdown in the Settings window, automated layout switchers.</description></item>
+        /// <item><term>Typical Subscribers:</term><description><c>SOSController</c> (tears down outgoing profile and builds incoming profile at <see cref="EventPriority.System"/>), <c>ProfileHelper</c> (refreshes open settings at <see cref="EventPriority.PostUI"/>).</description></item>
         /// </list>
         /// </remarks>
         public static string ChangeProfile => "ChangeProfile";
 
         /// <summary>
-        /// Emitted when a window layout should be applied.
+        /// Channel emitted to apply a geometry layout preset to the active profile.
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload:</term><description><see cref="string"/> layout identifier or <c>null</c> for default.</description></item>
-        /// <item><term>Typical emitters:</term><description>Layout selector, profile changes.</description></item>
-        /// <item><term>Typical subscribers:</term><description>Window managers, profile helpers.</description></item>
+        /// <item><term>Payload Type:</term><description>Profile-specific layout struct or model (e.g., <c>ThreeColumnWindowProfile.TPLayout</c>).</description></item>
+        /// <item><term>Typical Emitters:</term><description>Default layout preset buttons, user custom layout preset buttons in Settings.</description></item>
+        /// <item><term>Typical Subscribers:</term><description>Active window profile (resizes panels, updates splitters, and recalculates boundaries at <see cref="EventPriority.UI"/>).</description></item>
         /// </list>
         /// </remarks>
         public static string ApplyLayout => "ApplyLayout";
 
         /// <summary>
-        /// Emitted when the user navigates back in the prefab selection history.
+        /// Channel emitted to request backward navigation in the inspection history stack.
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload:</term><description>None (event-only signal).</description></item>
-        /// <item><term>Typical emitters:</term><description>Back button, Alt+Left shortcut, Mouse 4 button.</description></item>
-        /// <item><term>Typical subscribers:</term><description>Navigation history component, tab widgets.</description></item>
+        /// <item><term>Payload Type:</term><description>None (signal event).</description></item>
+        /// <item><term>Typical Emitters:</term><description>Window top-bar Back button, keyboard shortcuts (<c>Alt + Left</c>, <c>Backspace</c>), mouse shortcut (<c>Mouse 4</c>).</description></item>
+        /// <item><term>Typical Subscribers:</term><description><c>ProfileHelper</c> / <see cref="GUI.GUINavigationHistory{T}"/> (decrements history index and re-emits <see cref="SelectTarget"/>).</description></item>
         /// </list>
         /// </remarks>
         public static string NavigateBack => "NavigateBack";
 
         /// <summary>
-        /// Emitted when the user navigates forward in the prefab selection history.
+        /// Channel emitted to request forward navigation in the inspection history stack.
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload:</term><description>None (event-only signal).</description></item>
-        /// <item><term>Typical emitters:</term><description>Forward button, Alt+Right shortcut, Shift+Backspace, Mouse 5 button.</description></item>
-        /// <item><term>Typical subscribers:</term><description>Navigation history component, tab widgets.</description></item>
+        /// <item><term>Payload Type:</term><description>None (signal event).</description></item>
+        /// <item><term>Typical Emitters:</term><description>Window top-bar Forward button, keyboard shortcuts (<c>Alt + Right</c>, <c>Shift + Backspace</c>), mouse shortcut (<c>Mouse 5</c>).</description></item>
+        /// <item><term>Typical Subscribers:</term><description><c>ProfileHelper</c> / <see cref="GUI.GUINavigationHistory{T}"/> (increments history index and re-emits <see cref="SelectTarget"/>).</description></item>
         /// </list>
         /// </remarks>
         public static string NavigateForward => "NavigateForward";
 
         /// <summary>
-        /// Emitted when the search/filter results need to be refreshed.
+        /// Channel emitted to request rebuilding or re-filtering the search candidate list.
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload:</term><description>None (event-only signal) or optional filter parameters.</description></item>
-        /// <item><term>Typical emitters:</term><description>Favorite toggles, filter changes, profile switches.</description></item>
-        /// <item><term>Typical subscribers:</term><description>Prefab browser, search result panels.</description></item>
+        /// <item><term>Payload Type:</term><description>None (signal event).</description></item>
+        /// <item><term>Typical Emitters:</term><description>Favorites toggled via <see cref="Prefabs.PrefabHelper"/>, dynamic prefab provider updates, round start events.</description></item>
+        /// <item><term>Typical Subscribers:</term><description>Active window profile's search component (re-evaluates filters and repopulates visible chunks at <see cref="EventPriority.UI"/>).</description></item>
         /// </list>
         /// </remarks>
         public static string RefreshSearch => "RefreshSearch";
 
         /// <summary>
-        /// Emitted to toggle the main S.O.S. window visibility.
+        /// Channel emitted to toggle the visibility of the active S.O.S. window.
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload:</term><description>None (event-only signal).</description></item>
-        /// <item><term>Typical emitters:</term><description>Hotkey (default: <c>Keys.J</c>, defined in CoreConfig), toolbar button.</description></item>
-        /// <item><term>Typical subscribers:</term><description>Main window controller.</description></item>
+        /// <item><term>Payload Type:</term><description>None (signal event).</description></item>
+        /// <item><term>Typical Emitters:</term><description>Configured global toggle hotkey (default: <c>Keys.J</c>).</description></item>
+        /// <item><term>Typical Subscribers:</term><description>Active window profile (toggles <see cref="Barotrauma.GUIComponent.Visible"/> or closes the window at <see cref="EventPriority.UI"/>).</description></item>
         /// </list>
         /// </remarks>
         public static string ToggleWindow => "ToggleWindow";
 
         /// <summary>
-        /// Emitted to explicitly open the main S.O.S. window.
+        /// Channel emitted to explicitly open the active S.O.S. window.
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload:</term><description>None (event-only signal).</description></item>
-        /// <item><term>Typical emitters:</term><description>Toolbar button, command, other mods.</description></item>
-        /// <item><term>Typical subscribers:</term><description>Main window controller.</description></item>
+        /// <item><term>Payload Type:</term><description>None (signal event).</description></item>
+        /// <item><term>Typical Emitters:</term><description>Console command (<c>sos</c>), right-click contextual actions ("View Recipes"), external mod triggers.</description></item>
+        /// <item><term>Typical Subscribers:</term><description>Active window profile (sets <see cref="Barotrauma.GUIComponent.Visible"/> to <c>true</c> and brings window to front at <see cref="EventPriority.UI"/>).</description></item>
         /// </list>
         /// </remarks>
         public static string OpenWindow => "OpenWindow";
 
         /// <summary>
-        /// Emitted to explicitly close the main S.O.S. window.
+        /// Channel emitted to explicitly close and dismiss the active S.O.S. window.
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload:</term><description>None (event-only signal).</description></item>
-        /// <item><term>Typical emitters:</term><description>Close button, Escape key, Escape shortcut.</description></item>
-        /// <item><term>Typical subscribers:</term><description>Main window controller, navigation history (clears parent).</description></item>
+        /// <item><term>Payload Type:</term><description>None (signal event).</description></item>
+        /// <item><term>Typical Emitters:</term><description>Window title-bar Close button, <c>Escape</c> key handler.</description></item>
+        /// <item><term>Typical Subscribers:</term><description><c>SOSController</c> (persists dirty settings, disposes active profile, and clears temporary instances at <see cref="EventPriority.System"/>).</description></item>
         /// </list>
         /// </remarks>
         public static string CloseWindow => "CloseWindow";
 
         /// <summary>
-        /// Emitted when the search filter text changes.
+        /// Channel emitted to populate the search query box with a specific filter token.
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload:</term><description><see cref="string"/> containing the new filter text.</description></item>
-        /// <item><term>Typical emitters:</term><description>Search text box, filter UI.</description></item>
-        /// <item><term>Typical subscribers:</term><description>Prefab browser, filter logic.</description></item>
+        /// <item><term>Payload Type:</term><description><see cref="string"/> (the search token, e.g., <c>"#Medical"</c>, <c>"$surgery"</c>, or <c>"@Vanilla"</c>).</description></item>
+        /// <item><term>Typical Emitters:</term><description>Clickable badge hyperlinks in <see cref="ISOSStatSection"/> rows, category badges, mod tags.</description></item>
+        /// <item><term>Typical Subscribers:</term><description>Active window profile (updates search text box, triggers debounced search at <see cref="EventPriority.UI"/>).</description></item>
         /// </list>
         /// </remarks>
         public static string SetSearchFilter => "SetSearchFilter";

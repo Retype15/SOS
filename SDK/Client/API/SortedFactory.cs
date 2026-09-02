@@ -12,26 +12,18 @@ using Barotrauma.LuaCs;
 namespace SOS
 {
     /// <summary>
-    /// Internal ordered discovery factory for mod components.
+    /// Thread-safe, ordered service registry managing component discovery, sorting, activation, and instance lifecycle.
     /// </summary>
-    /// <typeparam name="T">The type of component managed by this factory. Must be a reference type (<c>class</c>).</typeparam>
+    /// <typeparam name="T">The contract type managed by this registry. Must be a reference type.</typeparam>
     /// <remarks>
     /// <para>
-    /// <b>Ordered Discovery:</b> Components are registered with an order value that determines their priority position.
-    /// When retrieving sorted components via <see cref="GetSorted"/>, items are ordered by ascending order, then by key name.
-    /// </para>
-    /// <para>
-    /// <b>Auto-Registration:</b> Via <see cref="AutoRegister{IPluginManagementService}"/>, types decorated with
-    /// <see cref="AutoRegisterAttribute"/> can be automatically discovered and registered through the
-    /// <see cref="Barotrauma.LuaCs.IPluginManagementService"/>.
-    /// </para>
-    /// <para>
-    /// <b>Instance Caching:</b> The factory maintains a cache of instantiated instances (dictionary `_instances`).
-    /// </para>
-    /// <para>
-    /// <b>Thread Safety:</b> Registration and state checks occur under a monitor lock on the internal dictionary
-    /// (_dict), ensuring atomic updates. However, handler execution and instance retrieval occur outside locks,
-    /// guaranteeing reentrancy safety and zero deadlocks.
+    /// <b>Core Responsibilities:</b>
+    /// <list type="bullet">
+    /// <item><description><b>Ordered Discovery:</b> Stores component factories paired with a priority order. Output queries are sorted ascending by order, then alphabetically by identifier.</description></item>
+    /// <item><description><b>Automated Assembly Scanning:</b> Discovers classes decorated with <see cref="AutoRegisterAttribute"/> via <see cref="AutoRegister(IPluginManagementService)"/> without premature instantiation.</description></item>
+    /// <item><description><b>Instance Lifecycle Management:</b> Tracks singletons or transient instances based on the <c>keepInstance</c> parameter. Deactivating or evicting an entry disposes cached instances if they implement <see cref="IDisposable"/>.</description></item>
+    /// <item><description><b>Thread-Safety &amp; Reentrancy:</b> Internal maps are guarded by monitor locks during mutations. Factory invocations occur outside locks, guaranteeing deadlock immunity during nested registrations.</description></item>
+    /// </list>
     /// </para>
     /// </remarks>
     internal sealed class SortedFactory<T> where T : class
@@ -52,15 +44,14 @@ namespace SOS
         }
 
         /// <summary>
-        /// Removes a registered entry by key from the factory.
+        /// Unregisters an entry or evicts its cached instance by identifier.
         /// </summary>
-        /// <param name="key">The unique identifier of the entry to remove.</param>
-        /// <param name="onlyInstance">If <c>true</c>, only removes the cached instance without removing the registration.
-        /// If <c>false</c> (default), removes the registration and also removes the cached instance.</param>
-        /// <returns><c>true</c> if the entry was found and removed (or instance removed); <c>false</c> if the key was not found.</returns>
+        /// <param name="key">The unique string identifier of the component to remove.</param>
+        /// <param name="onlyInstance">If <c>true</c>, evicts and disposes only the cached instance, preserving the factory registration. If <c>false</c>, completely removes both the registration and the instance.</param>
+        /// <returns><c>true</c> if the entry or instance was found and removed; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// The registration is removed from the internal dictionary (_dict) when <paramref name="onlyInstance"/> is <c>false</c>.
-        /// If a cached instance exists and implements <see cref="IDisposable"/>, it is disposed.
+        /// If <paramref name="onlyInstance"/> is <c>false</c>, the internal sorted cache is marked dirty so subsequent queries regenerate the output list.
+        /// Any evicted instance implementing <see cref="IDisposable"/> has its <see cref="IDisposable.Dispose"/> method called immediately under lock.
         /// </remarks>
         public bool Remove(string key, bool onlyInstance = false)
         {
@@ -74,23 +65,16 @@ namespace SOS
         }
 
         /// <summary>
-        /// Registers an object or factory delegate as a component of type <typeparamref name="T"/>.
+        /// Registers an instance, type, or factory delegate under the specified identifier and priority order.
         /// </summary>
-        /// <param name="obj">The object to register. Supports the following types:
-        /// <list type="bullet">
-        /// <item><c>null</c>: registration fails, returns <c>false</c>.</item>
-        /// <item><see cref="Type"/>: registers a type that must be instantiable (not abstract, have a non-void constructor).</item>
-        /// <item><see cref="Func{T}"/>: a factory delegate that creates instances of type <typeparamref name="T"/>.</item>
-        /// <item>existing <paramref name="obj"/> instance: registers the instance directly.</item>
-        /// </list>
-        /// </param>
-        /// <param name="id">Optional unique identifier. If <c>null</c>, the type's full name is used as the ID.</param>
-        /// <param name="order">Registration order. Determines position in sorted output. Lower values appear first. Defaults to 0.</param>
-        /// <param name="active">Whether the registration is initially active. Defaults to true.</param>
-        /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is <c>null</c> or fails type contract checks.</returns>
+        /// <param name="obj">The target to register. Supports concrete <see cref="Type"/>, <see cref="Func{T}"/>, <see cref="Func{Object}"/>, or an existing instance.</param>
+        /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
+        /// <param name="order">Priority order determining placement in sorted queries. Lower values appear first. Defaults to <c>0.0</c>.</param>
+        /// <param name="active">Whether the component is initially enabled. Defaults to <c>true</c>.</param>
+        /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is null or fails type contract validation.</returns>
         /// <remarks>
-        /// The type contract requires the registered type to be <c>class</c>, not abstract, have a non-void parameterless constructor,
-        /// and be castable to <typeparamref name="T"/>. Registration failures are logged via <see cref="Logger"/> at trace level.
+        /// When registering a <see cref="Type"/>, it must be a non-abstract class with a public parameterless constructor.
+        /// Registering an entry marks the sorted snapshot cache as dirty and invalidates any prior cached instance under <paramref name="id"/>.
         /// </remarks>
         public bool Register(object obj, string? id = null, double order = 0, bool active = true)
         {
@@ -109,18 +93,6 @@ namespace SOS
             return isSuccess;
         }
 
-        /// <summary>
-        /// Registers a type as a component of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="id">The identifier to use for registration. If <c>null</c>, the type's full name is used.</param>
-        /// <param name="order">Registration order. Lower values appear first in sorted output. Defaults to 0.</param>
-        /// <param name="active">Whether the registration is initially active. Defaults to true.</param>
-        /// <param name="type">The type to register. Must be instantiable (not abstract, have a non-void constructor) and castable to <typeparamref name="T"/>.</param>
-        /// <returns><c>true</c> if the type was successfully registered; <c>false</c> otherwise.</returns>
-        /// <remarks>
-        /// The type must not be abstract, must not be an interface, and must have a non-void parameterless constructor.
-        /// Failed registrations are logged via <see cref="Logger"/> with details about the type contract violation.
-        /// </remarks>
         private bool RegisterType(string? id, double order, bool active, Type type)
         {
             if (type.IsAbstract || type.IsInterface || type.GetConstructor(Type.EmptyTypes) == null)
@@ -144,17 +116,6 @@ namespace SOS
             }
         }
 
-        /// <summary>
-        /// Registers a factory delegate as a component of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="id">The identifier to use for registration. If <c>null</c>, the factory's method return type full name is used.</param>
-        /// <param name="order">Registration order. Lower values appear first in sorted output. Defaults to 0.</param>
-        /// <param name="active">Whether the registration is initially active. Defaults to true.</param>
-        /// <param name="func">The factory delegate that creates instances of type <typeparamref name="T"/>.</param>
-        /// <returns><c>true</c> if registration succeeded.</returns>
-        /// <remarks>
-        /// The delegate must return type <typeparamref name="T"/>. The identifier is derived from the delegate's method return type full name.
-        /// </remarks>
         private bool RegisterFunc(string? id, double order, bool active, Func<T?> func)
         {
             id ??= func.Method.ReturnType.FullOrName();
@@ -163,17 +124,6 @@ namespace SOS
             return true;
         }
 
-        /// <summary>
-        /// Registers a factory delegate (returning <see cref="object"/>) as a component of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="id">The identifier to use for registration. If <c>null</c>, the factory's method return type full name is used.</param>
-        /// <param name="order">Registration order. Lower values appear first in sorted output. Defaults to 0.</param>
-        /// <param name="active">Whether the registration is initially active. Defaults to true.</param>
-        /// <param name="func">The factory delegate that creates instances, boxed as <see cref="object"/>.</param>
-        /// <returns><c>true</c> if registration succeeded.</returns>
-        /// <remarks>
-        /// The delegate must return a value that can be cast to <typeparamref name="T"/>. The identifier is derived from the delegate's method return type full name.
-        /// </remarks>
         private bool RegisterFunc(string? id, double order, bool active, Func<object> func)
         {
             id ??= func.Method.ReturnType.FullOrName();
@@ -182,17 +132,6 @@ namespace SOS
             return true;
         }
 
-        /// <summary>
-        /// Registers an existing instance as a component of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="id">The identifier to use for registration. If <c>null</c>, the instance's type full name is used.</param>
-        /// <param name="order">Registration order. Lower values appear first in sorted output. Defaults to 0.</param>
-        /// <param name="active">Whether the registration is initially active. Defaults to true.</param>
-        /// <param name="obj">The instance to register. Must be non-null and castable to <typeparamref name="T"/>.</param>
-        /// <returns><c>true</c> if registration succeeded; <c>false</c> if the instance fails the type contract.</returns>
-        /// <remarks>
-        /// The instance is stored and later retrieved via the factory delegate. Failed registrations are logged via <see cref="Logger"/>.
-        /// </remarks>
         private bool RegisterInstance(string? id, double order, bool active, object obj)
         {
             id ??= obj.GetType().FullOrName();
@@ -210,27 +149,21 @@ namespace SOS
         }
 
         /// <summary>
-        /// Auto-registers components from the provided <see cref="IPluginManagementService"/>.
+        /// Automatically discovers and registers all loaded types implementing <typeparamref name="T"/> decorated with <see cref="AutoRegisterAttribute"/>.
         /// </summary>
-        /// <param name="pluginManagementService">The service used to discover implementing types.</param>
-        /// <returns><c>true</c> if at least one component was successfully registered; <c>false</c> otherwise.</returns>
-        /// <remarks>
-        /// Retrieves all implementing types of <typeparamref name="T"/> via <see cref="IPluginManagementService.GetImplementingTypes{T}"/>
-        /// and checks each for the <see cref="AutoRegisterAttribute"/>. If present, the attribute's values (<see cref="AutoRegisterAttribute.Id"/>,
-        /// <see cref="AutoRegisterAttribute.Order"/>, <see cref="AutoRegisterAttribute.Active"/>) are used for registration.
-        /// </remarks>
+        /// <param name="pluginManagementService">The LuaCs plugin management service used for assembly reflection scanning.</param>
+        /// <returns><c>true</c> if at least one component was registered; otherwise, <c>false</c>.</returns>
         public bool AutoRegister(IPluginManagementService pluginManagementService) => AutoRegister<T>(pluginManagementService);
 
         /// <summary>
-        /// Auto-registers components of type <typeparamref name="TAuto"/> from the provided <see cref="IPluginManagementService"/>.
+        /// Automatically discovers and registers all loaded types implementing or deriving from <typeparamref name="TAuto"/> decorated with <see cref="AutoRegisterAttribute"/>.
         /// </summary>
-        /// <typeparam name="TAuto">The base type that registered types must implement or inherit from.</typeparam>
-        /// <param name="pluginManagementService">The service used to discover implementing types.</param>
-        /// <returns><c>true</c> if at least one component was successfully registered; <c>false</c> otherwise.</returns>
+        /// <typeparam name="TAuto">The filter contract type to scan for. Must derive from or implement <typeparamref name="T"/>.</typeparam>
+        /// <param name="pluginManagementService">The LuaCs plugin management service used for assembly reflection scanning.</param>
+        /// <returns><c>true</c> if at least one component was registered; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// Retrieves all implementing types of <typeparamref name="TAuto"/> via <see cref="IPluginManagementService.GetImplementingTypes{T}"/>
-        /// and checks each for the <see cref="AutoRegisterAttribute"/>. If present, the attribute's values (<see cref="AutoRegisterAttribute.Id"/>,
-        /// <see cref="AutoRegisterAttribute.Order"/>, <see cref="AutoRegisterAttribute.Active"/>) are used for registration via <see cref="RegisterType"/>.
+        /// Reads metadata (<see cref="AutoRegisterAttribute.Id"/>, <see cref="AutoRegisterAttribute.Order"/>, and <see cref="AutoRegisterAttribute.Active"/>)
+        /// directly from the attribute metadata without instantiating the classes during the scan.
         /// </remarks>
         public bool AutoRegister<TAuto>(IPluginManagementService pluginManagementService) where TAuto : T
         {
@@ -251,14 +184,14 @@ namespace SOS
         }
 
         /// <summary>
-        /// Sets the active state of a registered component identified by <paramref name="id"/>.
+        /// Updates the activation state of a registered component by identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the component to activate or deactivate.</param>
-        /// <param name="active">The desired active state. If <c>true</c>, the component is activated; if <c>false</c>, it is deactivated.</param>
-        /// <returns><c>true</c> if the component was found and its state was set; <c>false</c> if no component with the given ID exists.</returns>
+        /// <param name="id">The unique identifier of the component.</param>
+        /// <param name="active">The new activation state. If <c>false</c>, the component is omitted from sorted queries.</param>
+        /// <returns><c>true</c> if the component was found; <c>false</c> if no registration exists under <paramref name="id"/>.</returns>
         /// <remarks>
-        /// Thread-safety: This method acquires a monitor lock on the internal dictionary (_dict) to ensure atomic state updates.
-        /// If the component is being deactivated and a cached instance implements <see cref="IDisposable"/>, it is disposed.
+        /// If a component is deactivated and has an active cached instance implementing <see cref="IDisposable"/>,
+        /// it is disposed and evicted immediately. Marks the sorted snapshot cache as dirty.
         /// </remarks>
         public bool SetActive(string id, bool active)
         {
@@ -280,13 +213,10 @@ namespace SOS
         }
 
         /// <summary>
-        /// Checks whether a registered component identified by <paramref name="id"/> is currently active.
+        /// Checks whether a registered component is currently enabled.
         /// </summary>
-        /// <param name="id">The unique identifier of the component to check.</param>
-        /// <returns><c>true</c> if the component exists and is active; <c>false</c> otherwise.</returns>
-        /// <remarks>
-        /// Thread-safety: This method acquires a monitor lock on the internal dictionary (_dict) to ensure a consistent read.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the component.</param>
+        /// <returns><c>true</c> if registered and active; otherwise, <c>false</c>.</returns>
         public bool IsActive(string id)
         {
             lock (_dict)
@@ -294,13 +224,12 @@ namespace SOS
         }
 
         /// <summary>
-        /// Retrieves all active registrations sorted by order and key.
+        /// Generates or retrieves an ordered snapshot array of all active registrations.
         /// </summary>
-        /// <returns>An array of tuples containing (ID, Order, Factory) for all active registrations, sorted ascending by order then by key name.</returns>
+        /// <returns>An array of active entries sorted by order ascending, then alphabetically by key.</returns>
         /// <remarks>
-        /// If the internal cache is marked as dirty (due to modifications since last retrieval), the sorted list is regenerated
-        /// from the dictionary under a monitor lock for thread safety.
-        /// The returned array is a snapshot; subsequent modifications to the factory will not be reflected until this method is called again.
+        /// Results are cached internally. If no registrations have been added, removed, or toggled since the last call,
+        /// returns the precomputed array directly with zero allocations.
         /// </remarks>
         public (string Id, double Order, Func<T?> Factory)[] GetSorted()
         {
@@ -321,14 +250,19 @@ namespace SOS
         }
 
         /// <summary>
-        /// Retrieves all registered components, optionally keeping cached instances.
+        /// Resolves and enumerates all currently active components in registration order.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, cached instances are returned (and updated). If <c>false</c>, each call creates new instances via factories.</param>
-        /// <returns>An enumerable of tuples containing (ID, Instance) for all registered components.</returns>
+        /// <param name="keepInstance">If <c>true</c>, resolved instances are stored in the internal cache for future queries.</param>
+        /// <returns>An enumerable sequence of resolved (Id, Instance) pairs for active components.</returns>
         /// <remarks>
-        /// For each registration, the factory delegate is invoked to create an instance. If <paramref name="keepInstance"/>
-        /// is true and the instance is non-null, it is cached in the internal dictionary for faster subsequent access.
-        /// Failed instantiation is logged via <see cref="Logger"/> and skipped (iteration continues).
+        /// <para>
+        /// <b>Safe Resolution:</b> For each active entry, checks the instance cache first. If missing, invokes the factory delegate
+        /// and caches the result if <paramref name="keepInstance"/> is <c>true</c>.
+        /// </para>
+        /// <para>
+        /// If a factory throws an exception during construction, a warning is logged via <see cref="Logger"/> and enumeration
+        /// skips to the next entry without aborting the sequence.
+        /// </para>
         /// </remarks>
         public IEnumerable<(string Id, T Instance)> GetAll(bool keepInstance = true)
         {
@@ -359,18 +293,18 @@ namespace SOS
         }
 
         /// <summary>
-        /// Retrieves a component by its identifier, optionally keeping the cached instance.
+        /// Resolves an active component instance by its unique identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the component to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the cached instance is returned if available; otherwise, a new instance is created via the factory.</param>
-        /// <returns>The component instance if found; otherwise, <c>null</c>.</returns>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance in memory for subsequent calls.</param>
+        /// <returns>The resolved instance if found and active; otherwise, <c>null</c>.</returns>
         /// <remarks>
-        /// The retrieval process:
-        /// 1. Checks the cached instance dictionary (_instances) for a previously cached instance.
-        /// 2. If not cached, checks the registration dictionary (_dict) for the entry.
-        /// 3. If found, invokes the factory delegate to create an instance.
-        /// 4. If <paramref name="keepInstance"/> is true and the instance is non-null, caches it for future calls.
-        /// Failed instantiation is logged via <see cref="Logger"/> and null is returned.
+        /// Execution order:
+        /// <list type="number">
+        /// <item><description>Checks if an instance is already cached in memory under lock.</description></item>
+        /// <item><description>If not cached, extracts the factory delegate under lock and executes it <i>outside the monitor lock</i> to prevent deadlocks.</description></item>
+        /// <item><description>If <paramref name="keepInstance"/> is <c>true</c>, stores the new instance back in the cache under lock.</description></item>
+        /// </list>
         /// </remarks>
         public T? Get(string id, bool keepInstance = true)
         {
@@ -406,13 +340,10 @@ namespace SOS
         }
 
         /// <summary>
-        /// Retrieves the first active component, ordered by registration order.
+        /// Resolves the first active component according to registration order.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls.</param>
-        /// <returns>The first active component, or <c>null</c> if no components are registered.</returns>
-        /// <remarks>
-        /// Calls <see cref="GetSorted"/> to obtain the sorted list, then returns the first element's instance via <see cref="Get"/>.
-        /// </remarks>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance.</param>
+        /// <returns>The first active component instance, or <c>null</c> if no active components are registered.</returns>
         public T? First(bool keepInstance = true)
         {
             var sorted = GetSorted();
@@ -420,27 +351,21 @@ namespace SOS
         }
 
         /// <summary>
-        /// Retrieves a component by identifier, or the first active component if not found.
+        /// Resolves the active component matching <paramref name="id"/>, falling back to the first active component if not found.
         /// </summary>
-        /// <param name="id">The unique identifier to look up. If non-null and a component with this ID is found, it is returned.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls.</param>
-        /// <returns>The component identified by <paramref name="id"/>, or the first active component if <paramref name="id"/> is null or not found.</returns>
-        /// <remarks>
-        /// If <paramref name="id"/> is null, behavior is equivalent to calling <see cref="First"/>.
-        /// If <paramref name="id"/> is provided but not found, falls back to <see cref="First"/>.
-        /// </remarks>
+        /// <param name="id">The unique identifier to look up. If <c>null</c> or not found, falls back to <see cref="First"/>.</param>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance.</param>
+        /// <returns>The resolved instance, or <c>null</c> if no active registrations exist.</returns>
         public T? GetOrFirst(string? id, bool keepInstance = true)
             => (id != null && Get(id, keepInstance) is { } instance) ? instance : First(keepInstance);
 
         /// <summary>
-        /// Clears all registrations and instances from the factory.
+        /// Clears the factory contents, disposing cached instances and optionally removing all registrations.
         /// </summary>
-        /// <param name="onlyInstances">If <c>true</c>, only removes cached instances and disposes them if <see cref="IDisposable"/>,
-        /// leaving the registration dictionary intact. If <c>false</c> (default), clears both the registration dictionary and cached instances.</param>
+        /// <param name="onlyInstances">If <c>true</c>, disposes and clears only cached instances while preserving factory registrations and sorted cache. If <c>false</c>, completely clears all registrations and resets the factory.</param>
         /// <remarks>
-        /// When <paramref name="onlyInstances"/> is <c>false</c>, the internal cache (_cache) is also cleared and the dirty flag (_isDirty) is reset.
-        /// All cached instances implementing <see cref="IDisposable"/> are disposed.
-        /// This operation is performed under a monitor lock on the internal dictionary to ensure thread safety.
+        /// Any cached instance implementing <see cref="IDisposable"/> has its <see cref="IDisposable.Dispose"/> method called under lock.
+        /// When <paramref name="onlyInstances"/> is <c>false</c>, the internal sorted snapshot is emptied and the dirty flag is cleared.
         /// </remarks>
         public void Clear(bool onlyInstances = false)
         {

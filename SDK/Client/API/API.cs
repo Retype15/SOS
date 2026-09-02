@@ -10,23 +10,36 @@ using Barotrauma.LuaCs;
 
 namespace SOS
 {
+
     /// <summary>
-    /// Static facade for S.O.S mod API extensibility points.
+    /// Primary static facade providing access to S.O.S. mod extensibility points, component registries, prioritized event dispatching, and shared runtime state.
     /// </summary>
     /// <remarks>
-    /// Provides registration, retrieval, and removal mechanisms for mod components including sections, tabs, configs,
-    /// prefab providers, and window profiles. Uses <see cref="SortedFactory{T}"/> for ordered discovery and instance caching.
-    /// Event-related methods (<see cref="API.On"/>, <see cref="API.Off"/>, <c>API.Emit</c>, <c>API.SetState</c>,
-    /// <see cref="GetState"/>) utilize the internal <see cref="EventBus"/> with priority-based execution ordering via
-    /// <see cref="EventPriority"/>. Thread-safety: registry dictionaries are protected by monitor locks; event handlers
-    /// execute outside locks, guaranteeing reentrancy safety and zero deadlocks.
+    /// <para>
+    /// <b>Architecture:</b>
+    /// <list type="bullet">
+    /// <item><description><b>Component Registries:</b> Manages extensible sections (<see cref="ISOSStatSection"/>), tabs (<see cref="ISOSTab"/>), configs (<see cref="ISOSConfig"/>), prefab providers (<see cref="ISOSPrefab"/>), and window profiles (<see cref="ISOSWindowProfile"/>) with ordering and activation control.</description></item>
+    /// <item><description><b>Prioritized Event Pipeline:</b> Provides thread-safe event publishing and subscription (<c>On"</c>, <c>Off"</c>, <c>Emit</c>) ordered deterministically across <see cref="EventPriority"/> tiers.</description></item>
+    /// <item><description><b>Shared State:</b> Offers a lightweight, reactive key-value state store (<see cref="SetState{T}(string, T, bool)"/>, <see cref="GetState{T}(string)"/>) for cross-mod communication.</description></item>
+    /// </list>
+    /// </para>
+    /// <para>
+    /// <b>Thread-Safety &amp; Reentrancy:</b> Internal registry mutations are synchronized via monitor locks. Event callbacks execute outside internal locks, ensuring safe reentrant invocations and zero deadlocks.
+    /// </para>
     /// </remarks>
     /// <example>
     /// <code>
-    /// API.RegisterSection(new MyStatSection(), "my-section", 5.0);
-    /// var section = API.GetSection&lt;MyStatSection&gt;("my-section");
-    /// API.On("key", () => Console.WriteLine("event fired"), EventPriority.UI);
-    /// API.Emit("key");
+    /// // Registering an extension tab:
+    /// API.RegisterTab(typeof(MyCustomTab), "MyMod.CustomTab", order: 10.0);
+    /// 
+    /// // Listening to target selection events:
+    /// API.On&lt;Prefab?&gt;(CommKeys.SelectTarget, target => 
+    /// {
+    ///     Logger.LogDebug($"Target selected: {target?.Identifier}");
+    /// }, EventPriority.UI);
+    /// 
+    /// // Reading shared state:
+    /// var currentTarget = API.GetState&lt;Prefab?&gt;(CommKeys.SelectTarget);
     /// </code>
     /// </example>
     public static class API
@@ -45,86 +58,63 @@ namespace SOS
         #region Info Sections
 
         /// <summary>
-        /// Registers a <paramref name="obj"/> as a stat section of type <see cref="ISOSStatSection"/> managed by <see cref="SortedFactory{T}"/>.
+        /// Registers a stat section provider into the S.O.S. inspector sidebar registry.
         /// </summary>
-        /// <param name="obj">The instance or factory delegate to register. Can be an object, a <see cref="Type"/>, a <see cref="Func{T}"/> factory, or an existing instance.</param>
-        /// <param name="id">Optional unique identifier. If null, the type's full name is used.</param>
-        /// <param name="order">Registration order determines display priority. Lower values appear first. Defaults to 0.0.</param>
-        /// <param name="active">Whether the section is initially active. Defaults to true.</param>
-        /// <returns><c>true</c> if registration succeeded; otherwise, <c>false</c> if <paramref name="obj"/> is null or fails type checks.</returns>
-        /// <remarks>
-        /// Registered sections are discoverable via <see cref="GetSection"/> or <see cref="GetAllSections"/>.
-        /// Instances are cached based on the <paramref name="obj"/> flag in retrieval methods.
-        /// </remarks>
+        /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSStatSection"/>, a factory delegate (<see cref="Func{ISOSStatSection}"/>), or an existing instance.</param>
+        /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
+        /// <param name="order">Display priority order. Lower values appear higher up in the inspector sidebar. Defaults to <c>0.0</c>.</param>
+        /// <param name="active">Whether the section is initially enabled for rendering. Defaults to <c>true</c>.</param>
+        /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is null or fails type contract validation.</returns>
         public static bool RegisterSection(object obj, string? id = null, double order = 0.0, bool active = true)
             => _sectionFactories.Register(obj, id, order, active);
 
         /// <summary>
-        /// Activates the stat section identified by <paramref name="id"/>.
+        /// Activates the stat section matching <paramref name="id"/>, enabling it to render in subsequent inspections.
         /// </summary>
-        /// <param name="id">The unique identifier of the section to activate.</param>
-        /// <returns><c>true</c> if the section was found and activated; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// If the section is already active, this method returns <c>true</c> without side effects.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the section to enable.</param>
+        /// <returns><c>true</c> if the section was found; otherwise, <c>false</c>.</returns>
         public static bool ActivateSection(string id) => _sectionFactories.SetActive(id, true);
 
         /// <summary>
-        /// Deactivates the stat section identified by <paramref name="id"/>.
+        /// Deactivates the stat section matching <paramref name="id"/>, suppressing its rendering and evicting any cached instance.
         /// </summary>
-        /// <param name="id">The unique identifier of the section to deactivate.</param>
-        /// <returns><c>true</c> if the section was found and deactivated; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// If the section is already inactive, this method returns <c>true</c> without side effects.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the section to disable.</param>
+        /// <returns><c>true</c> if the section was found; otherwise, <c>false</c>.</returns>
         public static bool DeactivateSection(string id) => _sectionFactories.SetActive(id, false);
 
         /// <summary>
-        /// Retrieves a stat section of type <typeparamref name="T"/> by its identifier.
+        /// Resolves a registered stat section by identifier and casts it to <typeparamref name="T"/>.
         /// </summary>
-        /// <typeparam name="T">The expected type of the section; must match the registered type.</typeparam>
-        /// <param name="id">The unique identifier of the section to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false</c>, a new instance is created each time via the factory.</param>
-        /// <returns>The section instance if found; otherwise, <c>default</c> (<c>null</c> for reference types).</returns>
-        /// <remarks>
-        /// The keepInstance flag controls whether the instance is cached in the internal dictionary for faster subsequent access.
-        /// </remarks>
+        /// <typeparam name="T">The concrete or interface type expected. Must implement <see cref="ISOSStatSection"/>.</typeparam>
+        /// <param name="id">The unique identifier of the section.</param>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>The resolved section instance if found and active; otherwise, <c>default</c>.</returns>
         public static T? GetSection<T>(string id, bool keepInstance = true)
             => GetSection(id, keepInstance) is T t ? t : default;
 
         /// <summary>
-        /// Retrieves a stat section by its identifier.
+        /// Resolves a registered stat section by identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the section to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls.</param>
-        /// <returns>The <see cref="ISOSStatSection"/> instance if found; otherwise, <c>null</c>.</returns>
-        /// <remarks>
-        /// Uses the internal <see cref="SortedFactory{T}.Get(string, bool)"/> method which may instantiate the section via its factory if not already cached.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the section.</param>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>The <see cref="ISOSStatSection"/> instance if found and active; otherwise, <c>null</c>.</returns>
         public static ISOSStatSection? GetSection(string id, bool keepInstance = true)
             => _sectionFactories.Get(id, keepInstance);
 
         /// <summary>
-        /// Retrieves all registered stat sections.
+        /// Resolves and enumerates all currently active stat sections in ascending registration order.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false></c>, each call creates new instances via factories.</param>
-        /// <returns>An enumerable of all <see cref="ISOSStatSection"/> instances.</returns>
-        /// <remarks>
-        /// The order of sections follows the registration order within each <see cref="SortedFactory{T}"/>, sorted by their registration order value.
-        /// </remarks>
+        /// <param name="keepInstance">If <c>true</c>, caches resolved instances for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>An enumerable sequence of active <see cref="ISOSStatSection"/> instances.</returns>
         public static IEnumerable<ISOSStatSection> GetAllSections(bool keepInstance = true)
             => _sectionFactories.GetAll(keepInstance).Select(t => t.Instance);
 
         /// <summary>
-        /// Removes a stat section by its identifier.
+        /// Removes a stat section registration or its cached instance by identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the section to remove.</param>
-        /// <param name="onlyInstance">If <c>true</c>, only the cached instance is removed without removing the registration. If <c>false</c>, both the registration and cached instance are removed.</param>
-        /// <returns><c>true</c> if the section was found and removed; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// When <paramref name="onlyInstance"/> is <c>false</c> (default), the registration is completely removed from the factory,
-        /// and if a cached instance exists, it is disposed (if <see cref="IDisposable"/>).
-        /// </remarks>
+        /// <param name="id">The unique identifier of the section.</param>
+        /// <param name="onlyInstance">If <c>true</c>, evicts only the cached instance without removing the registration. Defaults to <c>false</c>.</param>
+        /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemoveSection(string id, bool onlyInstance = false)
             => _sectionFactories.Remove(id, onlyInstance);
 
@@ -134,85 +124,63 @@ namespace SOS
         #region Tabs
 
         /// <summary>
-        /// Registers a <paramref name="obj"/> as a tab of type <see cref="ISOSTab"/> managed by <see cref="SortedFactory{T}"/>.
+        /// Registers a UI tab provider into the central tab widget registry.
         /// </summary>
-        /// <param name="obj">The instance or factory delegate to register. Can be an object, a <see cref="Type"/>, a <see cref="Func{T}"/> factory, or an existing instance.</param>
-        /// <param name="id">Optional unique identifier. If null, the type's full name is used.</param>
-        /// <param name="order">Registration order determines display priority. Lower values appear first. Defaults to 0.0.</param>
-        /// <param name="active">Whether the tab is initially active. Defaults to true.</param>
-        /// <returns><c>true</c> if registration succeeded; otherwise, <c>false</c> if <paramref name="obj"/> is null or fails type checks.</returns>
-        /// <remarks>
-        /// Registered tabs are discoverable via <see cref="GetTab"/> or <see cref="GetAllTabs"/>.
-        /// Instances are cached based on the <paramref name="obj"/> flag in retrieval methods.
-        /// </remarks>
+        /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSTab"/>, a factory delegate (<see cref="Func{ISOSTab}"/>), or an existing instance.</param>
+        /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
+        /// <param name="order">Display priority order determining tab button sequence. Lower values appear first. Defaults to <c>0.0</c>.</param>
+        /// <param name="active">Whether the tab is initially enabled. Defaults to <c>true</c>.</param>
+        /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is null or fails type contract validation.</returns>
         public static bool RegisterTab(object obj, string? id = null, double order = 0.0, bool active = true)
             => _tabFactories.Register(obj, id, order, active);
 
         /// <summary>
-        /// Activates the tab identified by <paramref name="id"/>.
+        /// Enables the tab matching <paramref name="id"/> so it will appear in the tab bar when applicable.
         /// </summary>
-        /// <param name="id">The unique identifier of the tab to activate.</param>
-        /// <returns><c>true</c> if the tab was found and activated; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// If the tab is already active, this method returns <c>true</c> without side effects.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the tab.</param>
+        /// <returns><c>true</c> if the tab was found; otherwise, <c>false</c>.</returns>
         public static bool ActivateTab(string id) => _tabFactories.SetActive(id, true);
+
         /// <summary>
-        /// Deactivates the tab identified by <paramref name="id"/>.
+        /// Disables the tab matching <paramref name="id"/>, hiding it from the tab bar and evicting any cached instance.
         /// </summary>
-        /// <param name="id">The unique identifier of the tab to deactivate.</param>
-        /// <returns><c>true</c> if the tab was found and deactivated; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// If the tab is already inactive, this method returns <c>true</c> without side effects.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the tab.</param>
+        /// <returns><c>true</c> if the tab was found; otherwise, <c>false</c>.</returns>
         public static bool DeactivateTab(string id) => _tabFactories.SetActive(id, false);
 
         /// <summary>
-        /// Retrieves a tab of type <typeparamref name="T"/> by its identifier.
+        /// Resolves a registered tab by identifier and casts it to <typeparamref name="T"/>.
         /// </summary>
-        /// <typeparam name="T">The expected type of the tab; must match the registered type.</typeparam>
-        /// <param name="id">The unique identifier of the tab to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false</c>, a new instance is created each time via the factory.</param>
-        /// <returns>The tab instance if found; otherwise, <c>default</c> (<c>null</c> for reference types).</returns>
-        /// <remarks>
-        /// The keepInstance flag controls whether the instance is cached in the internal dictionary for faster subsequent access.
-        /// </remarks>
+        /// <typeparam name="T">The concrete or interface type expected. Must implement <see cref="ISOSTab"/>.</typeparam>
+        /// <param name="id">The unique identifier of the tab.</param>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>The resolved tab instance if found and active; otherwise, <c>default</c>.</returns>
         public static T? GetTab<T>(string id, bool keepInstance = true)
             => GetTab(id, keepInstance) is T t ? t : default;
 
         /// <summary>
-        /// Retrieves a tab by its identifier.
+        /// Resolves a registered tab by identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the tab to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls.</param>
-        /// <returns>The <see cref="ISOSTab"/> instance if found; otherwise, <c>null</c>.</returns>
-        /// <remarks>
-        /// Uses the internal <see cref="SortedFactory{T}.Get(string, bool)"/> method which may instantiate the tab via its factory if not already cached.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the tab.</param>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>The <see cref="ISOSTab"/> instance if found and active; otherwise, <c>null</c>.</returns>
         public static ISOSTab? GetTab(string id, bool keepInstance = true)
             => _tabFactories.Get(id, keepInstance);
 
         /// <summary>
-        /// Retrieves all registered tabs.
+        /// Resolves and enumerates all currently active tabs in ascending registration order.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false</c>, each call creates new instances via factories.</param>
-        /// <returns>An enumerable of all <see cref="ISOSTab"/> instances.</returns>
-        /// <remarks>
-        /// The order of tabs follows the registration order within the <see cref="SortedFactory{T}"/>, sorted by their registration order value.
-        /// </remarks>
+        /// <param name="keepInstance">If <c>true</c>, caches resolved instances for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>An enumerable sequence of active <see cref="ISOSTab"/> instances.</returns>
         public static IEnumerable<ISOSTab> GetAllTabs(bool keepInstance = true)
             => _tabFactories.GetAll(keepInstance).Select(t => t.Instance);
 
         /// <summary>
-        /// Removes a tab by its identifier.
+        /// Removes a tab registration or its cached instance by identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the tab to remove.</param>
-        /// <param name="onlyInstance">If <c>true</c>, only the cached instance is removed without removing the registration. If <c>false</c>, both the registration and cached instance are removed.</param>
-        /// <returns><c>true</c> if the tab was found and removed; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// When <paramref name="onlyInstance"/> is <c>false</c> (default), the registration is completely removed from the factory,
-        /// and if a cached instance exists, it is disposed (if <see cref="IDisposable"/>).
-        /// </remarks>
+        /// <param name="id">The unique identifier of the tab.</param>
+        /// <param name="onlyInstance">If <c>true</c>, evicts only the cached instance without unregistering. Defaults to <c>false</c>.</param>
+        /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemoveTab(string id, bool onlyInstance = false)
             => _tabFactories.Remove(id, onlyInstance);
 
@@ -221,84 +189,63 @@ namespace SOS
         #region Configs
 
         /// <summary>
-        /// Registers a <paramref name="obj"/> as a config of type <see cref="ISOSConfig"/> managed by <see cref="SortedFactory{T}"/>.
+        /// Registers an extensible configuration unit into the SDK.
         /// </summary>
-        /// <param name="obj">The instance or factory delegate to register. Can be an object, a <see cref="Type"/>, a <see cref="Func{T}"/> factory, or an existing instance.</param>
-        /// <param name="id">Optional unique identifier. If null, the type's full name is used.</param>
-        /// <param name="order">Registration order determines display priority. Lower values appear first. Defaults to 0.0.</param>
-        /// <param name="active">Whether the config is initially active. Defaults to true.</param>
-        /// <returns><c>true</c> if registration succeeded; otherwise, <c>false</c> if <paramref name="obj"/> is null or fails type checks.</returns>
-        /// <remarks>
-        /// Registered configs are discoverable via <see cref="GetConfig"/> or <see cref="GetAllConfigs"/>.
-        /// </remarks>
+        /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSConfig"/>, a factory delegate (<see cref="Func{ISOSConfig}"/>), or an existing instance.</param>
+        /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
+        /// <param name="order">Placement priority order in the settings window. Defaults to <c>0.0</c>.</param>
+        /// <param name="active">Whether the config is initially enabled. Defaults to <c>true</c>.</param>
+        /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is null or fails type contract validation.</returns>
         public static bool RegisterConfig(object obj, string? id = null, double order = 0.0, bool active = true)
             => _configFactories.Register(obj, id, order, active);
 
         /// <summary>
-        /// Activates the config identified by <paramref name="id"/>.
+        /// Enables the configuration matching <paramref name="id"/>, allowing it to load, save, and render in settings.
         /// </summary>
-        /// <param name="id">The unique identifier of the config to activate.</param>
-        /// <returns><c>true</c> if the config was found and activated; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// If the config is already active, this method returns <c>true</c> without side effects.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the config.</param>
+        /// <returns><c>true</c> if found; otherwise, <c>false</c>.</returns>
         public static bool ActivateConfig(string id) => _configFactories.SetActive(id, true);
+
         /// <summary>
-        /// Deactivates the config identified by <paramref name="id"/>.
+        /// Disables the configuration matching <paramref name="id"/> and evicts any cached instance.
         /// </summary>
-        /// <param name="id">The unique identifier of the config to deactivate.</param>
-        /// <returns><c>true</c> if the config was found and deactivated; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// If the config is already inactive, this method returns <c>true</c> without side effects.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the config.</param>
+        /// <returns><c>true</c> if found; otherwise, <c>false</c>.</returns>
         public static bool DeactivateConfig(string id) => _configFactories.SetActive(id, false);
 
         /// <summary>
-        /// Retrieves a config of type <typeparamref name="T"/> by its identifier.
+        /// Resolves a registered configuration by identifier and casts it to <typeparamref name="T"/>.
         /// </summary>
-        /// <typeparam name="T">The expected type of the config; must match the registered type.</typeparam>
-        /// <param name="id">The unique identifier of the config to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false</c>, a new instance is created each time via the factory.</param>
-        /// <returns>The config instance if found; otherwise, <c>default</c> (<c>null</c> for reference types).</returns>
-        /// <remarks>
-        /// The keepInstance flag controls whether the instance is cached in the internal dictionary for faster subsequent access.
-        /// </remarks>
+        /// <typeparam name="T">The concrete or interface type expected. Must implement <see cref="ISOSConfig"/>.</typeparam>
+        /// <param name="id">The unique identifier of the config.</param>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>The config instance if found and active; otherwise, <c>default</c>.</returns>
         public static T? GetConfig<T>(string id, bool keepInstance = true)
             => GetConfig(id, keepInstance) is T t ? t : default;
 
         /// <summary>
-        /// Retrieves a config by its identifier.
+        /// Resolves a registered configuration by identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the config to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls.</param>
-        /// <returns>The <see cref="ISOSConfig"/> instance if found; otherwise, <c>null</c>.</returns>
-        /// <remarks>
-        /// Uses the internal <see cref="SortedFactory{T}.Get(string, bool)"/> method which may instantiate the config via its factory if not already cached.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the config.</param>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>The <see cref="ISOSConfig"/> instance if found and active; otherwise, <c>null</c>.</returns>
         public static ISOSConfig? GetConfig(string id, bool keepInstance = true)
             => _configFactories.Get(id, keepInstance);
 
         /// <summary>
-        /// Retrieves all registered configs.
+        /// Resolves and enumerates all currently active configurations in ascending registration order.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false</c>, each call creates new instances via factories.</param>
-        /// <returns>An enumerable of all <see cref="ISOSConfig"/> instances.</returns>
-        /// <remarks>
-        /// The order of configs follows the registration order within the <see cref="SortedFactory{T}"/>, sorted by their registration order value.
-        /// </remarks>
+        /// <param name="keepInstance">If <c>true</c>, caches resolved instances for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>An enumerable sequence of active <see cref="ISOSConfig"/> instances.</returns>
         public static IEnumerable<ISOSConfig> GetAllConfigs(bool keepInstance = true)
             => _configFactories.GetAll(keepInstance).Select(t => t.Instance);
 
         /// <summary>
-        /// Removes a config by its identifier.
+        /// Removes a configuration registration or its cached instance by identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the config to remove.</param>
-        /// <param name="onlyInstance">If <c>true</c>, only the cached instance is removed without removing the registration. If <c>false</c>, both the registration and cached instance are removed.</param>
-        /// <returns><c>true</c> if the config was found and removed; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// When <paramref name="onlyInstance"/> is <c>false</c> (default), the registration is completely removed from the factory,
-        /// and if a cached instance exists, it is disposed (if <see cref="IDisposable"/>).
-        /// </remarks>
+        /// <param name="id">The unique identifier of the config.</param>
+        /// <param name="onlyInstance">If <c>true</c>, evicts only the cached instance without unregistering. Defaults to <c>false</c>.</param>
+        /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemoveConfig(string id, bool onlyInstance = false)
             => _configFactories.Remove(id, onlyInstance);
 
@@ -307,146 +254,111 @@ namespace SOS
         #region Prefab Providers
 
         /// <summary>
-        /// Registers a <paramref name="obj"/> as a prefab provider of type <see cref="ISOSPrefab"/> managed by <see cref="SortedFactory{T}"/>.
+        /// Registers a custom prefab data provider into the S.O.S. entity browser registry.
         /// </summary>
-        /// <param name="obj">The instance or factory delegate to register. Can be an object, a <see cref="Type"/>, a <see cref="Func{T}"/> factory, or an existing instance.</param>
-        /// <param name="id">Optional unique identifier. If null, the type's full name is used.</param>
-        /// <param name="order">Registration order determines display priority. Lower values appear first. Defaults to 0.0.</param>
-        /// <param name="active">Whether the provider is initially active. Defaults to true.</param>
-        /// <returns><c>true</c> if registration succeeded; otherwise, <c>false</c> if <paramref name="obj"/> is null or fails type checks.</returns>
-        /// <remarks>
-        /// Registered prefab providers are discoverable via <see cref="GetPrefabProvider"/> or <see cref="GetAllPrefabProviders"/>.
-        /// </remarks>
+        /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSPrefab"/>, a factory delegate (<see cref="Func{ISOSPrefab}"/>), or an existing instance.</param>
+        /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
+        /// <param name="order">Display priority order determining section sequence in the browser list. Lower values appear first. Defaults to <c>0.0</c>.</param>
+        /// <param name="active">Whether the provider is initially enabled. Defaults to <c>true</c>.</param>
+        /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is null or fails type contract validation.</returns>
         public static bool RegisterPrefabProvider(object obj, string? id = null, double order = 0.0, bool active = true)
             => _prefabFactories.Register(obj, id, order, active);
 
         /// <summary>
-        /// Activates the prefab provider identified by <paramref name="id"/>.
+        /// Enables the prefab provider matching <paramref name="id"/> so its prefabs appear in the browser.
         /// </summary>
-        /// <param name="id">The unique identifier of the provider to activate.</param>
-        /// <returns><c>true</c> if the provider was found and activated; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// If the provider is already active, this method returns <c>true</c> without side effects.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the provider.</param>
+        /// <returns><c>true</c> if found; otherwise, <c>false</c>.</returns>
         public static bool ActivatePrefabProvider(string id) => _prefabFactories.SetActive(id, true);
+
         /// <summary>
-        /// Deactivates the prefab provider identified by <paramref name="id"/>.
+        /// Disables the prefab provider matching <paramref name="id"/> and evicts any cached instance.
         /// </summary>
-        /// <param name="id">The unique identifier of the provider to deactivate.</param>
-        /// <returns><c>true</c> if the provider was found and deactivated; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// If the provider is already inactive, this method returns <c>true</c> without side effects.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the provider.</param>
+        /// <returns><c>true</c> if found; otherwise, <c>false</c>.</returns>
         public static bool DeactivatePrefabProvider(string id) => _prefabFactories.SetActive(id, false);
 
         /// <summary>
-        /// Retrieves a prefab provider of type <typeparamref name="T"/> by its identifier.
+        /// Resolves a registered prefab provider by identifier and casts it to <typeparamref name="T"/>.
         /// </summary>
-        /// <typeparam name="T">The expected type of the provider; must match the registered type.</typeparam>
-        /// <param name="id">The unique identifier of the provider to retrieve.</param>
-        /// <param name="refresh">If <c>true</c>, forces re-creation of the instance even if cached. If <c>false</c>, uses cached instance if available.</param>
-        /// <returns>The provider instance if found; otherwise, <c>default</c> (<c>null</c> for reference types).</returns>
-        /// <remarks>
-        /// Defaults to <c>true</c> to ensure the latest instance is returned, useful when providers may have been modified at runtime.
-        /// </remarks>
-        public static T? GetPrefabProvider<T>(string id, bool refresh = true)
-            => GetPrefabProvider(id, refresh) is T t ? t : default;
+        /// <typeparam name="T">The concrete or interface type expected. Must implement <see cref="ISOSPrefab"/>.</typeparam>
+        /// <param name="id">The unique identifier of the provider.</param>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>The provider instance if found and active; otherwise, <c>default</c>.</returns>
+        public static T? GetPrefabProvider<T>(string id, bool keepInstance = true)
+            => GetPrefabProvider(id, keepInstance) is T t ? t : default;
 
         /// <summary>
-        /// Retrieves a prefab provider by its identifier.
+        /// Resolves a registered prefab provider by identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the provider to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. If <c>false</c>, a new instance is created each time via the factory.</param>
-        /// <returns>The <see cref="ISOSPrefab"/> instance if found; otherwise, <c>null</c>.</returns>
-        /// <remarks>
-        /// Uses the internal <see cref="SortedFactory{T}.Get(string, bool)"/> method which may instantiate the provider via its factory if not already cached.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the provider.</param>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>The <see cref="ISOSPrefab"/> instance if found and active; otherwise, <c>null</c>.</returns>
         public static ISOSPrefab? GetPrefabProvider(string id, bool keepInstance = true)
             => _prefabFactories.Get(id, keepInstance);
 
         /// <summary>
-        /// Retrieves all registered prefab providers.
+        /// Resolves and enumerates all currently active prefab providers in ascending registration order.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false</c>, each call creates new instances via factories.</param>
-        /// <returns>An enumerable of all <see cref="ISOSPrefab"/> instances.</returns>
-        /// <remarks>
-        /// The order of providers follows the registration order within the <see cref="SortedFactory{T}"/>, sorted by their registration order value.
-        /// </remarks>
+        /// <param name="keepInstance">If <c>true</c>, caches resolved instances for subsequent calls. Defaults to <c>true</c>.</param>
+        /// <returns>An enumerable sequence of active <see cref="ISOSPrefab"/> instances.</returns>
         public static IEnumerable<ISOSPrefab> GetAllPrefabProviders(bool keepInstance = true)
-            => _prefabFactories.GetAll(keepInstance).Select(t => t.Instance);
+                    => _prefabFactories.GetAll(keepInstance).Select(t => t.Instance);
 
         /// <summary>
-        /// Removes a prefab provider by its identifier.
+        /// Removes a prefab provider registration or its cached instance by identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the provider to remove.</param>
-        /// <param name="onlyInstance">If <c>true</c>, only the cached instance is removed without removing the registration. If <c>false</c>, both the registration and cached instance are removed.</param>
-        /// <returns><c>true</c> if the provider was found and removed; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// When <paramref name="onlyInstance"/> is <c>false</c> (default), the registration is completely removed from the factory,
-        /// and if a cached instance exists, it is disposed (if <see cref="IDisposable"/>).
-        /// </remarks>
+        /// <param name="id">The unique identifier of the provider.</param>
+        /// <param name="onlyInstance">If <c>true</c>, evicts only the cached instance without unregistering. Defaults to <c>false</c>.</param>
+        /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemovePrefabProvider(string id, bool onlyInstance = false)
-            => _prefabFactories.Remove(id, onlyInstance);
+                    => _prefabFactories.Remove(id, onlyInstance);
 
         #endregion
 
         #region Window Profiles
 
         /// <summary>
-        /// Registers a <paramref name="obj"/> as a window profile of type <see cref="ISOSWindowProfile"/> managed by <see cref="SortedFactory{T}"/>.
+        /// Registers a visual window layout profile into the S.O.S. profile registry.
         /// </summary>
-        /// <param name="obj">The instance or factory delegate to register. Can be an object, a <see cref="Type"/>, a <see cref="Func{T}"/> factory, or an existing instance.</param>
-        /// <param name="id">Optional unique identifier. If null, the type's full name is used.</param>
-        /// <param name="order">Registration order determines display priority. Lower values appear first. Defaults to 0.0.</param>
-        /// <param name="active">Whether the profile is initially active. Defaults to true.</param>
-        /// <returns><c>true</c> if registration succeeded; otherwise, <c>false</c> if <paramref name="obj"/> is null or fails type checks.</returns>
-        /// <remarks>
-        /// Registered window profiles are discoverable via <see cref="GetWindowProfile"/> or <see cref="GetAllWindowProfiles"/>.
-        /// </remarks>
+        /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSWindowProfile"/>, a factory delegate (<see cref="Func{ISOSWindowProfile}"/>), or an existing instance.</param>
+        /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
+        /// <param name="order">Priority order in the profile selector dropdown. Defaults to <c>0.0</c>.</param>
+        /// <param name="active">Whether the profile is initially enabled. Defaults to <c>true</c>.</param>
+        /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is null or fails type contract validation.</returns>
         public static bool RegisterWindowProfile(object obj, string? id = null, double order = 0.0, bool active = true)
-            => _profileFactories.Register(obj, id, order, active);
+                    => _profileFactories.Register(obj, id, order, active);
 
         /// <summary>
-        /// Activates the window profile identified by <paramref name="id"/>.
+        /// Enables the window profile matching <paramref name="id"/> so it appears in the profile selection menu.
         /// </summary>
-        /// <param name="id">The unique identifier of the profile to activate.</param>
-        /// <returns><c>true</c> if the profile was found and activated; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// If the profile is already active, this method returns <c>true</c> without side effects.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the profile.</param>
+        /// <returns><c>true</c> if found; otherwise, <c>false</c>.</returns>
         public static bool ActivateWindowProfile(string id) => _profileFactories.SetActive(id, true);
+
         /// <summary>
-        /// Deactivates the window profile identified by <paramref name="id"/>.
+        /// Disables the window profile matching <paramref name="id"/> and evicts any cached instance.
         /// </summary>
-        /// <param name="id">The unique identifier of the profile to deactivate.</param>
-        /// <returns><c>true</c> if the profile was found and deactivated; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// If the profile is already inactive, this method returns <c>true</c> without side effects.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the profile.</param>
+        /// <returns><c>true</c> if found; otherwise, <c>false</c>.</returns>
         public static bool DeactivateWindowProfile(string id) => _profileFactories.SetActive(id, false);
 
         /// <summary>
-        /// Retrieves a window profile of type <typeparamref name="T"/> by its identifier.
+        /// Resolves a registered window profile by identifier and casts it to <typeparamref name="T"/>.
         /// </summary>
-        /// <typeparam name="T">The expected type of the profile; must match the registered type.</typeparam>
-        /// <param name="id">The unique identifier of the profile to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. Note: defaults to <c>false</c> for profiles.</param>
-        /// <returns>The profile instance if found; otherwise, <c>default</c> (<c>null</c> for reference types).</returns>
-        /// <remarks>
-        /// Uses the internal <see cref="SortedFactory{T}.Get(string, bool)"/> method. If no ID is provided, returns the first profile.
-        /// </remarks>
+        /// <typeparam name="T">The concrete or interface type expected. Must implement <see cref="ISOSWindowProfile"/>.</typeparam>
+        /// <param name="id">The unique identifier of the profile.</param>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance. Defaults to <c>false</c> for visual profiles.</param>
+        /// <returns>The profile instance if found and active; otherwise, <c>default</c>.</returns>
         public static T? GetWindowProfile<T>(string id, bool keepInstance = false)
             => GetWindowProfile(id, keepInstance) is T t ? t : default;
 
         /// <summary>
-        /// Retrieves a window profile by its identifier.
+        /// Resolves a registered window profile by identifier, falling back to the default profile if not found.
         /// </summary>
-        /// <param name="id">The unique identifier of the profile to retrieve. If <c>null</c> or empty, returns the first profile.</param>
-        /// <param name="keepInstance">If <c>true</c>, the returned instance is cached for subsequent calls. Defaults to <c>false</c>.</param>
-        /// <returns>The <see cref="ISOSWindowProfile"/> instance if found; otherwise, <c>null</c>.</returns>
-        /// <remarks>
-        /// Complex lookup logic: if the profile is not found, a warning is logged and the default profile is attempted.
-        /// </remarks>
+        /// <param name="id">The unique identifier of the profile. If <c>null</c> or empty, resolves the first active profile.</param>
+        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance. Defaults to <c>false</c> for visual profiles.</param>
+        /// <returns>The resolved <see cref="ISOSWindowProfile"/> instance; or <c>null</c> if no active profiles are registered.</returns>
         public static ISOSWindowProfile? GetWindowProfile(string? id, bool keepInstance = false)
         {
             ISOSWindowProfile? v;
@@ -472,26 +384,19 @@ namespace SOS
         }
 
         /// <summary>
-        /// Retrieves all registered window profiles.
+        /// Resolves and enumerates all currently active window profiles in ascending registration order.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, instances are cached for subsequent calls. If <c>false</c>, each call creates new instances via factories.</param>
-        /// <returns>An enumerable of all <see cref="ISOSWindowProfile"/> instances.</returns>
-        /// <remarks>
-        /// The order of profiles follows the registration order within the <see cref="SortedFactory{T}"/>, sorted by their registration order value.
-        /// </remarks>
+        /// <param name="keepInstance">If <c>true</c>, caches resolved instances. Defaults to <c>false</c> for visual profiles.</param>
+        /// <returns>An enumerable sequence of active <see cref="ISOSWindowProfile"/> instances.</returns>
         public static IEnumerable<ISOSWindowProfile> GetAllWindowProfiles(bool keepInstance = false)
             => _profileFactories.GetAll(keepInstance).Select(t => t.Instance);
 
         /// <summary>
-        /// Removes a window profile by its identifier.
+        /// Removes a window profile registration or its cached instance by identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the profile to remove.</param>
-        /// <param name="onlyInstance">If <c>true</c>, only the cached instance is removed without removing the registration. If <c>false</c>, both the registration and cached instance are removed.</param>
-        /// <returns><c>true</c> if the profile was found and removed; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// When <paramref name="onlyInstance"/> is <c>false</c> (default), the registration is completely removed from the factory,
-        /// and if a cached instance exists, it is disposed (if <see cref="IDisposable"/>).
-        /// </remarks>
+        /// <param name="id">The unique identifier of the profile.</param>
+        /// <param name="onlyInstance">If <c>true</c>, evicts only the cached instance without unregistering. Defaults to <c>false</c>.</param>
+        /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemoveWindowProfile(string id, bool onlyInstance = false)
             => _profileFactories.Remove(id, onlyInstance);
 
@@ -500,15 +405,13 @@ namespace SOS
         #region EventBus Facade
 
         /// <summary>
-        /// Subscribes a callback to the specified event channel with priority-based execution ordering.
+        /// Subscribes a parameterless callback to the specified event channel with priority-based execution ordering.
         /// </summary>
-        /// <param name="key">The unique event identifier channel (see <see cref="CommKeys"/>).</param>
-        /// <param name="handler">The delegate to invoke when the event is emitted.</param>
-        /// <param name="order">The execution priority weight. Lower values execute earlier (see <see cref="EventPriority"/>).
-        /// Values are normalized to 4 decimal places. Defaults to <see cref="EventPriority.Default"/> (<c>0.0</c>).</param>
+        /// <param name="key">The unique event channel identifier (see <see cref="CommKeys"/>).</param>
+        /// <param name="handler">The callback delegate invoked when the event is emitted.</param>
+        /// <param name="order">The execution priority weight. Lower values execute earlier (see <see cref="EventPriority"/>). Defaults to <c>0.0</c>.</param>
         /// <remarks>
-        /// Handlers are executed outside internal synchronization locks, guaranteeing reentrancy safety and zero deadlocks.
-        /// To unsubscribe, use <see cref="Off"/> with the same key and handler, or specify an exact order with <see cref="Off{T}(string, Action{T}, double?, bool)"/>.
+        /// Handlers execute outside internal locks, ensuring safe reentrancy and zero deadlocks.
         /// </remarks>
         public static void On(string key, Action handler, double order = 0) => eventBus.On(key, handler, order);
 
@@ -516,62 +419,38 @@ namespace SOS
         /// Subscribes a strongly-typed callback to the specified event channel with priority-based execution ordering.
         /// </summary>
         /// <typeparam name="T">The payload type associated with the event.</typeparam>
-        /// <param name="key">The unique event identifier channel (see <see cref="CommKeys"/>).</param>
-        /// <param name="handler">The delegate to invoke when the event is emitted.</param>
-        /// <param name="order">The execution priority weight. Lower values execute earlier (see <see cref="EventPriority"/>).
-        /// Values are normalized to 4 decimal places. Defaults to <see cref="EventPriority.Default"/> (<c>0.0</c>).</param>
+        /// <param name="key">The unique event channel identifier (see <see cref="CommKeys"/>).</param>
+        /// <param name="handler">The callback delegate invoked with the payload when the event is emitted.</param>
+        /// <param name="order">The execution priority weight. Lower values execute earlier (see <see cref="EventPriority"/>). Defaults to <c>0.0</c>.</param>
         /// <remarks>
-        /// Handlers are executed outside internal synchronization locks, guaranteeing reentrancy safety and zero deadlocks.
+        /// Handlers execute outside internal locks, ensuring safe reentrancy and zero deadlocks.
         /// </remarks>
         public static void On<T>(string key, Action<T> handler, double order = 0) => eventBus.On<T>(key, handler, order);
 
         /// <summary>
-        /// Unsubscribes a previously registered handler from the specified event channel.
+        /// Unsubscribes a parameterless callback from the specified event channel.
         /// </summary>
-        /// <param name="key">The unique event identifier channel.</param>
-        /// <param name="handler">The delegate to remove.</param>
-        /// <param name="order">Optional. If specified, removes the handler only from the priority level matching <paramref name="order"/>.
-        /// If <c>null</c>, removes the handler from <b>all</b> priority levels.</param>
-        /// <param name="removeState">If <c>true</c>, also removes any saved state associated with the key.</param>
-        /// <remarks>
-        /// <para>
-        /// <c>Off(key, handler)</c>: Removes the handler from all priority levels where it was subscribed.
-        /// </para>
-        /// <para>
-        /// <c>Off(key, handler, order)</c>: Targeted removal from a specific priority level.
-        /// </para>
-        /// </remarks>
+        /// <param name="key">The unique event channel identifier.</param>
+        /// <param name="handler">The callback delegate to remove.</param>
+        /// <param name="order">Optional. If specified, removes the handler only from this exact priority tier; if <c>null</c>, removes it across all tiers.</param>
+        /// <param name="removeState">If <c>true</c>, also evicts any state stored under <paramref name="key"/>.</param>
         public static void Off(string key, Action handler, double? order = null, bool removeState = false) => eventBus.Off(key, handler, order, removeState);
 
         /// <summary>
-        /// Unsubscribes a strongly-typed handler from the specified event channel.
+        /// Unsubscribes a strongly-typed callback from the specified event channel.
         /// </summary>
         /// <typeparam name="T">The payload type associated with the event.</typeparam>
-        /// <param name="key">The unique event identifier channel.</param>
-        /// <param name="handler">The delegate to remove.</param>
-        /// <param name="order">Optional. If specified, removes the handler only from the priority level matching <paramref name="order"/>.
-        /// If <c>null</c>, removes the handler from <b>all</b> priority levels.</param>
-        /// <param name="removeState">If <c>true</c>, also removes any saved state associated with the key.</param>
-        /// <remarks>
-        /// <para>
-        /// <c>Off&lt;T&gt;(key, handler)</c>: Removes the handler from all priority levels where it was subscribed.
-        /// </para>
-        /// <para>
-        /// <c>Off&lt;T&gt;(key, handler, order)</c>: Targeted removal from a specific priority level.
-        /// </para>
-        /// </remarks>
+        /// <param name="key">The unique event channel identifier.</param>
+        /// <param name="handler">The callback delegate to remove.</param>
+        /// <param name="order">Optional. If specified, removes the handler only from this exact priority tier; if <c>null</c>, removes it across all tiers.</param>
+        /// <param name="removeState">If <c>true</c>, also evicts any state stored under <paramref name="key"/>.</param>
         public static void Off<T>(string key, Action<T> handler, double? order = null, bool removeState = false) => eventBus.Off<T>(key, handler, order, removeState);
 
         /// <summary>
-        /// Emits an event on the specified channel, optionally with a value and state management.
+        /// Emits a parameterless event across all priority tiers on the specified channel.
         /// </summary>
-        /// <param name="key">The unique event identifier channel.</param>
-        /// <remarks>
-        /// <para><c>Emit(key)</c>: Emits with no value and no state change.</para>
-        /// <para><c>Emit(key, order)</c>: Emits with an optional order parameter.</para>
-        /// <para><c>Emit&lt;T&gt;(key, value)</c>: Emits a typed value.</para>
-        /// <para><c>EmitRange(key, min, max)</c>: Emits within a range.</para>
-        /// </remarks>
+        /// <param name="key">The unique event channel identifier (see <see cref="CommKeys"/>).</param>
+        /// <returns><c>true</c> if at least one handler was invoked; otherwise, <c>false</c>.</returns>
         public static bool Emit(string key) => eventBus.Emit(key, null);
 
         /// <summary>
@@ -583,81 +462,72 @@ namespace SOS
         public static bool Emit(string key, double? order = null) => eventBus.Emit(key, order);
 
         /// <summary>
-        /// Emits an event on the specified channel with a typed value and optional state management.
+        /// Emits a strongly-typed event across all priority tiers or within a specific tier, optionally persisting state.
         /// </summary>
-        /// <typeparam name="T">The type of the value to emit.</typeparam>
-        /// <param name="key">The unique event identifier channel.</param>
-        /// <param name="value">The value to emit.</param>
-        /// <param name="order">Optional execution order. If <c>null</c>, uses the handler's registered order.</param>
-        /// <param name="setState">If <c>true</c>, sets the state to the emitted value after handlers execute. Handlers execute first, then internal state is updated via <see cref="SetState{T}(string, T, bool)"/> if <paramref name="setState"/> is <c>true</c>.</param>
-        /// <returns><c>true</c> if the event was emitted to at least one handler; <c>false</c> otherwise.</returns>
+        /// <typeparam name="T">The payload type.</typeparam>
+        /// <param name="key">The unique event channel identifier (see <see cref="CommKeys"/>).</param>
+        /// <param name="value">The payload value delivered to subscribers.</param>
+        /// <param name="order">Optional exact priority tier to invoke. If <c>null</c>, delivers to handlers across all priority tiers.</param>
+        /// <param name="setState">If <c>true</c>, updates the internal state store with <paramref name="value"/> <i>after</i> all handlers have finished executing.</param>
+        /// <returns><c>true</c> if at least one handler was invoked; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// Handlers execute in ascending order of their priority weights. Delegate invocation occurs outside internal locks.
+        /// </remarks>
         public static bool Emit<T>(string key, T value, double? order = null, bool setState = true) => eventBus.Emit<T>(key, value, order, setState);
 
         /// <summary>
-        /// Emits an event on the specified channel within a priority range, invoking all handlers whose orders fall between <paramref name="min"/> and <paramref name="max"/>.
+        /// Emits a parameterless event to handlers whose priority order falls within [<paramref name="min"/>, <paramref name="max"/>].
         /// </summary>
-        /// <param name="key">The unique event identifier channel.</param>
-        /// <param name="min">Minimum order (inclusive). Defaults to <see cref="double.MinValue"/>.</param>
-        /// <param name="max">Maximum order (inclusive). Defaults to <see cref="double.MaxValue"/>.</param>
-        /// <returns><c>true</c> if the event was emitted to at least one handler; <c>false</c> otherwise.</returns>
+        /// <param name="key">The unique event channel identifier.</param>
+        /// <param name="min">Minimum priority order (inclusive). Defaults to <see cref="double.MinValue"/>.</param>
+        /// <param name="max">Maximum priority order (inclusive). Defaults to <see cref="double.MaxValue"/>.</param>
+        /// <returns><c>true</c> if at least one handler was invoked; otherwise, <c>false</c>.</returns>
         public static bool EmitRange(string key, double min = double.MinValue, double max = double.MaxValue) => eventBus.Emit(key, min, max);
 
         /// <summary>
-        /// Emits an event on the specified channel within a priority range with a typed value and optional state management.
+        /// Emits a strongly-typed event to handlers whose priority order falls within [<paramref name="min"/>, <paramref name="max"/>], optionally persisting state.
         /// </summary>
-        /// <typeparam name="T">The type of the value to emit.</typeparam>
-        /// <param name="key">The unique event identifier channel.</param>
-        /// <param name="value">The value to emit.</param>
-        /// <param name="min">Minimum order (inclusive). Defaults to <see cref="double.MinValue"/>.</param>
-        /// <param name="max">Maximum order (inclusive). Defaults to <see cref="double.MaxValue"/>.</param>
-        /// <param name="setState">If <c>true</c>, sets the state to the emitted value after handlers execute. Handlers execute first, then internal state is updated via <see cref="SetState{T}(string, T, bool)"/> if <paramref name="setState"/> is <c>true</c>.</param>
-        /// <returns><c>true</c> if the event was emitted to at least one handler; <c>false</c> otherwise.</returns>
+        /// <typeparam name="T">The payload type.</typeparam>
+        /// <param name="key">The unique event channel identifier.</param>
+        /// <param name="value">The payload value delivered to subscribers.</param>
+        /// <param name="min">Minimum priority order (inclusive). Defaults to <see cref="double.MinValue"/>.</param>
+        /// <param name="max">Maximum priority order (inclusive). Defaults to <see cref="double.MaxValue"/>.</param>
+        /// <param name="setState">If <c>true</c>, updates the internal state store with <paramref name="value"/> <i>after</i> all handlers have finished executing.</param>
+        /// <returns><c>true</c> if at least one handler was invoked; otherwise, <c>false</c>.</returns>
         public static bool EmitRange<T>(string key, T value, double min = double.MinValue, double max = double.MaxValue, bool setState = true) => eventBus.Emit<T>(key, value, min, max, setState);
 
         /// <summary>
-        /// Sets the state for a given key, optionally emitting the value as an event.
+        /// Stores a value in the shared state cache, optionally emitting it across the channel.
         /// </summary>
-        /// <typeparam name="T">The type of the state value.</typeparam>
-        /// <param name="key">The unique identifier for the state.</param>
-        /// <param name="value">The value to set as state.</param>
-        /// <param name="emit">If <c>true</c>, emits the value as an event after setting the state.</param>
-        /// <remarks>
-        /// State is stored internally and can be retrieved via <see cref="GetState{T}(string)"/>.
-        /// </remarks>
+        /// <typeparam name="T">The state payload type.</typeparam>
+        /// <param name="key">The state channel identifier.</param>
+        /// <param name="value">The value to store.</param>
+        /// <param name="emit">If <c>true</c>, also emits the value across the channel.</param>
         public static void SetState<T>(string key, T value, bool emit = false) => eventBus.SetState<T>(key, value, emit);
 
         /// <summary>
-        /// Sets the state for a given key using a provider method.
+        /// Stores a dynamic state generator evaluated on-demand when read via <see cref="GetState{T}(string)"/>.
         /// </summary>
-        /// <typeparam name="T">The type of the state value.</typeparam>
-        /// <param name="key">The unique identifier for the state.</param>
-        /// <param name="method">A <see cref="Func{T}"/> delegate that returns the state value.</param>
-        /// <param name="emit">If <c>true</c>, emits the resulting value as an event after invoking the method.</param>
-        /// <remarks>
-        /// The method is invoked each time <see cref="GetState{T}(string)"/> is called, allowing for dynamic state computation.
-        /// </remarks>
+        /// <typeparam name="T">The state payload type.</typeparam>
+        /// <param name="key">The state channel identifier.</param>
+        /// <param name="method">The delegate invoked on each retrieval to compute the state value.</param>
+        /// <param name="emit">If <c>true</c>, invokes the delegate immediately and emits the resulting value.</param>
         public static void SetState<T>(string key, Func<T> method, bool emit = false) => eventBus.SetState<T>(key, method, emit);
 
         /// <summary>
-        /// Retrieves the current state value for the specified key.
+        /// Retrieves the current state value stored under the specified channel key.
         /// </summary>
         /// <typeparam name="T">The expected type of the state value.</typeparam>
-        /// <param name="key">The unique identifier for the state.</param>
-        /// <returns>The state value if found; otherwise, <c>default</c> (<c>null</c> for reference types).</returns>
-        /// <remarks>
-        /// State is set via <see cref="SetState{T}(string, T, bool)"/> or <see cref="SetState{T}(string, Func{T}, bool)"/>.
-        /// If the stored type does not match <typeparamref name="T"/>, an exception is thrown.
-        /// </remarks>
+        /// <param name="key">The state channel identifier.</param>
+        /// <returns>The stored value if found; otherwise, <c>default</c>.</returns>
+        /// <exception cref="System.Runtime.InteropServices.SafeArrayTypeMismatchException">Thrown when the stored value cannot be cast to <typeparamref name="T"/>.</exception>
         public static T? GetState<T>(string key) => eventBus.GetState<T>(key);
 
         /// <summary>
-        /// Removes the state associated with the specified key.
+        /// Evicts the state value stored under the specified channel key.
         /// </summary>
-        /// <param name="key">The unique identifier of the state to remove.</param>
-        /// <returns><c>true</c> if the state was found and removed; <c>false</c> if not found.</returns>
-        /// <remarks>
-        /// State removal does not affect event handlers subscribed via <see cref="On"/>.
-        /// </remarks>
+        /// <param name="key">The state channel identifier.</param>
+        /// <returns><c>true</c> if an entry was removed; otherwise, <c>false</c>.</returns>
         public static bool RemoveState(string key) => eventBus.RemoveState(key);
 
         #endregion
@@ -665,12 +535,12 @@ namespace SOS
         #region Internal helpers
 
         /// <summary>
-        /// Initializes the SDK by auto-registering all mod components from the provided <see cref="IPluginManagementService"/>.
+        /// Discovers and auto-registers all components decorated with <see cref="AutoRegisterAttribute"/> across loaded assemblies.
         /// </summary>
-        /// <param name="pluginManagementService">The service used to discover implementing types via their <see cref="AutoRegisterAttribute"/>.</param>
+        /// <param name="pluginManagementService">The LuaCs plugin management service.</param>
         /// <remarks>
-        /// This method is typically called once during mod loading. It scans for types decorated with <see cref="AutoRegisterAttribute"/>
-        /// and registers them in the appropriate <see cref="SortedFactory{T}"/> registries.
+        /// Scans for classes implementing <see cref="ISOSStatSection"/>, <see cref="ISOSTab"/>, <see cref="ISOSConfig"/>,
+        /// <see cref="ISOSPrefab"/>, and <see cref="ISOSWindowProfile"/>.
         /// </remarks>
         internal static void Initialize(IPluginManagementService pluginManagementService)
         {
@@ -685,13 +555,6 @@ namespace SOS
             _scanned = true;
         }
 
-        /// <summary>
-        /// Clears cached instances for sections, tabs, prefab providers, and window profiles, while leaving factory registrations intact.
-        /// </summary>
-        /// <remarks>
-        /// Sections, tabs, prefab providers, and window profiles have their cached instances cleared (instances disposed if <see cref="IDisposable"/>). Factory registrations are left intact.
-        /// Useful for cleanup between game rounds or mod reload scenarios.
-        /// </remarks>
         internal static void ClearTemporaryInstances()
         {
             _sectionFactories.Clear(true);
@@ -700,13 +563,6 @@ namespace SOS
             _profileFactories.Clear(true);
         }
 
-        /// <summary>
-        /// Clears all registrations and instances from all factories, resetting the SDK to its initial state.
-        /// </summary>
-        /// <remarks>
-        /// All cached instances are disposed (if <see cref="IDisposable"/>), registrations are removed, and the internal scan flag is reset.
-        /// This effectively reinitializes the SDK; typically called for mod unloading or full reload scenarios.
-        /// </remarks>
         internal static void Clear()
         {
             _sectionFactories.Clear();

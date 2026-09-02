@@ -16,38 +16,62 @@ namespace SOS
     #region AutoRegister
 
     /// <summary>
-    /// Attribute used to automatically register mod components (sections, tabs, configs, prefab providers, window profiles)
-    /// during SDK initialization via <c>IPluginManagementService</c>.
+    /// Instructs the S.O.S. discovery engine to automatically register the decorated class into its corresponding <see cref="API"/> factory.
     /// </summary>
     /// <remarks>
-    /// The <see cref="Id"/> property is the optional unique identifier. If <c>null</c>, the type's full name is used.
-    /// The <see cref="Order"/> property determines registration order (lower values appear first, defaulting to 0.0).
-    /// The <see cref="Active"/> property controls whether the component is initially active (defaulting to true).
+    /// <para>
+    /// During mod first opening (<see cref="API.Initialize"/>), the LuaCs plugin management service scans loaded assemblies
+    /// for classes decorated with this attribute that implement one of the core extension interfaces:
+    /// <list type="bullet">
+    /// <item><description><see cref="ISOSTab"/> (or <see cref="ITab{T}"/>): Registered as a browser tab.</description></item>
+    /// <item><description><see cref="ISOSStatSection"/>: Registered as an inspector wiki section.</description></item>
+    /// <item><description><see cref="ISOSPrefab"/>: Registered as a prefab data provider in the browser.</description></item>
+    /// <item><description><see cref="ISOSWindowProfile"/>: Registered as a visual window layout profile.</description></item>
+    /// <item><description><see cref="ISOSConfig"/>: Registered as a reactive configuration unit.</description></item>
+    /// </list>
+    /// </para>
+    /// <para>
+    /// <b>Deferred Instantiation:</b> Decorating a type with this attribute registers its factory delegate without constructing an instance immediately.
+    /// Actual construction is deferred until the component is first requested by the user or the active profile.
+    /// </para>
     /// </remarks>
+    /// <example>
+    /// <code>
+    /// [AutoRegister("MyMod.RadiationSection", order: 5.0, active: true)]
+    /// public class RadiationSection : ISOSStatSection
+    /// {
+    ///     // ...
+    /// }
+    /// </code>
+    /// </example>
     [AttributeUsage(AttributeTargets.Class)]
     public class AutoRegisterAttribute : Attribute
     {
         /// <summary>
-        /// Optional unique identifier. If <c>null</c>, the type's full name is used.
+        /// Gets the unique string identifier used as the dictionary key in the internal registries.
+        /// If <c>null</c>, the SDK automatically defaults to <c>Type.FullName ?? Type.Name</c>.
         /// </summary>
         public readonly string? Id;
 
         /// <summary>
-        /// Registration order. Lower values appear first in sorted output. Defaults to 0.0.
+        /// Gets the numerical sorting order that determines the component's execution or layout sequence relative to others.
+        /// Lower values appear earlier or execute first. Defaults to <c>0.0</c>.
         /// </summary>
         public readonly double Order;
 
         /// <summary>
-        /// Whether the component is initially active. Defaults to true.
+        /// Gets a value indicating whether the component is enabled upon initial discovery.
+        /// If <c>false</c>, the component is registered but ignored during queries until explicitly activated via <see cref="API"/>.
+        /// Defaults to <c>true</c>.
         /// </summary>
         public readonly bool Active;
 
         /// <summary>
-        /// Creates a new auto-registration attribute.
+        /// Initializes a new instance of the <see cref="AutoRegisterAttribute"/> class with specified registration metadata.
         /// </summary>
-        /// <param name="id">Optional unique identifier. If <c>null</c>, the type's full name is used.</param>
-        /// <param name="order">Registration order. Lower values appear first in sorted output. Defaults to 0.0.</param>
-        /// <param name="active">Whether the component is initially active. Defaults to true.</param>
+        /// <param name="id">Optional unique identifier. If <c>null</c> or whitespace, defaults to the declaring class's full name.</param>
+        /// <param name="order">Priority order determining placement in UI lists or execution chains. Lower values appear first. Defaults to <c>0.0</c>.</param>
+        /// <param name="active">Whether the component is initially enabled. Defaults to <c>true</c>.</param>
         public AutoRegisterAttribute(string? id = null, double order = 0.0, bool active = true)
         {
             Id = id;
@@ -61,117 +85,130 @@ namespace SOS
     #region Interfaces
 
     /// <summary>
-    /// Provides a unique identifier for mod components.
+    /// Exposes an identifier property used to uniquely distinguish a component within the S.O.S. ecosystem.
     /// </summary>
-    /// <remarks>
-    /// The default implementation returns the type's full name (<c>Type.FullName</c>) or type name (<c>Type.Name</c>)
-    /// if the full name is null. Implementers can override this property to provide a custom identifier string.
-    /// This interface is used by <see cref="ITab{T}"/> and <see cref="ISOSWindowProfile"/> to provide
-    /// factory keys in <see cref="SortedFactory{T}"/> registries.
-    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IIdentifier
     {
         /// <summary>
-        /// Gets the unique identifier for this component.
+        /// Gets the unique string identifier of this instance.
+        /// By default, returns the full name of the implementing runtime type.
         /// </summary>
-        /// <returns>The type's full name or name as a fallback identifier.</returns>
         string Id => GetType().FullOrName();
     }
 
     /// <summary>
-    /// Defines a generic tab interface for modular UI tab pages that can handle objects of type <typeparamref name="T"/>.
+    /// Defines a modular, generic UI tab capable of inspecting and interacting with entities of type <typeparamref name="T"/>.
     /// </summary>
-    /// <typeparam name="T">The type of object this tab can handle. The tab will only be shown for items where <see cref="CanHandle"/> returns true.</typeparam>
+    /// <typeparam name="T">The data entity type inspected by this tab (e.g., <see cref="Barotrauma.Prefab"/> or <see cref="Barotrauma.Character"/>).</typeparam>
     /// <remarks>
-    /// This is the base generic tab contract. Implementations are registered via <see cref="API.RegisterTab"/>
-    /// and retrieved via <see cref="API.GetTab"/>. The tab lifecycle:
-    /// <list type="bullet">
-    /// <item><term><see cref="TabName"/>:</term><description>Display name shown on the tab button.</description></item>
-    /// <item><term><see cref="ToolTip"/>:</term><description>Optional tooltip for the tab button. Defaults to empty string.</description></item>
-    /// <item><term><see cref="CanHandle"/>:</term><description>Determines if this tab applies to a given item. Called during tab list refresh.</description></item>
-    /// <item><term><see cref="Init"/>:</term><description>Called once when the tab is initialized with the content container. Use to create persistent UI.</description></item>
-    /// <item><term><see cref="Show"/>:</term><description>Called when the tab becomes active for a given item. Populate dynamic content here.</description></item>
-    /// <item><term><see cref="Hide"/>:</term><description>Called when the tab is deactivated. Clean up dynamic content.</description></item>
-    /// <item><term><see cref="CreateTabButton"/>:</term><description>Creates the tab button. Defaults to <see cref="TabDefaults.CreateTabButton"/>. Can be overridden for custom appearance.</description></item>
-    /// </list>
     /// <para>
-    /// For prefab-specific tabs, use <see cref="ISOSTab"/> instead (which is <see cref="ITab{T}"/> with <c>T = Prefab</c>).
+    /// <b>Lifecycle Flow:</b>
+    /// <list type="number">
+    /// <item><description><see cref="Init"/>: Invoked once when the hosting tab widget (<see cref="GUI.GUITab{T}"/>) is constructed.</description></item>
+    /// <item><description><see cref="CanHandle"/>: Evaluated whenever a new target entity is selected to determine if this tab applies.</description></item>
+    /// <item><description><see cref="Show"/>: Invoked when the user selects this tab (or when target changes while this tab is active) to construct or refresh UI elements.</description></item>
+    /// <item><description><see cref="Hide"/>: Invoked when switching away from this tab to suspend visual updates or hide containers.</description></item>
+    /// <item><description><see cref="IDisposable.Dispose"/>: (If implemented) Invoked when the parent window profile or widget is closed to release Monogame textures or frames.</description></item>
+    /// </list>
     /// </para>
     /// </remarks>
+    /// <example>
+    /// <code>
+    /// [AutoRegister("MyMod.SubmarineTab", order: 10.0)]
+    /// public class SubmarineTab : ITab&lt;SubmarineInfo&gt;
+    /// {
+    ///     public string TabName => "DETAILS";
+    ///     public bool CanHandle(SubmarineInfo sub) => sub != null;
+    ///     public void Init(GUIComponent container) { /* Build persistent frame */ }
+    ///     public void Show(SubmarineInfo sub, Action&lt;SubmarineInfo&gt; onPrimary, Action&lt;SubmarineInfo&gt; onSecondary) { /* Draw sub stats */ }
+    ///     public void Hide() { /* Hide frame */ }
+    /// }
+    /// </code>
+    /// </example>
     [EditorBrowsable(EditorBrowsableState.Never), DefaultClass<TabDefaults>]
     public interface ITab<T> : IIdentifier
     {
         /// <summary>
-        /// Gets the display name of the tab shown on the tab button.
+        /// Gets the localized or display title rendered on the tab's selector button.
         /// </summary>
         string TabName { get; }
 
         /// <summary>
-        /// Gets the tooltip text for the tab button. Defaults to empty string.
+        /// Gets an optional tooltip description displayed when hovering over the tab's selector button.
+        /// Defaults to an empty string.
         /// </summary>
         string ToolTip => "";
 
         /// <summary>
-        /// Determines whether this tab can handle the specified item.
+        /// Evaluates whether this tab is capable of displaying meaningful information for the given <paramref name="item"/>.
         /// </summary>
-        /// <param name="item">The item to check.</param>
-        /// <returns><c>true</c> if this tab should be shown for the item; <c>false</c> otherwise.</returns>
+        /// <param name="item">The target entity currently selected.</param>
+        /// <returns><c>true</c> if this tab should appear in the tab bar for this entity; otherwise, <c>false</c>.</returns>
         bool CanHandle(T item);
 
         /// <summary>
-        /// Initializes the tab with a content container. Called once when the tab is first registered.
+        /// Initializes persistent UI containers when the tab widget is constructed.
         /// </summary>
-        /// <param name="contentContainer">The parent container where tab content should be created.</param>
+        /// <param name="contentContainer">The parent <see cref="Barotrauma.GUIComponent"/> where this tab's visual hierarchy must be attached.</param>
         void Init(GUIComponent contentContainer);
 
         /// <summary>
-        /// Called when the tab becomes the active tab for the given item.
+        /// Populates or updates the tab's visual content for the active <paramref name="item"/>.
         /// </summary>
-        /// <param name="item">The item currently being inspected.</param>
-        /// <param name="onPrimary">Callback for primary interaction (e.g., left-click navigation).</param>
-        /// <param name="onSecondary">Callback for secondary interaction (e.g., right-click context menu).</param>
+        /// <param name="item">The entity to inspect and visualize.</param>
+        /// <param name="onPrimary">Callback invoked when a related entity is primary-clicked (e.g., navigating to an ingredient).</param>
+        /// <param name="onSecondary">Callback invoked when a related entity is secondary-clicked (e.g., opening its context menu).</param>
         void Show(T item, Action<T> onPrimary, Action<T> onSecondary);
 
         /// <summary>
-        /// Called when the tab is no longer the active tab. Use to clean up dynamic content.
+        /// Hides the tab UI when another tab becomes active.
         /// </summary>
         void Hide();
 
         /// <summary>
-        /// Creates the tab button displayed in the tab bar.
+        /// Creates and styles the header button representing this tab in the tab bar.
         /// </summary>
-        /// <param name="tabName">The tab display name.</param>
-        /// <param name="parent">The parent rectangle transform for the button.</param>
-        /// <param name="isActive">Whether this tab is currently active.</param>
-        /// <param name="onClick">Callback invoked when the button is clicked.</param>
-        /// <param name="toolTip">Optional tooltip for the button.</param>
-        /// <returns>The created <see cref="GUIButton"/> representing this tab.</returns>
+        /// <param name="tabName">The label displayed on the button.</param>
+        /// <param name="parent">The parent <see cref="Barotrauma.RectTransform"/> layout container.</param>
+        /// <param name="isActive">Whether this tab is currently the active view.</param>
+        /// <param name="onClick">Action invoked when the player clicks this tab button.</param>
+        /// <param name="toolTip">Optional tooltip text displayed on hover.</param>
+        /// <returns>A configured <see cref="Barotrauma.GUIButton"/> instance.</returns>
         GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string toolTip = "")
             => TabDefaults.CreateTabButton(tabName, parent, isActive, onClick, toolTip);
     }
 
     /// <summary>
-    /// Defines a modular, stateless inspector section that extracts and renders metadata for a selected prefab
-    /// in the S.O.S. information sidebar.
+    /// Defines a modular, completely stateless wiki inspector section rendered in the right-hand panel of S.O.S.
     /// </summary>
     /// <remarks>
-    /// Implementations are registered via <see cref="AutoRegisterAttribute"/> and are treated as stateless rendering services
-    /// cached in the SDK registry. All analysis data must reside in local method variables during <see cref="Draw"/>
-    /// rather than mutable instance fields. The section is only rendered if it returns <c>true</c>.
+    /// <para>
+    /// <b>Zero-Allocation Stateless Architecture:</b> Implementations must be <b>100% stateless</b>. Instances are cached as reusable
+    /// services in the SDK registry; therefore, implementations must not store per-prefab analysis data in class fields.
+    /// All parsing, filtering, and visual row construction must occur locally within <see cref="Draw"/>.
+    /// </para>
+    /// <para>
+    /// <b>Rendering Pipeline:</b> When the player selects a prefab, the active window profile iterates all active sections:
+    /// <list type="bullet">
+    /// <item><description>If the prefab contains relevant data (e.g., medical treatments, weapon stats, container capacities), the section renders rows into <c>contentPanel</c> using <see cref="GUI.GUILayoutBuilder"/> and returns <c>true</c>.</description></item>
+    /// <item><description>If the prefab is not applicable, the section returns <c>false</c> immediately without appending any empty frames or layout dividers.</description></item>
+    /// </list>
+    /// </para>
     /// </remarks>
     /// <example>
     /// <code>
-    /// [AutoRegister(order: 5.0)]
+    /// [AutoRegister(order: 2.0)]
     /// public class RadiationStatSection : ISOSStatSection
     /// {
-    ///     public bool Draw(GUIListBox contentPanel, Prefab item, Action&lt;Prefab&gt; onPrimary, Action&lt;Prefab&gt; onSecondary)
+    ///     public bool Draw(GUIListBox contentPanel, Prefab prefab, Action&lt;Prefab&gt; onPrimary, Action&lt;Prefab&gt; onSecondary)
     ///     {
-    ///         if (item is not ItemPrefab p || !p.Tags.Contains("radioactive")) return false;
+    ///         if (prefab is not ItemPrefab item || !item.Tags.Contains("radioactive"))
+    ///             return false;
     ///
     ///         using var l = new GUILayoutBuilder(contentPanel);
     ///         l.Header("RADIATION HAZARD", Color.GreenYellow);
-    ///         l.Row("Radiation Level:", "High", Color.Red);
+    ///         l.Row("Radiation Output:", "High", Color.Red);
     ///         return true;
     ///     }
     /// }
@@ -180,52 +217,52 @@ namespace SOS
     public interface ISOSStatSection
     {
         /// <summary>
-        /// Analyzes the given <paramref name="prefab"/> and renders visual rows into <paramref name="contentPanel"/> if applicable.
+        /// Analyzes the specified <paramref name="prefab"/> and appends visual layout rows into <paramref name="contentPanel"/> if applicable.
         /// </summary>
-        /// <param name="contentPanel">The parent list box container where GUI components will be appended.</param>
-        /// <param name="prefab">The target prefab currently being inspected.</param>
-        /// <param name="onPrimary">Callback invoked when a related prefab is primary-clicked (navigates to target).</param>
-        /// <param name="onSecondary">Callback invoked when a related prefab is secondary-clicked (opens context menu).</param>
-        /// <returns><c>true</c> if the section contained relevant data and rendered components; otherwise, <c>false</c>.</returns>
+        /// <param name="contentPanel">The parent list box container where layout components will be added.</param>
+        /// <param name="prefab">The target entity currently being inspected.</param>
+        /// <param name="onPrimary">Callback invoked when a referenced prefab is left-clicked (e.g., selecting a required item or treatment).</param>
+        /// <param name="onSecondary">Callback invoked when a referenced prefab is right-clicked (e.g., opening a contextual action menu).</param>
+        /// <returns><c>true</c> if the section was applicable and visual elements were added; otherwise, <c>false</c>.</returns>
         bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
     }
 
     /// <summary>
-    /// Extension of <see cref="ITab{T}"/> specifically for <see cref="Prefab"/> items.
+    /// Defines a modular prefab inspection tab (type alias for <see cref="ITab{T}"/> where <c>T</c> is <see cref="Barotrauma.Prefab"/>).
     /// </summary>
-    /// <remarks>
-    /// This interface is a type alias for <see cref="ITab{T}"/> with <c>T = Prefab</c>.
-    /// Tabs implementing this interface appear in the left sidebar browser for prefab inspection.
-    /// Registered via <see cref="API.RegisterTab"/> and retrieved via <see cref="API.GetTab"/>.
-    /// Unlike the generic <see cref="ITab{T}"/>, this is the concrete contract used by the SOS UI
-    /// for prefab-specific tabs. Implementations should handle <see cref="ItemPrefab"/> and <see cref="AfflictionPrefab"/>.
-    /// </remarks>
     public interface ISOSTab : ITab<Prefab>;
 
     /// <summary>
-    /// Defines an interface for mod settings with a standard lifecycle.
+    /// Defines an extensible configuration unit with lifecycle persistence, factory defaults, and declarative UI rendering.
     /// </summary>
     /// <remarks>
-    /// Implementations are registered via <see cref="AutoRegisterAttribute"/> and are managed through the SDK's
-    /// configuration system. The lifecycle methods are called by <c>ConfigHelper.LoadConfigs()</c>,
-    /// <c>ConfigHelper.SaveConfigs()</c>, and <c>ConfigHelper.ResetConfigs()</c>.
+    /// <para>
+    /// Implementations are managed through <see cref="API"/> and integrate with <see cref="Configs.ConfigDirtySaver"/>
+    /// to buffer changes and persist them safely using Barotrauma's LuaCs config service.
+    /// </para>
+    /// <para>
+    /// <b>Lifecycle Methods:</b>
     /// <list type="bullet">
-    /// <item><term><see cref="Load"/>:</term><description>Load settings from persistent storage. Called on startup.</description></item>
-    /// <item><term><see cref="Save"/>:</term><description>Persist current settings to storage. Called on changes.</description></item>
-    /// <item><term><see cref="Reset"/>:</term><description>Reset settings to default values. Default implementation does nothing.</description></item>
-    /// <item><term><see cref="DrawSettings"/>:</term><description>Draw the settings UI into the provided container. Returns <c>true</c> if UI was drawn.</description></item>
+    /// <item><term><see cref="Load"/>:</term><description>Invoked during client startup (<see cref="Configs.ConfigHelper.LoadConfigs"/>) to load saved values into memory.</description></item>
+    /// <item><term><see cref="Save"/>:</term><description>Invoked on window dismissal or round transitions to serialize modified values to disk.</description></item>
+    /// <item><term><see cref="Reset"/>:</term><description>Restores all settings managed by this unit to their default values.</description></item>
+    /// <item><term><see cref="DrawSettings"/>:</term><description>Constructs the interactive configuration UI in the settings window using <see cref="GUI.GUILayoutBuilder"/>.</description></item>
     /// </list>
+    /// </para>
     /// </remarks>
     /// <example>
     /// <code>
-    /// [AutoRegister(order: 5.0)]
-    /// public class MyConfig : ISOSConfig
+    /// [AutoRegister("MyMod.Settings", order: 5.0)]
+    /// public class MyModSettings : ConfigDirtySaver, ISOSConfig
     /// {
-    ///     public void Load() { /* load settings */ }
-    ///     public void Save() { /* save settings */ }
+    ///     public void Load() { /* ... */ }
+    ///     public void Save() { /* ... */ }
+    ///     public void Reset() { /* ... */ }
     ///     public bool DrawSettings(GUIListBox container)
     ///     {
-    ///         // draw custom settings UI
+    ///         using var l = new GUILayoutBuilder(container);
+    ///         l.Header("MY MOD CONFIG", Color.Gold);
+    ///         l.ButtonToResetSection(this);
     ///         return true;
     ///     }
     /// }
@@ -235,166 +272,183 @@ namespace SOS
     public interface ISOSConfig
     {
         /// <summary>
-        /// Loads the configuration from persistent storage.
+        /// Loads saved settings from persistent storage into runtime memory.
         /// </summary>
         void Load();
 
         /// <summary>
-        /// Saves the configuration to persistent storage.
+        /// Persists modified configuration properties to disk.
         /// </summary>
         void Save();
 
         /// <summary>
-        /// Resets the configuration to default values.
+        /// Reverts all settings managed by this configuration back to their factory default values.
         /// </summary>
-        /// <remarks>
-        /// Default implementation does nothing. Override to provide default values.
-        /// </remarks>
         void Reset() { }
 
         /// <summary>
-        /// Draws the configuration settings UI into the provided container.
+        /// Declaratively draws the interactive settings controls for this configuration unit into the specified container.
         /// </summary>
-        /// <param name="container">The list box container to draw settings into.</param>
-        /// <returns><c>true</c> if settings UI was drawn; <c>false</c> if no UI was drawn (default).</returns>
+        /// <param name="container">The list box container in the settings window where controls will be appended.</param>
+        /// <returns><c>true</c> if any UI controls were drawn; otherwise, <c>false</c>.</returns>
         bool DrawSettings(GUIListBox container) => false;
     }
 
     /// <summary>
-    /// Filter specification for selecting prefabs in the left sidebar browser.
+    /// Represents parsed search criteria used by <see cref="ISOSPrefab.GetAll(ISOSPrefabFilter)"/> to filter entities in the browser.
     /// </summary>
     /// <remarks>
-    /// Each field contains a list of terms that are matched against prefab properties using ordinal ignore case comparison.
-    /// A prefab matches the filter if all non-empty lists contain the corresponding term.
+    /// Supports advanced search prefixes parsed by <c>PrefabFilterHelper.SearchFilter</c>:
     /// <list type="bullet">
-    /// <item><term>General:</term><description>General search terms matched against name, identifier, and mod name.</description></item>
-    /// <item><term>Mod:</term><description>Mod name filter.</description></item>
-    /// <item><term>Category:</term><description>Category filter.</description></item>
-    /// <item><term>Tag:</term><description>Tag filter.</description></item>
-    /// <item><term>Slot:</term><description>Slot filter.</description></item>
-    /// <item><term>ID:</term><description>Identifier filter.</description></item>
-    /// <item><term>PrefabType:</term><description>Prefab type filter.</description></item>
+    /// <item><term>@</term><description>Filters by Content Package / Mod Name (<see cref="Mod"/>).</description></item>
+    /// <item><term>#</term><description>Filters by Category enum string (<see cref="Category"/>).</description></item>
+    /// <item><term>$</term><description>Filters by item or affliction tag (<see cref="Tag"/>).</description></item>
+    /// <item><term>&amp;</term><description>Filters by equipment slot string (<see cref="Slot"/>).</description></item>
+    /// <item><term>!</term><description>Filters by exact or partial identifier string (<see cref="ID"/>).</description></item>
+    /// <item><term>%</term><description>Filters by Prefab type name (<see cref="PrefabType"/>).</description></item>
     /// </list>
     /// </remarks>
     public interface ISOSPrefabFilter
     {
         /// <summary>
-        /// General search terms matched against prefab name, identifier, and mod name.
+        /// Gets general search keywords that match across names, identifiers, or content package titles.
         /// </summary>
         List<string> General { get; }
 
         /// <summary>
-        /// Mod name filter terms.
+        /// Gets content package / mod name filter tokens (prefixed with '@').
         /// </summary>
         List<string> Mod { get; }
 
         /// <summary>
-        /// Category filter terms.
+        /// Gets entity category filter tokens (prefixed with '#').
         /// </summary>
         List<string> Category { get; }
 
         /// <summary>
-        /// Tag filter terms.
+        /// Gets tag filter tokens (prefixed with '$').
         /// </summary>
         List<string> Tag { get; }
 
         /// <summary>
-        /// Slot filter terms.
+        /// Gets equipment inventory slot filter tokens (prefixed with '&amp;').
         /// </summary>
         List<string> Slot { get; }
 
         /// <summary>
-        /// Identifier filter terms.
+        /// Gets exact identifier filter tokens (prefixed with '!').
         /// </summary>
         List<string> ID { get; }
 
         /// <summary>
-        /// Prefab type filter terms.
+        /// Gets entity prefab type filter tokens (prefixed with '%').
         /// </summary>
         List<string> PrefabType { get; }
     }
 
     /// <summary>
-    /// Defines an extension interface for custom prefab providers in the left sidebar browser.
+    /// Defines an extensible prefab data source that feeds entities into the S.O.S. left sidebar browser.
     /// </summary>
     /// <remarks>
-    /// Implementations provide a way for modders to add custom prefabs to the SOS prefab list.
-    /// The <see cref="PrefabType"/> property indicates the type of prefab (Item, Affliction, etc.).
-    /// The <see cref="GetAll"/> method returns an enumerable of prefab instances matching the applied filter.
-    /// The <see cref="BuildContextOptions"/> method provides context menu options for each prefab.
-    /// <list type="bullet">
-    /// <item><term><see cref="PrefabType"/>:</term><description>The type of prefab this provider handles.</description></item>
-    /// <item><term><see cref="Header"/>:</term><description>The display header shown in the sidebar browser.</description></item>
-    /// <item><term><see cref="GetAll"/>:</term><description>Returns all prefab instances matching the filter.</description></item>
-    /// <item><term><see cref="BuildContextOptions"/>:</term><description>Provides context menu options for a prefab. Default implementation uses <see cref="PrefabDefaults"/>.</description></item>
-    /// </list>
+    /// By implementing this interface and decorating the class with <see cref="AutoRegisterAttribute"/>,
+    /// third-party mods can introduce new browsable entity types (such as custom subassemblies, event prefabs, or jobs)
+    /// into the main S.O.S. interface.
     /// </remarks>
+    /// <example>
+    /// <code>
+    /// [AutoRegister("MyMod.JobProvider", order: 3.0)]
+    /// public class JobPrefabProvider : ISOSPrefab
+    /// {
+    ///     public Type PrefabType => typeof(JobPrefab);
+    ///     public string Header => "Jobs &amp; Roles";
+    ///     public IEnumerable&lt;Prefab&gt; GetAll(ISOSPrefabFilter filter)
+    ///     {
+    ///         return JobPrefab.Prefabs.Where(j => filter.General.Count == 0 || j.Name.Value.Contains(filter.General[0]));
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
     public interface ISOSPrefab
     {
         /// <summary>
-        /// Gets the type of prefab this provider handles (e.g., <see cref="ItemPrefab"/> or <see cref="AfflictionPrefab"/>).
+        /// Gets the base entity type provided by this source (e.g., <see cref="Barotrauma.ItemPrefab"/> or <see cref="Barotrauma.AfflictionPrefab"/>).
         /// </summary>
         Type PrefabType { get; }
 
         /// <summary>
-        /// Gets the display header shown in the sidebar browser for this provider.
+        /// Gets the section header title rendered above this provider's items in the browser list.
         /// </summary>
         string Header { get; }
 
         /// <summary>
-        /// Gets all prefab instances matching the provided filter.
+        /// Queries and yields all prefabs provided by this source that satisfy the specified <paramref name="filter"/>.
         /// </summary>
-        /// <param name="filter">The filter specification to apply.</param>
-        /// <returns>An enumerable of prefabs matching the filter.</returns>
+        /// <param name="filter">The structured search filter containing text, category, tag, and mod tokens.</param>
+        /// <returns>An enumerable sequence of matching <see cref="Barotrauma.Prefab"/> instances.</returns>
         IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter);
 
         /// <summary>
-        /// Builds context menu options for a prefab.
+        /// Constructs right-click contextual action options for an entity belonging to this provider.
         /// </summary>
-        /// <param name="prefab">The prefab to build options for.</param>
-        /// <returns>A list of context menu options.</returns>
+        /// <param name="prefab">The prefab being right-clicked.</param>
+        /// <returns>A list of context menu options (e.g., "View Recipes", "Add to Favorites", "Track to HUD").</returns>
         [DefaultClass<PrefabDefaults>]
         List<ContextMenuOption> BuildContextOptions(Prefab prefab) => PrefabDefaults.BuildContextOptions(prefab);
     }
 
     /// <summary>
-    /// Defines an extension interface for interchangeable visual window layouts.
+    /// Defines an interchangeable visual presentation layout for the S.O.S. window.
     /// </summary>
     /// <remarks>
-    /// Implementations provide alternative window profile configurations that can be swapped at runtime.
-    /// The <see cref="DisplayName"/> and <see cref="Description"/> properties are used for display in the profile selector.
-    /// The <see cref="ProfileConfig"/> property provides optional configuration specific to the profile type; by default
-    /// it returns <c>null</c>.
-    /// <list type="bullet">
-    /// <item><term><see cref="Init"/>:</term><description>Called once during profile initialization.</description></item>
-    /// <item><term><see cref="Update"/>:</term><description>Called each update cycle to allow profile state updates.</description></item>
-    /// </list>
+    /// <para>
+    /// Implementations inherit from <see cref="GUI.GUIWindow"/> and define how the screen space is partitioned
+    /// (e.g., 3-column browser view, compact single-column inspector, or floating HUD tool).
+    /// </para>
+    /// <para>
+    /// <b>Hot-Swapping:</b> Profiles can be changed dynamically at runtime via <see cref="API.Emit{T}(string, T, double?, bool)"/>
+    /// using <see cref="CommKeys.ChangeProfile"/>. When switching profiles, the outgoing profile is disposed and the incoming profile
+    /// is instantiated, initialized via <see cref="Init"/>, and opened seamlessly.
+    /// </para>
     /// </remarks>
+    /// <example>
+    /// <code>
+    /// [AutoRegister("MyMod.CompactProfile", order: 20.0)]
+    /// public class CompactProfile : GUIWindow, ISOSWindowProfile
+    /// {
+    ///     public string DisplayName => "Compact Inspector";
+    ///     public string Description => "Minimalist floating window.";
+    ///     public void Init() { /* Build UI */ }
+    ///     public void Update() { /* Frame update */ }
+    /// }
+    /// </code>
+    /// </example>
     [DefaultClass<WindowProfileDefaults>]
     public interface ISOSWindowProfile : IIdentifier, IDisposable
     {
         /// <summary>
-        /// Gets the display name shown in the profile selector.
+        /// Gets the localized or display name of this window profile, shown in the profile selection dropdown.
         /// </summary>
         string DisplayName { get; }
 
         /// <summary>
-        /// Gets the description shown in the profile selector.
+        /// Gets a localized description detailing the visual layout and intended usage of this profile.
         /// </summary>
         string Description { get; }
 
         /// <summary>
-        /// Gets optional configuration specific to this profile type. Returns <c>null</c> by default.
+        /// Gets optional profile-specific configuration settings (e.g., custom panel widths, saved layout presets).
+        /// Returns <c>null</c> if the profile does not require persistent settings.
         /// </summary>
         ISOSConfig? ProfileConfig => null;
 
         /// <summary>
-        /// Called once during profile initialization.
+        /// Initializes the profile's visual hierarchy, event subscriptions, and geometry state.
+        /// Invoked immediately after construction when the profile becomes active.
         /// </summary>
         void Init();
 
         /// <summary>
-        /// Called each update cycle to allow profile state updates.
+        /// Performs frame-by-frame updates, layout checks, input handling, and debouncing while the window is visible.
         /// </summary>
         void Update();
     }
@@ -404,21 +458,7 @@ namespace SOS
     #region Default Proxy Classes
 
     /// <summary>
-    /// Default values for ordenable identifier configurations.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    internal sealed class IdentifierOrdenableDefaults
-    {
-        private IdentifierOrdenableDefaults() { }
-
-        /// <summary>
-        /// Default registration order (0).
-        /// </summary>
-        public static double Order => 0;
-    }
-
-    /// <summary>
-    /// Default implementation for tab button creation and tool tip provision.
+    /// Provides default fallback implementations for tab components when adapted via <see cref="DuckProxy{T}"/>.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal sealed class TabDefaults
@@ -426,19 +466,19 @@ namespace SOS
         private TabDefaults() { }
 
         /// <summary>
-        /// Default tooltip (empty string).
+        /// Default empty tooltip for tabs.
         /// </summary>
         public static string ToolTip => "";
 
         /// <summary>
-        /// Creates a standard tab button with the given parameters.
+        /// Creates a standard tab button styled with the "MainMenuNotificationButton" template.
         /// </summary>
-        /// <param name="tabName">The tab display name.</param>
+        /// <param name="tabName">The label displayed on the button.</param>
         /// <param name="parent">The parent rectangle transform.</param>
-        /// <param name="isActive">Whether the tab is currently active.</param>
+        /// <param name="isActive">Whether this tab is currently selected.</param>
         /// <param name="onClick">Callback invoked when the button is clicked.</param>
-        /// <param name="toolTip">Optional tooltip for the button.</param>
-        /// <returns>The created tab button.</returns>
+        /// <param name="toolTip">Optional tooltip text.</param>
+        /// <returns>A configured <see cref="Barotrauma.GUIButton"/>.</returns>
         public static GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string toolTip = "")
         {
             Vector2 textSize = GUIStyle.SmallFont.MeasureString(tabName);
@@ -455,35 +495,35 @@ namespace SOS
     }
 
     /// <summary>
-    /// Default implementation for configuration resetting and settings drawing.
+    /// Provides default fallback implementations for configuration contracts when adapted via <see cref="DuckProxy{T}"/>.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal sealed class ConfigDefaults
     {
         /// <summary>
-        /// Default reset implementation (does nothing).
+        /// Default no-op reset implementation.
         /// </summary>
         public static void Reset() { }
 
         /// <summary>
-        /// Default settings drawing implementation (returns false, no UI drawn).
+        /// Default settings render implementation returning <c>false</c> (no UI drawn).
         /// </summary>
-        /// <param name="_">The container (unused).</param>
-        /// <returns>Always returns <c>false</c>.</returns>
+        /// <param name="_">The GUI list box container (ignored).</param>
+        /// <returns>Always <c>false</c>.</returns>
         public static bool DrawSettings(GUIListBox _) => false;
     }
 
     /// <summary>
-    /// Default implementation for building context menu options for prefabs.
+    /// Provides default fallback implementations for prefab right-click contextual actions.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal sealed class PrefabDefaults
     {
         /// <summary>
-        /// Builds default context menu options for a prefab (View Recipes, Add/Remove Favorite).
+        /// Constructs the baseline context menu options for a prefab: "View Recipes" and "Add/Remove from Favorites".
         /// </summary>
-        /// <param name="prefab">The prefab to build options for.</param>
-        /// <returns>A list of context menu options.</returns>
+        /// <param name="prefab">The target prefab.</param>
+        /// <returns>A list of standard <see cref="Barotrauma.ContextMenuOption"/> actions.</returns>
         public static List<ContextMenuOption> BuildContextOptions(Prefab prefab)
         {
             var options = new List<ContextMenuOption>
@@ -502,13 +542,13 @@ namespace SOS
     }
 
     /// <summary>
-    /// Default implementation for profile configuration.
+    /// Provides default fallback implementations for window profiles when adapted via <see cref="DuckProxy{T}"/>.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal sealed class WindowProfileDefaults
     {
         /// <summary>
-        /// Default profile configuration (returns null).
+        /// Default profile configuration accessor returning <c>null</c>.
         /// </summary>
         public static ISOSConfig? ProfileConfig => null;
     }
