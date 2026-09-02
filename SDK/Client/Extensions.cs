@@ -15,12 +15,20 @@ using Microsoft.Xna.Framework;
 namespace SOS
 {
     /// <summary>
-    /// Rich string formatting extensions for Barotrauma's RichString type.
+    /// Rich text formatting extension methods utilizing Barotrauma's native RichText formatting tags.
     /// </summary>
     /// <remarks>
-    /// Provides methods for setting color, bold, italic, underline, strikethrough, and hyperlinks on both
-    /// plain <see cref="string"/> and <see cref="LocalizedString"/> values. All formatting uses the Barotrauma
-    /// RichText syntax (&#124;color:R,G,B&#124; ... &#124;end&#124;).
+    /// <para>
+    /// Barotrauma requires the specific Unicode double vertical bar character <c>‖</c> (<c>\u2016</c>) as the tag delimiter.
+    /// Standard ASCII pipe characters (<c>|</c>) are not recognized by the engine and will render as raw text.
+    /// </para>
+    /// <para>
+    /// Formats produced:
+    /// <list type="bullet">
+    /// <item><description>Color: <c>‖color:R,G,B‖text‖end‖</c> or <c>‖color:ColorName‖text‖end‖</c></description></item>
+    /// <item><description>Style: <c>‖bold‖text‖end‖</c>, <c>‖italic‖text‖end‖</c>, <c>‖underline‖text‖end‖</c>, <c>‖strikethrough‖text‖end‖</c></description></item>
+    /// </list>
+    /// </para>
     /// </remarks>
     public static class RichStringExt
     {
@@ -39,7 +47,7 @@ namespace SOS
         /// </summary>
         /// <param name="text">The source string to apply the hyperlink color to.</param>
         /// <param name="color">Optional color for the hyperlink. Defaults to <see cref="Color.LightSkyBlue"/>.</param>
-        /// <returns>A string with hyperlink color formatting applied (&#124;color:R,G,B&#124;...&#124;end&#124;).</returns>
+        /// <returns>A string with hyperlink color formatting applied (‖color:R,G,B‖...‖end‖).</returns>
         /// <remarks>
         /// The formatting uses Barotrauma's RichText syntax. The ‖ symbol is the RichText color tag delimiter.
         /// </remarks>
@@ -63,7 +71,7 @@ namespace SOS
         /// </summary>
         /// <param name="text">The source string to apply the color to.</param>
         /// <param name="colorName">The name of the color (e.g., "Red", "Green", "Blue").</param>
-        /// <returns>A string with color formatting applied (&#124;color:R,G,B&#124;...&#124;end&#124;).</returns>
+        /// <returns>A string with color formatting applied (‖color:R,G,B‖...‖end‖).</returns>
         /// <remarks>
         /// The formatting uses Barotrauma's RichText syntax. The ‖ symbol is the RichText color tag delimiter.
         /// </remarks>
@@ -75,7 +83,7 @@ namespace SOS
         /// </summary>
         /// <param name="text">The source string to apply the color to.</param>
         /// <param name="color">The color to apply.</param>
-        /// <returns>A string with color formatting applied (&#124;color:R,G,B&#124;...&#124;end&#124;).</returns>
+        /// <returns>A string with color formatting applied (‖color:R,G,B‖...‖end‖).</returns>
         /// <remarks>
         /// The formatting uses Barotrauma's RichText syntax. The ‖ symbol is the RichText color tag delimiter.
         /// </remarks>
@@ -87,7 +95,7 @@ namespace SOS
         /// </summary>
         /// <param name="text">The source string to apply the color to.</param>
         /// <param name="hexCode">The hex color code (e.g., "FF0000" for red).</param>
-        /// <returns>A string with color formatting applied (&#124;color:R,G,B&#124;...&#124;end&#124;).</returns>
+        /// <returns>A string with color formatting applied (‖color:R,G,B‖...‖end‖).</returns>
         /// <remarks>
         /// The formatting uses Barotrauma's RichText syntax. The ‖ symbol is the RichText color tag delimiter.
         /// </remarks>
@@ -98,7 +106,7 @@ namespace SOS
         /// Sets bold formatting on a string.
         /// </summary>
         /// <param name="text">The source string to make bold.</param>
-        /// <returns>A string with bold formatting applied (&#124;bold‖...&#124;end&#124;).</returns>
+        /// <returns>A string with bold formatting applied (‖bold‖...‖end‖).</returns>
         /// <remarks>
         /// The formatting uses Barotrauma's RichText syntax. The ‖ symbol is the RichText formatting tag delimiter.
         /// </remarks>
@@ -109,7 +117,7 @@ namespace SOS
         /// Sets italic formatting on a string.
         /// </summary>
         /// <param name="text">The source string to make italic.</param>
-        /// <returns>A string with italic formatting applied (&#124;italic‖...&#124;end&#124;).</returns>
+        /// <returns>A string with italic formatting applied (‖italic‖...‖end‖).</returns>
         /// <remarks>
         /// The formatting uses Barotrauma's RichText syntax. The ‖ symbol is the RichText formatting tag delimiter.
         /// </remarks>
@@ -120,7 +128,7 @@ namespace SOS
         /// Sets underline formatting on a string.
         /// </summary>
         /// <param name="text">The source string to underline.</param>
-        /// <returns>A string with underline formatting applied (&#124;underline‖...&#124;end&#124;).</returns>
+        /// <returns>A string with underline formatting applied (‖underline‖...‖end‖).</returns>
         /// <remarks>
         /// The formatting uses Barotrauma's RichText syntax. The ‖ symbol is the RichText formatting tag delimiter.
         /// </remarks>
@@ -131,7 +139,7 @@ namespace SOS
         /// Sets strikethrough formatting on a string.
         /// </summary>
         /// <param name="text">The source string to strikethrough.</param>
-        /// <returns>A string with strikethrough formatting applied (&#124;strikethrough‖...&#124;end&#124;).</returns>
+        /// <returns>A string with strikethrough formatting applied (‖strikethrough‖...‖end‖).</returns>
         /// <remarks>
         /// The formatting uses Barotrauma's RichText syntax. The ‖ symbol is the RichText formatting tag delimiter.
         /// </remarks>
@@ -321,7 +329,7 @@ namespace SOS
     /// </summary>
     /// <remarks>
     /// Uses regular expressions to identify and color different parts of XML syntax. The coloring follows a "Dark Theme"
-    /// style palette. Note that color tags (&#124;color:...‖) are protected from being replaced by the punctuation regex.
+    /// style palette. Note that color tags (‖color:...‖) are protected from being replaced by the punctuation regex.
     /// </remarks>
     public static partial class XMLHighlighter
     {

@@ -134,27 +134,20 @@ namespace SOS.GUI
         }
 
         /// <summary>
-        /// Adds a row with a label and multiple badge-style values that act as clickable hyperlinks.
+        /// Adds a row with a label and multiple badge-style values that act as clickable search filters or hyperlinks.
         /// </summary>
         /// <param name="label">The label text displayed on the left side.</param>
-        /// <param name="values">The badge values to display. If null or empty, the method returns null.</param>
-        /// <param name="displayNames">Optional display names for each value. If provided, the count must match <paramref name="values"/>. If null, the raw values are used as display names.</param>
-        /// <param name="filterPrefix">Optional prefix to prepend to values when used as search filters.</param>
-        /// <param name="linkColor">Optional color for the badge hyperlinks. Defaults to <see cref="Color.LightSkyBlue"/>.</param>
-        /// <param name="onSearchFilter">Optional callback invoked when a badge is clicked, receiving the prefixed value string.</param>
-        /// <returns>The created <see cref="GUIButton"/> row, or null if <paramref name="values"/> is null or contains no elements.</returns>
-        /// <remarks>
-        /// Each badge is formatted as a colored hyperlink using RichText syntax (<c>‖color:R,G,B‖name‖end‖</c>). Badges are comma-separated.
-        /// If only one badge is present, the entire row becomes clickable with a hand cursor.
-        /// The row height auto-adjusts to fit the badge text, with a minimum of 24 pixels.
-        /// The label occupies 40% of the row width and the badges occupy 60%.
-        /// </remarks>
+        /// <param name="values">The badge token values to display. If null or empty, returns null.</param>
+        /// <param name="displayNames">Optional display titles corresponding to each value. If null, raw values are shown.</param>
+        /// <param name="filterPrefix">Optional prefix token prepended when triggering search filters (e.g., '$' for tags, '!' for IDs, '#' for categories).</param>
+        /// <param name="linkColor">Optional hyperlink text color. Defaults to <see cref="Color.LightSkyBlue"/>.</param>
+        /// <param name="onSearchFilter">Callback invoked when a badge is clicked, receiving the prefixed token string.</param>
+        /// <returns>The created <see cref="GUIButton"/> row, or null if <paramref name="values"/> is empty.</returns>
         /// <example>
         /// <code>
-        /// builder.BadgeRow("Tags:", new[] { "sword", "shield" },
-        ///     displayNames: new[] { "Weapon", "Armor" },
-        ///     filterPrefix: 'i',
-        ///     onSearchFilter: filter => SearchItems(filter));
+        /// builder.BadgeRow("Tags:", new[] { "smallitem", "medical" },
+        ///     filterPrefix: '$',
+        ///     onSearchFilter: filter => API.Emit(CommKeys.SetSearchFilter, filter));
         /// </code>
         /// </example>
         public GUIButton? BadgeRow(

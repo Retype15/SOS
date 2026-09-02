@@ -16,13 +16,12 @@ using SOS.GUI;
 namespace SOS.Configs
 {
     /// <summary>
-    /// A unit-of-work base class that buffers configuration changes and writes only modified properties to disk.
+    /// A unit-of-work base class that buffers configuration modifications and persists only changed settings to disk.
     /// </summary>
     /// <remarks>
-    /// The dirty settings set is tracked in <see cref="_dirtySettings"/>. Changes are only persisted when
-    /// <see cref="SaveChanges"/> is explicitly called, or automatically when the configuration service disposes.
-    /// This pattern avoids unnecessary disk writes during temporary operations and ensures only modified values
-    /// are saved.
+    /// Modified settings are tracked within <see cref="_dirtySettings"/>. Changes are only written to persistent storage
+    /// when <see cref="SaveChanges"/> is explicitly invoked (typically on window closure or round completion).
+    /// This pattern prevents redundant file I/O operations during interactive UI adjustments.
     /// </remarks>
     public abstract class ConfigDirtySaver
     {
@@ -121,12 +120,9 @@ namespace SOS.Configs
         /// Resets all registered configurations by calling <see cref="ISOSConfig.Reset"/> on each one.
         /// </summary>
         /// <remarks>
-        /// Iterates over all configs retrieved via <c>API.GetAllConfigs()</c>.
-        /// Note: The default implementation of <see cref="ISOSConfig.Reset"/> does nothing and returns <c>false</c>.
-        /// If a config overrides this method, it should reset its settings to default values.
-        /// If a config's <see cref="ISOSConfig.Reset"/> throws an exception, it is caught, logged via
-        /// <see cref="Logger.LogError"/>, and execution continues to the next config.
-        /// The misspelling "Reseted" in the original debug log is intentional (legacy).
+        /// Iterates over all active configurations retrieved via <see cref="API.GetAllConfigs"/>.
+        /// If an implementation throws an exception during reset, it is caught and logged via <see cref="Logger.LogError"/>,
+        /// allowing the remaining configurations to reset without interrupting execution.
         /// </remarks>
         public static void ResetConfigs()
         {
@@ -181,13 +177,13 @@ namespace SOS.Configs
         }
 
         /// <summary>
-        /// Converts a comma-separated string value to a <see cref="HashSet{T}"/>.
+        /// Converts a comma-separated string into a <see cref="HashSet{T}"/> of trimmed, non-empty terms.
         /// </summary>
-        /// <param name="csv">The comma-separated string. If <c>null</c> or empty, returns an empty <see cref="HashSet{T}"/>.</param>
-        /// <returns>A <see cref="HashSet{T}"/> containing the trimmed terms from the CSV string.</returns>
+        /// <param name="csv">The comma-separated string to parse. If <c>null</c> or whitespace, returns an empty set.</param>
+        /// <returns>A <see cref="HashSet{T}"/> containing unique, trimmed tokens. Empty entries are discarded.</returns>
         /// <remarks>
-        /// Entries are split by comma and trimmed. Empty entries (from consecutive commas or leading/trailing commas)
-        /// are included as empty strings unless the framework's default behavior excludes them.
+        /// Tokens are split by commas using <see cref="StringSplitOptions.RemoveEmptyEntries"/> and <see cref="StringSplitOptions.TrimEntries"/>,
+        /// ensuring whitespace and trailing or consecutive commas do not produce empty elements.
         /// </remarks>
         public static HashSet<string> CsvToHashSet(string? csv)
         {
@@ -196,13 +192,13 @@ namespace SOS.Configs
         }
 
         /// <summary>
-        /// Converts a comma-separated string value to a <see cref="List{T}"/>.
+        /// Converts a comma-separated string into a <see cref="List{T}"/> of trimmed, non-empty terms.
         /// </summary>
-        /// <param name="csv">The comma-separated string. If <c>null</c> or empty, returns an empty <see cref="List{T}"/>.</param>
-        /// <returns>A <see cref="List{T}"/> containing the trimmed terms from the CSV string.</returns>
+        /// <param name="csv">The comma-separated string to parse. If <c>null</c> or whitespace, returns an empty list.</param>
+        /// <returns>A <see cref="List{T}"/> containing the trimmed tokens in their original order. Empty entries are discarded.</returns>
         /// <remarks>
-        /// Entries are split by comma and trimmed. Empty entries (from consecutive commas or leading/trailing commas)
-        /// are included as empty strings unless the framework's default behavior excludes them.
+        /// Tokens are split by commas using <see cref="StringSplitOptions.RemoveEmptyEntries"/> and <see cref="StringSplitOptions.TrimEntries"/>,
+        /// ensuring whitespace and trailing or consecutive commas do not produce empty elements.
         /// </remarks>
         public static List<string> CsvToList(string? csv)
         {

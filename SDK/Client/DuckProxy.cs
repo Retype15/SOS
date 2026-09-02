@@ -47,27 +47,32 @@ namespace SOS
     }
 
     /// <summary>
-    /// Attribute specifying a default (fallback) static method for resolving DuckProxy handlers.
+    /// Specifies a static helper class containing fallback method implementations for interface contracts adapted by <see cref="DuckProxy{T}"/>.
     /// </summary>
     /// <remarks>
-    /// When a target method or property is not found directly on the adapted object, the DuckProxy will search for
-    /// a static method on the helper type decorated with this attribute. The static method signature must match the
-    /// interface method signature (parameter types and return type).
+    /// <para>
+    /// When a Lua table or external CLR object lacks an interface method or property getter, <see cref="DuckProxy{T}"/>
+    /// searches the static helper type declared by this attribute for a public static method matching the interface signature.
+    /// </para>
+    /// <para>
+    /// This attribute must be applied to the <b>interface</b> definition or individual interface properties, pointing to the helper type.
+    /// </para>
     /// </remarks>
     /// <example>
     /// <code>
+    /// [DefaultClass(typeof(MyServiceDefaults))]
     /// public interface IMyService
     /// {
     ///     int GetValue();
     /// }
     ///
-    /// public static class MyServiceHelper
+    /// public static class MyServiceDefaults
     /// {
-    ///     [DefaultClass]
     ///     public static int GetValue() => 42;
     /// }
     ///
-    /// // Usage: DuckProxy&lt;IMyService&gt;.Create(someObject);
+    /// // If luaTable lacks "GetValue", DuckProxy routes the call to MyServiceDefaults.GetValue():
+    /// var service = DuckProxy&lt;IMyService&gt;.Create(luaTable);
     /// </code>
     /// </example>
     public sealed class DefaultClassAttribute : DefaultClassAttributeBase
@@ -79,13 +84,18 @@ namespace SOS
     }
 
     /// <summary>
-    /// Generic version of <see cref="DefaultClassAttribute"/> that resolves to a specific helper type via a generic parameter.
+    /// Generic variant of <see cref="DefaultClassAttribute"/> that defines the fallback helper type via a generic type parameter.
     /// </summary>
-    /// <typeparam name="THelper">The concrete helper type that provides fallback methods.</typeparam>
-    /// <remarks>
-    /// The helper type is resolved at compile time via the generic parameter <typeparamref name="THelper"/>.
-    /// This is a convenient alternative to explicitly decorating interface methods with <see cref="DefaultClassAttribute"/>.
-    /// </remarks>
+    /// <typeparam name="THelper">The static helper class containing public static fallback methods matching the interface.</typeparam>
+    /// <example>
+    /// <code>
+    /// [DefaultClass&lt;TabDefaults&gt;]
+    /// public interface ITab&lt;T&gt; : IIdentifier
+    /// {
+    ///     string ToolTip => "";
+    /// }
+    /// </code>
+    /// </example>
     public sealed class DefaultClassAttribute<THelper> : DefaultClassAttributeBase where THelper : class
     {
         internal override Type HelperType => typeof(THelper);
