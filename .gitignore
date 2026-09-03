@@ -406,5 +406,9 @@ missingtranslation.xml
 # User-specific build configuration
 /UserBuildData.props
 
+# Docs deploy staging (gh-pages assemble)
+/docs/ci-deploy/
+/docs/ci-artifacts/
+
 #Generally Undeseable
 _*

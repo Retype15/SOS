@@ -8,28 +8,10 @@ try {
     exit 1
   }
 
-  Remove-Item -Force -Recurse ./build | Out-Null
-  New-Item -ItemType Directory ./build | Out-Null
-  New-Item -ItemType Directory ./build/baro-server | Out-Null
-  New-Item -ItemType Directory ./build/baro-client | Out-Null
+  Remove-Item -Force -Recurse ./build -ErrorAction SilentlyContinue
+  New-Item -ItemType Directory ./build -ErrorAction SilentlyContinue | Out-Null
 
-  echo "Building server docs"
-  try {
-    Change-Location ./baro-server
-    doxygen ./Doxyfile
-  } finally {
-    Restore-Location
-  }
-
-  echo "Building client docs"
-  try {
-    Change-Location ./baro-client
-    doxygen ./Doxyfile
-  } finally {
-    Restore-Location
-  }
-
-  echo "Building shared docs"
+  echo "Building SOS SDK docs"
   doxygen ./Doxyfile
 } finally {
   Restore-Location
