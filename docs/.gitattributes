@@ -1,0 +1,2 @@
+# prevent git from converting our line endings to CRLF
+* text=auto eol=lf
