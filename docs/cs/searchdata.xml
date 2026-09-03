@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<add>
+  <doc>
+    <field name="type">page</field>
+    <field name="name">index</field>
+    <field name="tag">MAIN</field>
+    <field name="url">index.html</field>
+    <field name="keywords"></field>
+    <field name="text"></field>
+  </doc>
+</add>
