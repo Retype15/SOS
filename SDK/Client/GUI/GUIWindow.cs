@@ -285,8 +285,7 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="text">Button text.</param>
         /// <param name="style">Button style name.</param>
-        /// <param name="tooltipKey">Localization key for tooltip.</param>
-        /// <param name="tooltipFallback">Fallback tooltip text.</param>
+        /// <param name="tooltip">Localization key for tooltip.</param>
         /// <param name="onClick">Click handler.</param>
         /// <returns>The created button, or <c>null</c> on failure.</returns>
         private GUIButton CreateSystemButton(string text, string style, LocalizedString tooltip, Action onClick)
