@@ -398,17 +398,8 @@ FodyWeavers.xsd
 *.sln.iml
 .idea/*
 
-# Extra unnecesary files
-SOS*.txt
-TODOs.md
+# Automated files
 missingtranslation.xml
 
 # User-specific build configuration
 /UserBuildData.props
-
-# Docs deploy staging (gh-pages assemble)
-/docs/ci-deploy/
-/docs/ci-artifacts/
-
-#Generally Undeseable
-_*
