@@ -179,7 +179,6 @@ namespace SOS
                         anySuccess |= RegisterType(attr.Id ?? t.FullOrName(), attr.Order, attr.Active, t);
                 }
 
-
             return anySuccess;
         }
 
