@@ -536,6 +536,8 @@ namespace SOS
 
         public static void SetSearchFilter(string tag) => API.Emit(CommKeys.SetSearchFilter, tag);
 
+        #endregion
+
         #region Internal helpers
 
         /// <summary>
