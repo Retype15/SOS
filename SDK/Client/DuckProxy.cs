@@ -101,6 +101,11 @@ namespace SOS
         internal override Type HelperType => typeof(THelper);
     }
 
+    public interface IDuckProxy
+    {
+        public object ProxyTarget { get; }
+    }
+
     /// <summary>
     /// A DispatchProxy-based adapter that dynamic MoonSharp Lua tables and external assemblies to C# interfaces at runtime.
     /// </summary>
@@ -128,8 +133,10 @@ namespace SOS
     /// var service2 = DuckProxy&lt;IMyService&gt;.Create(clrObject);
     /// </code>
     /// </example>
-    internal class DuckProxy<T> : DispatchProxy where T : class
+    internal class DuckProxy<T> : DispatchProxy, IDuckProxy where T : class
     {
+        public object ProxyTarget { get; private set; } = null!;
+
         private readonly Dictionary<MethodInfo, Func<object?[], object?>> _handlerMap = [];
 
         public DuckProxy() { }
@@ -145,6 +152,7 @@ namespace SOS
 
         private void Initialize(object target)
         {
+            ProxyTarget = target;
             switch (target)
             {
                 case null:
@@ -336,8 +344,10 @@ namespace SOS
             if (target is T native)
                 return native;
 
-            T proxy = DuckProxy<T>.Create(target);
-            return proxy;
+            if (target is IDuckProxy duckTarget)
+                return duckTarget.ProxyTarget.Cast<T>();
+
+            return DuckProxy<T>.Create(target);
         }
 
         internal static bool TryCast<T>(this object target, out T? a) where T : class

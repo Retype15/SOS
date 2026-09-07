@@ -384,7 +384,8 @@ namespace SOS
                     Logger.LogDebugWarning($"Cleaning factory to type: '{typeof(T).FullOrName()}'");
                 }
                 foreach (var kv in _instances)
-                    if (kv.Value is IDisposable i) i.Dispose();
+                    if (kv.Value.TryCast<IDisposable>(out var disposableInstance))
+                        disposableInstance?.Dispose();
 
                 _instances.Clear();
             }
