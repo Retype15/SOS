@@ -7,6 +7,7 @@
 #pragma warning disable IDE0290
 
 using System.Reflection;
+using System.Text;
 using MoonSharp.Interpreter;
 
 namespace SOS
@@ -181,7 +182,7 @@ namespace SOS
         {
             var targetType = target.GetType();
             var interfaceType = typeof(T);
-            var errors = new List<string>();
+            var errors = new StringBuilder();
 
             foreach (var interfaceMethod in GetAllInterfaceMethods(interfaceType))
             {
@@ -196,58 +197,67 @@ namespace SOS
                     if (TryResolveFallback(interfaceMethod, out var fallbackHandler))
                         _handlerMap[interfaceMethod] = fallbackHandler!;
                     else
-                        errors.Add($"Missing method or property: '{interfaceMethod.Name}'");
+                        errors.AppendLine($"  Missing method or property: '{interfaceMethod.Name}'");
 
                     continue;
                 }
 
                 if (targetMethod.ReturnType != interfaceMethod.ReturnType)
                 {
-                    errors.Add($"Return type mismatch on '{interfaceMethod.Name}'. Expected: {interfaceMethod.ReturnType.Name}, Found: {targetMethod.ReturnType.Name}");
+                    errors.AppendLine($"  Return type mismatch on '{interfaceMethod.Name}'. Expected: {interfaceMethod.ReturnType.Name}, Found: {targetMethod.ReturnType.Name}");
                     continue;
                 }
 
                 _handlerMap[interfaceMethod] = args => targetMethod.Invoke(target, args);
             }
 
-            if (errors.Count > 0)
+            if (errors.Length > 0)
             {
                 throw new InvalidCastException(
                     $"Type '{targetType.FullName}' does not satisfy contract of '{interfaceType.FullName}':\n" +
-                    string.Join("\n", errors));
+                    errors.ToString());
             }
         }
 
         private void ConfigureLuaTable(Table table)
         {
             var interfaceType = typeof(T);
-            var errors = new List<string>();
+            var errors = new StringBuilder();
 
             foreach (var interfaceMethod in GetAllInterfaceMethods(interfaceType))
             {
                 var methodName = interfaceMethod.Name;
                 var returnType = interfaceMethod.ReturnType;
 
-                if (methodName.StartsWith("get_"))
+                if (methodName.StartsWith("get_", ignoreCase: true, null))
                 {
                     var propName = methodName[4..];
-
 
                     if (table.Get(propName).IsNil())
                     {
                         if (TryResolveFallback(interfaceMethod, out var fallbackHandler))
                             _handlerMap[interfaceMethod] = fallbackHandler!;
                         else
-                            errors.Add($"Missing property '{propName}' in Lua table.");
+                            errors.AppendLine($"  Missing property getter '{propName}' in Lua table.");
 
                         continue;
                     }
 
                     _handlerMap[interfaceMethod] = _ => table.Get(propName).ToObject(returnType);
                 }
-                else if (methodName.StartsWith("set_"))
+                else if (methodName.StartsWith("set_", ignoreCase: true, null))
                 {
                     var propName = methodName[4..];
+
+                    if (table.Get(propName).IsNil())
+                    {
+                        if (TryResolveFallback(interfaceMethod, out var fallbackHandler))
+                            _handlerMap[interfaceMethod] = fallbackHandler!;
+                        else
+                            errors.AppendLine($"  Missing property setter '{propName}' in Lua table.");
+
+                        continue;
+                    }
 
                     _handlerMap[interfaceMethod] = args =>
                     {
@@ -264,7 +274,7 @@ namespace SOS
                         if (TryResolveFallback(interfaceMethod, out var fallbackHandler))
                             _handlerMap[interfaceMethod] = fallbackHandler!;
                         else
-                            errors.Add($"Missing function '{methodName}' in Lua table.");
+                            errors.AppendLine($"  Missing function '{methodName}' in Lua table.");
 
                         continue;
                     }
@@ -277,11 +287,11 @@ namespace SOS
                 }
             }
 
-            if (errors.Count > 0)
+            if (errors.Length > 0)
             {
                 throw new InvalidCastException(
                     $"Lua table does not satisfy contract of '{interfaceType.FullName}':\n" +
-                    string.Join("\n", errors));
+                    errors.ToString());
             }
         }
 
