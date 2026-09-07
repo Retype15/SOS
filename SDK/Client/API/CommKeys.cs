@@ -147,7 +147,7 @@ namespace SOS
         /// <remarks>
         /// <list type="bullet">
         /// <item><term>Payload Type:</term><description><see cref="string"/> (the search token, e.g., <c>"#Medical"</c>, <c>"$surgery"</c>, or <c>"@Vanilla"</c>).</description></item>
-        /// <item><term>Typical Emitters:</term><description>Clickable badge hyperlinks in <see cref="ISOSStatSection"/> rows, category badges, mod tags.</description></item>
+        /// <item><term>Typical Emitters:</term><description>Clickable badge hyperlinks in <see cref="ISOSStatInfo"/> rows, category badges, mod tags.</description></item>
         /// <item><term>Typical Subscribers:</term><description>Active window profile (updates search text box, triggers debounced search at <see cref="EventPriority.UI"/>).</description></item>
         /// </list>
         /// </remarks>

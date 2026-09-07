@@ -138,7 +138,8 @@ namespace SOS
 
             try
             {
-                Add(id, order, active, () => obj.Cast<T>());
+                var instance = obj.Cast<T>();
+                Add(id, order, active, () => instance);
                 return true;
             }
             catch (Exception ex)

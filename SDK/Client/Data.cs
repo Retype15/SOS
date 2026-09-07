@@ -24,7 +24,7 @@ namespace SOS
     /// for classes decorated with this attribute that implement one of the core extension interfaces:
     /// <list type="bullet">
     /// <item><description><see cref="ISOSTab"/> (or <see cref="ITab{T}"/>): Registered as a browser tab.</description></item>
-    /// <item><description><see cref="ISOSStatSection"/>: Registered as an inspector wiki section.</description></item>
+    /// <item><description><see cref="ISOSStatInfo"/>: Registered as an inspector wiki section.</description></item>
     /// <item><description><see cref="ISOSPrefab"/>: Registered as a prefab data provider in the browser.</description></item>
     /// <item><description><see cref="ISOSWindowProfile"/>: Registered as a visual window layout profile.</description></item>
     /// <item><description><see cref="ISOSConfig"/>: Registered as a reactive configuration unit.</description></item>
@@ -38,7 +38,7 @@ namespace SOS
     /// <example>
     /// <code>
     /// [AutoRegister("MyMod.RadiationSection", order: 5.0, active: true)]
-    /// public class RadiationSection : ISOSStatSection
+    /// public class RadiationSection : ISOSStatInfo
     /// {
     ///     // ...
     /// }
@@ -199,7 +199,7 @@ namespace SOS
     /// <example>
     /// <code>
     /// [AutoRegister(order: 2.0)]
-    /// public class RadiationStatSection : ISOSStatSection
+    /// public class RadiationStatInfo : ISOSStatInfo
     /// {
     ///     public bool Draw(GUIListBox contentPanel, Prefab prefab, Action&lt;Prefab&gt; onPrimary, Action&lt;Prefab&gt; onSecondary)
     ///     {
@@ -214,7 +214,7 @@ namespace SOS
     /// }
     /// </code>
     /// </example>
-    public interface ISOSStatSection
+    public interface ISOSStatInfo
     {
         /// <summary>
         /// Analyzes the specified <paramref name="prefab"/> and appends visual layout rows into <paramref name="contentPanel"/> if applicable.

@@ -255,7 +255,7 @@ namespace SOS.Profiles.TCWP
 
             bool hasDrawed = false;
 
-            foreach (var section in API.GetAllSections())
+            foreach (var section in API.GetAllStatInfo())
             {
                 try
                 {

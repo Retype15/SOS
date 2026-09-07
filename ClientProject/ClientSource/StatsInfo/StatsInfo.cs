@@ -10,11 +10,11 @@ using Barotrauma;
 using Microsoft.Xna.Framework;
 using SOS.GUI;
 
-namespace SOS.StatSections
+namespace SOS.StatsInfo
 {
     // MARK: General
     [AutoRegister(order: 0)]
-    public class GeneralSection : ISOSStatSection
+    public class GeneralStatInfo : ISOSStatInfo
     {
         public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
@@ -23,21 +23,21 @@ namespace SOS.StatSections
             using var l = new GUILayoutBuilder(contentPanel);
             l.Header(Texts.Get("sos.window.section_general", "GENERAL").Value, Color.Gold);
 
-            l.BadgeRow(Texts.Get("sos.item.id", "ID:").Value, [prefab.Identifier.Value], filterPrefix: '!', onSearchFilter: SectionHelper.SetSearchFilter);
+            l.BadgeRow(Texts.Get("sos.item.id", "ID:").Value, [prefab.Identifier.Value], filterPrefix: '!', onSearchFilter: API.SetSearchFilter);
 
             string modName = prefab.ContentPackage?.Name ?? "Vanilla";
-            l.BadgeRow(Texts.Get("sos.item.mod", "Mod:").Value, [modName], filterPrefix: '@', onSearchFilter: SectionHelper.SetSearchFilter);
+            l.BadgeRow(Texts.Get("sos.item.mod", "Mod:").Value, [modName], filterPrefix: '@', onSearchFilter: API.SetSearchFilter);
 
             if (prefab is ItemPrefab item)
             {
-                if (!item.Aliases.IsEmpty) l.BadgeRow(Texts.Get("sos.item.aliases", "Aliases:").Value, item.Aliases, onSearchFilter: SectionHelper.SetSearchFilter);
-                l.BadgeRow(Texts.Get("sos.item.category", "Category:").Value, item.Category.ToString().Split(','), filterPrefix: '#', onSearchFilter: SectionHelper.SetSearchFilter);
+                if (!item.Aliases.IsEmpty) l.BadgeRow(Texts.Get("sos.item.aliases", "Aliases:").Value, item.Aliases, onSearchFilter: API.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.item.category", "Category:").Value, item.Category.ToString().Split(','), filterPrefix: '#', onSearchFilter: API.SetSearchFilter);
 
                 if (item.ConfigElement != null)
                 {
                     string cargoBox = item.ConfigElement.GetAttributeString("cargocontaineridentifier", "");
                     if (!string.IsNullOrEmpty(cargoBox))
-                        l.SelectorRow(Texts.Get("sos.item.cargo_box", "Cargo Box:").Value, [cargoBox], onPrimary: onPrimary, onSecondary: onSecondary, onSearchFilter: SectionHelper.SetSearchFilter);
+                        l.SelectorRow(Texts.Get("sos.item.cargo_box", "Cargo Box:").Value, [cargoBox], onPrimary: onPrimary, onSecondary: onSecondary, onSearchFilter: API.SetSearchFilter);
 
                     var hazards = new List<string>();
                     foreach (var child in item.ConfigElement.Descendants())
@@ -46,11 +46,11 @@ namespace SOS.StatSections
                         if (n == "fire") hazards.Add(Texts.Get("sos.item.causes_fire", "Causes Fire").Value);
                         if (n == "statuseffect" && child.GetAttributeFloat("oxygen", 0f) < -100f) hazards.Add(Texts.Get("sos.item.drains_oxygen", "Drains Oxygen").Value);
                     }
-                    if (hazards.Count > 0) l.BadgeRow(Texts.Get("sos.item.hazards", "Hazards:").Value, hazards, onSearchFilter: SectionHelper.SetSearchFilter);
+                    if (hazards.Count > 0) l.BadgeRow(Texts.Get("sos.item.hazards", "Hazards:").Value, hazards, onSearchFilter: API.SetSearchFilter);
                 }
 
                 l.Row(Texts.Get("sos.item.max_stack", "Max Stack:").Value, item.MaxStackSize.ToString(), Color.White);
-                l.BadgeRow(Texts.Get("sos.item.tags", "TAGS:").Value, item.Tags.Select(t => t.Value), filterPrefix: '$', onSearchFilter: SectionHelper.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.item.tags", "TAGS:").Value, item.Tags.Select(t => t.Value), filterPrefix: '$', onSearchFilter: API.SetSearchFilter);
             }
             else if (prefab is AfflictionPrefab aff)
             {
@@ -73,7 +73,7 @@ namespace SOS.StatSections
                 }
 
                 l.Row(Texts.Get("sos.affliction.classification", "Classification:").Value, isBuff ? Texts.Get("sos.affliction.buff", "Buff").Value : Texts.Get("sos.affliction.debuff", "Debuff").Value, isBuff ? Color.LightGreen : Color.Salmon);
-                l.BadgeRow(Texts.Get("sos.affliction.type", "Type:").Value, [aff.AfflictionType.ToString()], filterPrefix: '#', onSearchFilter: SectionHelper.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.affliction.type", "Type:").Value, [aff.AfflictionType.ToString()], filterPrefix: '#', onSearchFilter: API.SetSearchFilter);
                 l.Row(Texts.Get("sos.affliction.max_strength", "Max Strength:").Value, aff.MaxStrength.ToValue(), Color.White);
 
                 if (activationThreshold > 0) l.Row(Texts.Get("sos.affliction.activation_threshold", "Activation Threshold:").Value, activationThreshold.ToValue(), Color.Yellow);
@@ -98,7 +98,7 @@ namespace SOS.StatSections
 
     // MARK: Economy
     [AutoRegister(order: 1)]
-    public class EconomySection : ISOSStatSection
+    public class EconomyStatInfo : ISOSStatInfo
     {
         public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
@@ -134,7 +134,7 @@ namespace SOS.StatSections
             if (requiredFaction != Identifier.Empty)
             {
                 string factionName = TextManager.Get("FactionName." + requiredFaction).Fallback(requiredFaction.Value).Value;
-                l.BadgeRow(Texts.Get("sos.item.required_faction", "Required Faction:").Value, [factionName], onSearchFilter: SectionHelper.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.item.required_faction", "Required Faction:").Value, [factionName], onSearchFilter: API.SetSearchFilter);
             }
             return true;
         }
@@ -142,7 +142,7 @@ namespace SOS.StatSections
 
     // MARK: weapons
     [AutoRegister(order: 2)]
-    public class WeaponSection : ISOSStatSection
+    public class WeaponStatInfo : ISOSStatInfo
     {
         public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
@@ -255,7 +255,7 @@ namespace SOS.StatSections
                 var ids = group.Select(a => a.Identifier);
                 var displayNames = group.Select(a => a.Probability < 1.0f ? $"{a.Strength} ({(int)(a.Probability * 100)}%)" : a.Strength.ToValue());
 
-                l.BadgeRow(label, ids, displayNames, linkColor: Color.Salmon, onSearchFilter: SectionHelper.SetSearchFilter);
+                l.BadgeRow(label, ids, displayNames, linkColor: Color.Salmon, onSearchFilter: API.SetSearchFilter);
             }
             return true;
         }
@@ -286,7 +286,7 @@ namespace SOS.StatSections
 
     // MARK: equipements
     [AutoRegister(order: 3)]
-    public class EquipmentSection : ISOSStatSection
+    public class EquipmentStatInfo : ISOSStatInfo
     {
         public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
@@ -378,7 +378,7 @@ namespace SOS.StatSections
 
             foreach (var res in aggregatedResistances)
             {
-                l.BadgeRow($"{res.Key} {Texts.Get("sos.equip.res_suffix", "Res:").Value}", [res.Key], [string.Join(", ", res.Value)], linkColor: Color.LightGreen, onSearchFilter: SectionHelper.SetSearchFilter);
+                l.BadgeRow($"{res.Key} {Texts.Get("sos.equip.res_suffix", "Res:").Value}", [res.Key], [string.Join(", ", res.Value)], linkColor: Color.LightGreen, onSearchFilter: API.SetSearchFilter);
             }
 
             if (equipSlots.Count > 0)
@@ -387,7 +387,7 @@ namespace SOS.StatSections
                     .SelectMany(s => s.Split([',', ' '], StringSplitOptions.RemoveEmptyEntries))
                     .Distinct();
 
-                l.BadgeRow(Texts.Get("sos.equip.equips_in", "Equips In:").Value, uniqueSlots, filterPrefix: '&', onSearchFilter: SectionHelper.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.equip.equips_in", "Equips In:").Value, uniqueSlots, filterPrefix: '&', onSearchFilter: API.SetSearchFilter);
             }
             return true;
         }
@@ -395,7 +395,7 @@ namespace SOS.StatSections
 
     // MARK: Medical
     [AutoRegister(order: 4)]
-    public class MedicalSection : ISOSStatSection
+    public class MedicalStatInfo : ISOSStatInfo
     {
         public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
@@ -476,7 +476,7 @@ namespace SOS.StatSections
             l.Header(Texts.Get("sos.window.section_medical", "MEDICAL").Value, Color.Gold);
 
             if (medicalSkillReq > 0)
-                l.BadgeRow(Texts.Get("sos.med.skill_req", "Medical Skill Req:").Value, [medicalSkillReq.ToString()], ["medical " + medicalSkillReq.ToString()], linkColor: Color.Orange, onSearchFilter: SectionHelper.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.med.skill_req", "Medical Skill Req:").Value, [medicalSkillReq.ToString()], ["medical " + medicalSkillReq.ToString()], linkColor: Color.Orange, onSearchFilter: API.SetSearchFilter);
 
             if (suitableTreatments.Count > 0)
             {
@@ -485,7 +485,7 @@ namespace SOS.StatSections
                     suitableTreatments.Select(t => t.Identifier),
                     suitableTreatments.Select(t => t.DisplayName),
                     linkColor: Color.LightSkyBlue,
-                    onSearchFilter: SectionHelper.SetSearchFilter
+                    onSearchFilter: API.SetSearchFilter
                 );
             }
 
@@ -496,7 +496,7 @@ namespace SOS.StatSections
                 var ids = dict.Keys;
                 var displayNames = dict.Select(kvp => $"{kvp.Value.Name} ({kvp.Value.Amount.ToValue()})");
 
-                l.BadgeRow(label, ids, displayNames, linkColor: linkColor, onSearchFilter: SectionHelper.SetSearchFilter);
+                l.BadgeRow(label, ids, displayNames, linkColor: linkColor, onSearchFilter: API.SetSearchFilter);
             }
 
             DrawHyperlinkEffect(Texts.Get("sos.med.always_heals", "Always Heals:").Value, alwaysHeals, Color.LightGreen);
@@ -531,7 +531,7 @@ namespace SOS.StatSections
 
     // MARK: utility
     [AutoRegister(order: 5)]
-    public class UtilitySection : ISOSStatSection
+    public class UtilityStatInfo : ISOSStatInfo
     {
         public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
@@ -569,7 +569,7 @@ namespace SOS.StatSections
 
     // MARK: container
     [AutoRegister(order: 6)]
-    public class ContainerSection : ISOSStatSection
+    public class ContainerStatInfo : ISOSStatInfo
     {
         public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
@@ -643,14 +643,14 @@ namespace SOS.StatSections
             {
                 _ = new GUIDesplegableBox(new RectTransform(new Vector2(1f, 0f), contentPanel.Content.RectTransform) { MinSize = new Point(0, 24) },
 
-                    SectionHelper.SetSearchFilter,
+                    API.SetSearchFilter,
                     Texts.Get("sos.container.accepts", "Accepts:").Value,
                     acceptedTags, compatibleItems, onPrimary, onSecondary);
             }
 
             if (spawnLocations.Count > 0)
             {
-                l.BadgeRow(Texts.Get("sos.container.contained", "Contained by:").Value, spawnLocations, onSearchFilter: SectionHelper.SetSearchFilter);
+                l.BadgeRow(Texts.Get("sos.container.contained", "Contained by:").Value, spawnLocations, onSearchFilter: API.SetSearchFilter);
             }
             return true;
         }
@@ -658,7 +658,7 @@ namespace SOS.StatSections
 
     // MARK: Affliction effects
     [AutoRegister(order: 7)]
-    public class AfflictionEffectsSection : ISOSStatSection
+    public class AfflictionEffectsStatInfo : ISOSStatInfo
     {
         public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
@@ -783,7 +783,7 @@ namespace SOS.StatSections
                             fallbackFilterPrefix: '!',
                             onPrimary: onPrimary,
                             onSecondary: onSecondary,
-                            onSearchFilter: SectionHelper.SetSearchFilter);
+                            onSearchFilter: API.SetSearchFilter);
                     }
 
                     l.RichText(" ");
@@ -809,7 +809,7 @@ namespace SOS.StatSections
                             fallbackFilterPrefix: '!',
                             onPrimary: onPrimary,
                             onSecondary: onSecondary,
-                            onSearchFilter: SectionHelper.SetSearchFilter);
+                            onSearchFilter: API.SetSearchFilter);
                     }
                     l.RichText(" ");
                 }
@@ -876,7 +876,7 @@ namespace SOS.StatSections
 
     // MARK: Affliction Treatments
     [AutoRegister(order: 8)]
-    public class AfflictionTreatmentSection : ISOSStatSection
+    public class AfflictionTreatmentStatInfo : ISOSStatInfo
     {
         public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
@@ -939,7 +939,7 @@ namespace SOS.StatSections
                     fallbackFilterPrefix: '!',
                     onPrimary: onPrimary,
                     onSecondary: onSecondary,
-                    onSearchFilter: SectionHelper.SetSearchFilter);
+                    onSearchFilter: API.SetSearchFilter);
             }
 
             void DrawRow(string label, List<ItemPrefab> items, Color? labelColor = null)
@@ -954,7 +954,7 @@ namespace SOS.StatSections
                     labelColor: labelColor,
                     onPrimary: onPrimary,
                     onSecondary: onSecondary,
-                    onSearchFilter: SectionHelper.SetSearchFilter);
+                    onSearchFilter: API.SetSearchFilter);
             }
 
             DrawRow(Texts.Get("sos.affliction.highlyeffective", "Highly Effective:").Value, highEff);
@@ -972,7 +972,7 @@ namespace SOS.StatSections
 
     // MARK: Description
     [AutoRegister(order: 9)]
-    public class DescriptionSection : ISOSStatSection
+    public class DescriptionStatInfo : ISOSStatInfo
     {
         public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
         {
@@ -990,10 +990,5 @@ namespace SOS.StatSections
             l.RichText(RichString.Rich(text));
             return true;
         }
-    }
-
-    internal static class SectionHelper
-    {
-        public static void SetSearchFilter(string tag) => API.Emit(CommKeys.SetSearchFilter, tag);
     }
 }

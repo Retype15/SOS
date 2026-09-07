@@ -18,7 +18,7 @@ namespace SOS
     /// <para>
     /// <b>Architecture:</b>
     /// <list type="bullet">
-    /// <item><description><b>Component Registries:</b> Manages extensible sections (<see cref="ISOSStatSection"/>), tabs (<see cref="ISOSTab"/>), configs (<see cref="ISOSConfig"/>), prefab providers (<see cref="ISOSPrefab"/>), and window profiles (<see cref="ISOSWindowProfile"/>) with ordering and activation control.</description></item>
+    /// <item><description><b>Component Registries:</b> Manages extensible sections (<see cref="ISOSStatInfo"/>), tabs (<see cref="ISOSTab"/>), configs (<see cref="ISOSConfig"/>), prefab providers (<see cref="ISOSPrefab"/>), and window profiles (<see cref="ISOSWindowProfile"/>) with ordering and activation control.</description></item>
     /// <item><description><b>Prioritized Event Pipeline:</b> Provides thread-safe event publishing and subscription (<c>On"</c>, <c>Off"</c>, <c>Emit</c>) ordered deterministically across <see cref="EventPriority"/> tiers.</description></item>
     /// <item><description><b>Shared State:</b> Offers a lightweight, reactive key-value state store (<see cref="SetState{T}(string, T, bool)"/>, <see cref="GetState{T}(string)"/>) for cross-mod communication.</description></item>
     /// </list>
@@ -47,7 +47,7 @@ namespace SOS
         private static EventBus eventBus = new();
 
         // Factories  
-        private static readonly SortedFactory<ISOSStatSection> _sectionFactories = new();
+        private static readonly SortedFactory<ISOSStatInfo> _sectionFactories = new();
         private static readonly SortedFactory<ISOSTab> _tabFactories = new();
         private static readonly SortedFactory<ISOSConfig> _configFactories = new();
         private static readonly SortedFactory<ISOSPrefab> _prefabFactories = new();
@@ -60,12 +60,12 @@ namespace SOS
         /// <summary>
         /// Registers a stat section provider into the S.O.S. inspector sidebar registry.
         /// </summary>
-        /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSStatSection"/>, a factory delegate (<see cref="Func{ISOSStatSection}"/>), or an existing instance.</param>
+        /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSStatInfo"/>, a factory delegate (<see cref="Func{ISOSStatInfo}"/>), or an existing instance.</param>
         /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
         /// <param name="order">Display priority order. Lower values appear higher up in the inspector sidebar. Defaults to <c>0.0</c>.</param>
         /// <param name="active">Whether the section is initially enabled for rendering. Defaults to <c>true</c>.</param>
         /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is null or fails type contract validation.</returns>
-        public static bool RegisterSection(object obj, string? id = null, double order = 0.0, bool active = true)
+        public static bool RegisterStatInfo(object obj, string? id = null, double order = 0.0, bool active = true)
             => _sectionFactories.Register(obj, id, order, active);
 
         /// <summary>
@@ -73,40 +73,40 @@ namespace SOS
         /// </summary>
         /// <param name="id">The unique identifier of the section to enable.</param>
         /// <returns><c>true</c> if the section was found; otherwise, <c>false</c>.</returns>
-        public static bool ActivateSection(string id) => _sectionFactories.SetActive(id, true);
+        public static bool ActivateStatInfo(string id) => _sectionFactories.SetActive(id, true);
 
         /// <summary>
         /// Deactivates the stat section matching <paramref name="id"/>, suppressing its rendering and evicting any cached instance.
         /// </summary>
         /// <param name="id">The unique identifier of the section to disable.</param>
         /// <returns><c>true</c> if the section was found; otherwise, <c>false</c>.</returns>
-        public static bool DeactivateSection(string id) => _sectionFactories.SetActive(id, false);
+        public static bool DeactivateStatInfo(string id) => _sectionFactories.SetActive(id, false);
 
         /// <summary>
         /// Resolves a registered stat section by identifier and casts it to <typeparamref name="T"/>.
         /// </summary>
-        /// <typeparam name="T">The concrete or interface type expected. Must implement <see cref="ISOSStatSection"/>.</typeparam>
+        /// <typeparam name="T">The concrete or interface type expected. Must implement <see cref="ISOSStatInfo"/>.</typeparam>
         /// <param name="id">The unique identifier of the section.</param>
         /// <param name="keepInstance">If <c>true</c>, caches the resolved instance for subsequent calls. Defaults to <c>true</c>.</param>
         /// <returns>The resolved section instance if found and active; otherwise, <c>default</c>.</returns>
-        public static T? GetSection<T>(string id, bool keepInstance = true)
-            => GetSection(id, keepInstance) is T t ? t : default;
+        public static T? GetStatInfo<T>(string id, bool keepInstance = true)
+            => GetStatInfo(id, keepInstance) is T t ? t : default;
 
         /// <summary>
         /// Resolves a registered stat section by identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the section.</param>
         /// <param name="keepInstance">If <c>true</c>, caches the resolved instance for subsequent calls. Defaults to <c>true</c>.</param>
-        /// <returns>The <see cref="ISOSStatSection"/> instance if found and active; otherwise, <c>null</c>.</returns>
-        public static ISOSStatSection? GetSection(string id, bool keepInstance = true)
+        /// <returns>The <see cref="ISOSStatInfo"/> instance if found and active; otherwise, <c>null</c>.</returns>
+        public static ISOSStatInfo? GetStatInfo(string id, bool keepInstance = true)
             => _sectionFactories.Get(id, keepInstance);
 
         /// <summary>
         /// Resolves and enumerates all currently active stat sections in ascending registration order.
         /// </summary>
         /// <param name="keepInstance">If <c>true</c>, caches resolved instances for subsequent calls. Defaults to <c>true</c>.</param>
-        /// <returns>An enumerable sequence of active <see cref="ISOSStatSection"/> instances.</returns>
-        public static IEnumerable<ISOSStatSection> GetAllSections(bool keepInstance = true)
+        /// <returns>An enumerable sequence of active <see cref="ISOSStatInfo"/> instances.</returns>
+        public static IEnumerable<ISOSStatInfo> GetAllStatInfo(bool keepInstance = true)
             => _sectionFactories.GetAll(keepInstance).Select(t => t.Instance);
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace SOS
         /// <param name="id">The unique identifier of the section.</param>
         /// <param name="onlyInstance">If <c>true</c>, evicts only the cached instance without removing the registration. Defaults to <c>false</c>.</param>
         /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
-        public static bool RemoveSection(string id, bool onlyInstance = false)
+        public static bool RemoveStatInfo(string id, bool onlyInstance = false)
             => _sectionFactories.Remove(id, onlyInstance);
 
 
@@ -532,6 +532,10 @@ namespace SOS
 
         #endregion
 
+        #region Event Helpers
+
+        public static void SetSearchFilter(string tag) => API.Emit(CommKeys.SetSearchFilter, tag);
+
         #region Internal helpers
 
         /// <summary>
@@ -539,7 +543,7 @@ namespace SOS
         /// </summary>
         /// <param name="pluginManagementService">The LuaCs plugin management service.</param>
         /// <remarks>
-        /// Scans for classes implementing <see cref="ISOSStatSection"/>, <see cref="ISOSTab"/>, <see cref="ISOSConfig"/>,
+        /// Scans for classes implementing <see cref="ISOSStatInfo"/>, <see cref="ISOSTab"/>, <see cref="ISOSConfig"/>,
         /// <see cref="ISOSPrefab"/>, and <see cref="ISOSWindowProfile"/>.
         /// </remarks>
         internal static void Initialize(IPluginManagementService pluginManagementService)
@@ -559,6 +563,7 @@ namespace SOS
         {
             _sectionFactories.Clear(true);
             _tabFactories.Clear(true);
+            _configFactories.Clear(true);
             _prefabFactories.Clear(true);
             _profileFactories.Clear(true);
         }
