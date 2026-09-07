@@ -30,7 +30,7 @@ namespace SOS
     {
         private readonly Dictionary<string, (double Order, bool IsActive, Func<T?> Factory)> _dict = [];
         private readonly Dictionary<string, T> _instances = [];
-        private (string Id, double Order, Func<T?> Factory)[] _cache = [];
+        private (string Id, double Order, bool IsActive, Func<T?> Factory)[] _cache = [];
         private bool _isDirty = false;
 
         private void Add(string id, double order, bool active, Func<T?> Factory)
@@ -231,7 +231,7 @@ namespace SOS
         /// Results are cached internally. If no registrations have been added, removed, or toggled since the last call,
         /// returns the precomputed array directly with zero allocations.
         /// </remarks>
-        public (string Id, double Order, Func<T?> Factory)[] GetSorted()
+        public (string Id, double Order, bool IsActive, Func<T?> Factory)[] GetSorted()
         {
             if (_isDirty)
             {
@@ -241,7 +241,7 @@ namespace SOS
                         .Where(kvp => kvp.Value.IsActive)
                         .OrderBy(kvp => kvp.Value.Order)
                         .ThenBy(kvp => kvp.Key)
-                        .Select(kvp => (kvp.Key, kvp.Value.Order, kvp.Value.Factory))];
+                        .Select(kvp => (kvp.Key, kvp.Value.Order, kvp.Value.IsActive, kvp.Value.Factory))];
 
                     _isDirty = false;
                 }
@@ -252,6 +252,7 @@ namespace SOS
         /// <summary>
         /// Resolves and enumerates all currently active components in registration order.
         /// </summary>
+        /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
         /// <param name="keepInstance">If <c>true</c>, resolved instances are stored in the internal cache for future queries.</param>
         /// <returns>An enumerable sequence of resolved (Id, Instance) pairs for active components.</returns>
         /// <remarks>
@@ -264,13 +265,17 @@ namespace SOS
         /// skips to the next entry without aborting the sequence.
         /// </para>
         /// </remarks>
-        public IEnumerable<(string Id, T Instance)> GetAll(bool keepInstance = true)
+        public IEnumerable<T> GetAll(bool onlyActives = true, bool keepInstance = true)
         {
-            foreach (var (Id, _, factory) in GetSorted())
+            foreach (var (Id, _, isActive, factory) in GetSorted())
             {
+                if (onlyActives && !isActive) continue;
+
                 T? instance = null;
                 lock (_dict)
                     _instances.TryGetValue(Id, out instance);
+
+                if (instance != null) { yield return instance; continue; }
 
                 try
                 {
@@ -287,7 +292,7 @@ namespace SOS
                     if (keepInstance)
                         lock (_dict)
                             _instances[Id] = instance;
-                    yield return (Id, instance);
+                    yield return instance;
                 }
             }
         }

@@ -104,10 +104,11 @@ namespace SOS
         /// <summary>
         /// Resolves and enumerates all currently active stat sections in ascending registration order.
         /// </summary>
+        /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
         /// <param name="keepInstance">If <c>true</c>, caches resolved instances for subsequent calls. Defaults to <c>true</c>.</param>
         /// <returns>An enumerable sequence of active <see cref="ISOSStatInfo"/> instances.</returns>
-        public static IEnumerable<ISOSStatInfo> GetAllStatInfo(bool keepInstance = true)
-            => _sectionFactories.GetAll(keepInstance).Select(t => t.Instance);
+        public static IEnumerable<ISOSStatInfo> GetAllStatInfo(bool onlyActives = true, bool keepInstance = true)
+            => _sectionFactories.GetAll(onlyActives, keepInstance);
 
         /// <summary>
         /// Removes a stat section registration or its cached instance by identifier.
@@ -170,10 +171,11 @@ namespace SOS
         /// <summary>
         /// Resolves and enumerates all currently active tabs in ascending registration order.
         /// </summary>
+        /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
         /// <param name="keepInstance">If <c>true</c>, caches resolved instances for subsequent calls. Defaults to <c>true</c>.</param>
         /// <returns>An enumerable sequence of active <see cref="ISOSTab"/> instances.</returns>
-        public static IEnumerable<ISOSTab> GetAllTabs(bool keepInstance = true)
-            => _tabFactories.GetAll(keepInstance).Select(t => t.Instance);
+        public static IEnumerable<ISOSTab> GetAllTabs(bool onlyActives = true, bool keepInstance = true)
+            => _tabFactories.GetAll(onlyActives, keepInstance);
 
         /// <summary>
         /// Removes a tab registration or its cached instance by identifier.
@@ -235,10 +237,11 @@ namespace SOS
         /// <summary>
         /// Resolves and enumerates all currently active configurations in ascending registration order.
         /// </summary>
+        /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
         /// <param name="keepInstance">If <c>true</c>, caches resolved instances for subsequent calls. Defaults to <c>true</c>.</param>
         /// <returns>An enumerable sequence of active <see cref="ISOSConfig"/> instances.</returns>
-        public static IEnumerable<ISOSConfig> GetAllConfigs(bool keepInstance = true)
-            => _configFactories.GetAll(keepInstance).Select(t => t.Instance);
+        public static IEnumerable<ISOSConfig> GetAllConfigs(bool onlyActives = true, bool keepInstance = true)
+            => _configFactories.GetAll(onlyActives, keepInstance);
 
         /// <summary>
         /// Removes a configuration registration or its cached instance by identifier.
@@ -300,10 +303,11 @@ namespace SOS
         /// <summary>
         /// Resolves and enumerates all currently active prefab providers in ascending registration order.
         /// </summary>
+        /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
         /// <param name="keepInstance">If <c>true</c>, caches resolved instances for subsequent calls. Defaults to <c>true</c>.</param>
         /// <returns>An enumerable sequence of active <see cref="ISOSPrefab"/> instances.</returns>
-        public static IEnumerable<ISOSPrefab> GetAllPrefabProviders(bool keepInstance = true)
-                    => _prefabFactories.GetAll(keepInstance).Select(t => t.Instance);
+        public static IEnumerable<ISOSPrefab> GetAllPrefabProviders(bool onlyActives = true, bool keepInstance = true)
+                    => _prefabFactories.GetAll(onlyActives, keepInstance);
 
         /// <summary>
         /// Removes a prefab provider registration or its cached instance by identifier.
@@ -377,7 +381,7 @@ namespace SOS
             if (v == null)
             {
                 var color = Microsoft.Xna.Framework.Color.LightSkyBlue;
-                Logger.LogDebugError($"[SOS] No one profile encountered.\n => Profile list: {string.Join(',', GetAllWindowProfiles().ToList().Select(p => p.DisplayName))}\n => Profile _dict => {string.Join(',', _profileFactories.GetSorted().Select(f => $"[{f.Id}, {f.Order}]"))}");
+                Logger.LogDebugError($"[SOS] No one profile encountered.\n => Profile list: {string.Join(',', GetAllWindowProfiles().Select(p => p.DisplayName))}\n => Profile _dict => {string.Join(',', _profileFactories.GetSorted().Select(f => $"[{f.Id}, {f.Order}]"))}");
                 Logger.LogReleaseError($"[SOS] No one profile encountered. Try reinstall 'S.O.S - Standard Operation Schematics' Mod, report that in steam mod page or create an issue on Git project(‖color:{color.R},{color.G},{color.B}‖https://github.com/retype15/SOS‖end‖).");
             }
             return v;
@@ -386,10 +390,11 @@ namespace SOS
         /// <summary>
         /// Resolves and enumerates all currently active window profiles in ascending registration order.
         /// </summary>
+        /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
         /// <param name="keepInstance">If <c>true</c>, caches resolved instances. Defaults to <c>false</c> for visual profiles.</param>
         /// <returns>An enumerable sequence of active <see cref="ISOSWindowProfile"/> instances.</returns>
-        public static IEnumerable<ISOSWindowProfile> GetAllWindowProfiles(bool keepInstance = false)
-            => _profileFactories.GetAll(keepInstance).Select(t => t.Instance);
+        public static IEnumerable<ISOSWindowProfile> GetAllWindowProfiles(bool onlyActives = true, bool keepInstance = false)
+            => _profileFactories.GetAll(onlyActives, keepInstance);
 
         /// <summary>
         /// Removes a window profile registration or its cached instance by identifier.
