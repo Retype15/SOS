@@ -2,6 +2,8 @@
 // This file is licensed under the GNU GPLv3.
 // See the LICENSE file in the project root for details.
 
+#if DEBUG
+
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
@@ -12,7 +14,7 @@ namespace SOS.Panels.PreviewPanel
 {
 
     // MARK: Preview Tab
-    [AutoRegister("SOS.PreviewPanel", 10)]
+    //[AutoRegister("SOS.PreviewPanel", 10)]
     public class PreviewPanelTab : ISOSTab, IDisposable
     {
         public string Id => "SOS.PreviewPanel";
@@ -74,3 +76,5 @@ namespace SOS.Panels.PreviewPanel
         }
     }
 }
+
+#endif

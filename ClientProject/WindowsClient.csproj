@@ -73,9 +73,11 @@
     <ItemGroup>
       <Assemblies Include="$(TargetDir)$(TargetName).dll" />
       <DepsFiles Include="$(TargetDir)$(TargetName).deps.json" />
+      <LuaFiles Include="**/*.lua" Exclude="bin/**;obj/**" />
     </ItemGroup>
     <Copy SourceFiles="@(Assemblies)" DestinationFiles="$(ModDeployDir)bin\Client\Windows\$(TargetName).dll" />
     <Copy SourceFiles="@(DepsFiles)" DestinationFiles="$(ModDeployDir)bin\Client\Windows\$(TargetName).deps.json" />
+    <Copy SourceFiles="@(LuaFiles)" DestinationFolder="$(ModDeployDir)lua\Autorun" SkipUnchangedFiles="true" />
   </Target>
 
 </Project>
