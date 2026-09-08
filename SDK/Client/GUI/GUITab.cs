@@ -115,16 +115,8 @@ namespace SOS.GUI
         /// </remarks>
         public void RegisterTab(ITab<T> tab)
         {
-            try
-            {
-                tab.Init(_contentArea);
-                tabs.Add(tab);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogReleaseError(ex.Message);
-                Logger.LogDebugError(ex.StackTrace ?? ex.Message);
-            }
+            tab.Init(_contentArea);
+            tabs.Add(tab);
         }
 
         /// <summary>
@@ -154,7 +146,15 @@ namespace SOS.GUI
                 _contentArea.RectTransform.RelativeSize = new Vector2(1f, 0.92f);
 
                 foreach (var tab in validTabs)
-                    _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == ActiveTab, () => SelectTab(tab), tab.ToolTip);
+                    try
+                    {
+                        _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == ActiveTab, () => SelectTab(tab), tab.ToolTip);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogWarning($"Exception as ocurred when called 'CreateTabButton' in tab '{tab.TabName}', this tab was removed temporally to prevent more errors...\n {ex}");
+                        tabs.Remove(tab);
+                    }
 
                 _buttonArea.RecalculateChildren();
             }

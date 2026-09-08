@@ -123,7 +123,7 @@ namespace SOS
         /// Otherwise, the type name is checked against each term in the PrefabType list using
         /// case-insensitive containment matching.
         /// </remarks>
-        internal bool AllowsType(string name)
+        public bool AllowsType(string name)
             => PrefabType.Count == 0 || PrefabType.Any(t => name.Contains(t, StringComparison.OrdinalIgnoreCase));
     }
 }

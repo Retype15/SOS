@@ -564,7 +564,27 @@ namespace SOS.Profiles
         {
             var widget = new GUITab<Prefab>(parent, onPrimary ?? OnPrimary, onSecondary ?? OnSecondary);
             foreach (var tab in tabs)
-                widget.RegisterTab(tab);
+            {
+                try
+                {
+                    widget.RegisterTab(tab);
+
+                }
+                catch (Exception ex)
+                {
+                    try
+                    {
+                        API.RemoveTab(tab.Id);
+                        Logger.LogWarning($"The tab '{tab.Id}' was launched an error when tried to register to GUITab. For safety reasons was removed.\n  {ex.Message}");
+                        Logger.LogDebugError(ex.StackTrace ?? ex.Message);
+                    }
+                    catch (Exception ex2)
+                    {
+                        Logger.LogError($"'Id' of tab was launched an error. Can't Remove. \n{ex.Message}{ex2.Message}");
+                        Logger.LogDebugError(string.Join('\n', [ex.Message, ex.StackTrace, "", ex2.Message, ex2.StackTrace]));
+                    }
+                }
+            }
             widget.OnTabSelected = tab => PushTabHistory(tab.Id);
             return widget;
         }
