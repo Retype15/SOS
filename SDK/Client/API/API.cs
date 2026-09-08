@@ -566,6 +566,24 @@ namespace SOS
             _scanned = true;
         }
 
+        private static bool _isRegisteredTypesToLuaDataService = false;
+        internal static void RegisterTypesToLuaDataService()
+        {
+            if (_isRegisteredTypesToLuaDataService) return;
+
+            var servicesProvider = Barotrauma.LuaCsSetup.Instance._servicesProvider;
+            ILuaUserDataService? userDataService = servicesProvider.GetService<ILuaUserDataService>();
+
+            foreach (var type in typeof(API).Assembly.GetExportedTypes())
+            {
+                var name = type.FullOrName();
+                Logger.LogDebug($"Trying to register '{name}'...", level: LogLevel.Trace);
+                userDataService.RegisterType(name);
+            }
+
+            _isRegisteredTypesToLuaDataService = true;
+        }
+
         internal static void ClearTemporaryInstances()
         {
             _sectionFactories.Clear(true);

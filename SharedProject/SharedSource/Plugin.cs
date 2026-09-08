@@ -54,7 +54,10 @@ namespace SOS
             Logger.LogDebug(Texts.Get("sos.shared.debugmode", "[SOS] Debug Mode is enabled.").Value);
         }
 
-        public void PreInitPatching() { }
+        public void PreInitPatching()
+        {
+            API.RegisterTypesToLuaDataService();
+        }
 
         public void Dispose()
         {
