@@ -7,6 +7,8 @@
     <Assembly File="%ModDir%/bin/Client/OSX/SOS.dll" Target="Client" Platform="OSX" />
     <Assembly File="%ModDir%/bin/Client/Windows/SOS.dll" Target="Client" Platform="Windows" />
 
+    <Lua File="%ModDir%/lua/Autorun/PreviewPanel.lua" IsAutorun="true" />
+
     <!-- Internal Settings -->
     <Config File="%ModDir%/Config/SettingsCore.xml" Target="Client" />
     <Config File="%ModDir%/Config/SettingsWindowConfigClient.xml" Target="Client" />
