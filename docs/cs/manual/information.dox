@@ -1,0 +1,204 @@
+## Information
+
+Este mod se ha separado en 2 proyectos principales con el objetivo de exponer el SDK completo limpio y ser completamente extensible por parte de otros mods que esperamos complementen la experiencia de uso de `S.O.S`.
+
+### **1.** [`S.O.S` - SDK](md_manual_sos-sdk.html)
+
+Proyecto integral principal, y el único binario sobre el que deberá trabajar cualquier mod. Está pensado para ser cargado Client-Side only y compatible para cualquier plataforma(Solo contiene referencias a Barotrauma y código multiplataforma). Este implementa la mayoría de logicas, contratos, observers, componentes GUI personalizados, etc. El archivo que deberá referenciar en proyectos derivados debe ser únicamente de este proyecto, archivo `SOS.SDK.dll`, y puede obtenerlo [AQUÍ](https://github.com/Retype15/SOS/releases/latest/download/SOS.SDK.dll).
+
+### **2.** `S.O.S` - Core
+
+Proyecto base el cual cumple dos funciones: Gestionar la ventana principal, inicialización crucial, ciclos y eventos de teclado internos duros a través de `SOSController`, e implementar los componentes vanilla del mod, como por ejemplo localizar items y sus recetas por medio de las herramientas del proyecto, el Profile vanilla, etc. [SDK](./md_manual_sos-sdk.html).
+
+Está compuesto por el controlador `SOSController`, quien se encarga gestionar los eventos de teclas e inicialización, y los componentes base que ya muestran las versiones anteriores, a excepción de `SimulatorManager` quien fue empujado como mod satélite separado del `Core`. *ver:* **[SOS - Dummy Manager](https://github.com/retype15/SOS-DummyManager)**. Generalmente nunca trabajará con este, pero es util para ver ejemplos de componentes ya implementados aquí.
+
+  **Implementa:**
+
+- [Prefabs a rastrear:](//)
+  - [ItemPrefabProvider:](//) Agrega todos los Items.
+  - [AfflictionPrefabProvider:](//) Agrega todas las aflicciones. Hace distinción sobre las aflicciones Husk usando otro subscriptor vacío[AfflictionHuskPrefabProvider](//).
+
+- [Paneles centrales:](//)
+  - [ItemPanelTab:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/ItemPanel/ItemPanel.cs) Componente que hereda de `ISOSTab` e implementa la lista de recetas del item seleccionado.
+  - [PreviewPanel:](//) Es un simple panel de ejemplo que simplemente muestra la imagen principal del componente seleccionado. Escrito como componente individual en Lua para demostrar capacidades de ejecución completa y limpia de componentes que provienen de Lua.
+
+- [Perfiles de Ventana:](//)
+  - [ThreeColumnWindowProfile:](//) Agrega el perfil visual clásico del mod con ventana redimensionable.
+
+- [Badges de información y estadísticas:](//)
+  - [*StatInfo:](//) Agregan información limpia sobre Items o aflicciones.
+  - ...
+
+## En el [`SDK`](//), se encontrará con lo siguiente:
+
+- **Contratos:**
+  
+  - [ISOSTab:](//) Agrega una nueva pestaña al menú central. redimensionable y completamente libre de dibujar en el area designada. Es una abstracción de [ITab](//).
+
+  - [ISOSStatInfo:](//) Agrega una nueva pestaña de información en la lista de información rápida lateral. Recomendamos usar un [LayoutBuilder](//) para añadir nueva info de forma coherente y rápida.
+
+  - [ISOSPrefab:](//) Permite extender el sistema de prefabs admitidos y su sistema de búsqueda/filtrado. Recomendamos complementar con otras pestañas como [ISOSStatInfo](//) para añadir información.
+
+  - [ISOSConfig:](//) Sistema para gestionar y simplificar el guardado/carga de informacion útil para otros componentes.
+  - [ISOSWindowProfile:](//) Sistema de creacion de perfiles visuales o "Temas" para la pestaña a mostrar. Completamente personalizable.
+
+- **Data Bridge:**
+
+  Un sistema de suscripcion de eventos y almacen de datos compartidos bidireccional para todos los mods para así evitar referencias duras entre todos. Cada uno requiere `string key`: clave o identificador de puente como primer parámetro. Las claves comúnes están definidas y documentadas en la clase estática [`CommKeys`](//).
+  
+  Opcionalmente `API.On`, `API.Off` y `API.Emit` aceptan `double order = 0` que define el orden de ejecución de los delegados y llamaremos layers. Layers recomendado a usar es la clase estática[`EventPriority`](//).
+
+  > [!NOTE]
+  > Aún faltan eventos a migrar del sistema anterior, por lo que la lista base de [`CommKeys`] puede ser expandida a futuro.
+
+  - [API.On:](//) Permite suscribir delegados que son llamados al emitir ([API.Emit](//)) y ejecutados en orden predecible. acepta `Action`/`Action<T>` *handler* como el método que es llamado al emitir sobre su misma clave.
+
+  - [API.Off:](//) Permite desuscribir un delegado del bus de eventos para limpiar referencias. Recuerde llamar apropiadamente este método cuando deje de necesitar escuchar. Requiere key, y el handler que suscribió usando [`API.On`](//) anteriormente. Opcionalmente acepta order para eliminar el método de forma atómica sólo en el layer de order definido.(Recomendado pasar el mismo order usado en [`API.On`](//).)
+
+  - [API.Emit:](//) Permite emitir un valor y llamar a todos los métodos suscritos de la `key` proporcionada. Acepta opcionalmente **value : `T`** para emitir pasando a los métodos registrados el objeto. `double order` para llamar todos los métodos que estén suscritos únicamente a ese layer. También acepta opcionalmente (.., `double min`, `double max`) para llamar a los métodos de un rango de layers o orden para casos de uso avanzados. y finalmente si es parametrizado acepta `bool setState = true` que llamará [`API.SetState<T>`](//) luego de emitir el valor si es true.
+
+  - [API.SetState<`T`>:](//) Permite guardar una variable de tipo **<`T`>** en un estado compartido público fácilmente accesibles desde cualquier mod.
+
+  - [API.GetState<`T`>:](//) Permite obtener la variable de tipo **<`T`>** guardada en el estado compartido público antes guardada por [`API.SetState<T>`](//).
+
+  > [!IMPORTANT]
+  > Emitir pasando un objeto `T` ejecutará todo método suscrito que acepte el parámetro `T` o no tenga parámetro, pero emitir sin parámetros solo llamará a los metodos sin parámetros.
+
+- **GUIs personalizados:**
+  - [GUIWindow:](//) Componente que permite la creación rápida y gestión general de ventanas redimensionables con barra de título, cajas de herramientas y componentes varios. Es una abstracción de [GUIResizableFrame](//)
+  - [GUITab:](//) Componente para la creacion de componentes [ITab](//) para la navegación por pestañas.
+  - [GUILayoutBuilder:](//) Una clase helper para construir layouts declarativos, responsivos y flexibles para listas ordenadas. fáciles de mantener y gestionar.
+  - Y otros que veremos más adelante.
+
+## Getting Started
+
+Cualquier mod que desee implementar una pestaña de información solamente necesita crear una clase base que herede de la interfaz correspondiente e implemente el contenido que quiera añadir (e.g: Una nueva seccion en los stat sections necesita una clase pública que implemente la interfaz [ISOSStatInfo](//)), y posteriormente registrarla ([Ver ejemplo: \<name>](//)).
+
+Hay dos formas principales de registrar un nuevo componente:
+
+- **1.** Usando el atributo [`[AutoRegister]`](//), para registro automático la primera vez que se abra la ventana de SOS(nunca antes) pasando las propiedades opcionales de registro:
+
+  - `string id`: El identificador único para su tipo, si otro objeto del mismo tipo intenta registrarse posteriormente con el mismo identificador, será sobreescrito. **Default: type.FullName ?? type.Name**.
+  - `double order`: Orden de ejecución o llamada. Orden ascendente. A menor valor se llama primero, permitiendo ordenarse en las llamdas sobre otros componentes, o en la UI. **Default: 0**
+  - `bool active`: Indica si por defecto este componente se ejecutará o no. Permite añadir lógica de activación/desactivación de componentes para mayor inmersión, o permitir al jugador desactivar componentes a conciencia para no sobrecargar su interfaz con informacion que no necesita. **Default: True**
+
+  ### Ejemplo de uso
+
+  - **Csharp:**
+
+    ```csharp
+    using Barotrauma;
+    using SOS;
+    
+    namespace MyNamespace;
+
+    [AutoRegister(id: "MyMod.TreatmentInfo", order: 1, active: true)] // Usar [AutoRegister] sin parámetros daría como resultado (id: "MyNamespace.TreatmentStatInfo", order: 0, active: true).
+    public class TreatmentStatInfo : ISOSStatInfo
+    {
+      public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+      {
+        //...
+        return true; // Devolver `true` si añadió algún componente componente, o `false` si no.
+      }
+    }
+    ```
+
+  - **Lua:** No permite registro automático de momento, así que vea el método 2.
+
+  > [!TIP]
+  > Usando este método, la clase se descubre automáticamente. Es la forma idiomática de registrar clases que implementen nuestras interfaces.
+  >
+  > Dado que este método no requiere ejecutar código manual para registrar las clases, se puede obviar por completo la clase Plugin si el objetivo de tu mod es únicamente añadir contenenido a SOS.
+  >
+  > Dada la limpieza del uso de esto, recomendamos además declararlas en archivos In-Memory Compiled at Time.
+
+- **2.** Registro manual, usando `API.Register*` y pasando un objeto que represente el método de instanciación y las mismas propiedades opcionales anteriormente descritas (obj, id, order, active). Puede registrar objetos genéricos y tablas Lua que implementen de forma indirecta los métodos del contrato.
+  - `object obj:` Hay varias formas de registrar un componente por este método:
+  
+    - `class\<T\>`: Instancia directa de un objeto que implemente el contrato. Esta es la forma más simple de pasar una unica instancia global y evitar instanciar.
+
+      ```csharp
+      var instance = new TreatmentStatInfo();
+      API.RegisterStatInfo(instance, "MyMod.TreatmentInfo", 1);
+      ```
+
+    - `Func\<T\>`: Pasar una función que retorne la instancia que se desea, útil para pasar una instancia única con un método personalizado para instanciación, por ejemplo compatibilidad con el patrón singleton.
+
+      ```csharp
+      API.RegisterConfig(() => MyModConfig.Instance, "MyMod.MainConfig", 0);
+      ```
+
+    - `object`: Objetos genéricos que no implementan de forma directa el contrato, o tablas de Lua(Compatibilidad con Lua). En estos casos se recurre a la reflexión para intentar vincular los metodos de la instancia recibida con los métodos que exige el contrato usando [`object.Cast<T>()`](//), esto permite registrar de forma indirecta clases sin necesidad de hacer una referencia dura al SDK de S.O.S, simplemente obteniendo por reflexion el método manual de registro `API.Register*` y pasando un objeto que cumpla el contrato de forma indirecta (por nombre de métodos).
+
+      ```csharp
+      // C#
+      using Barotrauma; 
+
+      public class MyStatInfo
+      {
+          public static string ID => "TestMod3Duck.MyStatInfo";
+
+          public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+          {
+              //...
+              return true;
+          }
+      }
+
+      //IMPORTANT: Se debe obtener el último assemblie cargado por el leak de assemblies de LuaCsForBarotrauma.
+      var apiType = AppDomain.CurrentDomain.GetAssemblies().LastOrDefault(t => t.GetType("SOS.API") != null)?.GetType("SOS.API");
+
+      if (apiType == null)
+      {
+          LuaCsLogger.LogError("[MyMod] SOS.API type not found — No S.O.S loaded");
+          return;
+      }
+      var registerMethod = apiType.GetMethod("RegisterStatInfo", BindingFlags.Public | BindingFlags.Static, null, [typeof(object), typeof(string), typeof(double), typeof(bool)], null);
+      if (registerMethod == null)
+      {
+          LuaCsLogger.LogError("[MyMod] API.RegisterStatInfo method not found!");
+          return;
+      }
+      registerMethod.Invoke(apiType, [new MyStatInfo(), MyStatInfo.ID, -1]);
+      ```
+
+      ```lua
+      -- LUA
+      -- Falta documentar.
+      ```
+
+      > [!WARN]
+      > Todo patrón desconocido cae en esta rama y por tanto se intentará castear usando la propiedad y los nombres de metodos directamente sobre el object(o su target si es DuckProxy). Asegúrese de que sea válido.
+
+    - `Func\<object\>`: Delegado para registrar un builder de instancia usando un objeto genérico que implemente de forma indirecta la interfaz, o tablas de Lua.
+
+      ```csharp
+      registerMethod.Invoke(apiType, [() => new MyStatInfo(), MyStatInfo.ID, 1]);
+      ```
+
+      ```lua
+      -- LUA
+      -- Falta documentar.
+      ```
+
+    - `Type : T`: Pasar un tipo de clase que implemente el contrato de la instancia. Es el método default que usa el registro automático.
+
+      ```csharp
+      API.RegisterStatInfo(typeof(TreatmentStatInfo), "MyMod.TreatmentInfo", 0.2);
+      ```
+
+    - `Type : object`: Pasar un tipo genérico que implemente el contrato de la instancia de forma indirecta.
+
+      ```csharp
+      registerMethod.Invoke(apiType, [typeof(MyStatInfo), MyStatInfo.ID]);
+      ```
+
+      ```lua
+      -- LUA
+      -- Falta documentar.
+      ```
+
+> [!IMPORTANT]
+> Cada `ISOS*` funciona como un builder de instancia única por defecto, lo que significa que se usa la misma instancia hasta cerrar/reabrir la ventana SOS a menos que registre por el método manual una instancia o un delegado enves de un type. Téngalo en cuenta si considera guardar información en la clase, que esta no interfiera al ser llamada en diferentes contextos.
+>
+> NO recomendamos implementar en una misma clase varios tipos de interfaces ISOS*, esto lo consideramos un anti-patrón y actualmente llevará a crear 2 instancias de la misma clase para cada tipo de contrato(A menos que registre manualmente una misma instancia o delegado para ambos, pero igualmente no lo recomendamos).
