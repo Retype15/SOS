@@ -7,7 +7,23 @@
 
 `S.O.S` es un ecosistema de mods que apunta a añadir un sistema de información integral unificado sobre el juego base, ya sea sobre contenido vanilla o mods de terceros, permitiendo a los jugadores obtener información o análisis necesarios en tiempo real para cualquier partida de Barotrauma de forma muy sencilla e integrada. (eg. Recetas de fabricación, Información médica detallada, Talentos, Tracker de recetas, etc.)
 
-Este mod depende de [LuaCsForBarotrauma](https://github.com/evilfactory/LuaCsForBarotrauma).
+Este mod es totalmente compatible con mods desde C# con referencias duras, C# con referencias por reflexión y provenientes de Lua.
+
+## Dependences
+
+Depende del ecosistema de [LuaCsForBarotrauma](https://github.com/evilfactory/LuaCsForBarotrauma).
 
 > [!TIP]
 > If you are wondering how to get started with CSharp/Lua modding, please read [LuaCsForBarotrauma Guide](https://evilfactory.github.io/LuaCsForBarotrauma) to get you started making Barotrauma mods.
+
+---
+
+**Recomended to start:** [`Getting Started`](getting_started.html)
+
+**Other resources:**
+
+- [Getting Started](getting_started.html)
+- [Registration](registration.html)
+- [Data Sharing](data_sharing.html)
+- [UI and GUI Components](ui_comps.html)
+<!-- - [Core Components](//)  TODO: En construcción... -->
