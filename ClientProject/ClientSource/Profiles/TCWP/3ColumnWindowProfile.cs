@@ -234,7 +234,7 @@ namespace SOS.Profiles.TCWP
                 {
                     Color = target.IconColor(),
                     CanBeFocused = true,
-                    OnSecondaryClicked = (_, _) => { ProfileHelper.OpenContextMenu(target); return true; }
+                    OnSecondaryClicked = (_, _) => { ProfileHelper.OnSecondary(target); return true; }
                 };
             }
 
@@ -247,7 +247,7 @@ namespace SOS.Profiles.TCWP
                 Wrap = false,
                 AutoScaleHorizontal = true,
                 CanBeFocused = true,
-                OnSecondaryClicked = (_, _) => { ProfileHelper.OpenContextMenu(target); return true; }
+                OnSecondaryClicked = (_, _) => { ProfileHelper.OnSecondary(target); return true; }
             };
 
 
@@ -259,7 +259,7 @@ namespace SOS.Profiles.TCWP
             {
                 try
                 {
-                    hasDrawed |= section.Draw(metaPanel, target, ProfileHelper.OnPrimary, ProfileHelper.OnSecondary);
+                    hasDrawed |= section.Draw(metaPanel, target);
                 }
                 catch (Exception ex)
                 {

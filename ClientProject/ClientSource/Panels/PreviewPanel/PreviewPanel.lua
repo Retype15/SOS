@@ -78,7 +78,7 @@ function PreviewTab.Init(parentContainer)
     end)
 end
 
-function PreviewTab.Show(prefab, onPrimary, onSecondary)
+function PreviewTab.Show(prefab)
     if container == nil or prefab == nil then return end
     container.Visible = true
     currentPrefab = prefab

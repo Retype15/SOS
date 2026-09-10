@@ -136,8 +136,8 @@ namespace SOS.Profiles
 
             navigationHistory = new(new(new(68, 32), parent, isFixedSize: true), history, historyIndex);
 
-            navigationHistory.OnNavigateBack += SelectTarget;
-            navigationHistory.OnNavigateForward += SelectTarget;
+            navigationHistory.OnNavigateBack += Prefabs.PrefabHelper.SelectTarget;
+            navigationHistory.OnNavigateForward += Prefabs.PrefabHelper.SelectTarget;
 
             navigationHistory.OnChangeToolTipBack = static (prefab) =>
             {
@@ -206,19 +206,6 @@ namespace SOS.Profiles
             API.Emit(CommKeys.SelectTarget, item);
         }
 
-        /// <summary>
-        /// Selects a target prefab by emitting <see cref="CommKeys.SelectTarget"/>.
-        /// </summary>
-        /// <param name="target">The prefab target to select, or <c>null</c> to clear selection.</param>
-        /// <remarks>
-        /// Emits <see cref="CommKeys.SelectTarget"/> only if the target differs from the current API state.
-        /// </remarks>
-        public static void SelectTarget(Prefab? target)
-        {
-            var cur = API.GetState<Prefab?>(CommKeys.SelectTarget);
-            if (cur != target)
-                API.Emit(CommKeys.SelectTarget, target);
-        }
 
         /// <summary>
         /// Gets or sets the saved window size for settings.
@@ -539,14 +526,14 @@ namespace SOS.Profiles
         /// </summary>
         /// <param name="p">The prefab to select.</param>
         /// <seealso cref="SelectTarget"/>
-        public static void OnPrimary(Prefab p) => ProfileHelper.SelectTarget(p);
+        public static void OnPrimary(Prefab p) => Prefabs.PrefabHelper.SelectTarget(p);
 
         /// <summary>
         /// Opens the context menu on secondary action.
         /// </summary>
         /// <param name="p">The prefab to open context menu for.</param>
         /// <seealso cref="OpenContextMenu"/>
-        public static void OnSecondary(Prefab p) => ProfileHelper.OpenContextMenu(p);
+        public static void OnSecondary(Prefab p) => Prefabs.PrefabHelper.OpenContextMenu(p);
 
         /// <summary>
         /// Creates a tab widget for the given tabs.
@@ -560,9 +547,9 @@ namespace SOS.Profiles
         /// Registers each <paramref name="tabs"/> and sets <see cref="GUITab{Prefab}.OnTabSelected"/>
         /// to push the tab ID onto the history stack.
         /// </remarks>
-        public static GUITab<Prefab> CreateTabWidget(RectTransform parent, IEnumerable<ITab<Prefab>> tabs, Action<Prefab>? onPrimary = null, Action<Prefab>? onSecondary = null)
+        public static GUITab<Prefab> CreateTabWidget(RectTransform parent, IEnumerable<ITab<Prefab>> tabs)
         {
-            var widget = new GUITab<Prefab>(parent, onPrimary ?? OnPrimary, onSecondary ?? OnSecondary);
+            var widget = new GUITab<Prefab>(parent);
             foreach (var tab in tabs)
             {
                 try
@@ -605,28 +592,6 @@ namespace SOS.Profiles
                 if (widget.TrySelectTab(id)) break;
         }
 
-        /// <summary>
-        /// Opens a context menu for the target prefab.
-        /// </summary>
-        /// <param name="target">The prefab to open the context menu for.</param>
-        /// <param name="position">Optional mouse position. Defaults to <see cref="PlayerInput.MousePosition"/>.</param>
-        /// <remarks>
-        /// Collects context options from all <see cref="ISOSPrefab"/> instances whose
-        /// <see cref="ISOSPrefab.PrefabType"/> is assignable from <paramref name="target"/>'s type,
-        /// then creates a <see cref="GUIContextMenu"/> with those options.
-        /// Returns immediately if no options are available.
-        /// </remarks>
-        public static void OpenContextMenu(Prefab target, Vector2? position = null)
-        {
-            if (target == null) return;
-            var options = API.GetAllPrefabProviders()
-                .Where(p => p.PrefabType.IsAssignableFrom(target.GetType()))
-                .SelectMany(p => p.BuildContextOptions(target))
-                .ToList();
-            if (options.Count == 0) return;
-            RichString name = target.Name();
-            _ = GUIContextMenu.CreateContextMenu(position ?? PlayerInput.MousePosition, name, null, [.. options]);
-        }
 
         #region XML
 

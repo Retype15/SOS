@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
 using SOS.GUI;
+using SOS.Profiles;
 
 namespace SOS.StatsInfo
 {
@@ -16,7 +17,7 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 0)]
     public class GeneralStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab)
         {
             if (prefab == null) return false;
 
@@ -37,7 +38,7 @@ namespace SOS.StatsInfo
                 {
                     string cargoBox = item.ConfigElement.GetAttributeString("cargocontaineridentifier", "");
                     if (!string.IsNullOrEmpty(cargoBox))
-                        l.SelectorRow(Texts.Get("sos.item.cargo_box", "Cargo Box:").Value, [cargoBox], onPrimary: onPrimary, onSecondary: onSecondary, onSearchFilter: API.SetSearchFilter);
+                        l.SelectorRow(Texts.Get("sos.item.cargo_box", "Cargo Box:").Value, [cargoBox], onPrimary: ProfileHelper.OnPrimary, onSecondary: ProfileHelper.OnSecondary, onSearchFilter: API.SetSearchFilter);
 
                     var hazards = new List<string>();
                     foreach (var child in item.ConfigElement.Descendants())
@@ -60,17 +61,10 @@ namespace SOS.StatsInfo
                 float baseHealCost = aff.BaseHealCost;
                 float healMultiplier = aff.HealCostMultiplier;
                 float medSkillGain = aff.MedicalSkillGain;
+                string causeOfDeath = aff.CauseOfDeathDescription.Value;
 
-                float activationThreshold = 0f;
-                float treatmentThreshold = 0f;
-                string causeOfDeath = "";
-
-                if (aff.configElement != null)
-                {
-                    activationThreshold = aff.configElement.GetAttributeFloat("activationthreshold", 0f);
-                    treatmentThreshold = aff.configElement.GetAttributeFloat("treatmentthreshold", 0f);
-                    causeOfDeath = aff.configElement.GetAttributeString("causeofdeathdescription", "");
-                }
+                float activationThreshold = aff.ActivationThreshold;
+                float treatmentThreshold = aff.TreatmentThreshold;
 
                 l.Row(Texts.Get("sos.affliction.classification", "Classification:").Value, isBuff ? Texts.Get("sos.affliction.buff", "Buff").Value : Texts.Get("sos.affliction.debuff", "Debuff").Value, isBuff ? Color.LightGreen : Color.Salmon);
                 l.BadgeRow(Texts.Get("sos.affliction.type", "Type:").Value, [aff.AfflictionType.ToString()], filterPrefix: '#', onSearchFilter: API.SetSearchFilter);
@@ -100,7 +94,7 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 1)]
     public class EconomyStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab)
         {
             if (prefab is not ItemPrefab item) return false;
 
@@ -144,7 +138,7 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 2)]
     public class WeaponStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab)
         {
             if (prefab is not ItemPrefab item || item.ConfigElement == null) return false;
 
@@ -288,7 +282,7 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 3)]
     public class EquipmentStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab)
         {
             if (prefab is not ItemPrefab item) return false;
 
@@ -397,7 +391,7 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 4)]
     public class MedicalStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab)
         {
             if (prefab is not ItemPrefab item || item.ConfigElement == null) return false;
 
@@ -533,7 +527,7 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 5)]
     public class UtilityStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab)
         {
             if (prefab is not ItemPrefab item || item.ConfigElement == null) return false;
 
@@ -571,7 +565,7 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 6)]
     public class ContainerStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab)
         {
             if (prefab is not ItemPrefab item) return false;
 
@@ -645,7 +639,7 @@ namespace SOS.StatsInfo
 
                     API.SetSearchFilter,
                     Texts.Get("sos.container.accepts", "Accepts:").Value,
-                    acceptedTags, compatibleItems, onPrimary, onSecondary);
+                    acceptedTags, compatibleItems, ProfileHelper.OnPrimary, ProfileHelper.OnSecondary);
             }
 
             if (spawnLocations.Count > 0)
@@ -660,7 +654,7 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 7)]
     public class AfflictionEffectsStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab)
         {
             if (prefab is not AfflictionPrefab aff || aff.configElement == null) return false;
 
@@ -781,8 +775,8 @@ namespace SOS.StatsInfo
                             phase.LinkedAfflictions.Select(a => a.ID),
                             phase.LinkedAfflictions.Select(a => a.Name.SetColor(a.Theme)),
                             fallbackFilterPrefix: '!',
-                            onPrimary: onPrimary,
-                            onSecondary: onSecondary,
+                            onPrimary: ProfileHelper.OnPrimary,
+                            onSecondary: ProfileHelper.OnSecondary,
                             onSearchFilter: API.SetSearchFilter);
                     }
 
@@ -807,8 +801,8 @@ namespace SOS.StatsInfo
                             phase.LinkedAfflictions.Select(a => a.ID),
                             phase.LinkedAfflictions.Select(a => a.Name.SetColor(a.Theme)),
                             fallbackFilterPrefix: '!',
-                            onPrimary: onPrimary,
-                            onSecondary: onSecondary,
+                            onPrimary: ProfileHelper.OnPrimary,
+                            onSecondary: ProfileHelper.OnSecondary,
                             onSearchFilter: API.SetSearchFilter);
                     }
                     l.RichText(" ");
@@ -878,7 +872,7 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 8)]
     public class AfflictionTreatmentStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab)
         {
             if (prefab is not AfflictionPrefab affliction) return false;
 
@@ -937,8 +931,8 @@ namespace SOS.StatsInfo
 
                 l.SelectorRow(Texts.Get("sos.affliction.blockedby", "Treatment Blocked By:").Value, blockers, displayNames,
                     fallbackFilterPrefix: '!',
-                    onPrimary: onPrimary,
-                    onSecondary: onSecondary,
+                    onPrimary: ProfileHelper.OnPrimary,
+                    onSecondary: ProfileHelper.OnSecondary,
                     onSearchFilter: API.SetSearchFilter);
             }
 
@@ -952,8 +946,8 @@ namespace SOS.StatsInfo
                 l.SelectorRow(label, ids, names,
                     fallbackFilterPrefix: '!',
                     labelColor: labelColor,
-                    onPrimary: onPrimary,
-                    onSecondary: onSecondary,
+                    onPrimary: ProfileHelper.OnPrimary,
+                    onSecondary: ProfileHelper.OnSecondary,
                     onSearchFilter: API.SetSearchFilter);
             }
 
@@ -974,7 +968,7 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 9)]
     public class DescriptionStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public bool Draw(GUIListBox contentPanel, Prefab prefab)
         {
             string? text = prefab switch
             {

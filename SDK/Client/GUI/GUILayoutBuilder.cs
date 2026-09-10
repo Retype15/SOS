@@ -57,7 +57,7 @@ namespace SOS.GUI
         /// The <paramref name="rectT"/> becomes the root container for all components added through
         /// the returned builder instance.
         /// </remarks>
-        internal GUILayoutBuilder(RectTransform rectT) : base(rectT) { }
+        public GUILayoutBuilder(RectTransform rectT) : base(rectT) { }
 
         /// <summary>
         /// Adds a header text block with the specified title and color.

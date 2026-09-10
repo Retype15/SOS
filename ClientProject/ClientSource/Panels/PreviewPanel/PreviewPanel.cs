@@ -54,7 +54,7 @@ namespace SOS.Panels.PreviewPanel
                 });
         }
 
-        public void Show(Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public void Show(Prefab prefab)
         {
             if (_container == null) return;
             _container.Visible = true;

@@ -121,7 +121,7 @@ namespace SOS
     ///     public string TabName => "DETAILS";
     ///     public bool CanHandle(SubmarineInfo sub) => sub != null;
     ///     public void Init(GUIComponent container) { /* Build persistent frame */ }
-    ///     public void Show(SubmarineInfo sub, Action&lt;SubmarineInfo&gt; onPrimary, Action&lt;SubmarineInfo&gt; onSecondary) { /* Draw sub stats */ }
+    ///     public void Show(SubmarineInfo sub) { /* Draw sub stats */ }
     ///     public void Hide() { /* Hide frame */ }
     /// }
     /// </code>
@@ -157,9 +157,7 @@ namespace SOS
         /// Populates or updates the tab's visual content for the active <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entity to inspect and visualize.</param>
-        /// <param name="onPrimary">Callback invoked when a related entity is primary-clicked (e.g., navigating to an ingredient).</param>
-        /// <param name="onSecondary">Callback invoked when a related entity is secondary-clicked (e.g., opening its context menu).</param>
-        void Show(T item, Action<T> onPrimary, Action<T> onSecondary);
+        void Show(T item);
 
         /// <summary>
         /// Hides the tab UI when another tab becomes active.
@@ -184,8 +182,7 @@ namespace SOS
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Zero-Allocation Stateless Architecture:</b> Implementations must be <b>100% stateless</b>. Instances are cached as reusable
-    /// services in the SDK registry; therefore, implementations must not store per-prefab analysis data in class fields.
+    /// Instances are cached as reusable services in the SDK registry.
     /// All parsing, filtering, and visual row construction must occur locally within <see cref="Draw"/>.
     /// </para>
     /// <para>
@@ -201,7 +198,7 @@ namespace SOS
     /// [AutoRegister(order: 2.0)]
     /// public class RadiationStatInfo : ISOSStatInfo
     /// {
-    ///     public bool Draw(GUIListBox contentPanel, Prefab prefab, Action&lt;Prefab&gt; onPrimary, Action&lt;Prefab&gt; onSecondary)
+    ///     public bool Draw(GUIListBox contentPanel, Prefab prefab)
     ///     {
     ///         if (prefab is not ItemPrefab item || !item.Tags.Contains("radioactive"))
     ///             return false;
@@ -221,10 +218,8 @@ namespace SOS
         /// </summary>
         /// <param name="contentPanel">The parent list box container where layout components will be added.</param>
         /// <param name="prefab">The target entity currently being inspected.</param>
-        /// <param name="onPrimary">Callback invoked when a referenced prefab is left-clicked (e.g., selecting a required item or treatment).</param>
-        /// <param name="onSecondary">Callback invoked when a referenced prefab is right-clicked (e.g., opening a contextual action menu).</param>
         /// <returns><c>true</c> if the section was applicable and visual elements were added; otherwise, <c>false</c>.</returns>
-        bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
+        bool Draw(GUIListBox contentPanel, Prefab prefab);
     }
 
     /// <summary>
