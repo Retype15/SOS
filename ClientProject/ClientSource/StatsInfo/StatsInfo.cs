@@ -84,7 +84,7 @@ namespace SOS.StatsInfo
                     l.Row(Texts.Get("sos.affliction.indicator_limb", "Indicator Limb:").Value, aff.IndicatorLimb.ToString(), Color.Gray);
 
                 if (!string.IsNullOrEmpty(causeOfDeath))
-                    l.RichText($"{Texts.Get("sos.affliction.death_cause", "Death Cause:").Value} {causeOfDeath}".SetColor(Color.Crimson));
+                    l.Text($"{Texts.Get("sos.affliction.death_cause", "Death Cause:").Value} {causeOfDeath}".SetColor(Color.Crimson).Rich());
             }
         }
     }
@@ -743,24 +743,24 @@ namespace SOS.StatsInfo
 
                 foreach (var phase in phases)
                 {
-                    l.RichText($"{Texts.Get("sos.affliction.strength_range", "Strength Range:").Value} {phase.Range.SetColor(Color.Orange)}");
+                    l.Text($"{Texts.Get("sos.affliction.strength_range", "Strength Range:").Value} {phase.Range.SetColor(Color.Orange)}".Rich());
 
                     if (phase.StrengthChange != 0)
                     {
                         string trend = phase.StrengthChange > 0
                             ? $"{Texts.Get("sos.affliction.worsens", "Worsens:").Value} +{phase.StrengthChange}/s".SetColor(Color.Salmon)
                             : $"{Texts.Get("sos.affliction.natural_healing", "Natural Healing:").Value} {phase.StrengthChange}/s".SetColor(Color.LightGreen);
-                        l.RichText($"  -> {trend}");
+                        l.Text($"  -> {trend}".Rich());
                     }
 
                     if (phase.Stats.Count > 0)
-                        l.RichText($"  -> {string.Join(" | ", phase.Stats)}");
+                        l.Text($"  -> {string.Join(" | ", phase.Stats)}".Rich());
 
                     if (phase.Resistances.Count > 0)
-                        l.RichText($"  -> {Texts.Get("sos.affliction.resistances", "Resistances:").Value} {string.Join(" | ", phase.Resistances)}");
+                        l.Text($"  -> {Texts.Get("sos.affliction.resistances", "Resistances:").Value} {string.Join(" | ", phase.Resistances)}".Rich());
 
                     if (phase.Events.Count > 0)
-                        l.RichText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
+                        l.Text($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}".Rich());
 
                     if (phase.LinkedAfflictions.Count > 0)
                     {
@@ -773,7 +773,7 @@ namespace SOS.StatsInfo
                             onSearchFilter: API.SetSearchFilter);
                     }
 
-                    l.RichText(" ");
+                    l.Separator();
                 }
             }
 
@@ -783,10 +783,10 @@ namespace SOS.StatsInfo
                 l.Header(Texts.Get("sos.affliction.periodic_header", "PERIODIC EVENTS").Value, Color.MediumPurple);
                 foreach (var phase in periodicPhases)
                 {
-                    l.RichText($"{Texts.Get("sos.affliction.frequency", "Frequency:").Value} {phase.Range.SetColor(Color.Cyan)}");
+                    l.Text($"{Texts.Get("sos.affliction.frequency", "Frequency:").Value} {phase.Range.SetColor(Color.Cyan)}".Rich());
 
                     if (phase.Events.Count > 0)
-                        l.RichText($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}");
+                        l.Text($"  -> {string.Join(", ", phase.Events).SetColor(Color.MediumPurple)}".Rich());
 
                     if (phase.LinkedAfflictions.Count > 0)
                     {
@@ -798,7 +798,7 @@ namespace SOS.StatsInfo
                             onSecondary: ProfileHelper.OnSecondary,
                             onSearchFilter: API.SetSearchFilter);
                     }
-                    l.RichText(" ");
+                    l.Separator();
                 }
             }
         }
@@ -949,7 +949,7 @@ namespace SOS.StatsInfo
 
             if (harmful.Count > 0)
             {
-                l.RichText(Texts.Get("sos.affliction.contraindicated_warn", "WARNING: The following items worsen the condition!").Value.SetColor(Color.Salmon));
+                l.Text(Texts.Get("sos.affliction.contraindicated_warn", "WARNING: The following items worsen the condition!").Value.SetColor(Color.Salmon).Rich());
                 DrawRow(Texts.Get("sos.affliction.contraindicated", "Contraindicated:").Value, harmful, labelColor: Color.Salmon);
             }
         }
@@ -972,7 +972,7 @@ namespace SOS.StatsInfo
 
             using var l = new GUILayoutBuilder(rectT);
             l.Header(Texts.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
-            l.RichText(RichString.Rich(text));
+            l.Text(text.Rich());
         }
     }
 }

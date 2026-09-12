@@ -370,11 +370,11 @@ namespace SOS.GUI
         /// The block height auto-adjusts to fit the text content with 10 pixels of vertical padding.
         /// The block listens to <see cref="RectTransform.SizeChanged"/> to recalculate height dynamically.
         /// </remarks>
-        public GUITextBlock? RichText(RichString text)
+        public GUITextBlock? Text(RichString text)
         {
             if (text.IsNullOrEmpty()) return null;
 
-            var block = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), RectTransform), RichString.Rich(text), font: GUIStyle.SmallFont, wrap: true, textAlignment: Alignment.Left)
+            var block = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), RectTransform), text, font: GUIStyle.SmallFont, wrap: true, textAlignment: Alignment.Left)
             {
                 CanBeFocused = false
             };
