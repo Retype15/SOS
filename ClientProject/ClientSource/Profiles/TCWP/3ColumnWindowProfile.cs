@@ -253,20 +253,7 @@ namespace SOS.Profiles.TCWP
 
             ProfileHelper.UpdateTabWidget(centerTabWidget, target);
 
-            bool hasDrawed = false;
-
-            foreach (var section in API.GetAllStatInfo())
-            {
-                try
-                {
-                    hasDrawed |= section.Draw(metaPanel, target);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError($"[SOS] Exception in section '{section.GetType().FullOrName()}': {ex.Message}");
-                    continue;
-                }
-            }
+            ProfileHelper.BuildStatSections(metaPanel, target);
 
             if (xmlContentText != null)
                 xmlContentText.Text = ProfileHelper.GetRawXMLSafe(target).FormatToXMLCode();

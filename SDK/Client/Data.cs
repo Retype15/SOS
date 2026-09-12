@@ -188,8 +188,8 @@ namespace SOS
     /// <para>
     /// <b>Rendering Pipeline:</b> When the player selects a prefab, the active window profile iterates all active sections:
     /// <list type="bullet">
-    /// <item><description>If the prefab contains relevant data (e.g., medical treatments, weapon stats, container capacities), the section renders rows into <c>contentPanel</c> using <see cref="GUI.GUILayoutBuilder"/> and returns <c>true</c>.</description></item>
-    /// <item><description>If the prefab is not applicable, the section returns <c>false</c> immediately without appending any empty frames or layout dividers.</description></item>
+    /// <item><description>If the prefab contains relevant data (e.g., medical treatments, weapon stats, container capacities), the section renders rows into <c>rectT</c> using <see cref="GUI.GUILayoutBuilder"/>.</description></item>
+    /// <item><description>If the prefab is not applicable, the section draws nothing: no empty frames or layout dividers.</description></item>
     /// </list>
     /// </para>
     /// </remarks>
@@ -198,15 +198,14 @@ namespace SOS
     /// [AutoRegister(order: 2.0)]
     /// public class RadiationStatInfo : ISOSStatInfo
     /// {
-    ///     public bool Draw(GUIListBox contentPanel, Prefab prefab)
+    ///     public void Draw(RectTransform rectT, Prefab prefab)
     ///     {
     ///         if (prefab is not ItemPrefab item || !item.Tags.Contains("radioactive"))
-    ///             return false;
+    ///             return;
     ///
-    ///         using var l = new GUILayoutBuilder(contentPanel);
+    ///         using var l = new GUILayoutBuilder(rectT);
     ///         l.Header("RADIATION HAZARD", Color.GreenYellow);
     ///         l.Row("Radiation Output:", "High", Color.Red);
-    ///         return true;
     ///     }
     /// }
     /// </code>
@@ -214,12 +213,11 @@ namespace SOS
     public interface ISOSStatInfo
     {
         /// <summary>
-        /// Analyzes the specified <paramref name="prefab"/> and appends visual layout rows into <paramref name="contentPanel"/> if applicable.
+        /// Analyzes the specified <paramref name="prefab"/> and appends visual layout rows into <paramref name="rectT"/> if applicable.
         /// </summary>
-        /// <param name="contentPanel">The parent list box container where layout components will be added.</param>
+        /// <param name="rectT">Dedicated layout space provided by the host for this section. Build a <see cref="GUI.GUILayoutBuilder"/> on it; draw nothing when not applicable.</param>
         /// <param name="prefab">The target entity currently being inspected.</param>
-        /// <returns><c>true</c> if the section was applicable and visual elements were added; otherwise, <c>false</c>.</returns>
-        bool Draw(GUIListBox contentPanel, Prefab prefab);
+        void Draw(RectTransform rectT, Prefab prefab);
     }
 
     /// <summary>

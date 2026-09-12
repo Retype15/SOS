@@ -17,11 +17,11 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 0)]
     public class GeneralStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab)
+        public void Draw(RectTransform rectT, Prefab prefab)
         {
-            if (prefab == null) return false;
+            if (prefab == null) return;
 
-            using var l = new GUILayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(rectT);
             l.Header(Texts.Get("sos.window.section_general", "GENERAL").Value, Color.Gold);
 
             l.BadgeRow(Texts.Get("sos.item.id", "ID:").Value, [prefab.Identifier.Value], filterPrefix: '!', onSearchFilter: API.SetSearchFilter);
@@ -86,7 +86,6 @@ namespace SOS.StatsInfo
                 if (!string.IsNullOrEmpty(causeOfDeath))
                     l.RichText($"{Texts.Get("sos.affliction.death_cause", "Death Cause:").Value} {causeOfDeath}".SetColor(Color.Crimson));
             }
-            return true;
         }
     }
 
@@ -94,12 +93,12 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 1)]
     public class EconomyStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab)
+        public void Draw(RectTransform rectT, Prefab prefab)
         {
-            if (prefab is not ItemPrefab item) return false;
+            if (prefab is not ItemPrefab item) return;
 
             var priceInfo = item.DefaultPrice;
-            if (priceInfo == null) return false;
+            if (priceInfo == null) return;
 
             int price = priceInfo.Price;
             bool canBuy = item.CanBeBought;
@@ -107,9 +106,9 @@ namespace SOS.StatsInfo
             int minDifficulty = priceInfo.MinLevelDifficulty;
             Identifier requiredFaction = priceInfo.RequiredFaction;
 
-            if (price <= 0 && !canBuy) return false;
+            if (price <= 0 && !canBuy) return;
 
-            using var l = new GUILayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(rectT);
             l.Header(Texts.Get("sos.window.section_economy", "ECONOMY").Value, Color.Gold);
 
             l.Row(Texts.Get("sos.item.base_price", "Base Price:").Value, $"{price} mk", Color.Yellow);
@@ -130,7 +129,6 @@ namespace SOS.StatsInfo
                 string factionName = TextManager.Get("FactionName." + requiredFaction).Fallback(requiredFaction.Value).Value;
                 l.BadgeRow(Texts.Get("sos.item.required_faction", "Required Faction:").Value, [factionName], onSearchFilter: API.SetSearchFilter);
             }
-            return true;
         }
     }
 
@@ -138,9 +136,9 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 2)]
     public class WeaponStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab)
+        public void Draw(RectTransform rectT, Prefab prefab)
         {
-            if (prefab is not ItemPrefab item || item.ConfigElement == null) return false;
+            if (prefab is not ItemPrefab item || item.ConfigElement == null) return;
 
             float penetration = 0f;
             int maxTargets = 1;
@@ -222,9 +220,9 @@ namespace SOS.StatsInfo
             }
 
             if (afflictions.Count == 0 && penetration <= 0 && structureDamage <= 0 && itemDamage <= 0 && reload <= 0 && !isThrowable && explosionRange <= 0)
-                return false;
+                return;
 
-            using var l = new GUILayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(rectT);
             l.Header(Texts.Get("sos.window.section_weapon", "AS WEAPON").Value, Color.Gold);
 
             if (reload > 0) l.Row(isAutomatic ? Texts.Get("sos.weapon.fire_rate", "Fire Rate:").Value : Texts.Get("sos.weapon.reload", "Reload:").Value, $"{reload}s", Color.Cyan);
@@ -251,7 +249,6 @@ namespace SOS.StatsInfo
 
                 l.BadgeRow(label, ids, displayNames, linkColor: Color.Salmon, onSearchFilter: API.SetSearchFilter);
             }
-            return true;
         }
 
         private class AfflictionData
@@ -282,9 +279,9 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 3)]
     public class EquipmentStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab)
+        public void Draw(RectTransform rectT, Prefab prefab)
         {
-            if (prefab is not ItemPrefab item) return false;
+            if (prefab is not ItemPrefab item) return;
 
             var equipSlots = new List<string>();
             var statModifiers = new List<string>();
@@ -349,9 +346,9 @@ namespace SOS.StatsInfo
             }
 
             if (equipSlots.Count == 0 && statModifiers.Count == 0 && aggregatedResistances.Count == 0 && maxPressure <= 0 && durability <= 0)
-                return false;
+                return;
 
-            using var l = new GUILayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(rectT);
             l.Header(Texts.Get("sos.window.section_equipment", "EQUIPMENT").Value, Color.Gold);
 
             if (durability > 0)
@@ -383,7 +380,6 @@ namespace SOS.StatsInfo
 
                 l.BadgeRow(Texts.Get("sos.equip.equips_in", "Equips In:").Value, uniqueSlots, filterPrefix: '&', onSearchFilter: API.SetSearchFilter);
             }
-            return true;
         }
     }
 
@@ -391,9 +387,9 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 4)]
     public class MedicalStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab)
+        public void Draw(RectTransform rectT, Prefab prefab)
         {
-            if (prefab is not ItemPrefab item || item.ConfigElement == null) return false;
+            if (prefab is not ItemPrefab item || item.ConfigElement == null) return;
 
             int medicalSkillReq = 0;
             var suitableTreatments = new List<(string Identifier, string DisplayName)>();
@@ -464,9 +460,9 @@ namespace SOS.StatsInfo
             }
 
             if (suitableTreatments.Count == 0 && alwaysHeals.Count == 0 && successHeals.Count == 0 && alwaysCauses.Count == 0 && successCauses.Count == 0)
-                return false;
+                return;
 
-            using var l = new GUILayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(rectT);
             l.Header(Texts.Get("sos.window.section_medical", "MEDICAL").Value, Color.Gold);
 
             if (medicalSkillReq > 0)
@@ -501,7 +497,6 @@ namespace SOS.StatsInfo
 
             DrawHyperlinkEffect(Texts.Get("sos.med.failure_heals", "On Failure Heals:").Value, failureHeals, Color.DarkSeaGreen);
             DrawHyperlinkEffect(Texts.Get("sos.med.failure_causes", "On Failure Applies:").Value, failureCauses, Color.Crimson);
-            return true;
         }
 
         private static void AddStat(Dictionary<string, (string Name, float Amount)> dict, string id, string name, float amount)
@@ -527,9 +522,9 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 5)]
     public class UtilityStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab)
+        public void Draw(RectTransform rectT, Prefab prefab)
         {
-            if (prefab is not ItemPrefab item || item.ConfigElement == null) return false;
+            if (prefab is not ItemPrefab item || item.ConfigElement == null) return;
 
             var deviceProperties = new Dictionary<string, string>();
 
@@ -550,14 +545,13 @@ namespace SOS.StatsInfo
                     deviceProperties[Texts.Get("sos.util.sonar_range", "Sonar Range").Value] = child.GetAttributeFloat("range", 0).ToMeters();
             }
 
-            if (deviceProperties.Count == 0) return false;
+            if (deviceProperties.Count == 0) return;
 
-            using var l = new GUILayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(rectT);
             l.Header(Texts.Get("sos.window.section_utility", "UTILITY").Value, Color.Gold);
 
             foreach (var prop in deviceProperties)
                 l.Row(prop.Key + ":", prop.Value, Color.Cyan);
-            return true;
         }
     }
 
@@ -565,9 +559,9 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 6)]
     public class ContainerStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab)
+        public void Draw(RectTransform rectT, Prefab prefab)
         {
-            if (prefab is not ItemPrefab item) return false;
+            if (prefab is not ItemPrefab item) return;
 
             string capacity = "";
             var acceptedTags = new HashSet<string>();
@@ -622,9 +616,9 @@ namespace SOS.StatsInfo
             }
 
             if (string.IsNullOrEmpty(capacity) && compatibleItems.Count == 0 && spawnLocations.Count == 0)
-                return false;
+                return;
 
-            using var l = new GUILayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(rectT);
             l.Header(Texts.Get("sos.window.section_container", "CONTAINER").Value, Color.Gold);
 
             if (!string.IsNullOrEmpty(capacity))
@@ -635,7 +629,7 @@ namespace SOS.StatsInfo
 
             if (compatibleItems.Count > 0)
             {
-                _ = new GUIDesplegableBox(new RectTransform(new Vector2(1f, 0f), contentPanel.Content.RectTransform) { MinSize = new Point(0, 24) },
+                _ = new GUIDesplegableBox(new RectTransform(new Vector2(1f, 0f), rectT) { MinSize = new Point(0, 24) },
 
                     API.SetSearchFilter,
                     Texts.Get("sos.container.accepts", "Accepts:").Value,
@@ -646,7 +640,6 @@ namespace SOS.StatsInfo
             {
                 l.BadgeRow(Texts.Get("sos.container.contained", "Contained by:").Value, spawnLocations, onSearchFilter: API.SetSearchFilter);
             }
-            return true;
         }
     }
 
@@ -654,9 +647,9 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 7)]
     public class AfflictionEffectsStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab)
+        public void Draw(RectTransform rectT, Prefab prefab)
         {
-            if (prefab is not AfflictionPrefab aff || aff.configElement == null) return false;
+            if (prefab is not AfflictionPrefab aff || aff.configElement == null) return;
 
             var phases = new List<PhaseData>();
             var periodicPhases = new List<PhaseData>();
@@ -741,11 +734,11 @@ namespace SOS.StatsInfo
             }
 
             if (phases.Count == 0 && periodicPhases.Count == 0)
-                return false;
+                return;
 
             if (phases.Count > 0)
             {
-                using var l = new GUILayoutBuilder(contentPanel);
+                using var l = new GUILayoutBuilder(rectT);
                 l.Header(Texts.Get("sos.affliction.effects_header", "EFFECTS BY STRENGTH PHASE").Value, Color.Gold);
 
                 foreach (var phase in phases)
@@ -786,7 +779,7 @@ namespace SOS.StatsInfo
 
             if (periodicPhases.Count > 0)
             {
-                using var l = new GUILayoutBuilder(contentPanel);
+                using var l = new GUILayoutBuilder(rectT);
                 l.Header(Texts.Get("sos.affliction.periodic_header", "PERIODIC EVENTS").Value, Color.MediumPurple);
                 foreach (var phase in periodicPhases)
                 {
@@ -808,7 +801,6 @@ namespace SOS.StatsInfo
                     l.RichText(" ");
                 }
             }
-            return true;
         }
 
         private class PhaseData
@@ -872,9 +864,9 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 8)]
     public class AfflictionTreatmentStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab)
+        public void Draw(RectTransform rectT, Prefab prefab)
         {
-            if (prefab is not AfflictionPrefab affliction) return false;
+            if (prefab is not AfflictionPrefab affliction) return;
 
             var highEff = new List<ItemPrefab>();
             var medEff = new List<ItemPrefab>();
@@ -919,9 +911,9 @@ namespace SOS.StatsInfo
             }
 
             if (highEff.Count == 0 && medEff.Count == 0 && lowEff.Count == 0 && harmful.Count == 0 && blockers.Count == 0)
-                return false;
+                return;
 
-            using var l = new GUILayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(rectT);
             l.Header(Texts.Get("sos.window.section_treatments", "TREATMENTS & MEDICATION").Value, Color.SpringGreen);
 
             if (blockers.Count > 0)
@@ -960,7 +952,6 @@ namespace SOS.StatsInfo
                 l.RichText(Texts.Get("sos.affliction.contraindicated_warn", "WARNING: The following items worsen the condition!").Value.SetColor(Color.Salmon));
                 DrawRow(Texts.Get("sos.affliction.contraindicated", "Contraindicated:").Value, harmful, labelColor: Color.Salmon);
             }
-            return true;
         }
     }
 
@@ -968,7 +959,7 @@ namespace SOS.StatsInfo
     [AutoRegister(order: 9)]
     public class DescriptionStatInfo : ISOSStatInfo
     {
-        public bool Draw(GUIListBox contentPanel, Prefab prefab)
+        public void Draw(RectTransform rectT, Prefab prefab)
         {
             string? text = prefab switch
             {
@@ -977,12 +968,11 @@ namespace SOS.StatsInfo
                 _ => null
             };
 
-            if (string.IsNullOrEmpty(text)) return false;
+            if (string.IsNullOrEmpty(text)) return;
 
-            using var l = new GUILayoutBuilder(contentPanel);
+            using var l = new GUILayoutBuilder(rectT);
             l.Header(Texts.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
             l.RichText(RichString.Rich(text));
-            return true;
         }
     }
 }

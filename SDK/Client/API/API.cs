@@ -539,6 +539,10 @@ namespace SOS
 
         #region Event Helpers
 
+        /// <summary>
+        /// Requests the active window profile to populate the search box with the given filter token.
+        /// </summary>
+        /// <param name="tag">The search token (e.g. <c>"#Medical"</c>, <c>"$surgery"</c> or <c>"@Vanilla"</c>).</param>
         public static void SetSearchFilter(string tag) => API.Emit(CommKeys.SetSearchFilter, tag);
 
         #endregion

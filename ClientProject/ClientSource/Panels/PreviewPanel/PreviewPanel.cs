@@ -48,8 +48,8 @@ namespace SOS.Panels.PreviewPanel
                     if (sprite == null) return;
                     Vector2 center = comp.Rect.Location.ToVector2() + comp.Rect.Size.ToVector2() * 0.5f;
                     float scale = Math.Min(
-                        comp.Rect.Width / (float)sprite.SourceRect.Width,
-                        comp.Rect.Height / (float)sprite.SourceRect.Height) * 0.85f;
+                        comp.Rect.Width / sprite.SourceRect.Width,
+                        comp.Rect.Height / sprite.SourceRect.Height) * 0.85f;
                     sb.Draw(sprite.Texture, center, sprite.SourceRect, Color.White, 0f, new Vector2(sprite.SourceRect.Width * 0.5f, sprite.SourceRect.Height * 0.5f), scale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0f);
                 });
         }

@@ -525,14 +525,14 @@ namespace SOS.Profiles
         /// Selects the target prefab on primary action.
         /// </summary>
         /// <param name="p">The prefab to select.</param>
-        /// <seealso cref="SelectTarget"/>
+        /// <seealso cref="Prefabs.PrefabHelper.SelectTarget"/>
         public static void OnPrimary(Prefab p) => Prefabs.PrefabHelper.SelectTarget(p);
 
         /// <summary>
         /// Opens the context menu on secondary action.
         /// </summary>
         /// <param name="p">The prefab to open context menu for.</param>
-        /// <seealso cref="OpenContextMenu"/>
+        /// <seealso cref="Prefabs.PrefabHelper.OpenContextMenu"/>
         public static void OnSecondary(Prefab p) => Prefabs.PrefabHelper.OpenContextMenu(p);
 
         /// <summary>
@@ -540,8 +540,6 @@ namespace SOS.Profiles
         /// </summary>
         /// <param name="parent">The parent rectangle transform.</param>
         /// <param name="tabs">The tabs to register in the widget.</param>
-        /// <param name="onPrimary">Optional primary action handler. Defaults to <see cref="OnPrimary"/>.</param>
-        /// <param name="onSecondary">Optional secondary action handler. Defaults to <see cref="OnSecondary"/>.</param>
         /// <returns>The created <see cref="GUITab{Prefab}"/> widget.</returns>
         /// <remarks>
         /// Registers each <paramref name="tabs"/> and sets <see cref="GUITab{Prefab}.OnTabSelected"/>
@@ -592,6 +590,75 @@ namespace SOS.Profiles
                 if (widget.TrySelectTab(id)) break;
         }
 
+        #region StatSection Helper
+
+        /// <summary>
+        /// Draws every active stat section into the given list box for the specified target.
+        /// </summary>
+        /// <param name="listBox">The list box whose content hosts the sections.</param>
+        /// <param name="target">The prefab being inspected.</param>
+        /// <param name="drawSection">Optional per-section draw policy. If null, <see cref="AddStatSection"/> is used.</param>
+        /// <returns><c>true</c> if at least one section drew content; otherwise, <c>false</c>.</returns>
+        public static bool BuildStatSections(GUIListBox listBox, Prefab target, Func<RectTransform, ISOSStatInfo, Prefab, bool>? drawSection = null)
+            => BuildStatSections(listBox.Content.RectTransform, target, drawSection);
+
+        /// <summary>
+        /// Draws every active stat section into the given container for the specified target.
+        /// </summary>
+        /// <param name="parent">The container transform hosting one wrapper per section. Suitable for any layout, not just list boxes.</param>
+        /// <param name="target">The prefab being inspected.</param>
+        /// <param name="drawSection">Optional per-section draw policy. If null, <see cref="AddStatSection"/> is used. Custom policies must not leave bare <see cref="Barotrauma.RectTransform"/>s.</param>
+        /// <returns><c>true</c> if at least one section drew content; otherwise, <c>false</c>.</returns>
+        public static bool BuildStatSections(RectTransform parent, Prefab target, Func<RectTransform, ISOSStatInfo, Prefab, bool>? drawSection = null)
+        {
+            drawSection ??= AddStatSection;
+            int drawn = 0;
+            foreach (var section in API.GetAllStatInfo())
+            {
+                try
+                {
+                    if (drawSection(parent, section, target)) drawn++;
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError($"[SOS] Custom drawSection failed for '{section.GetType().FullOrName()}': {ex.Message}");
+                    continue;
+                }
+            }
+            Logger.LogDebug($"Drawed {drawn} 'ISOSStatInfo'.", level: LogLevel.Trace);
+            return drawn > 0;
+        }
+
+        /// <summary>
+        /// Draws a single stat section into a fresh wrapper under the given parent.
+        /// </summary>
+        /// <param name="parent">The container transform for the new wrapper.</param>
+        /// <param name="section">The section to draw.</param>
+        /// <param name="target">The prefab being inspected.</param>
+        /// <returns><c>true</c> if the section added content; otherwise, <c>false</c> (the wrapper is detached).</returns>
+        public static bool AddStatSection(RectTransform parent, ISOSStatInfo section, Prefab target)
+        {
+            var rectT = new RectTransform(new Vector2(1f, 0f), parent, Anchor.TopCenter);
+            try
+            {
+                section.Draw(rectT, target);
+                if (rectT.CountChildren == 0)
+                {
+                    Logger.LogDebug($"'{section.GetType()}' have nothing to draw, removing created RectTransform...", level: LogLevel.Trace);
+                    rectT.Parent = null;
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"[SOS] Exception in section '{section.GetType().FullOrName()}': {ex.Message}");
+                if (rectT.CountChildren == 0) rectT.Parent = null;
+                return false;
+            }
+        }
+
+        #endregion
 
         #region XML
 

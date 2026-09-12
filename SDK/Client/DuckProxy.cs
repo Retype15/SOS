@@ -102,8 +102,14 @@ namespace SOS
         internal override Type HelperType => typeof(THelper);
     }
 
+    /// <summary>
+    /// Exposes the wrapped target of a <see cref="DuckProxy{T}"/>-based adapter.
+    /// </summary>
     public interface IDuckProxy
     {
+        /// <summary>
+        /// Gets the original target object (MoonSharp Lua table or CLR object) wrapped by the proxy.
+        /// </summary>
         public object ProxyTarget { get; }
     }
 
