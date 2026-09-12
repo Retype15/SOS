@@ -136,8 +136,8 @@ namespace SOS.Profiles
 
             navigationHistory = new(new(new(68, 32), parent, isFixedSize: true), history, historyIndex);
 
-            navigationHistory.OnNavigateBack += SelectTarget;
-            navigationHistory.OnNavigateForward += SelectTarget;
+            navigationHistory.OnNavigateBack += Prefabs.PrefabHelper.SelectTarget;
+            navigationHistory.OnNavigateForward += Prefabs.PrefabHelper.SelectTarget;
 
             navigationHistory.OnChangeToolTipBack = static (prefab) =>
             {
@@ -206,19 +206,6 @@ namespace SOS.Profiles
             API.Emit(CommKeys.SelectTarget, item);
         }
 
-        /// <summary>
-        /// Selects a target prefab by emitting <see cref="CommKeys.SelectTarget"/>.
-        /// </summary>
-        /// <param name="target">The prefab target to select, or <c>null</c> to clear selection.</param>
-        /// <remarks>
-        /// Emits <see cref="CommKeys.SelectTarget"/> only if the target differs from the current API state.
-        /// </remarks>
-        public static void SelectTarget(Prefab? target)
-        {
-            var cur = API.GetState<Prefab?>(CommKeys.SelectTarget);
-            if (cur != target)
-                API.Emit(CommKeys.SelectTarget, target);
-        }
 
         /// <summary>
         /// Gets or sets the saved window size for settings.
@@ -538,31 +525,29 @@ namespace SOS.Profiles
         /// Selects the target prefab on primary action.
         /// </summary>
         /// <param name="p">The prefab to select.</param>
-        /// <seealso cref="SelectTarget"/>
-        public static void OnPrimary(Prefab p) => ProfileHelper.SelectTarget(p);
+        /// <seealso cref="Prefabs.PrefabHelper.SelectTarget"/>
+        public static void OnPrimary(Prefab p) => Prefabs.PrefabHelper.SelectTarget(p);
 
         /// <summary>
         /// Opens the context menu on secondary action.
         /// </summary>
         /// <param name="p">The prefab to open context menu for.</param>
-        /// <seealso cref="OpenContextMenu"/>
-        public static void OnSecondary(Prefab p) => ProfileHelper.OpenContextMenu(p);
+        /// <seealso cref="Prefabs.PrefabHelper.OpenContextMenu"/>
+        public static void OnSecondary(Prefab p) => Prefabs.PrefabHelper.OpenContextMenu(p);
 
         /// <summary>
         /// Creates a tab widget for the given tabs.
         /// </summary>
         /// <param name="parent">The parent rectangle transform.</param>
         /// <param name="tabs">The tabs to register in the widget.</param>
-        /// <param name="onPrimary">Optional primary action handler. Defaults to <see cref="OnPrimary"/>.</param>
-        /// <param name="onSecondary">Optional secondary action handler. Defaults to <see cref="OnSecondary"/>.</param>
         /// <returns>The created <see cref="GUITab{Prefab}"/> widget.</returns>
         /// <remarks>
         /// Registers each <paramref name="tabs"/> and sets <see cref="GUITab{Prefab}.OnTabSelected"/>
         /// to push the tab ID onto the history stack.
         /// </remarks>
-        public static GUITab<Prefab> CreateTabWidget(RectTransform parent, IEnumerable<ITab<Prefab>> tabs, Action<Prefab>? onPrimary = null, Action<Prefab>? onSecondary = null)
+        public static GUITab<Prefab> CreateTabWidget(RectTransform parent, IEnumerable<ITab<Prefab>> tabs)
         {
-            var widget = new GUITab<Prefab>(parent, onPrimary ?? OnPrimary, onSecondary ?? OnSecondary);
+            var widget = new GUITab<Prefab>(parent);
             foreach (var tab in tabs)
             {
                 try
@@ -605,28 +590,75 @@ namespace SOS.Profiles
                 if (widget.TrySelectTab(id)) break;
         }
 
+        #region StatSection Helper
+
         /// <summary>
-        /// Opens a context menu for the target prefab.
+        /// Draws every active stat section into the given list box for the specified target.
         /// </summary>
-        /// <param name="target">The prefab to open the context menu for.</param>
-        /// <param name="position">Optional mouse position. Defaults to <see cref="PlayerInput.MousePosition"/>.</param>
-        /// <remarks>
-        /// Collects context options from all <see cref="ISOSPrefab"/> instances whose
-        /// <see cref="ISOSPrefab.PrefabType"/> is assignable from <paramref name="target"/>'s type,
-        /// then creates a <see cref="GUIContextMenu"/> with those options.
-        /// Returns immediately if no options are available.
-        /// </remarks>
-        public static void OpenContextMenu(Prefab target, Vector2? position = null)
+        /// <param name="listBox">The list box whose content hosts the sections.</param>
+        /// <param name="target">The prefab being inspected.</param>
+        /// <param name="drawSection">Optional per-section draw policy. If null, <see cref="AddStatSection"/> is used.</param>
+        /// <returns><c>true</c> if at least one section drew content; otherwise, <c>false</c>.</returns>
+        public static bool BuildStatSections(GUIListBox listBox, Prefab target, Func<RectTransform, ISOSStatInfo, Prefab, bool>? drawSection = null)
+            => BuildStatSections(listBox.Content.RectTransform, target, drawSection);
+
+        /// <summary>
+        /// Draws every active stat section into the given container for the specified target.
+        /// </summary>
+        /// <param name="parent">The container transform hosting one wrapper per section. Suitable for any layout, not just list boxes.</param>
+        /// <param name="target">The prefab being inspected.</param>
+        /// <param name="drawSection">Optional per-section draw policy. If null, <see cref="AddStatSection"/> is used. Custom policies must not leave bare <see cref="Barotrauma.RectTransform"/>s.</param>
+        /// <returns><c>true</c> if at least one section drew content; otherwise, <c>false</c>.</returns>
+        public static bool BuildStatSections(RectTransform parent, Prefab target, Func<RectTransform, ISOSStatInfo, Prefab, bool>? drawSection = null)
         {
-            if (target == null) return;
-            var options = API.GetAllPrefabProviders()
-                .Where(p => p.PrefabType.IsAssignableFrom(target.GetType()))
-                .SelectMany(p => p.BuildContextOptions(target))
-                .ToList();
-            if (options.Count == 0) return;
-            RichString name = target.Name();
-            _ = GUIContextMenu.CreateContextMenu(position ?? PlayerInput.MousePosition, name, null, [.. options]);
+            drawSection ??= AddStatSection;
+            int drawn = 0;
+            foreach (var section in API.GetAllStatInfo())
+            {
+                try
+                {
+                    if (drawSection(parent, section, target)) drawn++;
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError($"[SOS] Custom drawSection failed for '{section.GetType().FullOrName()}': {ex.Message}");
+                    continue;
+                }
+            }
+            Logger.LogDebug($"Drawed {drawn} 'ISOSStatInfo'.", level: LogLevel.Trace);
+            return drawn > 0;
         }
+
+        /// <summary>
+        /// Draws a single stat section into a fresh wrapper under the given parent.
+        /// </summary>
+        /// <param name="parent">The container transform for the new wrapper.</param>
+        /// <param name="section">The section to draw.</param>
+        /// <param name="target">The prefab being inspected.</param>
+        /// <returns><c>true</c> if the section added content; otherwise, <c>false</c> (the wrapper is detached).</returns>
+        public static bool AddStatSection(RectTransform parent, ISOSStatInfo section, Prefab target)
+        {
+            var rectT = new RectTransform(new Vector2(1f, 0f), parent, Anchor.TopCenter);
+            try
+            {
+                section.Draw(rectT, target);
+                if (rectT.CountChildren == 0)
+                {
+                    Logger.LogDebug($"'{section.GetType()}' have nothing to draw, removing created RectTransform...", level: LogLevel.Trace);
+                    rectT.Parent = null;
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"[SOS] Exception in section '{section.GetType().FullOrName()}': {ex.Message}");
+                if (rectT.CountChildren == 0) rectT.Parent = null;
+                return false;
+            }
+        }
+
+        #endregion
 
         #region XML
 

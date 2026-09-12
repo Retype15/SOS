@@ -234,7 +234,7 @@ namespace SOS.Profiles.TCWP
                 {
                     Color = target.IconColor(),
                     CanBeFocused = true,
-                    OnSecondaryClicked = (_, _) => { ProfileHelper.OpenContextMenu(target); return true; }
+                    OnSecondaryClicked = (_, _) => { ProfileHelper.OnSecondary(target); return true; }
                 };
             }
 
@@ -247,26 +247,13 @@ namespace SOS.Profiles.TCWP
                 Wrap = false,
                 AutoScaleHorizontal = true,
                 CanBeFocused = true,
-                OnSecondaryClicked = (_, _) => { ProfileHelper.OpenContextMenu(target); return true; }
+                OnSecondaryClicked = (_, _) => { ProfileHelper.OnSecondary(target); return true; }
             };
 
 
             ProfileHelper.UpdateTabWidget(centerTabWidget, target);
 
-            bool hasDrawed = false;
-
-            foreach (var section in API.GetAllStatInfo())
-            {
-                try
-                {
-                    hasDrawed |= section.Draw(metaPanel, target, ProfileHelper.OnPrimary, ProfileHelper.OnSecondary);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError($"[SOS] Exception in section '{section.GetType().FullOrName()}': {ex.Message}");
-                    continue;
-                }
-            }
+            ProfileHelper.BuildStatSections(metaPanel, target);
 
             if (xmlContentText != null)
                 xmlContentText.Text = ProfileHelper.GetRawXMLSafe(target).FormatToXMLCode();

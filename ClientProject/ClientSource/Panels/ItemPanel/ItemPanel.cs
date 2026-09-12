@@ -23,8 +23,6 @@ namespace SOS.Panels.ItemPanel
         private GUIListBox? _colUsage;
 
         private Prefab? _currentPrefab;
-        private Action<Prefab>? _onPrimary;
-        private Action<Prefab>? _onSecondary;
 
         private static bool needsAnim = true;
 
@@ -35,11 +33,9 @@ namespace SOS.Panels.ItemPanel
             _container = new GUIFrame(new RectTransform(Vector2.One, parentContainer.RectTransform), style: null) { Visible = false };
         }
 
-        public void Show(Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary)
+        public void Show(Prefab prefab)
         {
             _currentPrefab = prefab;
-            _onPrimary = onPrimary;
-            _onSecondary = onSecondary;
 
             if (_container == null || prefab is not ItemPrefab item) return;
             _container.Visible = true;
@@ -54,7 +50,7 @@ namespace SOS.Panels.ItemPanel
                     {
                         if (_container != null && _container.Visible && _currentPrefab != null)
                         {
-                            Show(_currentPrefab, _onPrimary!, _onSecondary!);
+                            Show(_currentPrefab);
                         }
                     });
                 });
@@ -62,6 +58,9 @@ namespace SOS.Panels.ItemPanel
             }
 
             _container.ClearChildren();
+
+            var onPrimary = Profiles.ProfileHelper.OnPrimary;
+            var onSecondary = Profiles.ProfileHelper.OnSecondary;
 
             var recipeSplit = new GUILayoutGroup(new RectTransform(Vector2.One, _container.RectTransform), isHorizontal: true)
             {
@@ -127,7 +126,7 @@ namespace SOS.Panels.ItemPanel
 
                     if (item.RandomDeconstructionOutput) mg.AddCard(new CardBuilder.DeconOutputCard(item, deconList, onPrimary, onSecondary));
                     else foreach (var output in deconList.GroupBy(di => di.ItemIdentifier).Select(g => new { ID = g.Key, Amount = g.Max(di => di.Amount), Weight = g.Sum(di => di.Commonness) }))
-                            mg.AddCard(new CardBuilder.SingleDeconOutputCard(item, output.ID, output.Amount, output.Weight, onPrimary, onSecondary));
+                        mg.AddCard(new CardBuilder.SingleDeconOutputCard(item, output.ID, output.Amount, output.Weight, onPrimary, onSecondary));
                 }
             }
 

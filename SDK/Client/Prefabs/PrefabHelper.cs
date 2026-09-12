@@ -6,6 +6,9 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using Barotrauma;
+using Microsoft.Xna.Framework;
+
 namespace SOS.Prefabs
 {
     /// <summary>
@@ -117,6 +120,43 @@ namespace SOS.Prefabs
         {
             favorites.Clear();
             if (emit) API.Emit(CommKeys.RefreshSearch);
+        }
+
+        /// <summary>
+        /// Selects a target prefab by emitting <see cref="CommKeys.SelectTarget"/>.
+        /// </summary>
+        /// <param name="target">The prefab target to select, or <c>null</c> to clear selection.</param>
+        /// <remarks>
+        /// Emits <see cref="CommKeys.SelectTarget"/> only if the target differs from the current API state.
+        /// </remarks>
+        public static void SelectTarget(Prefab? target)
+        {
+            var cur = API.GetState<Prefab?>(CommKeys.SelectTarget);
+            if (cur != target)
+                API.Emit(CommKeys.SelectTarget, target);
+        }
+
+        /// <summary>
+        /// Opens a context menu for the target prefab.
+        /// </summary>
+        /// <param name="target">The prefab to open the context menu for.</param>
+        /// <param name="position">Optional mouse position. Defaults to <see cref="PlayerInput.MousePosition"/>.</param>
+        /// <remarks>
+        /// Collects context options from all <see cref="ISOSPrefab"/> instances whose
+        /// <see cref="ISOSPrefab.PrefabType"/> is assignable from <paramref name="target"/>'s type,
+        /// then creates a <see cref="GUIContextMenu"/> with those options.
+        /// Returns immediately if no options are available.
+        /// </remarks>
+        public static void OpenContextMenu(Prefab target, Vector2? position = null)
+        {
+            if (target == null) return;
+            var options = API.GetAllPrefabProviders()
+                .Where(p => p.PrefabType.IsAssignableFrom(target.GetType()))
+                .SelectMany(p => p.BuildContextOptions(target))
+                .ToList();
+            if (options.Count == 0) return;
+            RichString name = target.Name();
+            _ = GUIContextMenu.CreateContextMenu(position ?? PlayerInput.MousePosition, name, null, [.. options]);
         }
     }
 }

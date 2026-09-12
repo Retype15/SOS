@@ -61,28 +61,21 @@ namespace SOS.GUI
         /// <summary>
         /// Action invoked when a primary interaction occurs on a prefab in the active tab.
         /// </summary>
-        public Action<T> OnPrimary;
-
-        /// <summary>
-        /// Action invoked when a secondary interaction occurs on a prefab in the active tab.
-        /// </summary>
-        public Action<T> OnSecondary;
+        public Action<T>? OnClicked;
 
         /// <summary>
         /// Creates a new tabbed interface container.
         /// </summary>
         /// <param name="rectT">The rectangle transform for positioning and sizing.</param>
-        /// <param name="onPrimary">Action to invoke on primary interaction with a tab item.</param>
-        /// <param name="onSecondary">Action to invoke on secondary interaction with a tab item.</param>
+        /// <param name="onClicked">Action to invoke on primary interaction with a tab item.</param>
         /// <remarks>
         /// Initializes a vertical layout with a button area (8% height) and content area (92% height).
         /// The button area is a horizontal list box with 32px fixed height for tab buttons.
         /// </remarks>
-        public GUITab(RectTransform rectT, Action<T> onPrimary, Action<T> onSecondary) : base(rectT, style: null)
+        public GUITab(RectTransform rectT, Action<T>? onClicked = null) : base(rectT, style: null)
         {
             CanBeFocused = false;
-            OnPrimary = onPrimary;
-            OnSecondary = onSecondary;
+            OnClicked = onClicked;
 
             _verticalLayout = new GUILayoutGroup(new RectTransform(Vector2.One, RectTransform))
             {
@@ -148,7 +141,7 @@ namespace SOS.GUI
                 foreach (var tab in validTabs)
                     try
                     {
-                        _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == ActiveTab, () => SelectTab(tab), tab.ToolTip);
+                        _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == ActiveTab, () => { SelectTab(tab); OnClicked?.Invoke(_currentTarget); }, tab.ToolTip);
                     }
                     catch (Exception ex)
                     {
@@ -251,7 +244,7 @@ namespace SOS.GUI
             foreach (var tab in tabs)
             {
                 if (tab == ActiveTab)
-                    tab.Show(_currentTarget, OnPrimary, OnSecondary);
+                    tab.Show(_currentTarget);
                 else
                     tab.Hide();
             }

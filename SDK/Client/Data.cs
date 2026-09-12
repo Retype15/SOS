@@ -121,7 +121,7 @@ namespace SOS
     ///     public string TabName => "DETAILS";
     ///     public bool CanHandle(SubmarineInfo sub) => sub != null;
     ///     public void Init(GUIComponent container) { /* Build persistent frame */ }
-    ///     public void Show(SubmarineInfo sub, Action&lt;SubmarineInfo&gt; onPrimary, Action&lt;SubmarineInfo&gt; onSecondary) { /* Draw sub stats */ }
+    ///     public void Show(SubmarineInfo sub) { /* Draw sub stats */ }
     ///     public void Hide() { /* Hide frame */ }
     /// }
     /// </code>
@@ -157,9 +157,7 @@ namespace SOS
         /// Populates or updates the tab's visual content for the active <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entity to inspect and visualize.</param>
-        /// <param name="onPrimary">Callback invoked when a related entity is primary-clicked (e.g., navigating to an ingredient).</param>
-        /// <param name="onSecondary">Callback invoked when a related entity is secondary-clicked (e.g., opening its context menu).</param>
-        void Show(T item, Action<T> onPrimary, Action<T> onSecondary);
+        void Show(T item);
 
         /// <summary>
         /// Hides the tab UI when another tab becomes active.
@@ -184,15 +182,14 @@ namespace SOS
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Zero-Allocation Stateless Architecture:</b> Implementations must be <b>100% stateless</b>. Instances are cached as reusable
-    /// services in the SDK registry; therefore, implementations must not store per-prefab analysis data in class fields.
+    /// Instances are cached as reusable services in the SDK registry.
     /// All parsing, filtering, and visual row construction must occur locally within <see cref="Draw"/>.
     /// </para>
     /// <para>
     /// <b>Rendering Pipeline:</b> When the player selects a prefab, the active window profile iterates all active sections:
     /// <list type="bullet">
-    /// <item><description>If the prefab contains relevant data (e.g., medical treatments, weapon stats, container capacities), the section renders rows into <c>contentPanel</c> using <see cref="GUI.GUILayoutBuilder"/> and returns <c>true</c>.</description></item>
-    /// <item><description>If the prefab is not applicable, the section returns <c>false</c> immediately without appending any empty frames or layout dividers.</description></item>
+    /// <item><description>If the prefab contains relevant data (e.g., medical treatments, weapon stats, container capacities), the section renders rows into <c>rectT</c> using <see cref="GUI.GUILayoutBuilder"/>.</description></item>
+    /// <item><description>If the prefab is not applicable, the section draws nothing: no empty frames or layout dividers.</description></item>
     /// </list>
     /// </para>
     /// </remarks>
@@ -201,15 +198,14 @@ namespace SOS
     /// [AutoRegister(order: 2.0)]
     /// public class RadiationStatInfo : ISOSStatInfo
     /// {
-    ///     public bool Draw(GUIListBox contentPanel, Prefab prefab, Action&lt;Prefab&gt; onPrimary, Action&lt;Prefab&gt; onSecondary)
+    ///     public void Draw(RectTransform rectT, Prefab prefab)
     ///     {
     ///         if (prefab is not ItemPrefab item || !item.Tags.Contains("radioactive"))
-    ///             return false;
+    ///             return;
     ///
-    ///         using var l = new GUILayoutBuilder(contentPanel);
+    ///         using var l = new GUILayoutBuilder(rectT);
     ///         l.Header("RADIATION HAZARD", Color.GreenYellow);
     ///         l.Row("Radiation Output:", "High", Color.Red);
-    ///         return true;
     ///     }
     /// }
     /// </code>
@@ -217,14 +213,11 @@ namespace SOS
     public interface ISOSStatInfo
     {
         /// <summary>
-        /// Analyzes the specified <paramref name="prefab"/> and appends visual layout rows into <paramref name="contentPanel"/> if applicable.
+        /// Analyzes the specified <paramref name="prefab"/> and appends visual layout rows into <paramref name="rectT"/> if applicable.
         /// </summary>
-        /// <param name="contentPanel">The parent list box container where layout components will be added.</param>
+        /// <param name="rectT">Dedicated layout space provided by the host for this section. Build a <see cref="GUI.GUILayoutBuilder"/> on it; draw nothing when not applicable.</param>
         /// <param name="prefab">The target entity currently being inspected.</param>
-        /// <param name="onPrimary">Callback invoked when a referenced prefab is left-clicked (e.g., selecting a required item or treatment).</param>
-        /// <param name="onSecondary">Callback invoked when a referenced prefab is right-clicked (e.g., opening a contextual action menu).</param>
-        /// <returns><c>true</c> if the section was applicable and visual elements were added; otherwise, <c>false</c>.</returns>
-        bool Draw(GUIListBox contentPanel, Prefab prefab, Action<Prefab> onPrimary, Action<Prefab> onSecondary);
+        void Draw(RectTransform rectT, Prefab prefab);
     }
 
     /// <summary>
