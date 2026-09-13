@@ -66,9 +66,9 @@ namespace SOS.Configs.TCWP
             CustomLayouts.Clear();
         }
 
-        public bool DrawSettings(GUIListBox container)
+        public void Draw(RectTransform rectT)
         {
-            using var a = new GUILayoutBuilder(container);
+            using var a = new GUILayoutBuilder(rectT);
             using var l = a.Accordion(a.Header("LAYOUT PRESETS", Color.Gold), collapsed: _presetsCollapsed, onToggle: (c) => _presetsCollapsed = c);
 
             l.Button("Minimal", () => ApplyPreset(500, 600, 0, 0));
@@ -97,7 +97,7 @@ namespace SOS.Configs.TCWP
             l.Separator();
             l.ButtonToResetSection(this);
 
-            return true;
+            return;
         }
 
         internal void SaveCurrentLayout()

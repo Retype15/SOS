@@ -82,9 +82,9 @@ namespace SOS.Configs
             ctr.Tracker.Visible = TrackerVisible;
         }
 
-        public bool DrawSettings(GUIListBox container)
+        public void Draw(RectTransform rectT)
         {
-            using var l = new SOS.GUI.GUILayoutBuilder(container);
+            using var l = new SOS.GUI.GUILayoutBuilder(rectT);
             l.Header("CORE SETTINGS", Microsoft.Xna.Framework.Color.Gold);
             l.Separator();
             l.Button(
@@ -97,7 +97,7 @@ namespace SOS.Configs
                 },
                 style: "GUIButtonSmall",
                 color: Microsoft.Xna.Framework.Color.IndianRed * 0.8f);
-            return true;
+            return;
         }
 
         private readonly ISettingControl _sosOpenKey;

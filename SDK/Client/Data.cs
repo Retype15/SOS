@@ -239,7 +239,7 @@ namespace SOS
     /// <item><term><see cref="Load"/>:</term><description>Invoked during client startup (<see cref="Configs.ConfigHelper.LoadConfigs"/>) to load saved values into memory.</description></item>
     /// <item><term><see cref="Save"/>:</term><description>Invoked on window dismissal or round transitions to serialize modified values to disk.</description></item>
     /// <item><term><see cref="Reset"/>:</term><description>Restores all settings managed by this unit to their default values.</description></item>
-    /// <item><term><see cref="DrawSettings"/>:</term><description>Constructs the interactive configuration UI in the settings window using <see cref="GUI.GUILayoutBuilder"/>.</description></item>
+    /// <item><term><see cref="Draw"/>:</term><description>Constructs the interactive configuration UI in the settings window using <see cref="GUI.GUILayoutBuilder"/>.</description></item>
     /// </list>
     /// </para>
     /// </remarks>
@@ -251,12 +251,12 @@ namespace SOS
     ///     public void Load() { /* ... */ }
     ///     public void Save() { /* ... */ }
     ///     public void Reset() { /* ... */ }
-    ///     public bool DrawSettings(GUIListBox container)
+    ///     public void Draw(RectTransform rectT)
     ///     {
     ///         using var l = new GUILayoutBuilder(container);
     ///         l.Header("MY MOD CONFIG", Color.Gold);
     ///         l.ButtonToResetSection(this);
-    ///         return true;
+    ///         return;
     ///     }
     /// }
     /// </code>
@@ -279,12 +279,7 @@ namespace SOS
         /// </summary>
         void Reset() { }
 
-        /// <summary>
-        /// Declaratively draws the interactive settings controls for this configuration unit into the specified container.
-        /// </summary>
-        /// <param name="container">The list box container in the settings window where controls will be appended.</param>
-        /// <returns><c>true</c> if any UI controls were drawn; otherwise, <c>false</c>.</returns>
-        bool DrawSettings(GUIListBox container) => false;
+        void Draw(RectTransform rectT) { }
     }
 
     /// <summary>
@@ -503,7 +498,7 @@ namespace SOS
         /// </summary>
         /// <param name="_">The GUI list box container (ignored).</param>
         /// <returns>Always <c>false</c>.</returns>
-        public static bool DrawSettings(GUIListBox _) => false;
+        public static void Draw(GUIListBox _) { }
     }
 
     /// <summary>

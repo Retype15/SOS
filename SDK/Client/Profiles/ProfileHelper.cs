@@ -504,7 +504,7 @@ namespace SOS.Profiles
                     for (int i = 0; i < count; i++)
                     {
                         var config = configList[startIndex + i];
-                        config.DrawSettings(targetList);
+                        ProfileHelper.TryDraw(targetList.Content.RectTransform, (rectT) => config.Draw(rectT), config.GetType().FullOrName());
                     }
                 }
             }
@@ -611,7 +611,7 @@ namespace SOS.Profiles
         /// <returns><c>true</c> if at least one section drew content; otherwise, <c>false</c>.</returns>
         public static bool BuildStatSections(RectTransform parent, Prefab target, Func<RectTransform, ISOSStatInfo, Prefab, bool>? drawSection = null)
         {
-            drawSection ??= AddStatSection;
+            drawSection ??= (rectT, section, prefab) => TryDraw(rectT, (rectT) => section.Draw(rectT, prefab), section.GetType().FullOrName());
             int drawn = 0;
             foreach (var section in API.GetAllStatInfo())
             {
@@ -629,22 +629,17 @@ namespace SOS.Profiles
             return drawn > 0;
         }
 
-        /// <summary>
-        /// Draws a single stat section into a fresh wrapper under the given parent.
-        /// </summary>
-        /// <param name="parent">The container transform for the new wrapper.</param>
-        /// <param name="section">The section to draw.</param>
-        /// <param name="target">The prefab being inspected.</param>
-        /// <returns><c>true</c> if the section added content; otherwise, <c>false</c> (the wrapper is detached).</returns>
-        public static bool AddStatSection(RectTransform parent, ISOSStatInfo section, Prefab target)
+        #endregion
+
+        public static bool TryDraw(RectTransform parent, Action<RectTransform> handler, string typeName)
         {
             var rectT = new RectTransform(new Vector2(1f, 0f), parent, Anchor.TopCenter);
             try
             {
-                section.Draw(rectT, target);
+                handler(rectT);
                 if (rectT.CountChildren == 0)
                 {
-                    Logger.LogDebug($"'{section.GetType()}' have nothing to draw, removing created RectTransform...", level: LogLevel.Trace);
+                    Logger.LogDebug($"'{typeName}' have nothing to draw, removing created RectTransform...", level: LogLevel.Trace);
                     rectT.Parent = null;
                     return false;
                 }
@@ -652,13 +647,11 @@ namespace SOS.Profiles
             }
             catch (Exception ex)
             {
-                Logger.LogError($"[SOS] Exception in section '{section.GetType().FullOrName()}': {ex.Message}");
+                Logger.LogError($"[SOS] Exception when try to draw '{typeName}': {ex.Message}");
                 if (rectT.CountChildren == 0) rectT.Parent = null;
                 return false;
             }
         }
-
-        #endregion
 
         #region XML
 

@@ -55,9 +55,9 @@ namespace SOS.Configs
             ProfileHelper.SettingsWindowPosition = new(_settingsWindowPositionX.DefaultValue, _settingsWindowPositionY.DefaultValue);
         }
 
-        public bool DrawSettings(GUIListBox container)
+        public void Draw(RectTransform rectT)
         {
-            using var l = new GUILayoutBuilder(container);
+            using var l = new GUILayoutBuilder(rectT);
             l.Header("ACTIVE VISUAL PROFILE", Color.Gold);
 
             var profiles = API.GetAllWindowProfiles().ToList();
@@ -76,12 +76,16 @@ namespace SOS.Configs
 
             l.Separator();
 
-            SOSController.Instance.ActiveProfile?.ProfileConfig?.DrawSettings(container);
+            var profileConfig = SOSController.Instance.ActiveProfile?.ProfileConfig;
+            if (profileConfig != null)
+            {
+                ProfileHelper.TryDraw(rectT, (rectT) => profileConfig.Draw(rectT), profileConfig.GetType().FullOrName());
+                l.Separator();
+            }
 
-            l.Separator();
             l.ButtonToResetSection(this);
 
-            return true;
+            return;
         }
 
         private readonly ISettingBase<string> _activeProfileId;
