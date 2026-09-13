@@ -391,6 +391,66 @@ namespace SOS.GUI
             return block;
         }
 
+        /// <summary>
+        /// Adds a labeled horizontal slider with a live value display and change handler.
+        /// </summary>
+        /// <param name="label">The label text displayed on the left side in gray.</param>
+        /// <param name="range">The value range as <c>(min, max)</c>. Degenerate ranges are normalized.</param>
+        /// <param name="value">The initial value, clamped into <paramref name="range"/>.</param>
+        /// <param name="onChange">Action invoked when the slider value changes, receiving the snapped value.</param>
+        /// <param name="step">Snap increment in value units (e.g. 0.2 snaps 0.6 -> 0.8). Zero or negative means continuous.</param>
+        /// <param name="format">Formats the value display. Defaults to zero decimals when range and step are whole numbers, single decimal otherwise.</param>
+        /// <param name="tooltip">Optional tooltip shown when hovering the slider.</param>
+        /// <returns>The slider and its live value label, so callers can update both programmatically.</returns>
+        /// <example>
+        /// <code>
+        /// builder.Slider("Volume:", new Vector2(0f, 1f), 0.8f, v => SetVolume(v));
+        /// builder.Slider("Count:", new Vector2(0f, 3f), 1f, v => SetCount(v), step: 1f);
+        /// </code>
+        /// </example>
+        public (GUIScrollBar Slider, GUITextBlock ValueLabel) Slider(
+            string label, Vector2 range, float value, Action<float> onChange,
+            float step = 0f, Func<float, string>? format = null, string? tooltip = null)
+        {
+            float lo = Math.Min(range.X, range.Y);
+            float hi = Math.Max(range.X, range.Y);
+            if (hi - lo <= 0f) hi = lo + 1f;
+
+            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+            _ = new GUITextBlock(new RectTransform(new Vector2(0.30f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+
+            var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.70f, 1f), row.RectTransform, Anchor.CenterRight), isHorizontal: true);
+            var slider = new GUIScrollBar(new RectTransform(new Vector2(0.78f, 0.6f), layout.RectTransform, Anchor.CenterLeft), style: "GUISlider", isHorizontal: true)
+            {
+                Range = new Vector2(lo, hi)
+            };
+            if (step > 0f)
+            {
+                slider.StepValue = step;
+                slider.BarSize = slider.Step;
+            }
+            else
+            {
+                slider.Step = 0f;
+                slider.BarSize = 0.05f;
+            }
+            slider.BarScrollValue = MathHelper.Clamp(value, lo, hi);
+            if (tooltip != null) slider.ToolTip = tooltip;
+
+            bool integer = step > 0f && float.IsInteger(lo) && float.IsInteger(hi) && float.IsInteger(step);
+            format ??= integer ? static v => v.FormatZeroDecimal()
+                                : static v => v.FormatSingleDecimal();
+
+            var valueLabel = new GUITextBlock(new RectTransform(new Vector2(0.22f, 1f), layout.RectTransform, Anchor.CenterRight), format(slider.BarScrollValue), font: GUIStyle.SmallFont, wrap: false, textAlignment: Alignment.Center) { CanBeFocused = false };
+            slider.OnMoved = (sb, _) =>
+            {
+                valueLabel.Text = format(sb.BarScrollValue);
+                onChange(sb.BarScrollValue);
+                return true;
+            };
+            return (slider, valueLabel);
+        }
+
         //TODO: Hecho por IA, aún no revisado.
         #region Hecho por IA, aún no revisado.
 
@@ -555,55 +615,6 @@ namespace SOS.GUI
                 OnSelected = (tb) => { onToggle(tb.Selected); return true; }
             };
             return tick;
-        }
-
-        /// <summary>
-        /// Adds a labeled horizontal slider with a live value display and change handler.
-        /// </summary>
-        /// <param name="label">The label text displayed on the left side in gray.</param>
-        /// <param name="min">The minimum value of the slider range.</param>
-        /// <param name="max">The maximum value of the slider range.</param>
-        /// <param name="value">The initial value of the slider.</param>
-        /// <param name="onChange">Action invoked when the slider value changes, receiving the new value as a parameter.</param>
-        /// <returns>The created <see cref="GUIScrollBar"/> styled as a horizontal slider.</returns>
-        /// <remarks>
-        /// Creates a row with the label occupying 35% of the width, the slider occupying 55%, and the value display occupying 10%.
-        /// The slider uses the "GUISlider" style with a bar size of 0.1.
-        /// The value display shows the current value formatted with zero decimal places via <c>FormatZeroDecimal</c>.
-        /// The <paramref name="onChange"/> callback is invoked on every slider movement with the computed float value.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// builder.Slider("Volume:", 0f, 100f, 50f, value => SetVolume(value));
-        /// </code>
-        /// </example>
-        public GUIScrollBar Slider(string label, float min, float max, float value, Action<float> onChange)
-        {
-            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
-            _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
-
-            var slider = new GUIScrollBar(new RectTransform(new Vector2(0.55f, 0.6f), row.RectTransform, Anchor.CenterRight), barSize: 0.1f, style: "GUISlider", isHorizontal: true)
-            {
-                MinValue = min,
-                MaxValue = max,
-                BarScroll = (value - min) / (max - min),
-                OnMoved = (sb, val) =>
-                {
-                    float v = min + val * (max - min);
-                    onChange(v);
-                    return true;
-                }
-            };
-
-            var valText = new GUITextBlock(new RectTransform(new Vector2(0.1f, 1f), row.RectTransform, Anchor.CenterRight), value.FormatZeroDecimal(), font: GUIStyle.SmallFont, textAlignment: Alignment.CenterRight) { CanBeFocused = false };
-            slider.OnMoved = (sb, val) =>
-            {
-                float v = min + val * (max - min);
-                valText.Text = ((int)v).ToString();
-                onChange(v);
-                return true;
-            };
-            return slider;
         }
 
         #endregion
