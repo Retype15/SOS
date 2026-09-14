@@ -30,8 +30,6 @@ Cualquier mod que desee implementar una pestaña de información solamente neces
 
   namespace MyMod;
 
-  // Usar [AutoRegister] sin parámetros daría como resultado:
-  // (id: "MyMod.UsageMessageStatInfo", order: 0, active: true).
   [AutoRegister("MyMod.ArtieUsage", order: -1)]
   public class UsageMessageStatInfo : ISOSStatInfo
   {
@@ -96,4 +94,4 @@ Ahora sí, podemos comenzar a aprender los métodos y atributos que te serán de
 
 ## Otros recursos
 
-## Next to: [Registration](registration.html)
+## Next to: [SOS Modules](sos_modules.html)

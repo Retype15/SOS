@@ -23,7 +23,7 @@ Depende del ecosistema de [LuaCsForBarotrauma](https://github.com/evilfactory/Lu
 **Other resources:**
 
 - [Getting Started](getting_started.html)
+- [SOS Modules](sos_modules.html)
 - [Registration](registration.html)
 - [Data Sharing](data_sharing.html)
 - [UI and GUI Components](ui_comps.html)
-<!-- - [Core Components](//)  TODO: En construcción... -->

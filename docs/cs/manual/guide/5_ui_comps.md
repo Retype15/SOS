@@ -1,6 +1,4 @@
-# ISOS* interfaces and GUI Components {#ui_comps}
-
-## Interfaces
+# UI and GUI Components {#ui_comps}
 
 ## GUIs personalizados
 

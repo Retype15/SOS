@@ -14,8 +14,6 @@ Hay dos formas principales de registrar un nuevo módulo SOS:
 > Usando este método, la clase se descubre automáticamente. Es la forma idiomática de registrar clases que implementen nuestras interfaces.
 >
 > Dado que este método no requiere ejecutar código manual para registrar las clases, se puede obviar por completo la clase Plugin si el objetivo de tu mod es únicamente añadir contenenido a SOS.
->
-> Dada la limpieza, recomendamos además declararlas en archivos In-Memory Compiled at Time.
 
 ## 2. Registro manual
 
@@ -87,18 +85,10 @@ Hay dos formas principales de registrar un nuevo módulo SOS:
 
 <!-- TODO: Explicar sobre DefaultClassAtribute y métodos defaults para Lua?(redirigir a lua_interop para más info) -->
 
-> [!NOTE]
-> NO recomendamos implementar en una misma clase varios tipos de módulos SOS (interfaces ISOS*), esto lo consideramos un anti-patrón y actualmente llevará a crear 2 instancias de la misma clase para cada tipo de contrato(A menos que registre manualmente una misma instancia o delegado para ambos, pero igualmente no lo recomendamos).
-
-<!-- - -->
-
-> [!IMPORTANT]
-> Cada módulo SOS (clase que implemente alguna interfaz `ISOS*`) y se registre funcionará como un builder de instancia única por defecto, lo que significa que se usa la misma instancia hasta cerrar/reabrir la ventana SOS (A menos que registre por el método manual una instancia o un delegado enves de un type o una factoría (() => new Object())). Téngalo en cuenta si considera guardar información en la clase, que esta no interfiera al ser llamada en diferentes contextos.
-
 <!-- TODO: Recordar hAblar de IDisposable para objetos genéricos. -->
 
 ## Otros recursos
 
 **Next to: [Data Sharing](data_sharing.html)**
 
-**Back to: [Getting Started](getting_started.html)**
+**Back to: [SOS Modules](sos_modules.html)**
