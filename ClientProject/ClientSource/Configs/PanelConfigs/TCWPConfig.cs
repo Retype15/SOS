@@ -69,7 +69,7 @@ namespace SOS.Configs.TCWP
         public void Draw(RectTransform rectT)
         {
             using var a = new GUILayoutBuilder(rectT);
-            using var l = a.Accordion(a.Header("LAYOUT PRESETS", Color.Gold), collapsed: _presetsCollapsed, onToggle: (c) => _presetsCollapsed = c);
+            using var l = a.Accordion(a.Header("LAYOUT PRESETS", Color.Gold), collapsed: _presetsCollapsed, onToggle: (c) => _presetsCollapsed = c).Content;
 
             l.Button("Minimal", () => ApplyPreset(500, 600, 0, 0));
             l.Button("Medium-List", () => ApplyPreset(850, 650, 220, 0));
@@ -79,7 +79,7 @@ namespace SOS.Configs.TCWP
             if (CustomLayouts.Count > 0)
             {
                 l.Separator();
-                using var acc = l.Accordion(l.Header("MY PRESETS", Color.Gold), collapsed: _userPresetsCollapsed, onToggle: (c) => _userPresetsCollapsed = c);
+                using var acc = l.Accordion(l.Header("MY PRESETS", Color.Gold), collapsed: _userPresetsCollapsed, onToggle: (c) => _userPresetsCollapsed = c).Content;
                 foreach (var (k, v) in CustomLayouts)
                 {
                     acc.Button(k,

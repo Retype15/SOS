@@ -60,7 +60,7 @@ namespace SOS.GUI
         /// Creates a new accordion with a custom header component.
         /// </summary>
         /// <param name="header">The custom header component to use.</param>
-        /// <param name="parent">The parent rectangle transform.</param>
+        /// <param name="rectT">The rectangle transform for the accordion container.</param>
         /// <param name="collapsed">Whether the accordion starts collapsed. Defaults to false.</param>
         /// <param name="onToggle">Optional callback invoked when the accordion is toggled.</param>
         /// <param name="iconAnchor">The anchor for the chevron icon. Defaults to CenterRight.</param>
@@ -68,9 +68,10 @@ namespace SOS.GUI
         /// The header component is made non-focusable and wrapped in a transparent button that handles clicks.
         /// A chevron icon is created from the "GUIDropDown.dropdownicon" style if available.
         /// The content area is a <see cref="GUILayoutBuilder"/> initially visible based on <paramref name="collapsed"/>.
+        /// Vanilla pattern: the transform is created outside and passed in (e.g. <c>l.NewDefaultRectTransform()</c>), so the caller owns the parent chain.
         /// </remarks>
-        public GUIAccordion(GUIComponent header, RectTransform parent, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
-            : base(new RectTransform(new Vector2(1f, 0f), parent))
+        public GUIAccordion(GUIComponent header, RectTransform rectT, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
+            : base(rectT)
         {
             _collapsed = collapsed;
             _onToggle = onToggle;
@@ -116,16 +117,17 @@ namespace SOS.GUI
         /// Creates a new accordion with a text header.
         /// </summary>
         /// <param name="title">The header title text.</param>
-        /// <param name="parent">The parent rectangle transform.</param>
+        /// <param name="rectT">The rectangle transform for the accordion container.</param>
         /// <param name="tooltip">Optional tooltip for the header button.</param>
         /// <param name="collapsed">Whether the accordion starts collapsed. Defaults to false.</param>
         /// <param name="onToggle">Optional callback invoked when the accordion is toggled.</param>
         /// <param name="iconAnchor">The anchor for the chevron icon. Defaults to CenterRight.</param>
         /// <remarks>
         /// Creates a text block header using <see cref="CreateHeader"/> and delegates to the component-based constructor.
+        /// The transform is passed through to the custom-header constructor, so the caller owns the parent chain (vanilla pattern).
         /// </remarks>
-        public GUIAccordion(string title, RectTransform parent, string? tooltip = null, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
-            : this(CreateHeader(parent, title), parent, collapsed, onToggle, iconAnchor)
+        public GUIAccordion(string title, RectTransform rectT, string? tooltip = null, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
+            : this(CreateHeader(rectT, title), rectT, collapsed, onToggle, iconAnchor)
         {
             if (tooltip != null) _headerButton.ToolTip = tooltip.Rich();
         }

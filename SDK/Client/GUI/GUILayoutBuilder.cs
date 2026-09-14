@@ -60,6 +60,30 @@ namespace SOS.GUI
         public GUILayoutBuilder(RectTransform rectT) : base(rectT) { }
 
         /// <summary>
+        /// Creates the default <see cref="RectTransform"/> for rows built with this builder.
+        /// </summary>
+        /// <param name="height">Fixed height in pixels. Constrained via <c>MinSize</c> and <c>MaxSize</c> to exactly <paramref name="height"/>.</param>
+        /// <returns>A new <see cref="RectTransform"/> with full width (<c>(1f, 0f)</c>), parented to this builder, and fixed height.</returns>
+        /// <remarks>
+        /// Centralizes <c>new((1f, 0f), RectTransform, minSize:(0,height), maxSize:(int.MaxValue,height))</c> to avoid duplication.
+        /// Use for fixed-height custom rows (e.g. 28px like <c>Slider</c>/<c>TextBox</c> or 20px like <c>Button</c>).
+        /// External custom creation: <c>var row = new GUIFrame(l.NewDefaultRectTransform(28), style:null);</c>
+        /// </remarks>
+        public RectTransform NewDefaultRectTransform(int height)
+            => new((1f, 0f), RectTransform, minSize: (0, height), maxSize: (int.MaxValue, height));
+
+        /// <summary>
+        /// Creates the default auto-height <see cref="RectTransform"/> for rows built with this builder.
+        /// </summary>
+        /// <returns>A new <see cref="RectTransform"/> with full width (<c>(1f, 0f)</c>), parented to this builder, and no height constraint.</returns>
+        /// <remarks>
+        /// Use for dynamic-height rows where the height is determined by content (e.g. <see cref="Header"/>, <see cref="Row"/>, <see cref="Text"/>).
+        /// External custom creation: <c>var row = new GUIFrame(l.NewDefaultRectTransform(), style:null);</c>
+        /// </remarks>
+        public RectTransform NewDefaultRectTransform()
+            => new((1f, 0f), RectTransform);
+
+        /// <summary>
         /// Adds a header text block with the specified title and color.
         /// </summary>
         /// <param name="title">The header text to display.</param>
@@ -73,7 +97,7 @@ namespace SOS.GUI
         /// </remarks>
         public GUITextBlock Header(string title, Color color)
         {
-            var titleBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), RectTransform), title, font: GUIStyle.SubHeadingFont, textColor: color, textAlignment: Alignment.Left)
+            var titleBlock = new GUITextBlock(NewDefaultRectTransform(), title, font: GUIStyle.SubHeadingFont, textColor: color, textAlignment: Alignment.Left)
             {
                 CanBeFocused = false
             };
@@ -101,7 +125,7 @@ namespace SOS.GUI
         {
             if (string.IsNullOrEmpty(value)) return null;
 
-            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), RectTransform), style: null)
+            var row = new GUIButton(NewDefaultRectTransform(), style: null)
             {
                 CanBeFocused = false
             };
@@ -169,7 +193,7 @@ namespace SOS.GUI
                 Display = dispList != null && i < dispList.Count ? dispList[i] : val
             }).ToList();
 
-            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), RectTransform), style: null)
+            var row = new GUIButton(NewDefaultRectTransform(), style: null)
             {
                 CanBeFocused = false
             };
@@ -291,7 +315,7 @@ namespace SOS.GUI
                 return Color.LightSkyBlue;
             }
 
-            var row = new GUIButton(new RectTransform(new Vector2(1f, 0f), RectTransform), style: null)
+            var row = new GUIButton(NewDefaultRectTransform(), style: null)
             {
                 CanBeFocused = false
             };
@@ -374,7 +398,7 @@ namespace SOS.GUI
         {
             if (text.IsNullOrEmpty()) return null;
 
-            var block = new GUITextBlock(new RectTransform(new Vector2(1f, 0f), RectTransform), text, font: GUIStyle.SmallFont, wrap: true, textAlignment: Alignment.Left)
+            var block = new GUITextBlock(NewDefaultRectTransform(), text, font: GUIStyle.SmallFont, wrap: true, textAlignment: Alignment.Left)
             {
                 CanBeFocused = false
             };
@@ -401,23 +425,24 @@ namespace SOS.GUI
         /// <param name="step">Snap increment in value units (e.g. 0.2 snaps 0.6 -> 0.8). Zero or negative means continuous.</param>
         /// <param name="format">Formats the value display. Defaults to zero decimals when range and step are whole numbers, single decimal otherwise.</param>
         /// <param name="tooltip">Optional tooltip shown when hovering the slider.</param>
-        /// <returns>The slider and its live value label, so callers can update both programmatically.</returns>
+        /// <param name="height">Height of the row in pixels. Defaults to 28.</param>
+        /// <returns>A tuple with the label, the slider and its live value label.</returns>
         /// <example>
         /// <code>
         /// builder.Slider("Volume:", new Vector2(0f, 1f), 0.8f, v => SetVolume(v));
         /// builder.Slider("Count:", new Vector2(0f, 3f), 1f, v => SetCount(v), step: 1f);
         /// </code>
         /// </example>
-        public (GUIScrollBar Slider, GUITextBlock ValueLabel) Slider(
+        public (GUITextBlock Label, GUIScrollBar Slider, GUITextBlock ValueLabel) Slider(
             string label, Vector2 range, float value, Action<float> onChange,
-            float step = 0f, Func<float, string>? format = null, string? tooltip = null)
+            float step = 0f, Func<float, string>? format = null, string? tooltip = null, int height = 28)
         {
             float lo = Math.Min(range.X, range.Y);
             float hi = Math.Max(range.X, range.Y);
             if (hi - lo <= 0f) hi = lo + 1f;
 
-            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
-            _ = new GUITextBlock(new RectTransform(new Vector2(0.30f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+            var row = new GUIFrame(NewDefaultRectTransform(height), style: null) { CanBeFocused = false };
+            var labelBlock = new GUITextBlock(new RectTransform(new Vector2(0.30f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
 
             var layout = new GUILayoutGroup(new RectTransform(new Vector2(0.70f, 1f), row.RectTransform, Anchor.CenterRight), isHorizontal: true);
             var slider = new GUIScrollBar(new RectTransform(new Vector2(0.78f, 0.6f), layout.RectTransform, Anchor.CenterLeft), style: "GUISlider", isHorizontal: true)
@@ -448,27 +473,30 @@ namespace SOS.GUI
                 onChange(sb.BarScrollValue);
                 return true;
             };
-            return (slider, valueLabel);
+            return (labelBlock, slider, valueLabel);
         }
-
-        //TODO: Hecho por IA, aún no revisado.
-        #region Hecho por IA, aún no revisado.
 
         /// <summary>
         /// Adds a horizontal separator line spanning the full width of the builder.
         /// </summary>
-        /// <returns>A 2px tall <see cref="GUIFrame"/> with a gray color, spanning the full width.</returns>
+        /// <param name="spacing">Height of the divider in pixels. Defaults to 12.</param>
+        /// <param name="color">Optional tint for the line. Defaults to gray.</param>
+        /// <returns>A <see cref="GUIFrame"/> using the "HorizontalLine" style.</returns>
         /// <remarks>
-        /// Uses the "GUIFrameBottom" style and sets the tint color to 40% gray via <c>GUIFrame.Color</c>.
-        /// The frame is not focusable and acts as a purely visual divider.
+        /// Uses the vanilla "HorizontalLine" divider style. The frame is not focusable
+        /// and acts as a purely visual divider.
         /// </remarks>
-        public GUIFrame Separator()
+        public GUIFrame Separator(int spacing = 12, Color? color = null)
         {
-            return new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 2), MaxSize = new Point(int.MaxValue, 2) }, style: "GUIFrameBottom")
+            var wrapper = new GUIFrame(NewDefaultRectTransform(spacing), style: null)
             {
-                Color = Color.Gray * 0.4f,
                 CanBeFocused = false
             };
+            var line = new GUIFrame(new RectTransform(Vector2.One, wrapper.RectTransform, Anchor.Center), style: "HorizontalLine", color ?? Color.Gray)
+            {
+                CanBeFocused = false
+            };
+            return line;
         }
 
         /// <summary>
@@ -478,16 +506,17 @@ namespace SOS.GUI
         /// <param name="onClick">The action to invoke when the button is clicked.</param>
         /// <param name="tooltip">Optional tooltip text displayed when the mouse hovers over the button.</param>
         /// <param name="color">Optional tint color for the button. If null, the style's default color is used.</param>
-        /// <param name="style">The GUI style name to apply. Defaults to "GUIButtonSmall".</param>
-        /// <returns>The created <see cref="GUIButton"/> with a 28-pixel minimum height.</returns>
+        /// <param name="style">The GUI style name to apply. Defaults to "GUIButtonSmallFreeScale".</param>
+        /// <param name="height">Height of the button in pixels. Defaults to 20.</param>
+        /// <returns>The created <see cref="GUIButton"/> with the specified height.</returns>
         /// <remarks>
         /// The button is focusable and invokes <paramref name="onClick"/> when clicked.
         /// If <paramref name="tooltip"/> is not null, it is assigned to <see cref="GUIButton.ToolTip"/>.
         /// If <paramref name="color"/> has a value, it is assigned to <see cref="GUIButton.Color"/>.
         /// </remarks>
-        public GUIButton Button(string text, Action onClick, string? tooltip = null, Color? color = null, string style = "GUIButtonSmall")
+        public GUIButton Button(string text, Action onClick, string? tooltip = null, Color? color = null, string style = "GUIButtonSmallFreeScale", int height = 20)
         {
-            var btn = new GUIButton(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, text, style: style)
+            var btn = new GUIButton(NewDefaultRectTransform(height), text, style: style)
             {
                 CanBeFocused = true,
                 OnClicked = (_, _) => { onClick(); return true; }
@@ -506,18 +535,22 @@ namespace SOS.GUI
         /// <param name="onDeleteClick">The action to invoke when the delete button is clicked.</param>
         /// <param name="deleteTooltip">Tooltip text for the delete button.</param>
         /// <param name="color">Optional tint color for the apply button. If null, the style's default color is used.</param>
-        /// <param name="style">The GUI style name for the apply button. Defaults to "GUIButtonSmall".</param>
-        /// <returns>The apply <see cref="GUIButton"/>. The delete button is created as a child of the same row but is not returned.</returns>
+        /// <param name="style">The GUI style name for the apply button. Defaults to "GUIButtonSmallFreeScale".</param>
+        /// <param name="height">Height of the row in pixels. Defaults to 20.</param>
+        /// <returns>A tuple with the apply <see cref="GUIButton"/> and the delete <see cref="GUIButton"/>.</returns>
         /// <remarks>
-        /// Creates a horizontal <see cref="GUIFrame"/> row containing the apply button (90% width) and a red "x" delete button (28x28 pixels).
-        /// The delete button uses the "GUICancelButton" style with <see cref="Color.IndianRed"/> tint.
+        /// Creates a horizontal <see cref="GUILayoutGroup"/> row containing the apply button and a square delete button.
+        /// The delete button uses the "GUICancelButton" style with <see cref="Color.IndianRed"/> tint and stays square via <see cref="ScaleBasis.BothHeight"/>.
         /// Both buttons are focusable and invoke their respective callbacks when clicked.
         /// </remarks>
-        public GUIButton Button(string text, Action onClick, string applyTooltip, Action onDeleteClick, string deleteTooltip, Color? color = null, string style = "GUIButtonSmall")
+        public (GUIButton ApplyBtn, GUIButton DeleteBtn) Button(string text, Action onClick, string applyTooltip, Action onDeleteClick, string deleteTooltip, Color? color = null, string style = "GUIButtonSmallFreeScale", int height = 20)
         {
-            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+            var row = new GUILayoutGroup(NewDefaultRectTransform(height), isHorizontal: true, childAnchor: Anchor.CenterLeft)
+            {
+                RelativeSpacing = 0.02f
+            };
 
-            var apply = new GUIButton(new RectTransform(new Vector2(0.9f, 1f), row.RectTransform, Anchor.CenterLeft), text, style: style)
+            var apply = new GUIButton(new RectTransform(new Vector2(0.90f, 1f), row.RectTransform), text, style: style)
             {
                 ToolTip = applyTooltip,
                 CanBeFocused = true,
@@ -525,14 +558,14 @@ namespace SOS.GUI
             };
             if (color.HasValue) apply.Color = color.Value;
 
-            _ = new GUIButton(new RectTransform(new Point(28, 28), row.RectTransform, Anchor.CenterRight), "x", style: "GUICancelButton", color: Color.IndianRed)
+            var del = new GUIButton(new RectTransform(new Vector2(1f, 1f), row.RectTransform, scaleBasis: ScaleBasis.BothHeight), style: "GUICancelButton", color: Color.IndianRed)
             {
                 ToolTip = deleteTooltip,
                 CanBeFocused = true,
                 OnClicked = (_, _) => { onDeleteClick(); return true; }
             };
 
-            return apply;
+            return (apply, del);
         }
 
         /// <summary>
@@ -541,17 +574,25 @@ namespace SOS.GUI
         /// <param name="label">The label text displayed on the left side in gray.</param>
         /// <param name="initialValue">The initial text value to populate the text box with.</param>
         /// <param name="onChange">Action invoked when the text changes, receiving the new text value as a parameter.</param>
-        /// <returns>The created <see cref="GUITextBox"/> with <see cref="GUIStyle.SmallFont"/>.</returns>
+        /// <param name="tooltip">Optional tooltip shown when hovering the text box.</param>
+        /// <param name="maxLength">Optional maximum text length. Null means unlimited.</param>
+        /// <param name="height">Height of the row in pixels. Defaults to 28.</param>
+        /// <returns>The created <see cref="GUITextBox"/> with <see cref="GUIStyle.SmallFont"/>. Return value lets the caller attach <c>OnDeselected</c>/<c>OnEnterPressed</c> etc. for commit handling.</returns>
         /// <remarks>
         /// Creates a row with the label occupying 35% of the width and the text box occupying 60%.
         /// The <see cref="GUITextBox.OnTextChanged"/> event is wired to invoke <paramref name="onChange"/>.
-        /// The row frame is not focusable.
+        /// <see cref="GUITextBox.OverflowClip"/> is enabled. The row frame is not focusable.
         /// </remarks>
-        public GUITextBox TextBox(string label, string initialValue, Action<string> onChange)
+        public GUITextBox TextBox(string label, string initialValue, Action<string> onChange, string? tooltip = null, int? maxLength = null, int height = 28)
         {
-            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+            var row = new GUIFrame(NewDefaultRectTransform(height), style: null) { CanBeFocused = false };
             _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
-            var textBox = new GUITextBox(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), initialValue, font: GUIStyle.SmallFont);
+            var textBox = new GUITextBox(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), initialValue, font: GUIStyle.SmallFont)
+            {
+                OverflowClip = true
+            };
+            if (tooltip != null) textBox.ToolTip = tooltip;
+            if (maxLength.HasValue) textBox.MaxTextLength = maxLength.Value;
             textBox.OnTextChanged += (tb, text) => { onChange(text); return true; };
             return textBox;
         }
@@ -564,6 +605,8 @@ namespace SOS.GUI
         /// <param name="selected">The initially selected item string, or null to have no pre-selection.</param>
         /// <param name="onSelect">Action invoked when an item is selected, receiving the selected string as a parameter.</param>
         /// <param name="tooltips">Optional tooltips for each item. Must match the count of <paramref name="items"/> if provided.</param>
+        /// <param name="tooltip">Optional tooltip for the dropdown itself.</param>
+        /// <param name="height">Height of the row in pixels. Defaults to 28.</param>
         /// <returns>The created <see cref="GUIDropDown"/> with <see cref="GUIStyle.SmallFont"/>.</returns>
         /// <remarks>
         /// Creates a row with the label occupying 35% of the width and the dropdown occupying 60%.
@@ -571,18 +614,27 @@ namespace SOS.GUI
         /// If <paramref name="selected"/> matches an item string, that item is pre-selected.
         /// The <see cref="GUIDropDown.OnSelected"/> event is wired to invoke <paramref name="onSelect"/> when a string is selected.
         /// </remarks>
-        public GUIDropDown Dropdown(string label, IReadOnlyList<string> items, string? selected, Action<string> onSelect, IReadOnlyList<string?>? tooltips = null)
+        public GUIDropDown Dropdown(string label, IReadOnlyList<string> items, string? selected, Action<string> onSelect, IReadOnlyList<string?>? tooltips = null, string? tooltip = null, int height = 28)
         {
-            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 28) }, style: null) { CanBeFocused = false };
+            var row = new GUIFrame(NewDefaultRectTransform(height), style: null) { CanBeFocused = false };
             _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
 
             var dropdown = new GUIDropDown(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), text: "", elementCount: items.Count) { CanBeFocused = true, Font = GUIStyle.SmallFont };
+            if (tooltip != null) dropdown.ToolTip = tooltip;
+            int selectedIndex = -1;
             for (var i = 0; i < items.Count; i++)
             {
-                string tooltipText = (tooltips?.Count >= i) ? tooltips?[i] ?? "" : "";
+                string tooltipText = (tooltips != null && i < tooltips.Count) ? tooltips[i] ?? "" : "";
                 var item = items[i];
                 dropdown.AddItem(item, item, tooltipText);
-                if (item == selected) dropdown.SelectItem(item);
+                if (item == selected) selectedIndex = i;
+            }
+            if (selectedIndex >= 0)
+            {
+                dropdown.Select(selectedIndex);
+                dropdown.ListBox.ForceLayoutRecalculation();
+                var child = dropdown.ListBox.Content.GetChild(selectedIndex);
+                if (child != null) dropdown.ListBox.ScrollToElement(child);
             }
             dropdown.OnSelected = (comp, obj) =>
             {
@@ -598,6 +650,8 @@ namespace SOS.GUI
         /// <param name="label">The label text displayed on the tick box.</param>
         /// <param name="selected">The initial checked state of the tick box.</param>
         /// <param name="onToggle">Action invoked when the tick box state changes, receiving the new checked state as a parameter.</param>
+        /// <param name="tooltip">Optional tooltip shown when hovering the tick box.</param>
+        /// <param name="height">Height of the row in pixels. Defaults to 26.</param>
         /// <returns>The created <see cref="GUITickBox"/> with <see cref="GUIStyle.SmallFont"/>.</returns>
         /// <remarks>
         /// Creates a row with the tick box spanning the full width (100%).
@@ -605,19 +659,78 @@ namespace SOS.GUI
         /// The tick box is focusable and invokes <paramref name="onToggle"/> when the selected state changes.
         /// The row frame has a minimum height of 26 pixels.
         /// </remarks>
-        public GUITickBox TickBox(string label, bool selected, Action<bool> onToggle)
+        public GUITickBox TickBox(string label, bool selected, Action<bool> onToggle, string? tooltip = null, int height = 26)
         {
-            var row = new GUIFrame(new RectTransform(new Vector2(1f, 0f), RectTransform) { MinSize = new Point(0, 26) }, style: null) { CanBeFocused = false };
+            var row = new GUIFrame(NewDefaultRectTransform(height), style: null) { CanBeFocused = false };
             var tick = new GUITickBox(new RectTransform(new Vector2(1f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont)
             {
                 Selected = selected,
                 CanBeFocused = true,
                 OnSelected = (tb) => { onToggle(tb.Selected); return true; }
             };
+            if (tooltip != null) tick.ToolTip = tooltip;
             return tick;
         }
 
-        #endregion
+        /// <summary>
+        /// Adds a labeled integer number input with +/- buttons.
+        /// </summary>
+        /// <param name="label">The label text displayed on the left side in gray.</param>
+        /// <param name="value">The initial integer value.</param>
+        /// <param name="onChange">Action invoked when the value changes.</param>
+        /// <param name="min">Optional minimum value. Null means no lower bound.</param>
+        /// <param name="max">Optional maximum value. Null means no upper bound.</param>
+        /// <param name="step">Increment step for +/- buttons. Defaults to 1.</param>
+        /// <param name="tooltip">Optional tooltip shown when hovering the input.</param>
+        /// <param name="height">Height of the row in pixels. Defaults to 28.</param>
+        /// <returns>The created <see cref="GUINumberInput"/>.</returns>
+        public GUINumberInput NumberInput(string label, int value, Action<int> onChange, int? min = null, int? max = null, int step = 1, string? tooltip = null, int height = 28)
+        {
+            var row = new GUIFrame(NewDefaultRectTransform(height), style: null) { CanBeFocused = false };
+            _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+            var input = new GUINumberInput(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), NumberType.Int)
+            {
+                Font = GUIStyle.SmallFont,
+                IntValue = value
+            };
+            if (min.HasValue) input.MinValueInt = min.Value;
+            if (max.HasValue) input.MaxValueInt = max.Value;
+            if (step != 1) input.ValueStep = step;
+            if (tooltip != null) input.ToolTip = tooltip;
+            input.OnValueChanged += (ni) => onChange(ni.IntValue);
+            return input;
+        }
+
+        /// <summary>
+        /// Adds a labeled float number input with +/- buttons.
+        /// </summary>
+        /// <param name="label">The label text displayed on the left side in gray.</param>
+        /// <param name="value">The initial float value.</param>
+        /// <param name="onChange">Action invoked when the value changes.</param>
+        /// <param name="min">Optional minimum value.</param>
+        /// <param name="max">Optional maximum value.</param>
+        /// <param name="step">Increment step for +/- buttons. Zero means automatic (1% of range).</param>
+        /// <param name="decimals">Number of decimals to display. Defaults to 1.</param>
+        /// <param name="tooltip">Optional tooltip shown when hovering the input.</param>
+        /// <param name="height">Height of the row in pixels. Defaults to 28.</param>
+        /// <returns>The created <see cref="GUINumberInput"/>.</returns>
+        public GUINumberInput NumberInput(string label, float value, Action<float> onChange, float? min = null, float? max = null, float step = 0f, int decimals = 1, string? tooltip = null, int height = 28)
+        {
+            var row = new GUIFrame(NewDefaultRectTransform(height), style: null) { CanBeFocused = false };
+            _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+            var input = new GUINumberInput(new RectTransform(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), NumberType.Float)
+            {
+                Font = GUIStyle.SmallFont,
+                DecimalsToDisplay = decimals,
+                FloatValue = value
+            };
+            if (min.HasValue) input.MinValueFloat = min.Value;
+            if (max.HasValue) input.MaxValueFloat = max.Value;
+            if (step != 0f) input.ValueStep = step;
+            if (tooltip != null) input.ToolTip = tooltip;
+            input.OnValueChanged += (ni) => onChange(ni.FloatValue);
+            return input;
+        }
 
         /// <summary>
         /// Binds hyperlink click handlers to the clickable areas of a rich text block based on the provided items.
@@ -675,24 +788,19 @@ namespace SOS.GUI
         /// <param name="collapsed">Whether the accordion starts in a collapsed state. Defaults to false (expanded).</param>
         /// <param name="onToggle">Optional callback invoked when the accordion is toggled, receiving the new collapsed state.</param>
         /// <param name="iconAnchor">The anchor position for the expand/collapse chevron icon. Defaults to <see cref="Anchor.CenterRight"/>.</param>
-        /// <returns>A new <see cref="GUILayoutBuilder"/> for adding content inside the accordion's content area.</returns>
+        /// <returns>The created <see cref="GUIAccordion"/> container. Use its <see cref="GUIAccordion.Content"/> to add inner content.</returns>
         /// <remarks>
         /// Creates a <see cref="GUIAccordion"/> with the specified title and settings.
-        /// The returned builder can be used to add content inside the accordion using the fluent API.
         /// The accordion header is rendered within the current builder's <see cref="RectTransform"/>.
         /// </remarks>
         /// <example>
         /// <code>
-        /// using var content = builder.Accordion("Settings", tooltip: "Configure options", collapsed: true);
-        /// content.TickBox("Enable Feature:", true, checked => featureEnabled = checked);
-        /// content.Slider("Volume:", 0f, 100f, 80f, value => volume = value);
+        /// var acc = builder.Accordion("Settings", tooltip: "Configure options", collapsed: true);
+        /// acc.Content.TickBox("Enable Feature:", true, checked => featureEnabled = checked);
         /// </code>
         /// </example>
-        public GUILayoutBuilder Accordion(string title, string? tooltip = null, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
-        {
-            var accordion = new GUIAccordion(title, RectTransform, tooltip, collapsed, onToggle, iconAnchor);
-            return accordion.Content;
-        }
+        public GUIAccordion Accordion(string title, string? tooltip = null, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
+            => new(title, RectTransform, tooltip, collapsed, onToggle, iconAnchor);
 
         /// <summary>
         /// Creates an accordion (collapsible section) with a custom header component and returns its content builder.
@@ -701,17 +809,13 @@ namespace SOS.GUI
         /// <param name="collapsed">Whether the accordion starts in a collapsed state. Defaults to false (expanded).</param>
         /// <param name="onToggle">Optional callback invoked when the accordion is toggled, receiving the new collapsed state.</param>
         /// <param name="iconAnchor">The anchor position for the expand/collapse chevron icon. Defaults to <see cref="Anchor.CenterRight"/>.</param>
-        /// <returns>A new <see cref="GUILayoutBuilder"/> for adding content inside the accordion's content area.</returns>
+        /// <returns>The created <see cref="GUIAccordion"/> container. Use its <see cref="GUIAccordion.Content"/> to add inner content.</returns>
         /// <remarks>
         /// Creates a <see cref="GUIAccordion"/> with the specified custom header component and settings.
-        /// The returned builder can be used to add content inside the accordion using the fluent API.
         /// Use this overload when the default text header is insufficient and a custom GUI component is required.
         /// </remarks>
-        public GUILayoutBuilder Accordion(GUIComponent header, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
-        {
-            var accordion = new GUIAccordion(header, RectTransform, collapsed, onToggle, iconAnchor);
-            return accordion.Content;
-        }
+        public GUIAccordion Accordion(GUIComponent header, bool collapsed = false, Action<bool>? onToggle = null, Anchor iconAnchor = Anchor.CenterRight)
+            => new(header, NewDefaultRectTransform(), collapsed, onToggle, iconAnchor);
 
         /// <summary>
         /// Disposes the layout builder, removing it from its parent if empty or recalculating layout.
