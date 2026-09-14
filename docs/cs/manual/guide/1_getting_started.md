@@ -30,27 +30,27 @@ Cualquier mod que desee implementar una pestaña de información solamente neces
 
   namespace MyMod;
 
-  [AutoRegister("MyMod.UsageMessage", order: -1)] // Usar [AutoRegister] sin parámetros daría como resultado (id: "MyMod.TreatmentStatInfo", order: 0, active: true).
+  // Usar [AutoRegister] sin parámetros daría como resultado:
+  // (id: "MyMod.UsageMessageStatInfo", order: 0, active: true).
+  [AutoRegister("MyMod.ArtieUsage", order: -1)]
   public class UsageMessageStatInfo : ISOSStatInfo
   {
-      public bool Draw(GUIListBox contentPanel, Prefab prefab)
+      public void Draw(RectTransform rectT, Prefab prefab)
       {
           string? text = prefab switch
           {
-              ItemPrefab item => $"Artie Dolittle is using {item.Name.Value}...",
-              AfflictionPrefab aff when aff.CauseOfDeathDescription.Loaded => $"Artie Dolittle has {aff.CauseOfDeathDescription.Value}...",
+              ItemPrefab item when !item.Name.IsNullOrEmpty() => $"Artie Dolittle is using {item.Name.Value}...",
+              AfflictionPrefab aff when !aff.CauseOfDeathDescription.IsNullOrEmpty() => $"Artie Dolittle has {aff.CauseOfDeathDescription.Value}...",
               _ => null
           };
-
-          if (text.IsNullOrWhiteSpace()) return false;
-
-          using var l = new GUILayoutBuilder(contentPanel);
-          l.Header("OBITUARY", Color.Crimson);
-          l.RichText(RichString.Rich(text));
-          return true;
+  
+          if (text == null) return;
+  
+          using var l = new GUILayoutBuilder(rectT);
+          l.Header("ARTIE STATUS", Color.Crimson);
+          l.Text(text);
       }
   }
-
   ```
 
 - **Lua:**
@@ -74,7 +74,7 @@ Cualquier mod que desee implementar una pestaña de información solamente neces
           GUI.GUIStyle.LargeFont, GUI.Alignment.Center)
   end
 
-  function HelloTab.Show(prefab, onPrimary, onSecondary)
+  function HelloTab.Show(prefab)
       if container ~= nil then container.Visible = true end
   end
 
