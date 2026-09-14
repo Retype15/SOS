@@ -25,11 +25,11 @@ namespace SOS
         /// <param name="modName">The mod name the prefab belongs to.</param>
         /// <returns><c>true</c> if the prefab matches all general filter terms; <c>false</c> otherwise.</returns>
         /// <remarks>
-        /// If the filter's <see cref="ISOSPrefabFilter.General"/> list is empty, the method returns <c>true</c> immediately.
+        /// If the filter's <see cref="IPrefabFilter.General"/> list is empty, the method returns <c>true</c> immediately.
         /// For each term in the general filter, the method checks if the term is contained in the name, identifier, or mod name
         /// (case-insensitive). If any term is not found in any of the three fields, the method returns <c>false</c>.
         /// </remarks>
-        public static bool MatchesGeneral(ISOSPrefabFilter filter, string name, string identifier, string modName)
+        public static bool MatchesGeneral(IPrefabFilter filter, string name, string identifier, string modName)
         {
             if (filter.General.Count == 0) return true;
 
@@ -61,7 +61,7 @@ namespace SOS
     /// </list>
     /// The query is parsed by detecting these prefixes and splitting the query at each prefix character.
     /// </remarks>
-    internal class SearchFilter : ISOSPrefabFilter
+    internal class SearchFilter : IPrefabFilter
     {
         public List<string> General { get; } = [];
         public List<string> Mod { get; } = [];
@@ -119,7 +119,7 @@ namespace SOS
         /// <param name="name">The prefab type name to check.</param>
         /// <returns><c>true</c> if the type is allowed by the filter; <c>false</c> otherwise.</returns>
         /// <remarks>
-        /// If the <see cref="ISOSPrefabFilter.PrefabType"/> list is empty, all types are allowed.
+        /// If the <see cref="IPrefabFilter.PrefabType"/> list is empty, all types are allowed.
         /// Otherwise, the type name is checked against each term in the PrefabType list using
         /// case-insensitive containment matching.
         /// </remarks>

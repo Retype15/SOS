@@ -83,13 +83,13 @@ namespace SOS.Prefabs.Item
             return _itemSlotCache[prefab.Identifier] = string.Join(" ", slots).ToLowerInvariant();
         }
 
-        public IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter)
+        public IEnumerable<Prefab> GetAll(IPrefabFilter filter)
         {
             return ItemPrefab.Prefabs
                 .Where(p => Matches(p, filter)).OrderBy(p => p.Name());
         }
 
-        private static bool Matches(ItemPrefab p, ISOSPrefabFilter filter)
+        private static bool Matches(ItemPrefab p, IPrefabFilter filter)
         {
             if (filter.Mod.Count > 0 && !filter.Mod.Any(m =>
                 (p.ContentPackage?.Name ?? "Vanilla").Contains(m, StringComparison.OrdinalIgnoreCase)))
@@ -114,7 +114,7 @@ namespace SOS.Prefabs.Item
             return MatchesGeneral(p, filter);
         }
 
-        private static bool MatchesGeneral(ItemPrefab p, ISOSPrefabFilter filter)
+        private static bool MatchesGeneral(ItemPrefab p, IPrefabFilter filter)
         {
             if (filter.General.Count == 0) return true;
 

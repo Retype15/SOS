@@ -283,7 +283,7 @@ namespace SOS
     }
 
     /// <summary>
-    /// Represents parsed search criteria used by <see cref="ISOSPrefab.GetAll(ISOSPrefabFilter)"/> to filter entities in the browser.
+    /// Represents parsed search criteria used by <see cref="ISOSPrefab.GetAll(IPrefabFilter)"/> to filter entities in the browser.
     /// </summary>
     /// <remarks>
     /// Supports advanced search prefixes parsed by <c>PrefabFilterHelper.SearchFilter</c>:
@@ -296,7 +296,7 @@ namespace SOS
     /// <item><term>%</term><description>Filters by Prefab type name (<see cref="PrefabType"/>).</description></item>
     /// </list>
     /// </remarks>
-    public interface ISOSPrefabFilter
+    public interface IPrefabFilter
     {
         /// <summary>
         /// Gets general search keywords that match across names, identifiers, or content package titles.
@@ -349,7 +349,7 @@ namespace SOS
     /// {
     ///     public Type PrefabType => typeof(JobPrefab);
     ///     public string Header => "Jobs &amp; Roles";
-    ///     public IEnumerable&lt;Prefab&gt; GetAll(ISOSPrefabFilter filter)
+    ///     public IEnumerable&lt;Prefab&gt; GetAll(IPrefabFilter filter)
     ///     {
     ///         return JobPrefab.Prefabs.Where(j => filter.General.Count == 0 || j.Name.Value.Contains(filter.General[0]));
     ///     }
@@ -373,7 +373,7 @@ namespace SOS
         /// </summary>
         /// <param name="filter">The structured search filter containing text, category, tag, and mod tokens.</param>
         /// <returns>An enumerable sequence of matching <see cref="Barotrauma.Prefab"/> instances.</returns>
-        IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter);
+        IEnumerable<Prefab> GetAll(IPrefabFilter filter);
 
         /// <summary>
         /// Constructs right-click contextual action options for an entity belonging to this provider.

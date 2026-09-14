@@ -15,14 +15,14 @@ namespace SOS.Prefabs.Affliction
         public Type PrefabType => typeof(AfflictionPrefab);
         public string Header => Texts.Get("sos.list.header.afflictionprefab", "Afflictions").Value;
 
-        public IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter)
+        public IEnumerable<Prefab> GetAll(IPrefabFilter filter)
         {
             return AfflictionPrefab.List
                 .Where(a => Matches(a, filter))
                 .OrderBy(a => a is AfflictionPrefabHusk ? 1 : 0).ThenBy(p => p.Name());
         }
 
-        private static bool Matches(AfflictionPrefab a, ISOSPrefabFilter filter)
+        private static bool Matches(AfflictionPrefab a, IPrefabFilter filter)
         {
             if (filter.Slot.Count > 0 || filter.Tag.Count > 0) return false;
 
@@ -41,7 +41,7 @@ namespace SOS.Prefabs.Affliction
             return MatchesGeneral(a, filter);
         }
 
-        private static bool MatchesGeneral(AfflictionPrefab a, ISOSPrefabFilter filter)
+        private static bool MatchesGeneral(AfflictionPrefab a, IPrefabFilter filter)
         {
             if (filter.General.Count == 0) return true;
 
@@ -67,6 +67,6 @@ namespace SOS.Prefabs.Affliction
     {
         public Type PrefabType => typeof(AfflictionPrefabHusk);
         public string Header => Texts.Get("sos.list.header.afflictionprefabhusk", "Husk Afflictions").Value;
-        public IEnumerable<Prefab> GetAll(ISOSPrefabFilter filter) => [];
+        public IEnumerable<Prefab> GetAll(IPrefabFilter filter) => [];
     }
 }
