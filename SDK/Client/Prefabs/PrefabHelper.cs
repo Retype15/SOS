@@ -142,7 +142,7 @@ namespace SOS.Prefabs
         /// <param name="target">The prefab to open the context menu for.</param>
         /// <param name="position">Optional mouse position. Defaults to <see cref="PlayerInput.MousePosition"/>.</param>
         /// <remarks>
-        /// Collects context options from all <see cref="ISOSPrefab"/> instances whose
+        /// Collects context options from all SOS modules implementing <see cref="ISOSPrefab"/> whose
         /// <see cref="ISOSPrefab.PrefabType"/> is assignable from <paramref name="target"/>'s type,
         /// then creates a <see cref="GUIContextMenu"/> with those options.
         /// Returns immediately if no options are available.

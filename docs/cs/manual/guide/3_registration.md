@@ -1,14 +1,14 @@
 # Registration {#registration}
 
-Hay dos formas principales de registrar un nuevo componente:
+Hay dos formas principales de registrar un nuevo módulo SOS:
 
 ## 1. Registro Automático
 
-- Usando el atributo [`[AutoRegister]`](class_s_o_s_1_1_auto_register_attribute.html) soble una clase que implemente alguna interfaz [ISOS*](isos_interfaces.html), para registro automático la primera vez que se abra la ventana de SOS(nunca antes) pasando las propiedades opcionales de registro:
+- Usando el atributo [`[AutoRegister]`](class_s_o_s_1_1_auto_register_attribute.html) sobre un módulo SOS (clase que implemente alguna interfaz [ISOS*](sos_modules.html)), para registro automático la primera vez que se abra la ventana de SOS(nunca antes) pasando las propiedades opcionales de registro:
 
-  - `string id`: El identificador único para su tipo, si otro objeto del mismo tipo intenta registrarse posteriormente con el mismo identificador, será sobreescrito. **Default: type.FullName ?? type.Name**. Si registra un componente con el mismo nombre de uno anterior, se sobreescribirá, téngalo en cuenta si desea sobreescribir componentes de otros mods para lógica personalizada.
+  - `string id`: El identificador único para su tipo, si otro objeto del mismo tipo intenta registrarse posteriormente con el mismo identificador, será sobreescrito. **Default: type.FullName ?? type.Name**. Si registra un módulo SOS con el mismo nombre de uno anterior, se sobreescribirá, téngalo en cuenta si desea sobreescribir módulos SOS de otros mods para lógica personalizada.
   - `double order`: Orden de ejecución o llamada. Orden ascendente. llaman de menor a mayor, si es igual se trata alfabéticamente por el Id, permitiendo ordenarse en las llamdas de forma predecible. **Default: 0**
-  - `bool active`: Indica si por defecto este componente se ejecutará o no. Permite añadir lógica de activación/desactivación de componentes para lógica condicional, o permitir al jugador desactivar componentes a conciencia para no sobrecargar su interfaz con informacion que no necesita. **Default: True**
+  - `bool active`: Indica si por defecto este módulo SOS se ejecutará o no. Permite añadir lógica de activación/desactivación de módulos SOS para lógica condicional, o permitir al jugador desactivar módulos SOS a conciencia para no sobrecargar su interfaz con informacion que no necesita. **Default: True**
 
 > [!TIP]
 > Usando este método, la clase se descubre automáticamente. Es la forma idiomática de registrar clases que implementen nuestras interfaces.
@@ -20,7 +20,7 @@ Hay dos formas principales de registrar un nuevo componente:
 ## 2. Registro manual
 
 - Registro manual, usando cualquier método `API.Register*` y pasando un objeto que represente el método de instanciación y las mismas propiedades opcionales anteriormente descritas (obj, id, order, active). Puede registrar objetos genéricos y tablas Lua que implementen de forma directa o indirecta los métodos del contrato.
-  - `object obj:` Hay varias formas de registrar un componente:
+  - `object obj:` Hay varias formas de registrar un módulo SOS:
   
     - `class\<T\>`: Instancia directa de un objeto que implemente el contrato. Esta es la forma más simple de pasar una única instancia global y evitar instanciar.
 
@@ -88,12 +88,12 @@ Hay dos formas principales de registrar un nuevo componente:
 <!-- TODO: Explicar sobre DefaultClassAtribute y métodos defaults para Lua?(redirigir a lua_interop para más info) -->
 
 > [!NOTE]
-> NO recomendamos implementar en una misma clase varios tipos de interfaces ISOS*, esto lo consideramos un anti-patrón y actualmente llevará a crear 2 instancias de la misma clase para cada tipo de contrato(A menos que registre manualmente una misma instancia o delegado para ambos, pero igualmente no lo recomendamos).
+> NO recomendamos implementar en una misma clase varios tipos de módulos SOS (interfaces ISOS*), esto lo consideramos un anti-patrón y actualmente llevará a crear 2 instancias de la misma clase para cada tipo de contrato(A menos que registre manualmente una misma instancia o delegado para ambos, pero igualmente no lo recomendamos).
 
 <!-- - -->
 
 > [!IMPORTANT]
-> Cada clase que implemente alguna interfaz `ISOS*` y se registre funcionará como un builder de instancia única por defecto, lo que significa que se usa la misma instancia hasta cerrar/reabrir la ventana SOS (A menos que registre por el método manual una instancia o un delegado enves de un type o una factoría (() => new Object())). Téngalo en cuenta si considera guardar información en la clase, que esta no interfiera al ser llamada en diferentes contextos.
+> Cada módulo SOS (clase que implemente alguna interfaz `ISOS*`) y se registre funcionará como un builder de instancia única por defecto, lo que significa que se usa la misma instancia hasta cerrar/reabrir la ventana SOS (A menos que registre por el método manual una instancia o un delegado enves de un type o una factoría (() => new Object())). Téngalo en cuenta si considera guardar información en la clase, que esta no interfiera al ser llamada en diferentes contextos.
 
 <!-- TODO: Recordar hAblar de IDisposable para objetos genéricos. -->
 

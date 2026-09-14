@@ -73,7 +73,7 @@ namespace SOS.Configs
         #region Loader configs
 
         /// <summary>
-        /// Loads all registered configurations by calling <see cref="ISOSConfig.Load"/> on each one.
+        /// Loads all registered SOS modules implementing <see cref="ISOSConfig"/> by calling <see cref="ISOSConfig.Load"/> on each one.
         /// </summary>
         /// <remarks>
         /// Iterates over all configs retrieved via <c>API.GetAllConfigs()</c>.
@@ -95,7 +95,7 @@ namespace SOS.Configs
         }
 
         /// <summary>
-        /// Saves all registered configurations by calling <see cref="ISOSConfig.Save"/> on each one.
+        /// Saves all registered SOS modules implementing <see cref="ISOSConfig"/> by calling <see cref="ISOSConfig.Save"/> on each one.
         /// </summary>
         /// <remarks>
         /// Iterates over all configs retrieved via <c>API.GetAllConfigs()</c>.
@@ -117,7 +117,7 @@ namespace SOS.Configs
         }
 
         /// <summary>
-        /// Resets all registered configurations by calling <see cref="ISOSConfig.Reset"/> on each one.
+        /// Resets all registered SOS modules implementing <see cref="ISOSConfig"/> by calling <see cref="ISOSConfig.Reset"/> on each one.
         /// </summary>
         /// <remarks>
         /// Iterates over all active configurations retrieved via <see cref="API.GetAllConfigs"/>.
@@ -143,10 +143,10 @@ namespace SOS.Configs
         #region General Helpers
 
         /// <summary>
-        /// Adds a button to a <see cref="GUILayoutBuilder"/> that, when clicked, resets and saves the associated <see cref="ISOSConfig"/> section.
+        /// Adds a button to a <see cref="GUILayoutBuilder"/> that, when clicked, resets and saves the associated SOS module implementing <see cref="ISOSConfig"/>.
         /// </summary>
         /// <param name="l">The layout builder to which the button will be added.</param>
-        /// <param name="cfg">The configuration section to reset and save when the button is clicked.</param>
+        /// <param name="cfg">The SOS module configuration to reset and save when the button is clicked.</param>
         /// <param name="text">Optional custom text for the button. If <c>null</c>, uses the default text
         /// "sos.config.reset_section" (localized "Reset Section Defaults").</param>
         /// <param name="onClick">Optional additional action to perform after resetting and saving the config.</param>

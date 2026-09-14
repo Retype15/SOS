@@ -92,7 +92,7 @@ Cualquier mod que desee implementar una pestaña de información solamente neces
   API.RegisterTab(HelloTab, HelloTab.Id, 10)
   ```
 
-Ahora sí, podemos comenzar a aprender los métodos y atributos que te serán de utilidad para construir tus futuros componentes personalizados.
+Ahora sí, podemos comenzar a aprender los métodos y atributos que te serán de utilidad para construir tus futuros módulos SOS personalizados.
 
 ## Otros recursos
 

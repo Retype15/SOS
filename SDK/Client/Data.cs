@@ -16,23 +16,27 @@ namespace SOS
     #region AutoRegister
 
     /// <summary>
-    /// Instructs the S.O.S. discovery engine to automatically register the decorated class into its corresponding <see cref="API"/> factory.
+    /// Instructs the S.O.S. discovery engine to automatically register the decorated class as an SOS module into its corresponding <see cref="API"/> factory.
     /// </summary>
     /// <remarks>
     /// <para>
+    /// An SOS module is any class implementing one of the core <c>ISOS*</c> contracts
+    /// (<see cref="ISOSTab"/>, <see cref="ISOSStatInfo"/>, <see cref="ISOSPrefab"/>, <see cref="ISOSConfig"/>, <see cref="ISOSWindowProfile"/>).
+    /// </para>
+    /// <para>
     /// During mod first opening (<see cref="API.Initialize"/>), the LuaCs plugin management service scans loaded assemblies
-    /// for classes decorated with this attribute that implement one of the core extension interfaces:
+    /// for classes decorated with this attribute that implement one of the SOS module contracts:
     /// <list type="bullet">
-    /// <item><description><see cref="ISOSTab"/> (or <see cref="ITab{T}"/>): Registered as a browser tab.</description></item>
-    /// <item><description><see cref="ISOSStatInfo"/>: Registered as an inspector wiki section.</description></item>
-    /// <item><description><see cref="ISOSPrefab"/>: Registered as a prefab data provider in the browser.</description></item>
-    /// <item><description><see cref="ISOSWindowProfile"/>: Registered as a visual window layout profile.</description></item>
-    /// <item><description><see cref="ISOSConfig"/>: Registered as a reactive configuration unit.</description></item>
+    /// <item><description><see cref="ISOSTab"/> (or <see cref="ITab{T}"/>): Registered as an SOS module acting as a browser tab.</description></item>
+    /// <item><description><see cref="ISOSStatInfo"/>: Registered as an SOS module acting as an inspector wiki section.</description></item>
+    /// <item><description><see cref="ISOSPrefab"/>: Registered as an SOS module acting as a prefab data provider in the browser.</description></item>
+    /// <item><description><see cref="ISOSWindowProfile"/>: Registered as an SOS module acting as a visual window layout profile.</description></item>
+    /// <item><description><see cref="ISOSConfig"/>: Registered as an SOS module acting as a reactive configuration unit.</description></item>
     /// </list>
     /// </para>
     /// <para>
     /// <b>Deferred Instantiation:</b> Decorating a type with this attribute registers its factory delegate without constructing an instance immediately.
-    /// Actual construction is deferred until the component is first requested by the user or the active profile.
+    /// Actual construction is deferred until the SOS module is first requested by the user or the active profile.
     /// </para>
     /// </remarks>
     /// <example>
@@ -54,14 +58,14 @@ namespace SOS
         public readonly string? Id;
 
         /// <summary>
-        /// Gets the numerical sorting order that determines the component's execution or layout sequence relative to others.
+        /// Gets the numerical sorting order that determines the SOS module's execution or layout sequence relative to others.
         /// Lower values appear earlier or execute first. Defaults to <c>0.0</c>.
         /// </summary>
         public readonly double Order;
 
         /// <summary>
-        /// Gets a value indicating whether the component is enabled upon initial discovery.
-        /// If <c>false</c>, the component is registered but ignored during queries until explicitly activated via <see cref="API"/>.
+        /// Gets a value indicating whether the SOS module is enabled upon initial discovery.
+        /// If <c>false</c>, the SOS module is registered but ignored during queries until explicitly activated via <see cref="API"/>.
         /// Defaults to <c>true</c>.
         /// </summary>
         public readonly bool Active;
@@ -71,7 +75,7 @@ namespace SOS
         /// </summary>
         /// <param name="id">Optional unique identifier. If <c>null</c> or whitespace, defaults to the declaring class's full name.</param>
         /// <param name="order">Priority order determining placement in UI lists or execution chains. Lower values appear first. Defaults to <c>0.0</c>.</param>
-        /// <param name="active">Whether the component is initially enabled. Defaults to <c>true</c>.</param>
+        /// <param name="active">Whether the SOS module is initially enabled. Defaults to <c>true</c>.</param>
         public AutoRegisterAttribute(string? id = null, double order = 0.0, bool active = true)
         {
             Id = id;
@@ -85,7 +89,7 @@ namespace SOS
     #region Interfaces
 
     /// <summary>
-    /// Exposes an identifier property used to uniquely distinguish a component within the S.O.S. ecosystem.
+    /// Exposes an identifier property used to uniquely distinguish an SOS module within the S.O.S. ecosystem.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IIdentifier
@@ -98,7 +102,7 @@ namespace SOS
     }
 
     /// <summary>
-    /// Defines a modular, generic UI tab capable of inspecting and interacting with entities of type <typeparamref name="T"/>.
+    /// Defines an SOS module acting as a modular, generic UI tab capable of inspecting and interacting with entities of type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The data entity type inspected by this tab (e.g., <see cref="Barotrauma.Prefab"/> or <see cref="Barotrauma.Character"/>).</typeparam>
     /// <remarks>
@@ -178,7 +182,7 @@ namespace SOS
     }
 
     /// <summary>
-    /// Defines a modular, completely stateless wiki inspector section rendered in the right-hand panel of S.O.S.
+    /// Defines an SOS module acting as a modular, completely stateless wiki inspector section rendered in the right-hand panel of S.O.S.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -221,12 +225,12 @@ namespace SOS
     }
 
     /// <summary>
-    /// Defines a modular prefab inspection tab (type alias for <see cref="ITab{T}"/> where <c>T</c> is <see cref="Barotrauma.Prefab"/>).
+    /// Defines an SOS module acting as a modular prefab inspection tab (type alias for <see cref="ITab{T}"/> where <c>T</c> is <see cref="Barotrauma.Prefab"/>).
     /// </summary>
     public interface ISOSTab : ITab<Prefab>;
 
     /// <summary>
-    /// Defines an extensible configuration unit with lifecycle persistence, factory defaults, and declarative UI rendering.
+    /// Defines an SOS module acting as an extensible configuration unit with lifecycle persistence, factory defaults, and declarative UI rendering.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -335,7 +339,7 @@ namespace SOS
     }
 
     /// <summary>
-    /// Defines an extensible prefab data source that feeds entities into the S.O.S. left sidebar browser.
+    /// Defines an SOS module acting as an extensible prefab data source that feeds entities into the S.O.S. left sidebar browser.
     /// </summary>
     /// <remarks>
     /// By implementing this interface and decorating the class with <see cref="AutoRegisterAttribute"/>,
@@ -385,7 +389,7 @@ namespace SOS
     }
 
     /// <summary>
-    /// Defines an interchangeable visual presentation layout for the S.O.S. window.
+    /// Defines an SOS module acting as an interchangeable visual presentation layout for the S.O.S. window.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -446,7 +450,7 @@ namespace SOS
     #region Default Proxy Classes
 
     /// <summary>
-    /// Provides default fallback implementations for tab components when adapted via <see cref="DuckProxy{T}"/>.
+    /// Provides default fallback implementations for tab SOS modules when adapted via <see cref="DuckProxy{T}"/>.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal sealed class TabDefaults

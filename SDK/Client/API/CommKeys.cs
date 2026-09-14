@@ -50,7 +50,7 @@ namespace SOS
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
-        /// <item><term>Payload Type:</term><description><see cref="string"/> (the unique identifier of the target <see cref="ISOSWindowProfile"/>).</description></item>
+        /// <item><term>Payload Type:</term><description><see cref="string"/> (the unique identifier of the target SOS module implementing <see cref="ISOSWindowProfile"/>).</description></item>
         /// <item><term>Typical Emitters:</term><description>Profile selection dropdown in the Settings window, automated layout switchers.</description></item>
         /// <item><term>Typical Subscribers:</term><description><c>SOSController</c> (tears down outgoing profile and builds incoming profile at <see cref="EventPriority.System"/>), <c>ProfileHelper</c> (refreshes open settings at <see cref="EventPriority.PostUI"/>).</description></item>
         /// </list>
@@ -147,7 +147,7 @@ namespace SOS
         /// <remarks>
         /// <list type="bullet">
         /// <item><term>Payload Type:</term><description><see cref="string"/> (the search token, e.g., <c>"#Medical"</c>, <c>"$surgery"</c>, or <c>"@Vanilla"</c>).</description></item>
-        /// <item><term>Typical Emitters:</term><description>Clickable badge hyperlinks in <see cref="ISOSStatInfo"/> rows, category badges, mod tags.</description></item>
+        /// <item><term>Typical Emitters:</term><description>Clickable badge hyperlinks in SOS module rows (<see cref="ISOSStatInfo"/>), category badges, mod tags.</description></item>
         /// <item><term>Typical Subscribers:</term><description>Active window profile (updates search text box, triggers debounced search at <see cref="EventPriority.UI"/>).</description></item>
         /// </list>
         /// </remarks>
