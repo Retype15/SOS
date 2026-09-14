@@ -2,9 +2,9 @@
 
 Hay dos formas principales de registrar un nuevo componente:
 
-## 1. AutoRegister
+## 1. Registro Automático
 
-- Usando el atributo `[AutoRegister]`, para registro automático la primera vez que se abra la ventana de SOS(nunca antes) pasando las propiedades opcionales de registro:
+- Usando el atributo [`[AutoRegister]`](class_s_o_s_1_1_auto_register_attribute.html), para registro automático la primera vez que se abra la ventana de SOS(nunca antes) pasando las propiedades opcionales de registro:
 
   - `string id`: El identificador único para su tipo, si otro objeto del mismo tipo intenta registrarse posteriormente con el mismo identificador, será sobreescrito. **Default: type.FullName ?? type.Name**. Si registra un componente con el mismo nombre de uno anterior, se sobreescribirá, téngalo en cuenta si desea sobreescribir componentes de otros mods para lógica personalizada.
   - `double order`: Orden de ejecución o llamada. Orden ascendente. llaman de menor a mayor, si es igual se trata alfabéticamente por el Id, permitiendo ordenarse en las llamdas de forma predecible. **Default: 0**
@@ -19,10 +19,10 @@ Hay dos formas principales de registrar un nuevo componente:
 
 ## 2. Registro manual
 
-- Registro manual, usando `API.Register*` y pasando un objeto que represente el método de instanciación y las mismas propiedades opcionales anteriormente descritas (obj, id, order, active). Puede registrar objetos genéricos y tablas Lua que implementen de forma indirecta los métodos del contrato.
+- Registro manual, usando cualquier método `API.Register*` y pasando un objeto que represente el método de instanciación y las mismas propiedades opcionales anteriormente descritas (obj, id, order, active). Puede registrar objetos genéricos y tablas Lua que implementen de forma directa o indirecta los métodos del contrato.
   - `object obj:` Hay varias formas de registrar un componente:
   
-    - `class\<T\>`: Instancia directa de un objeto que implemente el contrato. Esta es la forma más simple de pasar una unica instancia global y evitar instanciar.
+    - `class\<T\>`: Instancia directa de un objeto que implemente el contrato. Esta es la forma más simple de pasar una única instancia global y evitar instanciar.
 
       ```csharp
       API.RegisterStatInfo(new TreatmentStatInfo(), "MyMod.TreatmentInfo", 1);
@@ -34,24 +34,25 @@ Hay dos formas principales de registrar un nuevo componente:
       API.RegisterConfig(() => MyModConfig.Instance, "MyMod.MainConfig", 0);
       ```
 
-    - `object`: Objetos genéricos que no implementan de forma directa el contrato, o tablas de Lua(Compatibilidad con Lua). En estos casos se recurre a la reflexión para intentar vincular los metodos de la instancia recibida con los métodos que exige el contrato usando [`object.Cast<T>()`](lua_interop.html), esto permite registrar de forma indirecta clases sin necesidad de hacer una referencia dura al SDK de S.O.S, simplemente obteniendo por reflexion el método manual de registro `API.Register*` y pasando un objeto que cumpla el contrato de forma indirecta (por nombre de métodos).
+    - `object`: Objetos genéricos que no implementan de forma directa el contrato, o tablas de Lua(Compatibilidad con Lua). En estos casos se recurre a la reflexión para intentar vincular los metodos de la instancia recibida con los métodos que exige el contrato usando un proxy personalizado [`object.Cast<T>()`](lua_interop.html), permitiendo registrar de forma indirecta clases sin necesidad de hacer una referencia dura al SDK de S.O.S, simplemente obteniendo por reflexion el método manual de registro `API.Register*` y pasando un objeto que cumpla el contrato de forma indirecta (por nombre de métodos).
 
       ```csharp
       using Barotrauma;
+
       public class MyStatInfoSoft
       {
           public static string ID => "MyMod.MyStatInfoSoft";
-          public bool Draw(GUIListBox contentPanel, Prefab prefab)
+          public void Draw(GUIListBox contentPanel, Prefab prefab)
           {
               //...
-              return true;
           }
       }
       //IMPORTANT: Se debe obtener el último assembly cargado por el leak de assemblies de LuaCsForBarotrauma.
+      // Hay formas más limpias de hacerlo. Esto es solo un ejemplo.
       var apiType = AppDomain.CurrentDomain.GetAssemblies().LastOrDefault(t => t.GetType("SOS.API") != null)?.GetType("SOS.API");
       if (apiType == null)
       {
-          LuaCsLogger.LogError("[MyMod] SOS.API type not found — No S.O.S loaded");
+          LuaCsLogger.LogError("[MyMod] No S.O.S loaded");
           return;
       }
       var registerMethod = apiType.GetMethod("RegisterStatInfo", BindingFlags.Public | BindingFlags.Static, null, [typeof(object), typeo  (string), typeof(double), typeof(bool)], null);
@@ -64,7 +65,7 @@ Hay dos formas principales de registrar un nuevo componente:
       ```
 
       > [!NOTE]
-      > Todo patrón desconocido cae en esta rama, y por tanto se intentará castear usando la propiedad y los nombres de metodos sobre este object(o su target si es DuckProxy). No intente registrar tipos arbitrarios que claramente no cumplen el contrato. Asegúrese de que sean válidos.
+      > Todo patrón desconocido cae en esta rama, y por tanto se intentará castear usando la propiedad y los nombres de metodos sobre este object(o su target si es DuckProxy). No intente registrar tipos arbitrarios que claramente no cumplen el contrato ni tampoco registrar en bucle indefinido porque podría penalizar el rendimiento. Asegúrese de que sean válidos.
 
     - `Func\<object\>`: Delegado para registrar un builder de instancia usando un objeto genérico que implemente de forma indirecta la interfaz, o tabla de Lua.
 
@@ -84,7 +85,7 @@ Hay dos formas principales de registrar un nuevo componente:
       registerMethod.Invoke(apiType, [typeof(MyStatInfoSoft), MyStatInfoSoft.ID]);
       ```
 
-<!-- TODO: Explicar sobre DefaultClassAtribute -->
+<!-- TODO: Explicar sobre DefaultClassAtribute y métodos defaults para Lua?(redirigir a lua_interop para más info) -->
 
 > [!NOTE]
 > NO recomendamos implementar en una misma clase varios tipos de interfaces ISOS*, esto lo consideramos un anti-patrón y actualmente llevará a crear 2 instancias de la misma clase para cada tipo de contrato(A menos que registre manualmente una misma instancia o delegado para ambos, pero igualmente no lo recomendamos).
@@ -92,7 +93,7 @@ Hay dos formas principales de registrar un nuevo componente:
 <!-- - -->
 
 > [!IMPORTANT]
-> Cada `ISOS*` funciona como un builder de instancia única por defecto, lo que significa que se usa la misma instancia hasta cerrar/reabrir la ventana SOS (A menos que registre por el método manual una instancia o un delegado enves de un type o una factoría (() => new Object())). Téngalo en cuenta si considera guardar información en la clase, que esta no interfiera al ser llamada en diferentes contextos.
+> Cada clase que implemente alguna interfaz `ISOS*` y se registre funcionará como un builder de instancia única por defecto, lo que significa que se usa la misma instancia hasta cerrar/reabrir la ventana SOS (A menos que registre por el método manual una instancia o un delegado enves de un type o una factoría (() => new Object())). Téngalo en cuenta si considera guardar información en la clase, que esta no interfiera al ser llamada en diferentes contextos.
 
 <!-- TODO: Recordar hAblar de IDisposable para objetos genéricos. -->
 

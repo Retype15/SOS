@@ -2,7 +2,7 @@
 
 ## 1. Requisitos mínimos
 
-Proyecto integral principal, y el único binario sobre el que deberá trabajar cualquier mod. Está pensado para ser cargado Client-Side only y compatible para cualquier plataforma(Solo contiene referencias a Barotrauma y código multiplataforma). Este implementa la mayoría de logicas, contratos, patrones y componentes GUI personalizados compartidos. El archivo que deberá referenciar en proyectos derivados debe ser únicamente de este proyecto, archivo `SOS.SDK.dll`, y puede obtenerlo [AQUÍ](https://github.com/Retype15/SOS/releases/latest/download/SOS.SDK.dll).
+Proyecto integral principal, y el único binario sobre el que deberá trabajar cualquier mod. Está pensado para ser cargado Client-Side only y compatible para cualquier plataforma (Solo contiene referencias a Barotrauma y código multiplataforma). Este implementa la mayoría de lógicas, contratos, patrones y componentes GUI personalizados compartidos. El archivo que deberá referenciar en proyectos derivados debe ser únicamente de este proyecto, archivo `SOS.SDK.dll`, y puede obtenerlo [AQUÍ](https://github.com/Retype15/SOS/releases/latest/download/SOS.SDK.dll).
 
 Requisitos específicos del proyecto dependen de LuaCsForBarotrauma, véase la [guía de introducción de `LuaCsForBarotrauma`](https://evilfactory.github.io/LuaCsForBarotrauma) para crear mods compatibles.
 
@@ -12,7 +12,7 @@ La forma más fácil de iniciar un mod que dependa del nuestro es referenciando 
 
 ## Example mod
 
-Cualquier mod que desee implementar una pestaña de información solamente necesita crear una clase base que herede de la interfaz correspondiente e implemente el contenido que quiera añadir (e.g: Una nueva seccion en los stat sections necesita una clase pública que implemente el contrato de `ISOSStatInfo`), y posteriormente registrarla.
+Cualquier mod que desee implementar una pestaña de información solamente necesita crear una clase base que herede de la interfaz correspondiente e implemente el contenido que quiera añadir (e.g: Una nueva sección en los stat sections necesita una clase pública que implemente el contrato de [`ISOSStatInfo`](interface_s_o_s_1_1_i_s_o_s_stat_info.html)), y posteriormente registrarla.
 
 ### Ejemplo de uso
 
@@ -92,7 +92,7 @@ Cualquier mod que desee implementar una pestaña de información solamente neces
   API.RegisterTab(HelloTab, HelloTab.Id, 10)
   ```
 
-Ahora si, podemos comenzar a aprender los métodos y atributos que te serán de utilidad para construir tus futuros componentes personalizados.
+Ahora sí, podemos comenzar a aprender los métodos y atributos que te serán de utilidad para construir tus futuros componentes personalizados.
 
 ## Otros recursos
 
