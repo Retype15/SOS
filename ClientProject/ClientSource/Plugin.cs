@@ -27,6 +27,10 @@ namespace SOS
                 API.RegisterConfig(() => CoreConfig.Instance, CoreConfig.ID, 0);
                 API.RegisterConfig(() => WindowProfileConfig.Instance, WindowProfileConfig.ID, 0);
 
+#if DEBUG
+                API.RegisterConfig(() => TestGUILayoutBuilderOnConfigs.Instance, TestGUILayoutBuilderOnConfigs.ID, 1);
+#endif
+
                 Configs.ConfigHelper.LoadConfigs();
 
                 ConsoleCommandsService.RegisterCommand(
