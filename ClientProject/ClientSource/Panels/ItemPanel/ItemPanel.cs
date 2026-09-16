@@ -13,33 +13,36 @@ namespace SOS.Panels.ItemPanel
 {
     // MARK: Item Recipes Tab
     [AutoRegister("SOS.ItemRecipe", 0)]
-    public class ItemPanelTab : ISOSTab, IDisposable
+    public class ItemPanelTab : ISOSTab
     {
         public string Id => "SOS.ItemRecipe";
-        public string TabName => Texts.Get("sos.tab.recipes", "RECIPES").Value;
-        public string ToolTip => Texts.Get("sos.tab.recipes_tooltip").Value;
         private GUIFrame? _container;
         private GUIListBox? _colObtain;
         private GUIListBox? _colUsage;
 
-        private Prefab? _currentPrefab;
+        private Prefab? _currentPrefab = null;
 
         private static bool needsAnim = true;
 
         public bool CanHandle(Prefab prefab) => prefab is ItemPrefab;
 
-        public void Init(GUIComponent parentContainer)
+        public void Init(GUIFrame container, GUIButton tabButton)
         {
-            _container = new GUIFrame(new RectTransform(Vector2.One, parentContainer.RectTransform), style: null) { Visible = false };
+            _container = container;
         }
 
-        public void Show(Prefab prefab)
+        public GUIButton CreateTabButton(RectTransform tabRectT, string _) =>
+            TabDefaults.CreateTabButton(tabRectT, Texts.Get("sos.tab.recipes", "RECIPES").Value, Texts.Get("sos.tab.recipes_tooltip").Value);
+
+        public void Update(Prefab target)
         {
-            _currentPrefab = prefab;
+            _currentPrefab = target;
+            Rebuild(target);
+        }
 
-            if (_container == null || prefab is not ItemPrefab item) return;
-            _container.Visible = true;
-
+        private void Rebuild(Prefab target)
+        {
+            if (_container == null || target is not ItemPrefab item) return;
             if (!RecipeAnalyzer.DataInitialized)
             {
                 _container.ClearChildren();
@@ -48,9 +51,9 @@ namespace SOS.Panels.ItemPanel
                 {
                     CrossThread.RequestExecutionOnMainThread(() =>
                     {
-                        if (_container != null && _container.Visible && _currentPrefab != null)
+                        if (_container != null && _currentPrefab is ItemPrefab pending)
                         {
-                            Show(_currentPrefab);
+                            Rebuild(_currentPrefab);
                         }
                     });
                 });
@@ -146,17 +149,5 @@ namespace SOS.Panels.ItemPanel
             }
         }
 
-        public void Hide()
-        {
-            if (_container != null) _container.Visible = false;
-        }
-
-        public void Dispose()
-        {
-            _container?.Parent?.RemoveChild(_container);
-            _colObtain = null;
-            _colUsage = null;
-            GC.SuppressFinalize(this);
-        }
     }
 }

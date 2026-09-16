@@ -18,9 +18,13 @@ namespace SOS.GUI
     /// <remarks>
     /// Manages a list of <see cref="ITab{T}"/> instances, providing a button bar for tab selection
     /// and a content area for the active tab. Tabs are filtered by their <see cref="ITab{T}.CanHandle"/> method.
+    /// Each tab owns a dedicated content frame and button, both created once in <see cref="RegisterTab"/>
+    /// and stored alongside the tab; the widget owns their visibility exclusively.
     /// </remarks>
     public class GUITab<T> : GUIFrame, IDisposable
     {
+        protected record TabData(SOS.ITab<T> Tab, Barotrauma.GUIFrame Content, Barotrauma.GUIButton Button);
+
         /// <summary>
         /// The layout group arranging the button area and content area vertically.
         /// </summary>
@@ -36,9 +40,9 @@ namespace SOS.GUI
         private readonly GUIFrame _contentArea;
 
         /// <summary>
-        /// The list of registered tabs.
+        /// The registered tabs alongside their content frames and buttons.
         /// </summary>
-        private readonly List<ITab<T>> tabs = [];
+        protected readonly List<TabData> tabs = [];
 
         /// <summary>
         /// Gets the currently active tab, or null if no tab is selected.
@@ -59,23 +63,16 @@ namespace SOS.GUI
         private T? _currentTarget;
 
         /// <summary>
-        /// Action invoked when a primary interaction occurs on a prefab in the active tab.
-        /// </summary>
-        public Action<T>? OnClicked;
-
-        /// <summary>
         /// Creates a new tabbed interface container.
         /// </summary>
         /// <param name="rectT">The rectangle transform for positioning and sizing.</param>
-        /// <param name="onClicked">Action to invoke on primary interaction with a tab item.</param>
         /// <remarks>
         /// Initializes a vertical layout with a button area (8% height) and content area (92% height).
         /// The button area is a horizontal list box with 32px fixed height for tab buttons.
         /// </remarks>
-        public GUITab(RectTransform rectT, Action<T>? onClicked = null) : base(rectT, style: null)
+        public GUITab(RectTransform rectT) : base(rectT, style: null)
         {
             CanBeFocused = false;
-            OnClicked = onClicked;
 
             _verticalLayout = new GUILayoutGroup(new RectTransform(Vector2.One, RectTransform))
             {
@@ -103,13 +100,97 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="tab">The tab to register.</param>
         /// <remarks>
-        /// Calls <see cref="ITab{T}.Init"/> with the content area, then adds the tab to the internal list.
-        /// If initialization throws an exception, it is caught and logged via <see cref="Logger"/>.
+        /// Creates the owned content frame, asks the tab for its button via
+        /// <see cref="ITab{T}.CreateTabButton"/>, calls <see cref="ITab{T}.Init"/>, wires the click
+        /// handler once, stores all three in the internal list, and catches up with
+        /// <see cref="ITab{T}.Update"/> when a valid target already exists.
+        /// If initialization throws an exception, the created frames are discarded, the error is logged
+        /// via <see cref="Logger"/>, and the tab is ignored.
         /// </remarks>
         public void RegisterTab(ITab<T> tab)
         {
-            tab.Init(_contentArea);
-            tabs.Add(tab);
+            if (tab.Id.IsNullOrEmpty()) throw new NullReferenceException($"ITab<{typeof(T)}>.Id Must be have a valid non-empty Id string.");
+
+            GUIFrame? content = null;
+            GUIButton? button = null;
+            try
+            {
+                bool canHandle = _currentTarget != null && tab.CanHandle(_currentTarget);
+
+                button = tab.CreateTabButton(_buttonArea.Content.RectTransform, tab.Id);
+                button.Visible = canHandle;
+                button.UserData = tab;
+                button.OnClicked += WhenClicked;
+
+                content = new GUIFrame(new RectTransform(Vector2.One, _contentArea.RectTransform), style: null)
+                {
+                    Visible = false,
+                    CanBeFocused = false
+                };
+
+                tab.Init(content, button);
+
+                if (canHandle) tab.Update(_currentTarget!);
+
+                tabs.Add(new(tab, content, button));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"Exception as ocurred when tryed to register tab '{tab.Id}', this tab was ignored to prevent more errors...\n {ex.Message}");
+                Logger.LogDebugError(ex.StackTrace);
+                try
+                {
+                    if (content != null) _contentArea.RemoveChild(content);
+                    if (button != null) _buttonArea.Content.RemoveChild(button);
+                }
+                catch (Exception ex2)
+                {
+                    Logger.LogError($"Error when trying to remove conflicted `ITab<{typeof(T).Name}>` of Type {tab.GetType().FullOrName()}.");
+                    Logger.LogDebugError(ex2.StackTrace);
+                }
+            }
+        }
+
+        private bool WhenClicked(GUIButton _, object userData)
+        {
+            try
+            {
+                if (userData is ITab<T> tab)
+                {
+                    SelectTab(tab);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"Exception as ocurred when selecting tab via button click: {ex.Message}");
+                Logger.LogDebugError(ex.StackTrace);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the button stored for the given tab.
+        /// </summary>
+        /// <param name="tab">The tab whose button to retrieve.</param>
+        /// <returns>The stored <see cref="GUIButton"/>; or <c>null</c> if the tab is not registered.</returns>
+        public GUIButton? GetTabButton(ITab<T> tab)
+        {
+            foreach (var (t, _, b) in tabs)
+                if (t == tab) return b;
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the button stored for the tab matching the given identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the tab (see <see cref="IIdentifier.Id"/>).</param>
+        /// <returns>The stored <see cref="GUIButton"/>; or <c>null</c> if no tab matches <paramref name="id"/>.</returns>
+        public GUIButton? GetTabButton(string id)
+        {
+            foreach (var (t, _, b) in tabs)
+                if (t.Id == id) return b;
+            return null;
         }
 
         /// <summary>
@@ -117,39 +198,78 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="target">The new target item to display.</param>
         /// <remarks>
-        /// Clears the button area and rebuilds it with tabs that can handle the target.
-        /// If the current active tab can't handle the new target, the first valid tab is selected.
+        /// Broadcasts the target to every tab via <see cref="ITab{T}.CanHandle"/>, falls back
+        /// <see cref="ActiveTab"/> when it no longer applies, flips stored content and button
+        /// visibility, then rebuilds the active tab only via <see cref="ITab{T}.Update"/>.
         /// If there's only one valid tab, the button area is hidden and the content area fills the full height.
         /// </remarks>
         public void UpdateTabs(T target)
         {
+            int countValidTabs = 0;
+            TabData? first = null;
+            bool activeStillValid = false;
+
+            foreach (var tab in tabs)
+            {
+                if (tab.Tab.CanHandle(target))
+                {
+                    first ??= tab;
+                    bool isActive = tab.Tab == ActiveTab;
+                    activeStillValid |= isActive;
+                    tab.Content.Visible = isActive;
+                    tab.Button.Selected = isActive;
+                    tab.Button.Visible = true;
+                    countValidTabs++;
+                }
+                else
+                {
+                    tab.Button.Selected = false;
+                    tab.Button.Visible = false;
+                    tab.Content.Visible = false;
+                }
+            }
+
+            if (!activeStillValid)
+            {
+                if (first != null)
+                {
+                    ActiveTab = first.Tab;
+                    first.Content.Visible = true;
+                    first.Button.Selected = true;
+                }
+                else ActiveTab = null;
+            }
+
+            bool sameTarget = ReferenceEquals(target, _currentTarget);
+
+            if (!sameTarget && ActiveTab != null)
+            {
+                try
+                {
+                    ActiveTab.Update(target);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning($"Exception as ocurred when called 'Update' in tab '{ActiveTab.Id}', was removed to prevent more errors...\n {ex.Message}");
+                    Logger.LogDebugError(ex.StackTrace);
+                    RemoveTab(ActiveTab);
+                    ActiveTab = tabs.FirstOrDefault()?.Tab;
+                    if (ActiveTab != null)
+                    {
+                        UpdateTabs(target);
+                        return;
+                    }
+                }
+            }
+
             _currentTarget = target;
 
-            _buttonArea.Content.ClearChildren();
-            List<ITab<T>> validTabs = [.. tabs.Where(t => t.CanHandle(target))];
-
-            if (ActiveTab == null || !validTabs.Contains(ActiveTab))
-                ActiveTab = validTabs.FirstOrDefault();
-
-            if (validTabs.Count > 1)
+            if (countValidTabs > 1)
             {
                 _buttonArea.Visible = true;
                 _buttonArea.RectTransform.MinSize = new Point(0, 32);
                 _buttonArea.RectTransform.MaxSize = new Point(int.MaxValue, 32);
                 _contentArea.RectTransform.RelativeSize = new Vector2(1f, 0.92f);
-
-                foreach (var tab in validTabs)
-                    try
-                    {
-                        _ = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == ActiveTab, () => { SelectTab(tab); OnClicked?.Invoke(_currentTarget); }, tab.ToolTip);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogWarning($"Exception as ocurred when called 'CreateTabButton' in tab '{tab.TabName}', this tab was removed temporally to prevent more errors...\n {ex}");
-                        tabs.Remove(tab);
-                    }
-
-                _buttonArea.RecalculateChildren();
             }
             else
             {
@@ -160,25 +280,23 @@ namespace SOS.GUI
             }
 
             _verticalLayout.Recalculate();
-            RefreshTabContent();
         }
 
         /// <summary>
         /// Attempts to select a tab by its identifier.
         /// </summary>
-        /// <param name="tabId">The identifier of the tab to select.</param>
+        /// <param name="id">The identifier of the tab to select.</param>
         /// <returns><c>true</c> if the tab was found and selected; <c>false</c> otherwise.</returns>
         /// <remarks>
-        /// Returns <c>false</c> if there is no current target, the tab ID is not found, or the tab
-        /// cannot handle the current target.
+        /// Returns <c>false</c> if the tab ID is not found or cannot be selected;
+        /// implemented on top of <see cref="SelectTab(string)"/> with selection errors swallowed.
         /// </remarks>
-        public bool TrySelectTab(string tabId)
+        public bool TrySelectTab(string id)
         {
-            if (_currentTarget == null) return false;
-            var tab = tabs.FirstOrDefault(t => t.Id == tabId);
-            if (tab == null) return false;
-            if (!tab.CanHandle(_currentTarget)) return false;
-            return SelectTab(tab);
+            if (id.IsNullOrEmpty() || _currentTarget == null) return false;
+            try { SelectTab(id); }
+            catch { return false; }
+            return true;
         }
 
         /// <summary>
@@ -187,82 +305,124 @@ namespace SOS.GUI
         /// <param name="tab">The tab to select.</param>
         /// <returns><c>true</c> if the tab was found and selected; <c>false</c> otherwise.</returns>
         /// <remarks>
-        /// Returns <c>false</c> if the tab is not registered, or if it cannot handle the current target.
+        /// Returns <c>false</c> if the tab cannot be selected;
+        /// implemented on top of <see cref="SelectTab(ITab{T})"/> with selection errors swallowed.
         /// </remarks>
         public bool TrySelectTab(ITab<T> tab)
         {
-            if (!tabs.Contains(tab)) return false;
-            if (_currentTarget != null && !tab.CanHandle(_currentTarget)) return false;
-            return SelectTab(tab);
+            if (tab == null || _currentTarget == null) return false;
+            try { SelectTab(tab); }
+            catch { return false; }
+            return true;
+        }
+
+        public void SelectTab(string id)
+        {
+            foreach (var tabData in tabs) if (tabData.Tab.Id == id)
+            {
+                SelectTab(tabData.Tab);
+                return;
+            }
+            throw new ArgumentException($"Not have any Tab with Id '{id}' registered in this widget.");
         }
 
         /// <summary>
         /// Selects the specified tab as the active tab.
         /// </summary>
-        /// <param name="tab">The tab to select.</param>
-        /// <returns><c>true</c> if the tab was selected (or was already active).</returns>
+        /// <param name="tab">The tab to select. Must be registered in the widget.</param>
+        /// <exception cref="ArgumentException">The tab is not registered in the widget.</exception>
+        /// <exception cref="InvalidOperationException">There is no current target, or the tab cannot handle it.</exception>
         /// <remarks>
-        /// If the tab is already active, returns <c>true</c> immediately.
-        /// Otherwise, sets the tab as active, invokes <see cref="OnTabSelected"/>, rebuilds the button
-        /// area with the new active state, and refreshes the tab content.
+        /// If the tab is already active, returns immediately.
+        /// Otherwise, sets the tab as active, invokes <see cref="OnTabSelected"/>, flips the stored
+        /// content visibility and button selection states, and rebuilds the tab via
+        /// <see cref="ITab{T}.Update"/>. Buttons are never rebuilt here.
         /// </remarks>
-        public bool SelectTab(ITab<T> tab)
+        public void SelectTab(ITab<T> tab)
         {
-            if (ActiveTab == tab) return true;
+            ArgumentNullException.ThrowIfNull(tab);
+
+            if (tabs.All((t) => t.Tab != tab))
+                throw new ArgumentException($"Tab '{tab.Id}' is not registered in this widget.", nameof(tab));
+            if (_currentTarget == null)
+                throw new InvalidOperationException($"Cannot select tab '{tab.Id}' without a current target.");
+            if (!tab.CanHandle(_currentTarget))
+                throw new InvalidOperationException($"Tab '{tab.Id}' cannot handle the current target.");
+
+            if (ActiveTab == tab) return;
 
             ActiveTab = tab;
+
             OnTabSelected?.Invoke(tab);
-            if (_currentTarget != null)
+
+            foreach (var tabData in tabs)
             {
-                var validTabs = tabs.Where(t => t.CanHandle(_currentTarget));
-                _buttonArea.Content.ClearChildren();
-                if (validTabs.Count() > 1)
-                {
-                    foreach (var t in validTabs)
-                        _ = t.CreateTabButton(t.TabName, _buttonArea.Content.RectTransform, t == ActiveTab, () => SelectTab(t), t.ToolTip);
-                    _buttonArea.RecalculateChildren();
-                }
-                RefreshTabContent();
+                bool isActive = tabData.Tab == ActiveTab;
+                tabData.Content.Visible = isActive;
+                tabData.Button.Selected = isActive;
             }
-            else
+
+            try
             {
-                RefreshTabContent();
+                tab.Update(_currentTarget);
             }
-            return true;
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"Exception as ocurred when trying to update the tab '{tab.Id}', its content was removed to prevent more errors...\n {ex.Message}");
+                Logger.LogDebugError(ex.StackTrace);
+                RemoveTab(tab);
+                ITab<T>? fallback = tabs.FirstOrDefault()?.Tab;
+                if (fallback != null) SelectTab(fallback);
+                else ActiveTab = null;
+            }
+            _verticalLayout.Recalculate();
         }
 
-        /// <summary>
-        /// Refreshes the visible content of all tabs, showing the active tab and hiding others.
-        /// </summary>
-        /// <remarks>
-        /// Calls <see cref="ITab{T}.Show"/> on the active tab and <see cref="ITab{T}.Hide"/> on all other tabs.
-        /// </remarks>
-        private void RefreshTabContent()
-        {
-            if (_currentTarget == null) return;
+        public bool HideTab(ITab<T> tab) => HideTab((t) => t == tab);
+        public bool HideTab(string id) => HideTab((t) => t.Id == id);
 
-            foreach (var tab in tabs)
+        private bool HideTab(Func<ITab<T>, bool> comparer)
+        {
+            foreach (var tab in tabs) if (comparer(tab.Tab))
             {
-                if (tab == ActiveTab)
-                    tab.Show(_currentTarget);
-                else
-                    tab.Hide();
+                tab.Content.Visible = false;
+                tab.Button.Visible = false;
+                return true;
             }
+            return false;
+        }
+
+        public bool RemoveTab(ITab<T> tab) => RemoveTab((t) => t == tab);
+        public bool RemoveTab(string id) => RemoveTab((t) => t.Id == id);
+
+        private bool RemoveTab(Func<ITab<T>, bool> comparer)
+        {
+            TabData? tabData = tabs.FirstOrDefault((t) => comparer(t.Tab));
+            if (tabData != null)
+            {
+                try { _contentArea.RemoveChild(tabData.Content); } catch { }
+                try { _buttonArea.Content.RemoveChild(tabData.Button); } catch { }
+                return tabs.Remove(tabData);
+            }
+            return false;
         }
 
         /// <summary>
         /// Disposes the tab container and all registered tabs.
         /// </summary>
         /// <remarks>
-        /// Clears the button area, disposes all tabs that implement <see cref="IDisposable"/>,
-        /// clears the tab list, and suppresses finalization.
+        /// Clears the button area and the owned content frames, disposes all tabs that implement
+        /// <see cref="IDisposable"/>, clears the tab list, and suppresses finalization.
         /// </remarks>
         public void Dispose()
         {
             _buttonArea.Content.ClearChildren();
-            foreach (var tab in tabs)
-                if (tab is IDisposable d) d.Dispose();
+            _contentArea.ClearChildren();
+            foreach (var tabData in tabs)
+                if (tabData.Tab is IDisposable d) d.Dispose();
             tabs.Clear();
+            ActiveTab = null;
+            _currentTarget = default;
             GC.SuppressFinalize(this);
         }
 

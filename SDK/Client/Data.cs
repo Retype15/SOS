@@ -109,12 +109,14 @@ namespace SOS
     /// <para>
     /// <b>Lifecycle Flow:</b>
     /// <list type="number">
-    /// <item><description><see cref="Init"/>: Invoked once when the hosting tab widget (<see cref="GUI.GUITab{T}"/>) is constructed.</description></item>
+    /// <item><description><see cref="Init"/>: Invoked once per widget construction with the owned content frame and tab bar button. Deferred constructor: store the frame and build the static skeleton; the widget triggers <see cref="Update"/> right after when a valid target exists.</description></item>
     /// <item><description><see cref="CanHandle"/>: Evaluated whenever a new target entity is selected to determine if this tab applies.</description></item>
-    /// <item><description><see cref="Show"/>: Invoked when the user selects this tab (or when target changes while this tab is active) to construct or refresh UI elements.</description></item>
-    /// <item><description><see cref="Hide"/>: Invoked when switching away from this tab to suspend visual updates or hide containers.</description></item>
+    /// <item><description><see cref="Update"/>: Invoked on the active tab whenever it is selected or its target changes. Rebuild content on the stored frame.</description></item>
     /// <item><description><see cref="IDisposable.Dispose"/>: (If implemented) Invoked when the parent window profile or widget is closed to release Monogame textures or frames.</description></item>
     /// </list>
+    /// </para>
+    /// <para>
+    /// Visibility of both the content frame and the button is owned exclusively by the hosting tab widget (<see cref="GUI.GUITab{T}"/>).
     /// </para>
     /// </remarks>
     /// <example>
@@ -122,28 +124,26 @@ namespace SOS
     /// [AutoRegister("MyMod.SubmarineTab", order: 10.0)]
     /// public class SubmarineTab : ITab&lt;SubmarineInfo&gt;
     /// {
-    ///     public string TabName => "DETAILS";
+    ///     private GUIFrame? _container;
     ///     public bool CanHandle(SubmarineInfo sub) => sub != null;
-    ///     public void Init(GUIComponent container) { /* Build persistent frame */ }
-    ///     public void Show(SubmarineInfo sub) { /* Draw sub stats */ }
-    ///     public void Hide() { /* Hide frame */ }
+    ///     public void Init(GUIFrame container, GUIButton tabButton)
+    ///     {
+    ///         _container = container;
+    ///         /* Build static skeleton on container */
+    ///     }
+    ///     public void Update(SubmarineInfo target)
+    ///     {
+    ///         Rebuild(target);
+    ///     }
+    ///     public GUIButton CreateTabButton(RectTransform tabRectT, string _) =>
+    ///         TabDefaults.CreateTabButton(tabRectT, "DETAILS");
+    ///     private void Rebuild(SubmarineInfo target) { /* Draw sub stats */ }
     /// }
     /// </code>
     /// </example>
     [EditorBrowsable(EditorBrowsableState.Never), DefaultClass<TabDefaults>]
     public interface ITab<T> : IIdentifier
     {
-        /// <summary>
-        /// Gets the localized or display title rendered on the tab's selector button.
-        /// </summary>
-        string TabName { get; }
-
-        /// <summary>
-        /// Gets an optional tooltip description displayed when hovering over the tab's selector button.
-        /// Defaults to an empty string.
-        /// </summary>
-        string ToolTip => "";
-
         /// <summary>
         /// Evaluates whether this tab is capable of displaying meaningful information for the given <paramref name="item"/>.
         /// </summary>
@@ -152,42 +152,32 @@ namespace SOS
         bool CanHandle(T item);
 
         /// <summary>
-        /// Initializes persistent UI containers when the tab widget is constructed.
+        /// Initializes the tab when the widget is constructed. Deferred constructor: store the owned frame and build the static skeleton.
         /// </summary>
-        /// <param name="contentContainer">The parent <see cref="Barotrauma.GUIComponent"/> where this tab's visual hierarchy must be attached.</param>
-        void Init(GUIComponent contentContainer);
+        /// <param name="container">The content frame owned by the widget. Store it and build the visual hierarchy on its <see cref="Barotrauma.RectTransform"/>; never toggle its <c>Visible</c>.</param>
+        /// <param name="tabButton">The tab bar button created via <see cref="CreateTabButton"/>. Optionally retouch it here (text, style); never toggle <c>Visible</c>/<c>Selected</c> nor wire <c>OnClicked</c>: the widget owns those.</param>
+        void Init(GUIFrame container, GUIButton tabButton);
 
         /// <summary>
-        /// Populates or updates the tab's visual content for the active <paramref name="item"/>.
+        /// Rebuilds the tab's content for the newly selected <paramref name="target"/>.
+        /// Invoked on the active tab only, and only when the target instance changed.
         /// </summary>
-        /// <param name="item">The entity to inspect and visualize.</param>
-        void Show(T item);
+        /// <param name="target">The entity to inspect and visualize.</param>
+        void Update(T target);
 
         /// <summary>
-        /// Hides the tab UI when another tab becomes active.
+        /// Creates the tab bar button. Override to customize text, tooltip or style; the widget assigns selection, click and visibility afterwards.
         /// </summary>
-        void Hide();
-
-        /// <summary>
-        /// Creates and styles the header button representing this tab in the tab bar.
-        /// </summary>
-        /// <param name="tabName">The label displayed on the button.</param>
-        /// <param name="parent">The parent <see cref="Barotrauma.RectTransform"/> layout container.</param>
-        /// <param name="isActive">Whether this tab is currently the active view.</param>
-        /// <param name="onClick">Action invoked when the player clicks this tab button.</param>
-        /// <param name="toolTip">Optional tooltip text displayed on hover.</param>
-        /// <returns>A configured <see cref="Barotrauma.GUIButton"/> instance.</returns>
-        GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string toolTip = "")
-            => TabDefaults.CreateTabButton(tabName, parent, isActive, onClick, toolTip);
+        /// <param name="rectT">The tab bar area where the button will live.</param>
+        /// <param name="text">The title of the tab.</param>
+        GUIButton CreateTabButton(RectTransform rectT, string text)
+            => TabDefaults.CreateTabButton(rectT, text);
     }
 
     /// <summary>
     /// Defines an SOS module acting as a modular prefab inspection tab (type alias for <see cref="ITab{T}"/> where <c>T</c> is <see cref="Barotrauma.Prefab"/>).
     /// </summary>
-    public interface ISOSTab : ITab<Prefab>
-    {
-
-    }
+    public interface ISOSTab : ITab<Prefab> { }
 
     /// <summary>
     /// Defines an SOS module acting as a modular, completely stateless wiki inspector section rendered in the right-hand panel of S.O.S.
@@ -461,30 +451,27 @@ namespace SOS
         private TabDefaults() { }
 
         /// <summary>
-        /// Default empty tooltip for tabs.
+        /// Creates a standard tab button styled with the "MainMenuNotificationButton" template, sized to fit <paramref name="text"/>.
         /// </summary>
-        public static string ToolTip => "";
+        /// <param name="parent">The parent rectangle transform (usually the tab bar content).</param>
+        /// <param name="text">The label displayed on the button.</param>
+        /// <returns>A configured <see cref="Barotrauma.GUIButton"/> without click wiring; the hosting tab widget assigns it.</returns>
+        public static GUIButton CreateTabButton(RectTransform parent, string text)
+            => CreateTabButton(parent, text, null);
 
         /// <summary>
-        /// Creates a standard tab button styled with the "MainMenuNotificationButton" template.
+        /// Creates a standard tab button styled with the "MainMenuNotificationButton" template, sized to fit <paramref name="text"/>.
         /// </summary>
-        /// <param name="tabName">The label displayed on the button.</param>
-        /// <param name="parent">The parent rectangle transform.</param>
-        /// <param name="isActive">Whether this tab is currently selected.</param>
-        /// <param name="onClick">Callback invoked when the button is clicked.</param>
-        /// <param name="toolTip">Optional tooltip text.</param>
-        /// <returns>A configured <see cref="Barotrauma.GUIButton"/>.</returns>
-        public static GUIButton CreateTabButton(string tabName, RectTransform parent, bool isActive, Action onClick, string toolTip = "")
+        /// <param name="parent">The parent rectangle transform (usually the tab bar content).</param>
+        /// <param name="text">The label displayed on the button.</param>
+        /// <param name="tooltip">Optional tooltip text. If <c>null</c> or empty, no tooltip is set.</param>
+        /// <returns>A configured <see cref="Barotrauma.GUIButton"/> without click wiring; the hosting tab widget assigns it.</returns>
+        public static GUIButton CreateTabButton(RectTransform parent, string text, string? tooltip = null)
         {
-            Vector2 textSize = GUIStyle.SmallFont.MeasureString(tabName);
+            Vector2 textSize = GUIStyle.SmallFont.MeasureString(text);
             int width = (int)textSize.X + 24;
-            var tabBtn = new GUIButton(new RectTransform(new Point(width, 32), parent) { IsFixedSize = true }, tabName, style: "MainMenuNotificationButton")
-            {
-                Selected = isActive,
-                OnClicked = (_, _) => { onClick(); return true; },
-            };
-            if (!toolTip.IsNullOrEmpty())
-                tabBtn.ToolTip = toolTip;
+            var tabBtn = new GUIButton(new(new Point(width, 32), parent) { IsFixedSize = true }, text, style: "MainMenuNotificationButton");
+            if (!tooltip.IsNullOrEmpty()) tabBtn.ToolTip = tooltip;
             return tabBtn;
         }
     }

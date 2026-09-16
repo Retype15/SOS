@@ -90,10 +90,10 @@ namespace SOS
     /// <typeparam name="THelper">The static helper class containing public static fallback methods matching the interface.</typeparam>
     /// <example>
     /// <code>
-    /// [DefaultClass&lt;TabDefaults&gt;]
-    /// public interface ITab&lt;T&gt; : IIdentifier
+    /// [DefaultClass&lt;ConfigDefaults&gt;]
+    /// public interface IMyService
     /// {
-    ///     string ToolTip => "";
+    ///     void Reset() { }
     /// }
     /// </code>
     /// </example>
