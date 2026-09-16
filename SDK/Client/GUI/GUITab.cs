@@ -18,7 +18,8 @@ namespace SOS.GUI
     /// <remarks>
     /// Manages a list of <see cref="ITab{T}"/> instances, providing a button bar for tab selection
     /// and a content area for the active tab. Tabs are filtered by their <see cref="ITab{T}.CanHandle"/> method.
-    /// Each tab button is created once in <see cref="RegisterTab"/> and stored alongside its tab.
+    /// Each tab owns a dedicated content frame and button, both created once in <see cref="RegisterTab"/>
+    /// and stored alongside the tab; the widget owns their visibility exclusively.
     /// </remarks>
     public class GUITab<T> : GUIFrame, IDisposable
     {
@@ -97,9 +98,12 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="tab">The tab to register.</param>
         /// <remarks>
-        /// Calls <see cref="ITab{T}.Init"/> with the content area, creates its button a single time via
-        /// <see cref="ITab{T}.CreateTabButton"/>, wires the click handler once, then stores both in the internal list.
-        /// If initialization throws an exception, it is caught and logged via <see cref="Logger"/> and the tab is ignored.
+        /// Creates the owned content frame, asks the tab for its button via
+        /// <see cref="ITab{T}.CreateTabButton"/>, calls <see cref="ITab{T}.Init"/>, wires the click
+        /// handler once, stores all three in the internal list, and catches up with
+        /// <see cref="ITab{T}.Update"/> when a valid target already exists.
+        /// If initialization throws an exception, the created frames are discarded, the error is logged
+        /// via <see cref="Logger"/>, and the tab is ignored.
         /// </remarks>
         public void RegisterTab(ITab<T> tab)
         {
@@ -173,8 +177,9 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="target">The new target item to display.</param>
         /// <remarks>
-        /// Toggles stored button visibility for tabs that can handle the target instead of rebuilding buttons.
-        /// If the current active tab can't handle the new target, the first valid tab is selected.
+        /// Broadcasts the target to every tab via <see cref="ITab{T}.CanHandle"/>, falls back
+        /// <see cref="ActiveTab"/> when it no longer applies, flips stored content and button
+        /// visibility, then rebuilds the active tab only via <see cref="ITab{T}.Update"/>.
         /// If there's only one valid tab, the button area is hidden and the content area fills the full height.
         /// </remarks>
         public void UpdateTabs(T target)
@@ -297,7 +302,8 @@ namespace SOS.GUI
         /// <remarks>
         /// If the tab is already active, returns <c>true</c> immediately.
         /// Otherwise, sets the tab as active, invokes <see cref="OnTabSelected"/>, flips the stored
-        /// button selection states, and refreshes the tab content. Buttons are never rebuilt here.
+        /// content visibility and button selection states, and rebuilds the tab via
+        /// <see cref="ITab{T}.Update"/>. Buttons are never rebuilt here.
         /// </remarks>
         public bool SelectTab(ITab<T> tab)
         {
@@ -332,8 +338,8 @@ namespace SOS.GUI
         /// Disposes the tab container and all registered tabs.
         /// </summary>
         /// <remarks>
-        /// Clears the button area, disposes all tabs that implement <see cref="IDisposable"/>,
-        /// clears the tab list, and suppresses finalization.
+        /// Clears the button area and the owned content frames, disposes all tabs that implement
+        /// <see cref="IDisposable"/>, clears the tab list, and suppresses finalization.
         /// </remarks>
         public void Dispose()
         {
