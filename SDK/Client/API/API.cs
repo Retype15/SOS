@@ -12,13 +12,13 @@ namespace SOS
 {
 
     /// <summary>
-    /// Primary static facade providing access to S.O.S. mod extensibility points, component registries, prioritized event dispatching, and shared runtime state.
+    /// Primary static facade providing access to S.O.S. mod extensibility points, SOS module registries, prioritized event dispatching, and shared runtime state.
     /// </summary>
     /// <remarks>
     /// <para>
     /// <b>Architecture:</b>
     /// <list type="bullet">
-    /// <item><description><b>Component Registries:</b> Manages extensible sections (<see cref="ISOSStatInfo"/>), tabs (<see cref="ISOSTab"/>), configs (<see cref="ISOSConfig"/>), prefab providers (<see cref="ISOSPrefab"/>), and window profiles (<see cref="ISOSWindowProfile"/>) with ordering and activation control.</description></item>
+    /// <item><description><b>SOS Module Registries:</b> Manages SOS modules: sections (<see cref="ISOSStatInfo"/>), tabs (<see cref="ISOSTab"/>), configs (<see cref="ISOSConfig"/>), prefab providers (<see cref="ISOSPrefab"/>), and window profiles (<see cref="ISOSWindowProfile"/>) with ordering and activation control.</description></item>
     /// <item><description><b>Prioritized Event Pipeline:</b> Provides thread-safe event publishing and subscription (<c>On"</c>, <c>Off"</c>, <c>Emit</c>) ordered deterministically across <see cref="EventPriority"/> tiers.</description></item>
     /// <item><description><b>Shared State:</b> Offers a lightweight, reactive key-value state store (<see cref="SetState{T}(string, T, bool)"/>, <see cref="GetState{T}(string)"/>) for cross-mod communication.</description></item>
     /// </list>
@@ -29,7 +29,7 @@ namespace SOS
     /// </remarks>
     /// <example>
     /// <code>
-    /// // Registering an extension tab:
+    /// // Registering an SOS module:
     /// API.RegisterTab(typeof(MyCustomTab), "MyMod.CustomTab", order: 10.0);
     /// 
     /// // Listening to target selection events:
@@ -58,7 +58,7 @@ namespace SOS
         #region Info Sections
 
         /// <summary>
-        /// Registers a stat section provider into the S.O.S. inspector sidebar registry.
+        /// Registers an SOS module acting as a stat section provider into the S.O.S. inspector sidebar registry.
         /// </summary>
         /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSStatInfo"/>, a factory delegate (<see cref="Func{ISOSStatInfo}"/>), or an existing instance.</param>
         /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
@@ -125,7 +125,7 @@ namespace SOS
         #region Tabs
 
         /// <summary>
-        /// Registers a UI tab provider into the central tab widget registry.
+        /// Registers an SOS module acting as a UI tab provider into the central tab widget registry.
         /// </summary>
         /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSTab"/>, a factory delegate (<see cref="Func{ISOSTab}"/>), or an existing instance.</param>
         /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
@@ -191,7 +191,7 @@ namespace SOS
         #region Configs
 
         /// <summary>
-        /// Registers an extensible configuration unit into the SDK.
+        /// Registers an SOS module acting as an extensible configuration unit into the SDK.
         /// </summary>
         /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSConfig"/>, a factory delegate (<see cref="Func{ISOSConfig}"/>), or an existing instance.</param>
         /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
@@ -257,7 +257,7 @@ namespace SOS
         #region Prefab Providers
 
         /// <summary>
-        /// Registers a custom prefab data provider into the S.O.S. entity browser registry.
+        /// Registers an SOS module acting as a custom prefab data provider into the S.O.S. entity browser registry.
         /// </summary>
         /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSPrefab"/>, a factory delegate (<see cref="Func{ISOSPrefab}"/>), or an existing instance.</param>
         /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
@@ -323,7 +323,7 @@ namespace SOS
         #region Window Profiles
 
         /// <summary>
-        /// Registers a visual window layout profile into the S.O.S. profile registry.
+        /// Registers an SOS module acting as a visual window layout profile into the S.O.S. profile registry.
         /// </summary>
         /// <param name="obj">The target to register: a concrete <see cref="Type"/> implementing <see cref="ISOSWindowProfile"/>, a factory delegate (<see cref="Func{ISOSWindowProfile}"/>), or an existing instance.</param>
         /// <param name="id">Optional unique identifier. If <c>null</c>, defaults to the type's full name.</param>
@@ -550,7 +550,7 @@ namespace SOS
         #region Internal helpers
 
         /// <summary>
-        /// Discovers and auto-registers all components decorated with <see cref="AutoRegisterAttribute"/> across loaded assemblies.
+        /// Discovers and auto-registers all SOS modules decorated with <see cref="AutoRegisterAttribute"/> across loaded assemblies.
         /// </summary>
         /// <param name="pluginManagementService">The LuaCs plugin management service.</param>
         /// <remarks>
