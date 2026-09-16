@@ -129,23 +129,36 @@ namespace SOS.GUI
             }
             catch (Exception ex)
             {
+                Logger.LogWarning($"Exception as ocurred when tryed to register tab '{tab.Id}', this tab was ignored to prevent more errors...\n {ex.Message}");
+                Logger.LogDebugError(ex.StackTrace);
                 try
                 {
                     _contentArea.RemoveChild(content);
                     _buttonArea.Content.RemoveChild(button);
                     if (button != null) tabs.Remove((tab, content, button));
                 }
-                catch (Exception ex2) { Logger.LogError($"Error when trying to remove conflicted `ITab<{typeof(T).Name}>` of Type {tab.GetType().FullOrName()}.\n {ex2.StackTrace}"); }
-                Logger.LogWarning($"Exception as ocurred when called 'RegisterTab' in tab '{tab.Id}', this tab was ignored to prevent more errors...\n {ex.Message}");
-                Logger.LogDebugError(ex.StackTrace);
+                catch (Exception ex2)
+                {
+                    Logger.LogError($"Error when trying to remove conflicted `ITab<{typeof(T).Name}>` of Type {tab.GetType().FullOrName()}.");
+                    Logger.LogDebugError(ex2.StackTrace);
+                }
             }
         }
 
         private bool WhenClicked(GUIButton _, object userData)
         {
-            if (userData is ITab<T> tab) SelectTab(tab);
-            else return false;
-            return true;
+            try
+            {
+                if (userData is ITab<T> tab) SelectTab(tab);
+                else return false;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"Exception as ocurred when selecting tab via button click: {ex.Message}");
+                Logger.LogDebugError(ex.StackTrace);
+                return false;
+            }
         }
 
         /// <summary>
@@ -184,9 +197,6 @@ namespace SOS.GUI
         /// </remarks>
         public void UpdateTabs(T target)
         {
-            bool sameTarget = ReferenceEquals(target, _currentTarget);
-            _currentTarget = target;
-
             int countValidTabs = 0;
             (ITab<T> tab, GUIFrame content, GUIButton button)? first = null;
             bool activeStillValid = false;
@@ -223,6 +233,8 @@ namespace SOS.GUI
                 else ActiveTab = null;
             }
 
+            bool sameTarget = ReferenceEquals(target, _currentTarget);
+
             if (!sameTarget && ActiveTab != null)
             {
                 try
@@ -231,12 +243,19 @@ namespace SOS.GUI
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogWarning($"Exception as ocurred when called 'Update' in tab '{ActiveTab.Id}', its content was hidden to prevent more errors...\n {ex.Message}");
+                    Logger.LogWarning($"Exception as ocurred when called 'Update' in tab '{ActiveTab.Id}', was removed to prevent more errors...\n {ex.Message}");
                     Logger.LogDebugError(ex.StackTrace);
-                    foreach (var (tab, content, _) in tabs)
-                        if (tab == ActiveTab) content.Visible = false;
+                    RemoveTab(ActiveTab);
+                    ActiveTab = tabs.FirstOrDefault().Tab;
+                    if (ActiveTab != null)
+                    {
+                        UpdateTabs(target);
+                        return;
+                    }
                 }
             }
+
+            _currentTarget = target;
 
             if (countValidTabs > 1)
             {
@@ -262,18 +281,20 @@ namespace SOS.GUI
         /// <param name="tabId">The identifier of the tab to select.</param>
         /// <returns><c>true</c> if the tab was found and selected; <c>false</c> otherwise.</returns>
         /// <remarks>
-        /// Returns <c>false</c> if there is no current target, the tab ID is not found, or the tab
-        /// cannot handle the current target.
+        /// Returns <c>false</c> if the tab ID is not found or cannot be selected;
+        /// implemented on top of <see cref="SelectTab"/> with selection errors swallowed.
         /// </remarks>
         public bool TrySelectTab(string tabId)
         {
-            if (_currentTarget == null) return false;
             ITab<T>? tab = null;
             foreach (var (t, _, _) in tabs)
                 if (t.Id == tabId) { tab = t; break; }
-            if (tab == null) return false;
-            if (!tab.CanHandle(_currentTarget)) return false;
-            return SelectTab(tab);
+            if (tab == null || _currentTarget == null) return false;
+
+            try { SelectTab(tab); }
+            catch { return false; }
+
+            return true;
         }
 
         /// <summary>
@@ -282,56 +303,112 @@ namespace SOS.GUI
         /// <param name="tab">The tab to select.</param>
         /// <returns><c>true</c> if the tab was found and selected; <c>false</c> otherwise.</returns>
         /// <remarks>
-        /// Returns <c>false</c> if the tab is not registered, or if it cannot handle the current target.
+        /// Returns <c>false</c> if the tab cannot be selected;
+        /// implemented on top of <see cref="SelectTab"/> with selection errors swallowed.
         /// </remarks>
         public bool TrySelectTab(ITab<T> tab)
         {
-            bool registered = false;
-            foreach (var (t, _, _) in tabs)
-                if (t == tab) { registered = true; break; }
-            if (!registered) return false;
-            if (_currentTarget != null && !tab.CanHandle(_currentTarget)) return false;
-            return SelectTab(tab);
+            if (tab == null || _currentTarget == null) return false;
+
+            try { SelectTab(tab); }
+            catch { return false; }
+            return true;
         }
 
         /// <summary>
         /// Selects the specified tab as the active tab.
         /// </summary>
-        /// <param name="tab">The tab to select.</param>
-        /// <returns><c>true</c> if the tab was selected (or was already active).</returns>
+        /// <param name="tab">The tab to select. Must be registered in the widget.</param>
+        /// <exception cref="ArgumentException">The tab is not registered in the widget.</exception>
+        /// <exception cref="InvalidOperationException">There is no current target, or the tab cannot handle it.</exception>
         /// <remarks>
-        /// If the tab is already active, returns <c>true</c> immediately.
+        /// If the tab is already active, returns immediately.
         /// Otherwise, sets the tab as active, invokes <see cref="OnTabSelected"/>, flips the stored
         /// content visibility and button selection states, and rebuilds the tab via
         /// <see cref="ITab{T}.Update"/>. Buttons are never rebuilt here.
         /// </remarks>
-        public bool SelectTab(ITab<T> tab)
+        public void SelectTab(ITab<T> tab)
         {
-            if (ActiveTab == tab) return true;
+            ArgumentNullException.ThrowIfNull(tab);
+
+
+            if (tabs.All((t) => t.Tab != tab))
+                throw new ArgumentException($"Tab '{tab.Id}' is not registered in this widget.", nameof(tab));
+            if (_currentTarget == null)
+                throw new InvalidOperationException($"Cannot select tab '{tab.Id}' without a current target.");
+            if (!tab.CanHandle(_currentTarget))
+                throw new InvalidOperationException($"Tab '{tab.Id}' cannot handle the current target.");
+
+            if (ActiveTab == tab) return;
 
             ActiveTab = tab;
+
             OnTabSelected?.Invoke(tab);
+
             foreach (var (t, c, b) in tabs)
             {
-                c.Visible = (t == ActiveTab);
-                b.Selected = (t == ActiveTab);
+                bool isActive = t == ActiveTab;
+                c.Visible = isActive;
+                b.Selected = isActive;
             }
-            if (_currentTarget != null)
+
+            try
             {
-                try
+                tab.Update(_currentTarget);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"Exception as ocurred when trying to update the tab '{tab.Id}', its content was removed to prevent more errors...\n {ex.Message}");
+                Logger.LogDebugError(ex.StackTrace);
+                RemoveTab(tab);
+                ITab<T>? fallback = tabs.FirstOrDefault().Tab;
+                if (fallback != null) SelectTab(fallback);
+                else
                 {
-                    tab.Update(_currentTarget);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogWarning($"Exception as ocurred when called 'Update' in tab '{tab.Id}', its content was hidden to prevent more errors...\n {ex.Message}");
-                    Logger.LogDebugError(ex.StackTrace);
-                    foreach (var (t, c, _) in tabs)
-                        if (t == tab) c.Visible = false;
+                    ActiveTab = null;
+                    _verticalLayout.Recalculate();
                 }
             }
             _verticalLayout.Recalculate();
-            return true;
+        }
+
+        public bool HideTab(ITab<T> tab) => HideTab((t) => t == tab);
+        public bool HideTab(string id) => HideTab((t) => t.Id == id);
+
+        private bool HideTab(Func<ITab<T>, bool> comparer)
+        {
+            foreach (var (t, c, b) in tabs) if (comparer(t))
+            {
+                c.Visible = false;
+                b.Visible = false;
+                return true;
+            }
+            return false;
+        }
+
+        public bool RemoveTab(ITab<T> tab) => RemoveTab((t) => t == tab);
+        public bool RemoveTab(string id) => RemoveTab((t) => t.Id == id);
+
+        private bool RemoveTab(Func<ITab<T>, bool> comparer)
+        {
+            (ITab<T>, GUIFrame, GUIButton)? result = null;
+            try
+            {
+                result = tabs.FirstOrDefault((t) => comparer(t.Tab));
+                if (result.HasValue)
+                {
+                    var (_, content, button) = result.Value;
+                    try { _contentArea.RemoveChild(content); } catch { }
+                    try { _buttonArea.Content.RemoveChild(button); } catch { }
+                    return tabs.Remove(result.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error when trying to remove tab" + (result.HasValue ? $" '{result.Value.Item1}'." : ".") + $" Error: {ex.Message}");
+            }
+
+            return false;
         }
 
         /// <summary>

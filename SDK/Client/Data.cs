@@ -463,7 +463,7 @@ namespace SOS
         /// </summary>
         /// <param name="parent">The parent rectangle transform (usually the tab bar content).</param>
         /// <param name="text">The label displayed on the button.</param>
-        /// <param name="toolTip">Optional tooltip text. If <c>null</c> or empty, no tooltip is set.</param>
+        /// <param name="tooltip">Optional tooltip text. If <c>null</c> or empty, no tooltip is set.</param>
         /// <returns>A configured <see cref="Barotrauma.GUIButton"/> without click wiring; the hosting tab widget assigns it.</returns>
         public static GUIButton CreateTabButton(RectTransform parent, string text, string? tooltip = null)
         {
