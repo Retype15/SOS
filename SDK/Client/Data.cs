@@ -173,10 +173,7 @@ namespace SOS
     /// <summary>
     /// Defines a modular prefab inspection tab (type alias for <see cref="ITab{T}"/> where <c>T</c> is <see cref="Barotrauma.Prefab"/>).
     /// </summary>
-    public interface ISOSTab : ITab<Prefab>
-    {
-
-    }
+    public interface ISOSTab : ITab<Prefab> { }
 
     /// <summary>
     /// Defines a modular, completely stateless wiki inspector section rendered in the right-hand panel of S.O.S.

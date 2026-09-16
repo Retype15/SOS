@@ -23,6 +23,8 @@ namespace SOS.GUI
     /// </remarks>
     public class GUITab<T> : GUIFrame, IDisposable
     {
+        protected record TabData(SOS.ITab<T> Tab, Barotrauma.GUIFrame Content, Barotrauma.GUIButton Button);
+
         /// <summary>
         /// The layout group arranging the button area and content area vertically.
         /// </summary>
@@ -40,7 +42,7 @@ namespace SOS.GUI
         /// <summary>
         /// The registered tabs alongside their content frames and buttons.
         /// </summary>
-        private readonly List<(ITab<T> Tab, GUIFrame Content, GUIButton Button)> tabs = [];
+        protected readonly List<TabData> tabs = [];
 
         /// <summary>
         /// Gets the currently active tab, or null if no tab is selected.
@@ -107,25 +109,30 @@ namespace SOS.GUI
         /// </remarks>
         public void RegisterTab(ITab<T> tab)
         {
-            var content = new GUIFrame(new RectTransform(Vector2.One, _contentArea.RectTransform), style: null)
-            {
-                Visible = false,
-                CanBeFocused = false
-            };
+            if (tab.Id.IsNullOrEmpty()) throw new NullReferenceException($"ITab<{typeof(T)}>.Id Must be have a valid non-empty Id string.");
+
+            GUIFrame? content = null;
             GUIButton? button = null;
             try
             {
+                bool canHandle = _currentTarget != null && tab.CanHandle(_currentTarget);
+
                 button = tab.CreateTabButton(_buttonArea.Content.RectTransform, tab.Id);
+                button.Visible = canHandle;
                 button.UserData = tab;
                 button.OnClicked += WhenClicked;
 
+                content = new GUIFrame(new RectTransform(Vector2.One, _contentArea.RectTransform), style: null)
+                {
+                    Visible = false,
+                    CanBeFocused = false
+                };
+
                 tab.Init(content, button);
 
-                tabs.Add((tab, content, button));
+                if (canHandle) tab.Update(_currentTarget!);
 
-                //if (_currentTarget != null && tab.CanHandle(_currentTarget))
-                //    tab.Update(_currentTarget);
-                //_buttonArea.RecalculateChildren();
+                tabs.Add(new(tab, content, button));
             }
             catch (Exception ex)
             {
@@ -133,9 +140,8 @@ namespace SOS.GUI
                 Logger.LogDebugError(ex.StackTrace);
                 try
                 {
-                    _contentArea.RemoveChild(content);
-                    _buttonArea.Content.RemoveChild(button);
-                    if (button != null) tabs.Remove((tab, content, button));
+                    if (content != null) _contentArea.RemoveChild(content);
+                    if (button != null) _buttonArea.Content.RemoveChild(button);
                 }
                 catch (Exception ex2)
                 {
@@ -149,16 +155,18 @@ namespace SOS.GUI
         {
             try
             {
-                if (userData is ITab<T> tab) SelectTab(tab);
-                else return false;
-                return true;
+                if (userData is ITab<T> tab)
+                {
+                    SelectTab(tab);
+                    return true;
+                }
             }
             catch (Exception ex)
             {
                 Logger.LogWarning($"Exception as ocurred when selecting tab via button click: {ex.Message}");
                 Logger.LogDebugError(ex.StackTrace);
-                return false;
             }
+            return false;
         }
 
         /// <summary>
@@ -198,37 +206,36 @@ namespace SOS.GUI
         public void UpdateTabs(T target)
         {
             int countValidTabs = 0;
-            (ITab<T> tab, GUIFrame content, GUIButton button)? first = null;
+            TabData? first = null;
             bool activeStillValid = false;
 
-            foreach (var (tab, content, button) in tabs)
+            foreach (var tab in tabs)
             {
-                if (tab.CanHandle(target))
+                if (tab.Tab.CanHandle(target))
                 {
-                    first ??= (tab, content, button);
-                    bool isActive = tab == ActiveTab;
+                    first ??= tab;
+                    bool isActive = tab.Tab == ActiveTab;
                     activeStillValid |= isActive;
-                    content.Visible = isActive;
-                    button.Selected = isActive;
-                    button.Visible = true;
+                    tab.Content.Visible = isActive;
+                    tab.Button.Selected = isActive;
+                    tab.Button.Visible = true;
                     countValidTabs++;
                 }
                 else
                 {
-                    button.Selected = false;
-                    button.Visible = false;
-                    content.Visible = false;
+                    tab.Button.Selected = false;
+                    tab.Button.Visible = false;
+                    tab.Content.Visible = false;
                 }
             }
 
             if (!activeStillValid)
             {
-                if (first.HasValue)
+                if (first != null)
                 {
-                    var (tab, content, button) = first.Value;
-                    ActiveTab = tab;
-                    content.Visible = true;
-                    button.Selected = true;
+                    ActiveTab = first.Tab;
+                    first.Content.Visible = true;
+                    first.Button.Selected = true;
                 }
                 else ActiveTab = null;
             }
@@ -246,7 +253,7 @@ namespace SOS.GUI
                     Logger.LogWarning($"Exception as ocurred when called 'Update' in tab '{ActiveTab.Id}', was removed to prevent more errors...\n {ex.Message}");
                     Logger.LogDebugError(ex.StackTrace);
                     RemoveTab(ActiveTab);
-                    ActiveTab = tabs.FirstOrDefault().Tab;
+                    ActiveTab = tabs.FirstOrDefault()?.Tab;
                     if (ActiveTab != null)
                     {
                         UpdateTabs(target);
@@ -278,22 +285,17 @@ namespace SOS.GUI
         /// <summary>
         /// Attempts to select a tab by its identifier.
         /// </summary>
-        /// <param name="tabId">The identifier of the tab to select.</param>
+        /// <param name="id">The identifier of the tab to select.</param>
         /// <returns><c>true</c> if the tab was found and selected; <c>false</c> otherwise.</returns>
         /// <remarks>
         /// Returns <c>false</c> if the tab ID is not found or cannot be selected;
-        /// implemented on top of <see cref="SelectTab"/> with selection errors swallowed.
+        /// implemented on top of <see cref="SelectTab(string)"/> with selection errors swallowed.
         /// </remarks>
-        public bool TrySelectTab(string tabId)
+        public bool TrySelectTab(string id)
         {
-            ITab<T>? tab = null;
-            foreach (var (t, _, _) in tabs)
-                if (t.Id == tabId) { tab = t; break; }
-            if (tab == null || _currentTarget == null) return false;
-
-            try { SelectTab(tab); }
+            if (id.IsNullOrEmpty() || _currentTarget == null) return false;
+            try { SelectTab(id); }
             catch { return false; }
-
             return true;
         }
 
@@ -304,15 +306,24 @@ namespace SOS.GUI
         /// <returns><c>true</c> if the tab was found and selected; <c>false</c> otherwise.</returns>
         /// <remarks>
         /// Returns <c>false</c> if the tab cannot be selected;
-        /// implemented on top of <see cref="SelectTab"/> with selection errors swallowed.
+        /// implemented on top of <see cref="SelectTab(ITab{T})"/> with selection errors swallowed.
         /// </remarks>
         public bool TrySelectTab(ITab<T> tab)
         {
             if (tab == null || _currentTarget == null) return false;
-
             try { SelectTab(tab); }
             catch { return false; }
             return true;
+        }
+
+        public void SelectTab(string id)
+        {
+            foreach (var tabData in tabs) if (tabData.Tab.Id == id)
+            {
+                SelectTab(tabData.Tab);
+                return;
+            }
+            throw new ArgumentException($"Not have any Tab with Id '{id}' registered in this widget.");
         }
 
         /// <summary>
@@ -331,7 +342,6 @@ namespace SOS.GUI
         {
             ArgumentNullException.ThrowIfNull(tab);
 
-
             if (tabs.All((t) => t.Tab != tab))
                 throw new ArgumentException($"Tab '{tab.Id}' is not registered in this widget.", nameof(tab));
             if (_currentTarget == null)
@@ -345,11 +355,11 @@ namespace SOS.GUI
 
             OnTabSelected?.Invoke(tab);
 
-            foreach (var (t, c, b) in tabs)
+            foreach (var tabData in tabs)
             {
-                bool isActive = t == ActiveTab;
-                c.Visible = isActive;
-                b.Selected = isActive;
+                bool isActive = tabData.Tab == ActiveTab;
+                tabData.Content.Visible = isActive;
+                tabData.Button.Selected = isActive;
             }
 
             try
@@ -361,13 +371,9 @@ namespace SOS.GUI
                 Logger.LogWarning($"Exception as ocurred when trying to update the tab '{tab.Id}', its content was removed to prevent more errors...\n {ex.Message}");
                 Logger.LogDebugError(ex.StackTrace);
                 RemoveTab(tab);
-                ITab<T>? fallback = tabs.FirstOrDefault().Tab;
+                ITab<T>? fallback = tabs.FirstOrDefault()?.Tab;
                 if (fallback != null) SelectTab(fallback);
-                else
-                {
-                    ActiveTab = null;
-                    _verticalLayout.Recalculate();
-                }
+                else ActiveTab = null;
             }
             _verticalLayout.Recalculate();
         }
@@ -377,10 +383,10 @@ namespace SOS.GUI
 
         private bool HideTab(Func<ITab<T>, bool> comparer)
         {
-            foreach (var (t, c, b) in tabs) if (comparer(t))
+            foreach (var tab in tabs) if (comparer(tab.Tab))
             {
-                c.Visible = false;
-                b.Visible = false;
+                tab.Content.Visible = false;
+                tab.Button.Visible = false;
                 return true;
             }
             return false;
@@ -391,23 +397,13 @@ namespace SOS.GUI
 
         private bool RemoveTab(Func<ITab<T>, bool> comparer)
         {
-            (ITab<T>, GUIFrame, GUIButton)? result = null;
-            try
+            TabData? tabData = tabs.FirstOrDefault((t) => comparer(t.Tab));
+            if (tabData != null)
             {
-                result = tabs.FirstOrDefault((t) => comparer(t.Tab));
-                if (result.HasValue)
-                {
-                    var (_, content, button) = result.Value;
-                    try { _contentArea.RemoveChild(content); } catch { }
-                    try { _buttonArea.Content.RemoveChild(button); } catch { }
-                    return tabs.Remove(result.Value);
-                }
+                try { _contentArea.RemoveChild(tabData.Content); } catch { }
+                try { _buttonArea.Content.RemoveChild(tabData.Button); } catch { }
+                return tabs.Remove(tabData);
             }
-            catch (Exception ex)
-            {
-                Logger.LogError("Error when trying to remove tab" + (result.HasValue ? $" '{result.Value.Item1}'." : ".") + $" Error: {ex.Message}");
-            }
-
             return false;
         }
 
@@ -422,8 +418,8 @@ namespace SOS.GUI
         {
             _buttonArea.Content.ClearChildren();
             _contentArea.ClearChildren();
-            foreach (var (tab, _, _) in tabs)
-                if (tab is IDisposable d) d.Dispose();
+            foreach (var tabData in tabs)
+                if (tabData.Tab is IDisposable d) d.Dispose();
             tabs.Clear();
             ActiveTab = null;
             _currentTarget = default;
