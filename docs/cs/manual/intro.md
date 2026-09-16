@@ -1,8 +1,8 @@
 # Introduction
 
-![Banner](https://github.com/Retype15/SOS/blob/main/Assets/SOS_Background.png)
+![S.O.S - Standard Operations Schematics](images/SOS_LOGO_TEXT.png)
 
-`S.O.S` es un ecosistema de mods que apunta a añadir un sistema de información integral unificado sobre el juego base, ya sea sobre contenido vanilla o mods de terceros, permitiendo a los jugadores obtener información o análisis necesarios en tiempo real para cualquier partida de Barotrauma de forma muy sencilla e integrada. (eg. Recetas de fabricación, Información médica detallada, Talentos, Tracker de recetas, etc.)
+**S.O.S** es un ecosistema de mods que apunta a añadir un sistema de información integral unificado sobre el juego base, ya sea sobre contenido vanilla o mods de terceros, permitiendo a los jugadores obtener información o análisis necesarios en tiempo real para cualquier partida de Barotrauma de forma muy sencilla e integrada. (eg. Recetas de fabricación, Información médica detallada, Talentos, Tracker de recetas, etc.)
 
 Este mod es totalmente compatible con mods desde C# con referencias duras, C# con referencias por reflexión y provenientes de Lua.
 
