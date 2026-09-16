@@ -593,7 +593,7 @@ namespace SOS.Profiles
         #region StatSection Helper
 
         /// <summary>
-        /// Draws every active stat section into the given list box for the specified target.
+        /// Draws every active SOS module implementing <see cref="ISOSStatInfo"/> into the given list box for the specified target.
         /// </summary>
         /// <param name="listBox">The list box whose content hosts the sections.</param>
         /// <param name="target">The prefab being inspected.</param>
@@ -603,7 +603,7 @@ namespace SOS.Profiles
             => BuildStatSections(listBox.Content.RectTransform, target, drawSection);
 
         /// <summary>
-        /// Draws every active stat section into the given container for the specified target.
+        /// Draws every active SOS module implementing <see cref="ISOSStatInfo"/> into the given container for the specified target.
         /// </summary>
         /// <param name="parent">The container transform hosting one wrapper per section. Suitable for any layout, not just list boxes.</param>
         /// <param name="target">The prefab being inspected.</param>

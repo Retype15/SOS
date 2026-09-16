@@ -2,18 +2,17 @@
 -- This file is licensed under the GNU GPLv3.
 -- See the LICENSE file in the project root for details.
 
-local API         = LuaUserData.CreateStatic("SOS.API")
-local Texts       = LuaUserData.CreateStatic("SOS.Texts")
-local Logger      = LuaUserData.CreateStatic("SOS.Logger")
-local TabDefaults = LuaUserData.CreateStatic("SOS.TabDefaults")
+local API        = LuaUserData.CreateStatic("SOS.API")
+local Texts      = LuaUserData.CreateStatic("SOS.Texts")
+local Logger     = LuaUserData.CreateStatic("SOS.Logger")
 
-local PreviewTab  = {}
+local PreviewTab = {}
 
-local nameBlock   = nil
-local idBlock     = nil
-local sprite      = nil
+local nameBlock  = nil
+local idBlock    = nil
+local sprite     = nil
 
-PreviewTab.Id     = "SOS.PreviewPanel"
+PreviewTab.Id    = "SOS.PreviewPanel"
 
 function PreviewTab.CanHandle(prefab)
     if prefab == nil then return false end

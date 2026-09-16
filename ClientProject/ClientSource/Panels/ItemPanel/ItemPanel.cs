@@ -20,7 +20,7 @@ namespace SOS.Panels.ItemPanel
         private GUIListBox? _colObtain;
         private GUIListBox? _colUsage;
 
-        private Prefab? _currentPrefab;
+        private Prefab? _currentPrefab = null;
 
         private static bool needsAnim = true;
 
@@ -29,7 +29,6 @@ namespace SOS.Panels.ItemPanel
         public void Init(GUIFrame container, GUIButton tabButton)
         {
             _container = container;
-            _currentPrefab = null;
         }
 
         public GUIButton CreateTabButton(RectTransform tabRectT, string _) =>
@@ -38,14 +37,12 @@ namespace SOS.Panels.ItemPanel
         public void Update(Prefab target)
         {
             _currentPrefab = target;
-            if (target is not ItemPrefab item) return;
-            Rebuild(item);
+            Rebuild(target);
         }
 
-        private void Rebuild(ItemPrefab item)
+        private void Rebuild(Prefab target)
         {
-            if (_container == null) return;
-
+            if (_container == null || target is not ItemPrefab item) return;
             if (!RecipeAnalyzer.DataInitialized)
             {
                 _container.ClearChildren();
@@ -54,11 +51,9 @@ namespace SOS.Panels.ItemPanel
                 {
                     CrossThread.RequestExecutionOnMainThread(() =>
                     {
-                        // Initialize drops callbacks issued while running, so the surviving
-                        // callback must refresh whatever is current, not the original target.
                         if (_container != null && _currentPrefab is ItemPrefab pending)
                         {
-                            Rebuild(pending);
+                            Rebuild(_currentPrefab);
                         }
                     });
                 });
