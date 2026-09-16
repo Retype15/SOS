@@ -15,24 +15,19 @@ namespace SOS.Panels.PreviewPanel
 
     // MARK: Preview Tab
     //[AutoRegister("SOS.PreviewPanel", 10)]
-    public class PreviewPanelTab : ISOSTab, IDisposable
+    public class PreviewPanelTab : ISOSTab
     {
         public string Id => "SOS.PreviewPanel";
-        public string TabName => Texts.Get("sos.tab.preview", "PREVIEW").Value;
-        public string ToolTip => Texts.Get("sos.tab.preview_tooltip", "Shows the visual sprite of the selected prefab.").Value;
 
-        private GUIFrame? _container;
         private GUITextBlock _nameBlock = null!;
         private GUITextBlock _idBlock = null!;
         private Prefab _currentPrefab = null!;
 
         public bool CanHandle(Prefab prefab) => prefab is ItemPrefab || prefab is AfflictionPrefab;
 
-        public void Init(GUIComponent parentContainer)
+        public void Init(GUIFrame container, GUIButton _)
         {
-            _container = new GUIFrame(new RectTransform(Vector2.One, parentContainer.RectTransform), style: null) { Visible = false };
-
-            var layout = new GUILayoutGroup(new RectTransform(Vector2.One, _container.RectTransform)) { Stretch = true, AbsoluteSpacing = 10 };
+            var layout = new GUILayoutGroup(new RectTransform(Vector2.One, container.RectTransform)) { Stretch = true, AbsoluteSpacing = 10 };
 
             _nameBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0.07f), layout.RectTransform), "", font: GUIStyle.LargeFont, textAlignment: Alignment.Center);
             _idBlock = new GUITextBlock(new RectTransform(new Vector2(1f, 0.04f), layout.RectTransform), "", font: GUIStyle.SmallFont, textAlignment: Alignment.Center, textColor: Color.Gray);
@@ -41,7 +36,7 @@ namespace SOS.Panels.PreviewPanel
             {
                 Color = Color.Black * 0.25f
             };
-            var _ = new GUICustomComponent(new RectTransform(Vector2.One, spriteContainer.RectTransform),
+            var __ = new GUICustomComponent(new RectTransform(Vector2.One, spriteContainer.RectTransform),
                 onDraw: (sb, comp) =>
                 {
                     var sprite = _currentPrefab.Icon();
@@ -54,25 +49,14 @@ namespace SOS.Panels.PreviewPanel
                 });
         }
 
-        public void Show(Prefab prefab)
-        {
-            if (_container == null) return;
-            _container.Visible = true;
-            _currentPrefab = prefab;
-            _nameBlock.Text = prefab.Name();
-            _idBlock.Text = prefab.Identifier.Value;
-        }
+        public GUIButton CreateTabButton(RectTransform tabRectT, string _) =>
+            TabDefaults.CreateTabButton(tabRectT, Texts.Get("sos.tab.preview", "PREVIEW").Value, Texts.Get("sos.tab.preview_tooltip", "Shows the visual sprite of the selected prefab.").Value);
 
-        public void Hide()
+        public void Update(Prefab target)
         {
-            if (_container != null) _container.Visible = false;
-        }
-
-        public void Dispose()
-        {
-            _container?.Parent?.RemoveChild(_container);
-            _currentPrefab = null!;
-            GC.SuppressFinalize(this);
+            _currentPrefab = target;
+            _nameBlock.Text = target.Name();
+            _idBlock.Text = target.Identifier.Value;
         }
     }
 }

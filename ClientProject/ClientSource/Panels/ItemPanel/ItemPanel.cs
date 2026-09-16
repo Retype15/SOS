@@ -13,11 +13,9 @@ namespace SOS.Panels.ItemPanel
 {
     // MARK: Item Recipes Tab
     [AutoRegister("SOS.ItemRecipe", 0)]
-    public class ItemPanelTab : ISOSTab, IDisposable
+    public class ItemPanelTab : ISOSTab
     {
         public string Id => "SOS.ItemRecipe";
-        public string TabName => Texts.Get("sos.tab.recipes", "RECIPES").Value;
-        public string ToolTip => Texts.Get("sos.tab.recipes_tooltip").Value;
         private GUIFrame? _container;
         private GUIListBox? _colObtain;
         private GUIListBox? _colUsage;
@@ -28,17 +26,25 @@ namespace SOS.Panels.ItemPanel
 
         public bool CanHandle(Prefab prefab) => prefab is ItemPrefab;
 
-        public void Init(GUIComponent parentContainer)
+        public void Init(GUIFrame container, GUIButton tabButton)
         {
-            _container = new GUIFrame(new RectTransform(Vector2.One, parentContainer.RectTransform), style: null) { Visible = false };
+            _container = container;
+            _currentPrefab = null;
         }
 
-        public void Show(Prefab prefab)
-        {
-            _currentPrefab = prefab;
+        public GUIButton CreateTabButton(RectTransform tabRectT, string _) =>
+            TabDefaults.CreateTabButton(tabRectT, Texts.Get("sos.tab.recipes", "RECIPES").Value, Texts.Get("sos.tab.recipes_tooltip").Value);
 
-            if (_container == null || prefab is not ItemPrefab item) return;
-            _container.Visible = true;
+        public void Update(Prefab target)
+        {
+            _currentPrefab = target;
+            if (target is not ItemPrefab item) return;
+            Rebuild(item);
+        }
+
+        private void Rebuild(ItemPrefab item)
+        {
+            if (_container == null) return;
 
             if (!RecipeAnalyzer.DataInitialized)
             {
@@ -48,9 +54,11 @@ namespace SOS.Panels.ItemPanel
                 {
                     CrossThread.RequestExecutionOnMainThread(() =>
                     {
-                        if (_container != null && _container.Visible && _currentPrefab != null)
+                        // Initialize drops callbacks issued while running, so the surviving
+                        // callback must refresh whatever is current, not the original target.
+                        if (_container != null && _currentPrefab is ItemPrefab pending)
                         {
-                            Show(_currentPrefab);
+                            Rebuild(pending);
                         }
                     });
                 });
@@ -146,17 +154,5 @@ namespace SOS.Panels.ItemPanel
             }
         }
 
-        public void Hide()
-        {
-            if (_container != null) _container.Visible = false;
-        }
-
-        public void Dispose()
-        {
-            _container?.Parent?.RemoveChild(_container);
-            _colObtain = null;
-            _colUsage = null;
-            GC.SuppressFinalize(this);
-        }
     }
 }

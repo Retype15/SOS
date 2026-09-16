@@ -2,20 +2,18 @@
 -- This file is licensed under the GNU GPLv3.
 -- See the LICENSE file in the project root for details.
 
-local API           = LuaUserData.CreateStatic("SOS.API")
-local Texts         = LuaUserData.CreateStatic("SOS.Texts")
-local Logger        = LuaUserData.CreateStatic("SOS.Logger")
+local API         = LuaUserData.CreateStatic("SOS.API")
+local Texts       = LuaUserData.CreateStatic("SOS.Texts")
+local Logger      = LuaUserData.CreateStatic("SOS.Logger")
+local TabDefaults = LuaUserData.CreateStatic("SOS.TabDefaults")
 
-local PreviewTab    = {}
+local PreviewTab  = {}
 
-local container     = nil
-local nameBlock     = nil
-local idBlock       = nil
-local currentPrefab = nil
+local nameBlock   = nil
+local idBlock     = nil
+local sprite      = nil
 
-PreviewTab.Id       = "SOS.PreviewPanel"
-PreviewTab.TabName  = Texts.Get("sos.tab.preview", "PREVIEW").Value
-PreviewTab.ToolTip  = Texts.Get("sos.tab.preview_tooltip", "Shows the visual sprite of the selected prefab.").Value
+PreviewTab.Id     = "SOS.PreviewPanel"
 
 function PreviewTab.CanHandle(prefab)
     if prefab == nil then return false end
@@ -41,9 +39,12 @@ local function GetPrefabName(pf)
     return tostring(pf.Identifier.Value or "")
 end
 
-function PreviewTab.Init(parentContainer)
-    container = GUI.Frame(GUI.RectTransform(Vector2(1, 1), parentContainer.RectTransform), nil)
-    container.Visible = false
+function PreviewTab.Init(container, tabButton)
+    local title = Texts.Get("sos.tab.preview", "PREVIEW")
+    tabButton.Text = title
+    tabButton.ToolTip = Texts.Get("sos.tab.preview_tooltip", "Shows the visual sprite of the selected prefab.")
+    local textSize = GUI.Style.SmallFont.MeasureString(title)
+    tabButton.RectTransform.nonScaledSize = Point(textSize.X + 24, 32)
 
     local layout = GUI.LayoutGroup(GUI.RectTransform(Vector2(1, 1), container.RectTransform), false)
     layout.Stretch = true
@@ -60,9 +61,6 @@ function PreviewTab.Init(parentContainer)
     spriteContainer.Color = Color(0, 0, 0, 64)
 
     GUI.CustomComponent(GUI.RectTransform(Vector2(1, 1), spriteContainer.RectTransform), function(sb, comp)
-        if currentPrefab == nil then return end
-
-        local sprite = GetPrefabIcon(currentPrefab)
         if sprite == nil or sprite.Texture == nil then return end
 
         local rect = comp.Rect
@@ -78,27 +76,22 @@ function PreviewTab.Init(parentContainer)
     end)
 end
 
-function PreviewTab.Show(prefab)
-    if container == nil or prefab == nil then return end
-    container.Visible = true
-    currentPrefab = prefab
+-- function PreviewTab.CreateTabButton(rectT, id)
+--     local title = Texts.Get("sos.tab.preview", "PREVIEW").Value
+--     local tooltip = Texts.Get("sos.tab.preview_tooltip", "Shows the visual sprite of the selected prefab.").Value
+--     return TabDefaults.CreateTabButton(rectT, title, tooltip)
+-- end
 
+function PreviewTab.Update(prefab)
     nameBlock.Text = GetPrefabName(prefab)
     idBlock.Text = tostring(prefab.Identifier.Value)
-end
-
-function PreviewTab.Hide()
-    if container ~= nil then
-        container.Visible = false
-    end
+    sprite = GetPrefabIcon(prefab)
 end
 
 function PreviewTab.Dispose()
-    if container ~= nil and container.Parent ~= nil then
-        container.Parent.RemoveChild(container)
-        container = nil
-    end
-    currentPrefab = nil
+    sprite = nil
+    nameBlock = nil
+    idBlock = nil
 end
 
 API.RegisterTab(PreviewTab, "SOS.PreviewPanel", 100)

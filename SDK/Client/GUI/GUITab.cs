@@ -37,9 +37,9 @@ namespace SOS.GUI
         private readonly GUIFrame _contentArea;
 
         /// <summary>
-        /// The registered tabs alongside their buttons.
+        /// The registered tabs alongside their content frames and buttons.
         /// </summary>
-        private readonly List<(ITab<T> Content, GUIButton TabButton)> tabs = [];
+        private readonly List<(ITab<T> Tab, GUIFrame Content, GUIButton Button)> tabs = [];
 
         /// <summary>
         /// Gets the currently active tab, or null if no tab is selected.
@@ -60,23 +60,16 @@ namespace SOS.GUI
         private T? _currentTarget;
 
         /// <summary>
-        /// Action invoked when a primary interaction occurs on a prefab in the active tab.
-        /// </summary>
-        public Action<T>? OnClicked;
-
-        /// <summary>
         /// Creates a new tabbed interface container.
         /// </summary>
         /// <param name="rectT">The rectangle transform for positioning and sizing.</param>
-        /// <param name="onClicked">Action to invoke on primary interaction with a tab item.</param>
         /// <remarks>
         /// Initializes a vertical layout with a button area (8% height) and content area (92% height).
         /// The button area is a horizontal list box with 32px fixed height for tab buttons.
         /// </remarks>
-        public GUITab(RectTransform rectT, Action<T>? onClicked = null) : base(rectT, style: null)
+        public GUITab(RectTransform rectT) : base(rectT, style: null)
         {
             CanBeFocused = false;
-            OnClicked = onClicked;
 
             _verticalLayout = new GUILayoutGroup(new RectTransform(Vector2.One, RectTransform))
             {
@@ -110,16 +103,45 @@ namespace SOS.GUI
         /// </remarks>
         public void RegisterTab(ITab<T> tab)
         {
+            var content = new GUIFrame(new RectTransform(Vector2.One, _contentArea.RectTransform), style: null)
+            {
+                Visible = false,
+                CanBeFocused = false
+            };
+            GUIButton? button = null;
             try
             {
-                tab.Init(_contentArea);
-                var btn = tab.CreateTabButton(tab.TabName, _buttonArea.Content.RectTransform, tab == ActiveTab, () => { SelectTab(tab); if (_currentTarget != null) OnClicked?.Invoke(_currentTarget); }, tab.ToolTip);
-                tabs.Add((tab, btn));
+                button = tab.CreateTabButton(_buttonArea.Content.RectTransform, tab.Id);
+                button.UserData = tab;
+                button.OnClicked += WhenClicked;
+
+                tab.Init(content, button);
+
+                tabs.Add((tab, content, button));
+
+                //if (_currentTarget != null && tab.CanHandle(_currentTarget))
+                //    tab.Update(_currentTarget);
+                //_buttonArea.RecalculateChildren();
             }
             catch (Exception ex)
             {
-                Logger.LogWarning($"Exception as ocurred when called 'RegisterTab' in tab '{tab.TabName}', this tab was ignored to prevent more errors...\n {ex}");
+                try
+                {
+                    _contentArea.RemoveChild(content);
+                    _buttonArea.Content.RemoveChild(button);
+                    if (button != null) tabs.Remove((tab, content, button));
+                }
+                catch (Exception ex2) { Logger.LogError($"Error when trying to remove conflicted `ITab<{typeof(T).Name}>` of Type {tab.GetType().FullOrName()}.\n {ex2.StackTrace}"); }
+                Logger.LogWarning($"Exception as ocurred when called 'RegisterTab' in tab '{tab.Id}', this tab was ignored to prevent more errors...\n {ex.Message}");
+                Logger.LogDebugError(ex.StackTrace);
             }
+        }
+
+        private bool WhenClicked(GUIButton _, object userData)
+        {
+            if (userData is ITab<T> tab) SelectTab(tab);
+            else return false;
+            return true;
         }
 
         /// <summary>
@@ -129,8 +151,8 @@ namespace SOS.GUI
         /// <returns>The stored <see cref="GUIButton"/>; or <c>null</c> if the tab is not registered.</returns>
         public GUIButton? GetTabButton(ITab<T> tab)
         {
-            foreach (var (Content, TabButton) in tabs)
-                if (Content == tab) return TabButton;
+            foreach (var (t, _, b) in tabs)
+                if (t == tab) return b;
             return null;
         }
 
@@ -141,8 +163,8 @@ namespace SOS.GUI
         /// <returns>The stored <see cref="GUIButton"/>; or <c>null</c> if no tab matches <paramref name="id"/>.</returns>
         public GUIButton? GetTabButton(string id)
         {
-            foreach (var (Content, TabButton) in tabs)
-                if (Content.Id == id) return TabButton;
+            foreach (var (t, _, b) in tabs)
+                if (t.Id == id) return b;
             return null;
         }
 
@@ -157,37 +179,59 @@ namespace SOS.GUI
         /// </remarks>
         public void UpdateTabs(T target)
         {
+            bool sameTarget = ReferenceEquals(target, _currentTarget);
             _currentTarget = target;
 
             int countValidTabs = 0;
-            bool foundActiveTab = false;
-            (ITab<T> Content, GUIButton TabButton)? firstTab = null;
+            (ITab<T> tab, GUIFrame content, GUIButton button)? first = null;
+            bool activeStillValid = false;
 
-            foreach (var (Content, TabButton) in tabs)
+            foreach (var (tab, content, button) in tabs)
             {
-                if (Content.CanHandle(target))
+                if (tab.CanHandle(target))
                 {
-                    firstTab ??= (Content, TabButton);
-                    bool isActiveTab = Content == ActiveTab;
-                    TabButton.Selected = isActiveTab;
-                    foundActiveTab |= isActiveTab;
-                    TabButton.Visible = true;
+                    first ??= (tab, content, button);
+                    bool isActive = tab == ActiveTab;
+                    activeStillValid |= isActive;
+                    content.Visible = isActive;
+                    button.Selected = isActive;
+                    button.Visible = true;
                     countValidTabs++;
                 }
                 else
                 {
-                    TabButton.Visible = false;
-                    TabButton.Selected = false;
+                    button.Selected = false;
+                    button.Visible = false;
+                    content.Visible = false;
                 }
-
             }
 
-            if (!foundActiveTab && firstTab.HasValue)
+            if (!activeStillValid)
             {
-                ActiveTab = firstTab!.Value.Content;
-                firstTab!.Value.TabButton.Selected = true;
+                if (first.HasValue)
+                {
+                    var (tab, content, button) = first.Value;
+                    ActiveTab = tab;
+                    content.Visible = true;
+                    button.Selected = true;
+                }
+                else ActiveTab = null;
             }
-            else ActiveTab = null;
+
+            if (!sameTarget && ActiveTab != null)
+            {
+                try
+                {
+                    ActiveTab.Update(target);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning($"Exception as ocurred when called 'Update' in tab '{ActiveTab.Id}', its content was hidden to prevent more errors...\n {ex.Message}");
+                    Logger.LogDebugError(ex.StackTrace);
+                    foreach (var (tab, content, _) in tabs)
+                        if (tab == ActiveTab) content.Visible = false;
+                }
+            }
 
             if (countValidTabs > 1)
             {
@@ -204,7 +248,6 @@ namespace SOS.GUI
                 _contentArea.RectTransform.RelativeSize = Vector2.One;
             }
 
-            RefreshTabContent();
             _verticalLayout.Recalculate();
         }
 
@@ -221,8 +264,8 @@ namespace SOS.GUI
         {
             if (_currentTarget == null) return false;
             ITab<T>? tab = null;
-            foreach (var (Content, _) in tabs)
-                if (Content.Id == tabId) { tab = Content; break; }
+            foreach (var (t, _, _) in tabs)
+                if (t.Id == tabId) { tab = t; break; }
             if (tab == null) return false;
             if (!tab.CanHandle(_currentTarget)) return false;
             return SelectTab(tab);
@@ -239,8 +282,8 @@ namespace SOS.GUI
         public bool TrySelectTab(ITab<T> tab)
         {
             bool registered = false;
-            foreach (var (Content, TabButton) in tabs)
-                if (Content == tab) { registered = true; break; }
+            foreach (var (t, _, _) in tabs)
+                if (t == tab) { registered = true; break; }
             if (!registered) return false;
             if (_currentTarget != null && !tab.CanHandle(_currentTarget)) return false;
             return SelectTab(tab);
@@ -262,29 +305,27 @@ namespace SOS.GUI
 
             ActiveTab = tab;
             OnTabSelected?.Invoke(tab);
-            foreach (var (Content, TabButton) in tabs)
-                TabButton.Selected = (Content == ActiveTab);
-            RefreshTabContent();
-            return true;
-        }
-
-        /// <summary>
-        /// Refreshes the visible content of all tabs, showing the active tab and hiding others.
-        /// </summary>
-        /// <remarks>
-        /// Calls <see cref="ITab{T}.Show"/> on the active tab and <see cref="ITab{T}.Hide"/> on all other tabs.
-        /// </remarks>
-        private void RefreshTabContent()
-        {
-            if (_currentTarget == null) return;
-
-            foreach (var (tab, _) in tabs)
+            foreach (var (t, c, b) in tabs)
             {
-                if (tab == ActiveTab)
-                    tab.Show(_currentTarget);
-                else
-                    tab.Hide();
+                c.Visible = (t == ActiveTab);
+                b.Selected = (t == ActiveTab);
             }
+            if (_currentTarget != null)
+            {
+                try
+                {
+                    tab.Update(_currentTarget);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning($"Exception as ocurred when called 'Update' in tab '{tab.Id}', its content was hidden to prevent more errors...\n {ex.Message}");
+                    Logger.LogDebugError(ex.StackTrace);
+                    foreach (var (t, c, _) in tabs)
+                        if (t == tab) c.Visible = false;
+                }
+            }
+            _verticalLayout.Recalculate();
+            return true;
         }
 
         /// <summary>
@@ -297,9 +338,12 @@ namespace SOS.GUI
         public void Dispose()
         {
             _buttonArea.Content.ClearChildren();
-            foreach (var (tab, _) in tabs)
+            _contentArea.ClearChildren();
+            foreach (var (tab, _, _) in tabs)
                 if (tab is IDisposable d) d.Dispose();
             tabs.Clear();
+            ActiveTab = null;
+            _currentTarget = default;
             GC.SuppressFinalize(this);
         }
 
