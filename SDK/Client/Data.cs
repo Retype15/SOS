@@ -182,6 +182,14 @@ namespace SOS
     }
 
     /// <summary>
+    /// Defines an SOS module acting as a modular prefab inspection tab (type alias for <see cref="ITab{T}"/> where <c>T</c> is <see cref="Barotrauma.Prefab"/>).
+    /// </summary>
+    public interface ISOSTab : ITab<Prefab>
+    {
+
+    }
+
+    /// <summary>
     /// Defines an SOS module acting as a modular, completely stateless wiki inspector section rendered in the right-hand panel of S.O.S.
     /// </summary>
     /// <remarks>
@@ -223,11 +231,6 @@ namespace SOS
         /// <param name="prefab">The target entity currently being inspected.</param>
         void Draw(RectTransform rectT, Prefab prefab);
     }
-
-    /// <summary>
-    /// Defines an SOS module acting as a modular prefab inspection tab (type alias for <see cref="ITab{T}"/> where <c>T</c> is <see cref="Barotrauma.Prefab"/>).
-    /// </summary>
-    public interface ISOSTab : ITab<Prefab>;
 
     /// <summary>
     /// Defines an SOS module acting as an extensible configuration unit with lifecycle persistence, factory defaults, and declarative UI rendering.
