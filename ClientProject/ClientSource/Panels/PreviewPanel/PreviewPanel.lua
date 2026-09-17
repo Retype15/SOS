@@ -96,5 +96,3 @@ end
 API.RegisterTab(PreviewTab, "SOS.PreviewPanel", 100)
 
 Logger.LogDebug("[SOS] PreviewPanel registered!", Color.LightGreen)
-
-return PreviewTab
