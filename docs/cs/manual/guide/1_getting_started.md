@@ -2,13 +2,18 @@
 
 ## 1. Requisitos mínimos
 
-El proyecto integral principal, y el único binario sobre el que deberá trabajar cualquier mod es el proyecto `SDK`(`SOS.SDK.dll`). Está pensado para ser cargado Client-Side only y compatible para cualquier plataforma. Este implementa la mayoría de lógicas, contratos, patrones y componentes GUI personalizados compartidos. El archivo que deberá referenciar en proyectos derivados debe ser únicamente de este proyecto, archivo `SOS.SDK.dll`, y puede obtenerlo [AQUÍ](https://github.com/Retype15/SOS/releases/latest/download/SOS.SDK.dll).
+El proyecto integral principal, y el único binario sobre el que deberá trabajar cualquier mod es el proyecto `SDK`(`SOS.SDK.dll`). Está pensado para ser cargado Client-Side only y compatible para cualquier plataforma. Este implementa la mayoría de lógicas, contratos, patrones y componentes GUI personalizados compartidos. Puede descargarlo desde [AQUÍ](https://github.com/Retype15/SOS/releases/latest/download/SOS.SDK.dll).
 
 Requisitos específicos del proyecto dependen de LuaCsForBarotrauma, véase la [guía de introducción de `LuaCsForBarotrauma`](https://evilfactory.github.io/LuaCsForBarotrauma) para crear mods compatibles.
 
 ## 2. Setup del proyecto
 
-La forma más fácil de iniciar un mod que dependa del nuestro es referenciando el binario `SOS.SDK.dll` a su proyecto. Recomendamos incluirlo en la carpeta /Refs y referenciar desde ahí si ha seguido la guía de LuaCsForBarotrauma para [Assembly CSharp Mods](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/html/md_manual_assemblymod.html), si no es el caso o desea una referencia opcional usando reflexión puede ignorar este paso. (Más información a continuación y en la [sección Registration](registration.html).)
+> [!TIP]
+> Si su proyecto es Lua, puede saltar este paso.
+
+La forma más fácil de iniciar un mod que dependa del nuestro es linkear el binario `SOS.SDK.dll` compilado para DEBUG a su proyecto o mod. Si ha seguido la guía de LuaCsForBarotrauma para [Assembly CSharp Mods](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/html/md_manual_assemblymod.html), recomendamos incluir el binario en la carpeta /Refs y referenciar desde ahí , si no es el caso o desea una referencia opcional usando reflexión puede ignorar este paso. (Más información a continuación y en la [sección Registration](registration.html).)
+
+Puede el binario con la flag DEBUG [AQUÍ](//). <!-- TODO: FALTA RUTA AQUÍ -->
 
 ## Example mod
 
@@ -56,42 +61,66 @@ public class UsageMessageStatInfo : ISOSStatInfo
 ```lua
 local API = LuaUserData.CreateStatic("SOS.API")
 
-local HelloTab = {}
-HelloTab.Id = "MyMod.HelloTab"
-HelloTab.TabName = "HELLO"
+local HelloTab  = {}
 
-local container = nil
+local text      = nil
+
+HelloTab.Id     = "MyMod.HelloTab"
 
 function HelloTab.CanHandle(prefab)
-    return prefab ~= nil
+    return true
 end
 
-function HelloTab.Init(parent)
-    container = GUI.Frame(GUI.RectTransform(Vector2(1, 1), parent.RectTransform), nil)
-    GUI.TextBlock(GUI.RectTransform(Vector2(1, 0.1), container.RectTransform, 4), "Hello, World!", nil,
-        GUI.GUIStyle.LargeFont, GUI.Alignment.Center)
+function HelloTab.Init(container, tabButton)
+    tabButton.Text = "HELLO"
+    tabButton.ToolTip = "There is a Hello Tab, say Hello!"
+
+    text = GUI.TextBlock(GUI.RectTransform(Vector2(1, 0.1), container.RectTransform, 4), "Hello, World!", nil,
+        GUI.Style.LargeFont, GUI.Alignment.Center)
 end
 
-function HelloTab.Show(prefab)
-    if container ~= nil then container.Visible = true end
-end
-
-function HelloTab.Hide()
-    if container ~= nil then container.Visible = false end
-end
-
-function HelloTab.Dispose()
-    if container ~= nil and container.Parent ~= nil then
-        container.Parent.RemoveChild(container)
-        container = nil
+function HelloTab.Update(prefab)
+    if text ~= nil then
+        local ok, name = pcall(function() return prefab.Name.Value end)
+        if ok and name then text.Text = string.format("Hello, %s!", name) end
     end
 end
 
-API.RegisterTab(HelloTab, HelloTab.Id, 10)
+function HelloTab.Dispose() -- Opcionalmente, si necesita liberar recursos, puede definir el método Dispose, y será invocado cuando se elimine el objeto en C#.
+    text = nil
+end
+
+API.RegisterTab(HelloTab, HelloTab.Id, 105)
 ```
 
 > [!NOTE]
 > Si en su caso específico no puede usar referencias duras, puede usar reflexion y registrar clases genéricas o instancias de las mismas que implementen de forma indirecta los contratos, o sea métodos por nombre y parámetros. Más información en la [sección Registration](registration.html).
+
+### Registro de binarios opcionales que usen el SDK
+
+Si su mod no requiere estrictamente de SOS, recomendamos configurar su ModConfig.xml para poder usar la lógica condicional y activar el archivo que contiene lógica SOS sólo cuando el mod SOS está activo.
+
+#### Ejemplo
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<ModConfig>
+    <FileGroup>  
+        <Conditional Dependencies="S.O.S - Standard Operations Schematics" IsLoaded="true" /> 
+        <!-- Ejemplo ensamblado --> 
+        <Assembly File="%ModDir%/bin/Client/Linux/MyModSOS.dll" Target="Client" Platform="Linux" Optional="true" />
+        <Assembly File="%ModDir%/bin/Client/OSX/MyModSOS.dll" Target="Client" Platform="OSX" Optional="true" />
+        <Assembly File="%ModDir%/bin/Client/Windows/MyModSOS.dll" Target="Client" Platform="Windows" Optional="true" />
+        <!-- Ejemplo Lua -->
+        <Lua File="%ModDir%/lua/Autorun/MyModSOS.lua" IsAutorun="true" Target="Client" Optional="true" />
+        <!-- Example In-mermory file -->
+        <Script File="%ModDir%/cs/MyModSOS.cs" Target="Client" Optional="true" />
+    </FileGroup>
+    <!-- Otros archivos... -->
+</ModConfig>
+```
+
+En resumen, solamente necesita agrupar en un *FileGroup* todos los archivos afectados, luego definir una item *Conditional* tal y como está definido en el ejemplo. Luego incluya la etiqueta '*Optional*="true"', y eso es todo.
 
 ## Otros recursos
 

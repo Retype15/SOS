@@ -1,4 +1,4 @@
-# UI and GUI Components {#ui_comps}
+# Helpers and GUI Components {#ui_comps}
 
 ## GUIs personalizados
 
@@ -16,7 +16,7 @@
 Esta documentación está incompleta, puede ver la documentación automatizada de [`GUILayoutBuilder` AQUÍ](class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html)
 
 > [!NOTE]
-> Este documento está en incompleto, cosidere ver la documentación auto-generada, o si lo desea, puede pedir ayuda en el [discord oficial](//) del mod.
+> Este documento está incompleto, cosidere ver la documentación auto-generada, o si lo desea puede pedir ayuda en el [discord oficial](//) del mod.
 
 ## Otros recursos
 

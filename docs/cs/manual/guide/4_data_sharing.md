@@ -4,8 +4,6 @@ Un sistema de suscripcion de eventos y almacen de datos compartidos bidirecciona
 
 Cada método necesita recibir como primer parámetro **string key**: clave o identificador de puente como primer parámetro. Las claves comúnes están definidas y documentadas en la clase estática *SOS.CommKeys*.
 
-Ver: [`CommKeys`](class_s_o_s_1_1_comm_keys.html).
-
 ## 1. Transmisores de datos compartido
 
 Métodos de suscripción y llamadas usando delegados.
@@ -32,10 +30,11 @@ Cada grupo de delegados agrupado por el mismo valor **order** lo llamaremos **la
 > [!IMPORTANT]
 > Emitir pasando un objeto `T` ejecutará todo método suscrito que acepte el parámetro `T` o no tenga parámetro, pero emitir sin parámetros solo llamará a los metodos sin parámetros, téngalo en cuenta.
 
-### Ejemplos {#1_examples}
+### Ejemplos {#examples_1}
 
-  ...
-  <!-- TODO: Añadir los ejemplos... -->
+...
+
+<!-- TODO: Añadir los ejemplos... -->
 
 ## 2. Almacén de datos
 
@@ -47,10 +46,11 @@ Para guardar objetos o datos compartidos públicos para todos los mods
 
 - `SOS.API.RemoveState`: Permite eliminar por completo un estado guardado.
 
-### Ejemplos {#2_examples}
+### Ejemplos {#examples_2}
 
-    ...
-    <!-- TODO: Añadir los ejemplos... -->
+...
+
+<!-- TODO: Añadir los ejemplos... -->
 
 ## Otros recursos
 

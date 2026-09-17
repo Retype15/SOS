@@ -26,4 +26,4 @@ Nunca trabajará con este, pero documentaremos igual porque es útil para entend
   - ...
 
 > [!NOTE]
-> Este documento está incompleto, cosidere ver la documentación auto-generada, o si lo desea, puede pedir ayuda en el [discord oficial](//) del mod.
+> Este documento está incompleto, cosidere ver la documentación auto-generada, o si lo desea puede pedir ayuda en el [discord oficial](//) del mod.
