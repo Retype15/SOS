@@ -149,7 +149,7 @@ namespace SOS
         /// </summary>
         /// <param name="item">The target entity currently selected.</param>
         /// <returns><c>true</c> if this tab should appear in the tab bar for this entity; otherwise, <c>false</c>.</returns>
-        bool CanHandle(T item);
+        bool CanHandle(T item) => true;
 
         /// <summary>
         /// Initializes the tab when the widget is constructed. Deferred constructor: store the owned frame and build the static skeleton.
@@ -163,7 +163,7 @@ namespace SOS
         /// Invoked on the active tab only, and only when the target instance changed.
         /// </summary>
         /// <param name="target">The entity to inspect and visualize.</param>
-        void Update(T target);
+        void Update(T target) { }
 
         /// <summary>
         /// Creates the tab bar button. Override to customize text, tooltip or style; the widget assigns selection, click and visibility afterwards.
@@ -449,6 +449,20 @@ namespace SOS
     internal sealed class TabDefaults
     {
         private TabDefaults() { }
+
+        /// <summary>
+        /// Evaluates whether this tab is capable of displaying meaningful information for the given <paramref name="item"/>.
+        /// </summary>
+        /// <param name="item">The target entity currently selected.</param>
+        /// <returns><c>true</c> if this tab should appear in the tab bar for this entity; otherwise, <c>false</c>.</returns>
+        public static bool CanHandle(Prefab _) => true;
+
+        /// <summary>
+        /// Rebuilds the tab's content for the newly selected <paramref name="target"/>.
+        /// Invoked on the active tab only, and only when the target instance changed.
+        /// </summary>
+        /// <param name="target">The entity to inspect and visualize.</param>
+        public static void Update(Prefab _) { }
 
         /// <summary>
         /// Creates a standard tab button styled with the "MainMenuNotificationButton" template, sized to fit <paramref name="text"/>.
