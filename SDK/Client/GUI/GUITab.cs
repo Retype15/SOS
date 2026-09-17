@@ -240,7 +240,7 @@ namespace SOS.GUI
                 else ActiveTab = null;
             }
 
-            bool sameTarget = ReferenceEquals(target, _currentTarget);
+            bool sameTarget = EqualityComparer<T>.Default.Equals(target, _currentTarget);
 
             if (!sameTarget && ActiveTab != null)
             {
