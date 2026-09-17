@@ -16,7 +16,7 @@ Un módulo SOS es cualquier clase que implemente alguna interfaz **ISOS\*** (`SO
 
 Sección de la wiki del inspector que dibuja filas de informacion sobre el prefab seleccionado. Si el *rectT* no tiene hijos, se limpia.
 
-### Ejemplo de uso
+### Ejemplo de uso <!-- TODO: Arreglar correctamente los ejemplos con info real.-->
 
 ```csharp
 using Barotrauma;
@@ -39,11 +39,7 @@ public class RadiationStatInfo : ISOSStatInfo
     {
         if (prefab is not ItemPrefab item || !item.Tags.Contains("radioactive"))
             return;
-
-        // GUILayoutBuilder es un helper para crear componentes de forma funcional y rápida.
-        using var l = new GUILayoutBuilder(rectT);
-        l.Header("RADIATION", Color.GreenYellow);
-        l.Row("Radiation Output:", "High", Color.Red);
+        // ...
     }
 }
 ```
@@ -55,7 +51,7 @@ public class RadiationStatInfo : ISOSStatInfo
 
 Pestaña central de inspección para un tipo de entidad. Aparece en la tab bar solo cuando `SOS.ISOSTab.CanHandle` devuelve `true` para el objetivo actual.
 
-### Ejemplo de uso {#ej1}
+### Ejemplo de uso {#ej1} <!-- TODO: Arreglar correctamente los ejemplos con info real.-->
 
 ```csharp
 using Barotrauma;
@@ -70,27 +66,21 @@ namespace MyMod;
 [AutoRegister("MyMod.BiomeTab", order: 10)]
 public class BiomeTab : ISOSTab
 {
-    public string TabName => "A Biome information...";
+    public string Id => "MyMod.BiomeTab"; // Identificador único del Tab.
 
-    private GUIComponent? container;
+    public bool CanHandle(Prefab prefab) => prefab is Biome; // Si es true, dibuja su Tab Button, si es False no se mostrará.
 
-    public bool CanHandle(Prefab item) => item is Biome;
-
-    public void Init(GUIComponent contentContainer)
+    public void Init(GUIFrame container, GUIButton tabButton) // Recibe las instancias del contenedor y el botón creado usando CreateTabButton.
     {
-        container = contentContainer;
+        // Inicializa y crea los componentes que necesite.
+        tabButton.Text = "Biome Visualizer";
+        tabButton.ToolTip = "A Biome information...";
     }
 
-    public void Show(Prefab item)
+    // Llamado cuando sea el Tab principal, CanHandle retorne true y el prefab haya cambiado.
+    public void Update(Prefab prefab)
     {
-        if (container == null) return;
-        container.Visible = true;
-    }
-
-    public void Hide()
-    {
-        if (container == null) return;
-        container.Visible = false;
+        // ...
     }
 }
 ```
