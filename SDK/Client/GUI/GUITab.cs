@@ -23,6 +23,12 @@ namespace SOS.GUI
     /// </remarks>
     public class GUITab<T> : GUIFrame, IDisposable
     {
+        /// <summary>
+        /// A registered tab alongside its owned content frame and tab bar button.
+        /// </summary>
+        /// <param name="Tab">The tab SOS module.</param>
+        /// <param name="Content">The content frame owned by the widget.</param>
+        /// <param name="Button">The tab bar button owned by the widget.</param>
         protected record TabData(SOS.ITab<T> Tab, Barotrauma.GUIFrame Content, Barotrauma.GUIButton Button);
 
         /// <summary>
@@ -319,6 +325,12 @@ namespace SOS.GUI
             return true;
         }
 
+        /// <summary>
+        /// Selects the tab matching the given identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the tab (see <see cref="IIdentifier.Id"/>).</param>
+        /// <exception cref="ArgumentException">No registered tab matches <paramref name="id"/>.</exception>
+        /// <exception cref="InvalidOperationException">There is no current target, or the tab cannot handle it.</exception>
         public void SelectTab(string id)
         {
             foreach (var tabData in tabs) if (tabData.Tab.Id == id)
@@ -381,7 +393,17 @@ namespace SOS.GUI
             _verticalLayout.Recalculate();
         }
 
+        /// <summary>
+        /// Hides the content frame and tab bar button of the given tab without unregistering it.
+        /// </summary>
+        /// <param name="tab">The tab to hide.</param>
+        /// <returns><c>true</c> if the tab was found; otherwise, <c>false</c>.</returns>
         public bool HideTab(ITab<T> tab) => HideTab((t) => t == tab);
+        /// <summary>
+        /// Hides the content frame and tab bar button of the tab matching the given identifier, without unregistering it.
+        /// </summary>
+        /// <param name="id">The unique identifier of the tab (see <see cref="IIdentifier.Id"/>).</param>
+        /// <returns><c>true</c> if a matching tab was found; otherwise, <c>false</c>.</returns>
         public bool HideTab(string id) => HideTab((t) => t.Id == id);
 
         private bool HideTab(Func<ITab<T>, bool> comparer)
@@ -395,7 +417,17 @@ namespace SOS.GUI
             return false;
         }
 
+        /// <summary>
+        /// Removes the given tab from the widget, retiring its content frame and tab bar button from the layout.
+        /// </summary>
+        /// <param name="tab">The tab to remove.</param>
+        /// <returns><c>true</c> if the tab was found and removed; otherwise, <c>false</c>.</returns>
         public bool RemoveTab(ITab<T> tab) => RemoveTab((t) => t == tab);
+        /// <summary>
+        /// Removes the tab matching the given identifier from the widget, retiring its content frame and tab bar button from the layout.
+        /// </summary>
+        /// <param name="id">The unique identifier of the tab (see <see cref="IIdentifier.Id"/>).</param>
+        /// <returns><c>true</c> if a matching tab was found and removed; otherwise, <c>false</c>.</returns>
         public bool RemoveTab(string id) => RemoveTab((t) => t.Id == id);
 
         private bool RemoveTab(Func<ITab<T>, bool> comparer)

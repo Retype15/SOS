@@ -79,7 +79,7 @@ namespace SOS.Configs
             var profileConfig = SOSController.Instance.ActiveProfile?.ProfileConfig;
             if (profileConfig != null)
             {
-                ProfileHelper.TryDraw(rectT, (rectT) => profileConfig.Draw(rectT), profileConfig.GetType().FullOrName());
+                ProfileHelper.TryDraw(rectT, profileConfig);
                 l.Separator();
             }
 

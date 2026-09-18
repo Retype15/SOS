@@ -504,7 +504,7 @@ namespace SOS.Profiles
                     for (int i = 0; i < count; i++)
                     {
                         var config = configList[startIndex + i];
-                        ProfileHelper.TryDraw(targetList.Content.RectTransform, (rectT) => config.Draw(rectT), config.GetType().FullOrName());
+                        ProfileHelper.TryDraw(targetList.Content.RectTransform, config);
                     }
                 }
             }
@@ -597,7 +597,7 @@ namespace SOS.Profiles
         /// </summary>
         /// <param name="listBox">The list box whose content hosts the sections.</param>
         /// <param name="target">The prefab being inspected.</param>
-        /// <param name="drawSection">Optional per-section draw policy. If null, <see cref="AddStatSection"/> is used.</param>
+        /// <param name="drawSection">Optional per-section draw policy. If null, a default policy drawing via <see cref="TryDraw(RectTransform, ISOSStatInfo, Prefab, string)"/> is used.</param>
         /// <returns><c>true</c> if at least one section drew content; otherwise, <c>false</c>.</returns>
         public static bool BuildStatSections(GUIListBox listBox, Prefab target, Func<RectTransform, ISOSStatInfo, Prefab, bool>? drawSection = null)
             => BuildStatSections(listBox.Content.RectTransform, target, drawSection);
@@ -607,11 +607,11 @@ namespace SOS.Profiles
         /// </summary>
         /// <param name="parent">The container transform hosting one wrapper per section. Suitable for any layout, not just list boxes.</param>
         /// <param name="target">The prefab being inspected.</param>
-        /// <param name="drawSection">Optional per-section draw policy. If null, <see cref="AddStatSection"/> is used. Custom policies must not leave bare <see cref="Barotrauma.RectTransform"/>s.</param>
+        /// <param name="drawSection">Optional per-section draw policy. If null, a default policy drawing via <see cref="TryDraw(RectTransform, ISOSStatInfo, Prefab, string)"/> is used. Custom policies must not leave bare <see cref="Barotrauma.RectTransform"/>s.</param>
         /// <returns><c>true</c> if at least one section drew content; otherwise, <c>false</c>.</returns>
         public static bool BuildStatSections(RectTransform parent, Prefab target, Func<RectTransform, ISOSStatInfo, Prefab, bool>? drawSection = null)
         {
-            drawSection ??= (rectT, section, prefab) => TryDraw(rectT, (rectT) => section.Draw(rectT, prefab), section.GetType().FullOrName());
+            drawSection ??= (rectT, section, prefab) => TryDraw(rectT, section, prefab);
             int drawn = 0;
             foreach (var section in API.GetAllStatInfo())
             {
@@ -631,12 +631,51 @@ namespace SOS.Profiles
 
         #endregion
 
-        public static bool TryDraw(RectTransform parent, Action<RectTransform> handler, string typeName)
+        /// <summary>
+        /// Draws an <see cref="ISOSConfig"/> module on a fresh child layout, discarding it when the module draws nothing.
+        /// </summary>
+        /// <param name="parent">The container transform hosting the wrapper created for this draw.</param>
+        /// <param name="config">The configuration module to draw.</param>
+        /// <param name="typeName">The owner type name, used in log messages when the draw fails or is empty. Defaults to the config runtime type name.</param>
+        /// <returns><c>true</c> if the module drew content; otherwise, <c>false</c>.</returns>
+        public static bool TryDraw(RectTransform parent, ISOSConfig config, string typeName = "")
         {
             var rectT = new RectTransform(new Vector2(1f, 0f), parent, Anchor.TopCenter);
+            if (typeName.IsNullOrEmpty()) typeName = config.GetType().FullOrName();
             try
             {
-                handler(rectT);
+                config.Draw(rectT);
+                if (rectT.CountChildren == 0)
+                {
+                    Logger.LogDebug($"'{typeName}' have nothing to draw, removing created RectTransform...", level: LogLevel.Trace);
+                    rectT.Parent = null;
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"[SOS] Exception when try to draw '{typeName}': {ex.Message}");
+                if (rectT.CountChildren == 0) rectT.Parent = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Draws an <see cref="ISOSStatInfo"/> section for the given target on a fresh child layout, discarding it when the section draws nothing.
+        /// </summary>
+        /// <param name="parent">The container transform hosting the wrapper created for this draw.</param>
+        /// <param name="statInfo">The stat section to draw.</param>
+        /// <param name="prefab">The target entity currently being inspected.</param>
+        /// <param name="typeName">The owner type name, used in log messages when the draw fails or is empty. Defaults to the section runtime type name.</param>
+        /// <returns><c>true</c> if the section drew content; otherwise, <c>false</c>.</returns>
+        public static bool TryDraw(RectTransform parent, ISOSStatInfo statInfo, Prefab prefab, string typeName = "")
+        {
+            var rectT = new RectTransform(new Vector2(1f, 0f), parent, Anchor.TopCenter);
+            if (typeName.IsNullOrEmpty()) typeName = statInfo.GetType().FullOrName();
+            try
+            {
+                statInfo.Draw(rectT, prefab);
                 if (rectT.CountChildren == 0)
                 {
                     Logger.LogDebug($"'{typeName}' have nothing to draw, removing created RectTransform...", level: LogLevel.Trace);

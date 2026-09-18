@@ -275,6 +275,10 @@ namespace SOS
         /// </summary>
         void Reset() { }
 
+        /// <summary>
+        /// Constructs the interactive configuration UI in the settings window.
+        /// </summary>
+        /// <param name="rectT">Dedicated layout space provided by the host. Build a <see cref="GUI.GUILayoutBuilder"/> on it.</param>
         void Draw(RectTransform rectT) { }
     }
 
