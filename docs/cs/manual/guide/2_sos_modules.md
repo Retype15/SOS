@@ -97,7 +97,7 @@ public class BiomeTab : ISOSTab
         // ...
     }
 
-    // Es opcional, y permite definir la forma en que se crea el botón de la barra de Tabs. Recibe el rectT de la lista, y el Id del objeto donde si no se define el método, se usará como nombre básico.
+    // Es opcional, y permite definir la forma en que se crea el botón de la barra de Tabs. Recibe el rectT de la lista, y el Id del objeto donde si no se define el método, se resolverá desde localización ({Id}.title/.tooltip).
     public GUIButton CreateTabButton(RectTransform rectT, string Id) => TabDefaults.CreateTabButton(rectT, "Biome Visualizer", "A Biome information...");
 }
 ```
@@ -107,7 +107,7 @@ public class BiomeTab : ISOSTab
 
 ## 3. Prefab Providers ([`ISOSPrefab`](interface_s_o_s_1_1_i_s_o_s_prefab.html))
 
-Proveedor de datos que alimenta el navegador lateral con un nuevo tipo de entidad (e.g: [`JobPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_job_prefab.html), [`EventPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_event_prefab.html), [`TalentPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_talent_prefab.html), [`CharacterPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_character_prefab.html), etc). Cada proveedor define su `SOS.ISOSPrefab.Header` y filtra con `SOS.ISOSPrefab.GetAll`.
+Proveedor de datos que alimenta el navegador lateral con un nuevo tipo de entidad (e.g: [`JobPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_job_prefab.html), [`EventPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_event_prefab.html), [`TalentPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_talent_prefab.html), [`CharacterPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_character_prefab.html), etc). El navegador agrupa sus prefabs por tipo de runtime y resuelve cada cabecera desde localización (`{Type}.header`); solo necesita servirlos con `SOS.ISOSPrefab.GetPrefabs`.
 
 ### Ejemplo de uso {#ej2}
 
@@ -126,10 +126,7 @@ namespace MyMod;
 [AutoRegister("MyMod.JobProvider", order: 3)]
 public class JobPrefabProvider : ISOSPrefab
 {
-    public Type PrefabType => typeof(JobPrefab);
-    public string Header => "Jobs";
-
-    public IEnumerable<Prefab> GetAll(IPrefabFilter filter)
+    public IEnumerable<Prefab> GetPrefabs(IPrefabFilter filter)
     {
         return JobPrefab.Prefabs.Where(j => filter.General.Count == 0 || j.Name.Value.Contains(filter.General[0]));
     }
@@ -137,6 +134,8 @@ public class JobPrefabProvider : ISOSPrefab
 ```
 
 > [!TIP]
+> La cabecera de su sección se resuelve sola desde localización (`sos.prefab.{Type}.header`, e.g: `sos.prefab.jobprefab.header` → "Jobs"). Si falta la clave, se usa el nombre del tipo humanizado.
+>
 > Use los tokens del filtro (`filter.General`, `filter.Mod`, `filter.Category`, etc.) para que su proveedor responda a la búsqueda avanzada del navegador.
 
 ## 4. Configs ([`ISOSConfig`](interface_s_o_s_1_1_i_s_o_s_config.html))

@@ -102,11 +102,11 @@
 	<sos.tracker.track-untrack.tooltip>追踪或取消追踪此物品的所有配方。</sos.tracker.track-untrack.tooltip>
 
 	<!-- Tabs -->
-	<sos.tab.recipes>配方</sos.tab.recipes>
-	<sos.tab.recipes_tooltip>显示物品的制作配方、来源和用途。</sos.tab.recipes_tooltip>
+	<sos.tab.itemrecipe.title>配方</sos.tab.itemrecipe.title>
+	<sos.tab.itemrecipe.tooltip>显示物品的制作配方、来源和用途。</sos.tab.itemrecipe.tooltip>
 	<sos.tab.recipes.analyzing>正在分析配方依赖图...</sos.tab.recipes.analyzing>
-	<sos.tab.preview>预览</sos.tab.preview>
-	<sos.tab.preview_tooltip>显示所选预制体的视觉精灵图。</sos.tab.preview_tooltip>
+	<sos.tab.previewpanel.title>预览</sos.tab.previewpanel.title>
+	<sos.tab.previewpanel.tooltip>显示所选预制体的视觉精灵图。</sos.tab.previewpanel.tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>别名：</sos.item.aliases>
@@ -232,10 +232,10 @@
 	<sos.xml.copy>复制 XML</sos.xml.copy>
 	<sos.xml.reset_zoom>重置缩放</sos.xml.reset_zoom>
 
-	<!-- List Headers -->
-	<sos.list.header.afflictionprefab>病症</sos.list.header.afflictionprefab>
-	<sos.list.header.afflictionprefabhusk>Husk 病症</sos.list.header.afflictionprefabhusk>
-	<sos.list.header.itemprefab>物品</sos.list.header.itemprefab>
+	<!-- List Prefab Headers -->
+	<sos.prefab.afflictionprefab.header>病症</sos.prefab.afflictionprefab.header>
+	<sos.prefab.afflictionprefabhusk.header>Husk 病症</sos.prefab.afflictionprefabhusk.header>
+	<sos.prefab.itemprefab.header>物品</sos.prefab.itemprefab.header>
 
 	<!-- List -->
 	<sos.list.separator_tooltip>点击按此对象类型筛选列表。</sos.list.separator_tooltip>

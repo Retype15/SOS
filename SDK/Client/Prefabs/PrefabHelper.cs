@@ -137,26 +137,68 @@ namespace SOS.Prefabs
         }
 
         /// <summary>
+        /// Resolves the browser section header for a prefab runtime type.
+        /// </summary>
+        /// <param name="type">The runtime <see cref="Barotrauma.Prefab"/> type to resolve.</param>
+        /// <returns>
+        /// The localized header (<c>sos.prefab.{type}.header</c>) of the closest translated ancestor in the
+        /// inheritance chain; otherwise a humanized type name.
+        /// </returns>
+        /// <remarks>
+        /// Pure function without internal cache: callers keep a per-operation cache when resolving
+        /// headers repeatedly (e.g., while building the browser list).
+        /// </remarks>
+        public static string GetHeader(Type type)
+        {
+            Type? current = type;
+            while (current != null && current != typeof(Prefab))
+            {
+                string key = $"sos.prefab.{current.Name}.header";
+                var result = Texts.Get(key).Value;
+                if (!result.IsNullOrEmpty())
+                    return result;
+                current = current.BaseType;
+            }
+            return type.Name.FormatCamelCaseWithSpaces();
+        }
+
+        /// <summary>
         /// Opens a context menu for the target prefab.
         /// </summary>
         /// <param name="target">The prefab to open the context menu for.</param>
         /// <param name="position">Optional mouse position. Defaults to <see cref="PlayerInput.MousePosition"/>.</param>
         /// <remarks>
-        /// Collects context options from all SOS modules implementing <see cref="ISOSPrefab"/> whose
-        /// <see cref="ISOSPrefab.PrefabType"/> is assignable from <paramref name="target"/>'s type,
-        /// then creates a <see cref="GUIContextMenu"/> with those options.
+        /// Collects provider-specific options from every SOS module implementing <see cref="ISOSPrefab"/>
+        /// (each provider filters by itself), then appends the baseline actions once,
+        /// and creates a <see cref="GUIContextMenu"/> with those options.
         /// Returns immediately if no options are available.
         /// </remarks>
         public static void OpenContextMenu(Prefab target, Vector2? position = null)
         {
             if (target == null) return;
             var options = API.GetAllPrefabProviders()
-                .Where(p => p.PrefabType.IsAssignableFrom(target.GetType()))
-                .SelectMany(p => p.BuildContextOptions(target))
+                .SelectMany(p => p.GetContextOptions(target))
                 .ToList();
+            options.AddRange(GetDefaultContextOptions(target));
             if (options.Count == 0) return;
             RichString name = target.Name();
             _ = GUIContextMenu.CreateContextMenu(position ?? PlayerInput.MousePosition, name, null, [.. options]);
+        }
+
+        private static List<ContextMenuOption> GetDefaultContextOptions(Prefab prefab)
+        {
+            var options = new List<ContextMenuOption>
+            {
+                new(Texts.Get("sos.context.view_recipes", "View Recipes").Value, isEnabled: true, onSelected: () => API.Emit(CommKeys.SelectTarget, prefab))
+            };
+
+            string targetId = prefab.Identifier.Value;
+            bool isFav = PrefabHelper.IsFavorite(targetId);
+            string favText = isFav ? Texts.Get("sos.context.remove_favorite", "Remove from Favorites").Value : Texts.Get("sos.context.add_favorite", "Add to Favorites").Value;
+
+            options.Add(new ContextMenuOption(favText, true, () => { PrefabHelper.ToggleFavorite(targetId); }));
+
+            return options;
         }
     }
 }

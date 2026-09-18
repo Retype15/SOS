@@ -132,11 +132,8 @@ namespace SOS
                         });
                     }
                 }
-            }
 
-            if (ActiveProfile != null)
-            {
-                if (canHandleInputs)
+                if (ActiveProfile != null)
                 {
                     if (PlayerInput.KeyHit(Keys.Escape))
                     {
@@ -162,9 +159,10 @@ namespace SOS
                         PlayerInput.Mouse4ButtonClicked()
                     ) CrossThread.RequestExecutionOnMainThread(() => API.Emit(CommKeys.NavigateBack));
                 }
-
-                ActiveProfile?.Update();
             }
+
+            ActiveProfile?.Update();
+
             if (migrationPending) MigrationDialog.Update();
             if (!IsSOSBlocked && Screen.Selected == GameMain.GameScreen) Tracker.Update();
             ProfileHelper.Update();

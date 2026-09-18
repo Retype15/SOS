@@ -14,10 +14,10 @@ namespace SOS.Panels.PreviewPanel
 {
 
     // MARK: Preview Tab
-    //[AutoRegister("SOS.PreviewPanel", 10)]
+    //[AutoRegister("SOS.Tab.PreviewPanel", 10)]
     public class PreviewPanelTab : ISOSTab
     {
-        public string Id => "SOS.PreviewPanel";
+        public string Id => "SOS.Tab.PreviewPanel";
 
         private GUITextBlock _nameBlock = null!;
         private GUITextBlock _idBlock = null!;
@@ -48,9 +48,6 @@ namespace SOS.Panels.PreviewPanel
                     sb.Draw(sprite.Texture, center, sprite.SourceRect, Color.White, 0f, new Vector2(sprite.SourceRect.Width * 0.5f, sprite.SourceRect.Height * 0.5f), scale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0f);
                 });
         }
-
-        public GUIButton CreateTabButton(RectTransform tabRectT, string _) =>
-            TabDefaults.CreateTabButton(tabRectT, Texts.Get("sos.tab.preview", "PREVIEW").Value, Texts.Get("sos.tab.preview_tooltip", "Shows the visual sprite of the selected prefab.").Value);
 
         public void Update(Prefab target)
         {

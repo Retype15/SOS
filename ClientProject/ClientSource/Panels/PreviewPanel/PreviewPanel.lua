@@ -3,7 +3,6 @@
 -- See the LICENSE file in the project root for details.
 
 local API        = LuaUserData.CreateStatic("SOS.API")
-local Texts      = LuaUserData.CreateStatic("SOS.Texts")
 local Logger     = LuaUserData.CreateStatic("SOS.Logger")
 
 local PreviewTab = {}
@@ -12,7 +11,7 @@ local nameBlock  = nil
 local idBlock    = nil
 local sprite     = nil
 
-PreviewTab.Id    = "SOS.PreviewPanel"
+PreviewTab.Id    = "SOS.Tab.PreviewPanel"
 
 function PreviewTab.CanHandle(prefab)
     if prefab == nil then return false end
@@ -39,12 +38,6 @@ local function GetPrefabName(pf)
 end
 
 function PreviewTab.Init(container, tabButton)
-    local title = Texts.Get("sos.tab.preview", "PREVIEW")
-    tabButton.Text = title
-    tabButton.ToolTip = Texts.Get("sos.tab.preview_tooltip", "Shows the visual sprite of the selected prefab.")
-    local textSize = GUI.Style.SmallFont.MeasureString(title)
-    tabButton.RectTransform.nonScaledSize = Point(textSize.X + 24, 32)
-
     local layout = GUI.LayoutGroup(GUI.RectTransform(Vector2(1, 1), container.RectTransform), false)
     layout.Stretch = true
     layout.AbsoluteSpacing = 10
@@ -75,12 +68,6 @@ function PreviewTab.Init(container, tabButton)
     end)
 end
 
--- function PreviewTab.CreateTabButton(rectT, id)
---     local title = Texts.Get("sos.tab.preview", "PREVIEW").Value
---     local tooltip = Texts.Get("sos.tab.preview_tooltip", "Shows the visual sprite of the selected prefab.").Value
---     return TabDefaults.CreateTabButton(rectT, title, tooltip)
--- end
-
 function PreviewTab.Update(prefab)
     nameBlock.Text = GetPrefabName(prefab)
     idBlock.Text = tostring(prefab.Identifier.Value)
@@ -93,6 +80,6 @@ function PreviewTab.Dispose()
     idBlock = nil
 end
 
-API.RegisterTab(PreviewTab, "SOS.PreviewPanel", 100)
+API.RegisterTab(PreviewTab, PreviewTab.Id, 100)
 
 Logger.LogDebug("[SOS] PreviewPanel registered!", Color.LightGreen)

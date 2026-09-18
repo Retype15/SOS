@@ -8,7 +8,6 @@
 using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
-using MonoMod.Utils;
 using SOS.Configs;
 using SOS.GUI;
 using SOS.Panels.ItemPanel;
@@ -17,12 +16,10 @@ using BGUI = Barotrauma.GUI;
 
 namespace SOS.Profiles.TCWP
 {
-    [AutoRegister("SOS.Default3Column", -1)]
+    [AutoRegister("SOS.Profile.Default3Column", -1)]
     internal sealed class ThreeColumnWindowProfile : GUIWindow, ISOSWindowProfile
     {
-        public string Id => "SOS.Default3Column";
-        public string DisplayName => Texts.Get("sos.profile.3CWP.name", "Three Column Window (Default)").Value;
-        public string Description => Texts.Get("sos.profile.3CWP.desc", "Classic profile divided with tree columns: \nLeft: List of all game objects.\nCenter:Tab panel with advanced content.\nRight:Detailed Info about selected item.").Value;
+        public string Id => "SOS.Profile.Default3Column";
 
         private Configs.TCWP.TCWPConfig? config;
         public ISOSConfig ProfileConfig => config ??= new();
@@ -51,10 +48,10 @@ namespace SOS.Profiles.TCWP
 
         // Search
         private List<Prefab> allFilteredTargets = [];
+        private readonly Dictionary<Type, string> headerCache = [];
         private int itemsLoaded = 0;
         private const int ChunkSize = 50;
         private bool isUpdating = false;
-        private Dictionary<Type, string>? prefabHeaders;
         private Type? lastTypeInList;
 
         private readonly double searchDelay = 0.2;
@@ -437,9 +434,6 @@ namespace SOS.Profiles.TCWP
 
             centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform), API.GetAllTabs());
 
-            ISOSPrefab[] prefabProviders = [.. API.GetAllPrefabProviders()];
-            prefabHeaders = prefabProviders.ToDictionary(p => p.PrefabType, p => p.Header);
-
             // Right panel
             int initialRightW = (config != null && config.RightPanelWidth > 0) ? config.RightPanelWidth : 300;
             rightPanel = new GUIResizableFrame(
@@ -522,16 +516,16 @@ namespace SOS.Profiles.TCWP
             var filter = new SearchFilter(query);
 
             allFilteredTargets.Clear();
+            headerCache.Clear();
             lastTypeInList = null;
 
             var candidates = new List<Prefab>();
 
-            foreach (var provider in API.GetAllPrefabProviders())
+            foreach (var provider in API.GetAllPrefabProviders()) // TODO: Optimize using .Next() in LoadNextChunk for consuming in place.
             {
                 try
                 {
-                    if (!filter.AllowsType(provider.PrefabType.Name)) continue;
-                    candidates.AddRange(provider.GetAll(filter));
+                    candidates.AddRange(provider.GetPrefabs(filter).Where(p => filter.AllowsType(p.GetType().Name)));
                 }
                 catch (Exception ex)
                 {
@@ -639,16 +633,9 @@ namespace SOS.Profiles.TCWP
 
         private string GetHeaderForType(Type type)
         {
-            if (prefabHeaders == null) return type.Name.SpacedPascalCase();
-
-            Type? current = type;
-            while (current != null && current != typeof(Prefab))
-            {
-                if (prefabHeaders.TryGetValue(current, out var header))
-                    return header;
-                current = current.BaseType;
-            }
-            return type.Name.SpacedPascalCase();
+            if (!headerCache.TryGetValue(type, out var header))
+                header = headerCache[type] = PrefabHelper.GetHeader(type);
+            return header;
         }
 
         #endregion

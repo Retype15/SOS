@@ -12,10 +12,10 @@ using SOS.GUI;
 namespace SOS.Panels.ItemPanel
 {
     // MARK: Item Recipes Tab
-    [AutoRegister("SOS.ItemRecipe", 0)]
+    [AutoRegister("SOS.Tab.ItemRecipe", 0)]
     public class ItemPanelTab : ISOSTab
     {
-        public string Id => "SOS.ItemRecipe";
+        public string Id => "SOS.Tab.ItemRecipe";
         private GUIFrame? _container;
         private GUIListBox? _colObtain;
         private GUIListBox? _colUsage;
@@ -30,9 +30,6 @@ namespace SOS.Panels.ItemPanel
         {
             _container = container;
         }
-
-        public GUIButton CreateTabButton(RectTransform tabRectT, string _) =>
-            TabDefaults.CreateTabButton(tabRectT, Texts.Get("sos.tab.recipes", "RECIPES").Value, Texts.Get("sos.tab.recipes_tooltip").Value);
 
         public void Update(Prefab target)
         {

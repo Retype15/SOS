@@ -13,13 +13,10 @@ namespace SOS.Prefabs.Item
     [AutoRegister("SOS.ItemPrefab", 1)]
     public sealed class ItemPrefabProvider : ISOSPrefab
     {
-        public Type PrefabType => typeof(ItemPrefab);
-        public string Header => Texts.Get("sos.list.header.itemprefab", "Items").Value;
-
-        public List<ContextMenuOption> BuildContextOptions(Prefab prefab)
+        public List<ContextMenuOption> GetContextOptions(Prefab prefab)
         {
             if (prefab is not ItemPrefab item || item.FabricationRecipes is not { Count: > 0 })
-                return PrefabDefaults.BuildContextOptions(prefab);
+                return [];
 
             var tracker = SOSController.Instance.Tracker;
             var options = new List<ContextMenuOption>();
@@ -52,12 +49,10 @@ namespace SOS.Prefabs.Item
                     { Tooltip = recipe.GetRequirementsToString() });
                 }
 
-                options.Add(new ContextMenuOption(
-                    Texts.Get("sos.context.track_recipe", "Add to HUD").Value,
-                    isEnabled: true, [.. subs]));
+            options.Add(new ContextMenuOption(
+                Texts.Get("sos.context.track_recipe", "Add to HUD").Value,
+                isEnabled: true, [.. subs]));
             }
-
-            options.AddRange(PrefabDefaults.BuildContextOptions(prefab));
             return options;
         }
 
@@ -83,7 +78,7 @@ namespace SOS.Prefabs.Item
             return _itemSlotCache[prefab.Identifier] = string.Join(" ", slots).ToLowerInvariant();
         }
 
-        public IEnumerable<Prefab> GetAll(IPrefabFilter filter)
+        public IEnumerable<Prefab> GetPrefabs(IPrefabFilter filter)
         {
             return ItemPrefab.Prefabs
                 .Where(p => Matches(p, filter)).OrderBy(p => p.Name());

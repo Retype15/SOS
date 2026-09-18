@@ -102,11 +102,11 @@
 	<sos.tracker.track-untrack.tooltip>Отслеживать или перестать отслеживать все рецепты этого предмета.</sos.tracker.track-untrack.tooltip>
 
 	<!-- Tabs -->
-	<sos.tab.recipes>РЕЦЕПТЫ</sos.tab.recipes>
-	<sos.tab.recipes_tooltip>Показывает рецепты создания, источники и использование предмета.</sos.tab.recipes_tooltip>
+	<sos.tab.itemrecipe.title>РЕЦЕПТЫ</sos.tab.itemrecipe.title>
+	<sos.tab.itemrecipe.tooltip>Показывает рецепты создания, источники и использование предмета.</sos.tab.itemrecipe.tooltip>
 	<sos.tab.recipes.analyzing>Анализ зависимой граф рецептов...</sos.tab.recipes.analyzing>
-	<sos.tab.preview>ПРЕДПРОСМОТР</sos.tab.preview>
-	<sos.tab.preview_tooltip>Показывает визуальный спрайт выбранного префаба.</sos.tab.preview_tooltip>
+	<sos.tab.previewpanel.title>ПРЕДПРОСМОТР</sos.tab.previewpanel.title>
+	<sos.tab.previewpanel.tooltip>Показывает визуальный спрайт выбранного префаба.</sos.tab.previewpanel.tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>Алиасы:</sos.item.aliases>
@@ -232,10 +232,10 @@
 	<sos.xml.copy>Копировать XML</sos.xml.copy>
 	<sos.xml.reset_zoom>Сбросить масштаб</sos.xml.reset_zoom>
 
-	<!-- List Headers -->
-	<sos.list.header.afflictionprefab>Недуги</sos.list.header.afflictionprefab>
-	<sos.list.header.afflictionprefabhusk>Недуги Хуска</sos.list.header.afflictionprefabhusk>
-	<sos.list.header.itemprefab>Предметы</sos.list.header.itemprefab>
+	<!-- List Prefab Headers -->
+	<sos.prefab.afflictionprefab.header>Недуги</sos.prefab.afflictionprefab.header>
+	<sos.prefab.afflictionprefabhusk.header>Недуги Хуска</sos.prefab.afflictionprefabhusk.header>
+	<sos.prefab.itemprefab.header>Предметы</sos.prefab.itemprefab.header>
 
 	<!-- List -->
 	<sos.list.separator_tooltip>Нажмите, чтобы отфильтровать список по этому типу объекта.</sos.list.separator_tooltip>

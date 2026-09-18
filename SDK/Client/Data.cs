@@ -131,13 +131,9 @@ namespace SOS
     ///         _container = container;
     ///         /* Build static skeleton on container */
     ///     }
-    ///     public void Update(SubmarineInfo target)
-    ///     {
-    ///         Rebuild(target);
-    ///     }
+    ///     public void Update(Prefab target) { /* Draw sub stats */ }
     ///     public GUIButton CreateTabButton(RectTransform tabRectT, string _) =>
-    ///         TabDefaults.CreateTabButton(tabRectT, "DETAILS");
-    ///     private void Rebuild(SubmarineInfo target) { /* Draw sub stats */ }
+    ///         TabDefaults.CreateTabButton(tabRectT, "DETAILS", "Submarine details.");
     /// }
     /// </code>
     /// </example>
@@ -166,12 +162,15 @@ namespace SOS
         void Update(T target) { }
 
         /// <summary>
-        /// Creates the tab bar button. Override to customize text, tooltip or style; the widget assigns selection, click and visibility afterwards.
+        /// Creates the tab bar button, resolving its title and tooltip from localization
+        /// (<c>{id}.title</c> / <c>{id}.tooltip</c>) with a humanized <paramref name="id"/> fallback.
+        /// Override to customize text, tooltip or style; the widget assigns selection, click and visibility afterwards.
         /// </summary>
         /// <param name="rectT">The tab bar area where the button will live.</param>
-        /// <param name="text">The title of the tab.</param>
-        GUIButton CreateTabButton(RectTransform rectT, string text)
-            => TabDefaults.CreateTabButton(rectT, text);
+        /// <param name="id">The unique identifier of the tab, used for the localization lookup.</param>
+        /// <returns>A configured <see cref="Barotrauma.GUIButton"/> without click wiring.</returns>
+        GUIButton CreateTabButton(RectTransform rectT, string id)
+            => TabDefaults.CreateTabButton(rectT, id);
     }
 
     /// <summary>
@@ -280,7 +279,7 @@ namespace SOS
     }
 
     /// <summary>
-    /// Represents parsed search criteria used by <see cref="ISOSPrefab.GetAll(IPrefabFilter)"/> to filter entities in the browser.
+    /// Represents parsed search criteria used by <see cref="ISOSPrefab.GetPrefabs(IPrefabFilter)"/> to filter entities in the browser.
     /// </summary>
     /// <remarks>
     /// Supports advanced search prefixes parsed by <c>PrefabFilterHelper.SearchFilter</c>:
@@ -344,9 +343,7 @@ namespace SOS
     /// [AutoRegister("MyMod.JobProvider", order: 3.0)]
     /// public class JobPrefabProvider : ISOSPrefab
     /// {
-    ///     public Type PrefabType => typeof(JobPrefab);
-    ///     public string Header => "Jobs &amp; Roles";
-    ///     public IEnumerable&lt;Prefab&gt; GetAll(IPrefabFilter filter)
+    ///     public IEnumerable&lt;Prefab&gt; GetPrefabs(IPrefabFilter filter)
     ///     {
     ///         return JobPrefab.Prefabs.Where(j => filter.General.Count == 0 || j.Name.Value.Contains(filter.General[0]));
     ///     }
@@ -356,29 +353,20 @@ namespace SOS
     public interface ISOSPrefab
     {
         /// <summary>
-        /// Gets the base entity type provided by this source (e.g., <see cref="Barotrauma.ItemPrefab"/> or <see cref="Barotrauma.AfflictionPrefab"/>).
-        /// </summary>
-        Type PrefabType { get; }
-
-        /// <summary>
-        /// Gets the section header title rendered above this provider's items in the browser list.
-        /// </summary>
-        string Header { get; }
-
-        /// <summary>
         /// Queries and yields all prefabs provided by this source that satisfy the specified <paramref name="filter"/>.
+        /// A provider serves its own prefabs whatever their runtime types are; related subtypes stay grouped by the browser.
         /// </summary>
         /// <param name="filter">The structured search filter containing text, category, tag, and mod tokens.</param>
         /// <returns>An enumerable sequence of matching <see cref="Barotrauma.Prefab"/> instances.</returns>
-        IEnumerable<Prefab> GetAll(IPrefabFilter filter);
+        IEnumerable<Prefab> GetPrefabs(IPrefabFilter filter);
 
         /// <summary>
         /// Constructs right-click contextual action options for an entity belonging to this provider.
         /// </summary>
         /// <param name="prefab">The prefab being right-clicked.</param>
-        /// <returns>A list of context menu options (e.g., "View Recipes", "Add to Favorites", "Track to HUD").</returns>
+        /// <returns>Provider-specific context menu options (e.g., "Track to HUD"). The hosting browser appends the baseline actions once.</returns>
         [DefaultClass<PrefabDefaults>]
-        List<ContextMenuOption> BuildContextOptions(Prefab prefab) => PrefabDefaults.BuildContextOptions(prefab);
+        List<ContextMenuOption> GetContextOptions(Prefab prefab) => [];
     }
 
     /// <summary>
@@ -410,15 +398,6 @@ namespace SOS
     [DefaultClass<WindowProfileDefaults>]
     public interface ISOSWindowProfile : IIdentifier, IDisposable
     {
-        /// <summary>
-        /// Gets the localized or display name of this window profile, shown in the profile selection dropdown.
-        /// </summary>
-        string DisplayName { get; }
-
-        /// <summary>
-        /// Gets a localized description detailing the visual layout and intended usage of this profile.
-        /// </summary>
-        string Description { get; }
 
         /// <summary>
         /// Gets optional profile-specific configuration settings (e.g., custom panel widths, saved layout presets).
@@ -451,27 +430,32 @@ namespace SOS
         private TabDefaults() { }
 
         /// <summary>
-        /// Evaluates whether this tab is capable of displaying meaningful information for the given <paramref name="item"/>.
+        /// Evaluates whether this tab is capable of displaying meaningful information for the given <c>item</c>.
         /// </summary>
-        /// <param name="item">The target entity currently selected.</param>
+        /// <param name="_"><c>item</c> - The target entity currently selected.</param>
         /// <returns><c>true</c> if this tab should appear in the tab bar for this entity; otherwise, <c>false</c>.</returns>
         public static bool CanHandle(Prefab _) => true;
 
         /// <summary>
-        /// Rebuilds the tab's content for the newly selected <paramref name="target"/>.
+        /// Rebuilds the tab's content for the newly selected <c>target</c>.
         /// Invoked on the active tab only, and only when the target instance changed.
         /// </summary>
-        /// <param name="target">The entity to inspect and visualize.</param>
+        /// <param name="_"><c>target</c> - The entity to inspect and visualize.</param>
         public static void Update(Prefab _) { }
 
         /// <summary>
-        /// Creates a standard tab button styled with the "MainMenuNotificationButton" template, sized to fit <paramref name="text"/>.
+        /// Creates the default tab button for the given tab identifier, resolving its title and tooltip
+        /// from localization (<c>{id}.title</c> / <c>{id}.tooltip</c>).
         /// </summary>
         /// <param name="parent">The parent rectangle transform (usually the tab bar content).</param>
-        /// <param name="text">The label displayed on the button.</param>
+        /// <param name="id">The unique identifier of the tab, used for the localization lookup.</param>
         /// <returns>A configured <see cref="Barotrauma.GUIButton"/> without click wiring; the hosting tab widget assigns it.</returns>
-        public static GUIButton CreateTabButton(RectTransform parent, string text)
-            => CreateTabButton(parent, text, null);
+        public static GUIButton CreateTabButton(RectTransform parent, string id)
+        {
+            var title = Texts.Get($"{id}.title", id.Split('.')[^1].FormatCamelCaseWithSpaces());
+            var tooltip = Texts.Get($"{id}.tooltip");
+            return CreateTabButton(parent, title, tooltip);
+        }
 
         /// <summary>
         /// Creates a standard tab button styled with the "MainMenuNotificationButton" template, sized to fit <paramref name="text"/>.
@@ -480,7 +464,7 @@ namespace SOS
         /// <param name="text">The label displayed on the button.</param>
         /// <param name="tooltip">Optional tooltip text. If <c>null</c> or empty, no tooltip is set.</param>
         /// <returns>A configured <see cref="Barotrauma.GUIButton"/> without click wiring; the hosting tab widget assigns it.</returns>
-        public static GUIButton CreateTabButton(RectTransform parent, string text, string? tooltip = null)
+        public static GUIButton CreateTabButton(RectTransform parent, RichString text, RichString? tooltip = null)
         {
             Vector2 textSize = GUIStyle.SmallFont.MeasureString(text);
             int width = (int)textSize.X + 24;
@@ -516,25 +500,10 @@ namespace SOS
     internal sealed class PrefabDefaults
     {
         /// <summary>
-        /// Constructs the baseline context menu options for a prefab: "View Recipes" and "Add/Remove from Favorites".
+        /// Default empty contextual actions for prefab providers adapted via <see cref="DuckProxy{T}"/>.
+        /// The hosting browser appends the baseline actions once.
         /// </summary>
-        /// <param name="prefab">The target prefab.</param>
-        /// <returns>A list of standard <see cref="Barotrauma.ContextMenuOption"/> actions.</returns>
-        public static List<ContextMenuOption> BuildContextOptions(Prefab prefab)
-        {
-            var options = new List<ContextMenuOption>
-            {
-                new(Texts.Get("sos.context.view_recipes", "View Recipes").Value, isEnabled: true, onSelected: () => API.Emit(CommKeys.SelectTarget, prefab))
-            };
-
-            string targetId = prefab.Identifier.Value;
-            bool isFav = PrefabHelper.IsFavorite(targetId);
-            string favText = isFav ? Texts.Get("sos.context.remove_favorite", "Remove from Favorites").Value : Texts.Get("sos.context.add_favorite", "Add to Favorites").Value;
-
-            options.Add(new ContextMenuOption(favText, true, () => { PrefabHelper.ToggleFavorite(targetId); }));
-
-            return options;
-        }
+        public static List<ContextMenuOption> GetContextOptions(Prefab _) => [];
     }
 
     /// <summary>

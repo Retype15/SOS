@@ -50,7 +50,7 @@ namespace SOS
         {
             var text = TextManager.Get(key);
 
-            if (!string.IsNullOrEmpty(fallback))
+            if (!fallback.IsNullOrEmpty())
             {
                 if (forceFallback) return fallback;
 #if DEBUG

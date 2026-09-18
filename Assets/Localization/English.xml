@@ -102,11 +102,11 @@ Example: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.tracker.track-untrack.tooltip>Track or untrack all recipes from this item.</sos.tracker.track-untrack.tooltip>
 
 	<!-- Tabs -->
-	<sos.tab.recipes>RECIPES</sos.tab.recipes>
-	<sos.tab.recipes_tooltip>Shows fabrication recipes, sources and usage of the item.</sos.tab.recipes_tooltip>
+	<sos.tab.itemrecipe.title>RECIPES</sos.tab.itemrecipe.title>
+	<sos.tab.itemrecipe.tooltip>Shows fabrication recipes, sources and usage of the item.</sos.tab.itemrecipe.tooltip>
 	<sos.tab.recipes.analyzing>Analyzing recipe dependency graph...</sos.tab.recipes.analyzing>
-	<sos.tab.preview>PREVIEW</sos.tab.preview>
-	<sos.tab.preview_tooltip>Shows the visual sprite of the selected prefab.</sos.tab.preview_tooltip>
+	<sos.tab.previewpanel.title>PREVIEW</sos.tab.previewpanel.title>
+	<sos.tab.previewpanel.tooltip>Shows the visual sprite of the selected prefab.</sos.tab.previewpanel.tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>Aliases:</sos.item.aliases>
@@ -232,10 +232,10 @@ Example: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.xml.copy>Copy XML</sos.xml.copy>
 	<sos.xml.reset_zoom>Reset Zoom</sos.xml.reset_zoom>
 
-	<!-- List Headers -->
-	<sos.list.header.afflictionprefab>Afflictions</sos.list.header.afflictionprefab>
-	<sos.list.header.afflictionprefabhusk>Husk Afflictions</sos.list.header.afflictionprefabhusk>
-	<sos.list.header.itemprefab>Items</sos.list.header.itemprefab>
+	<!-- List Prefab Headers -->
+	<sos.prefab.afflictionprefab.header>Afflictions</sos.prefab.afflictionprefab.header>
+	<sos.prefab.afflictionprefabhusk.header>Husk Afflictions</sos.prefab.afflictionprefabhusk.header>
+	<sos.prefab.itemprefab.header>Items</sos.prefab.itemprefab.header>
 
 	<!-- List -->
 	<sos.list.separator_tooltip>Click to filter the list by this type of object.</sos.list.separator_tooltip>

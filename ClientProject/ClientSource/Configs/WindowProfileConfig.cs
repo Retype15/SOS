@@ -60,14 +60,14 @@ namespace SOS.Configs
             using var l = new GUILayoutBuilder(rectT);
             l.Header("ACTIVE VISUAL PROFILE", Color.Gold);
 
-            var profiles = API.GetAllWindowProfiles().ToList();
-            var profileNames = profiles.Select(p => p.DisplayName).ToList();
-            var profileDesc = profiles.Select(p => p.Description).ToList();
-            var currentProfile = profiles.FirstOrDefault(p => p.Id == ActiveProfileId)?.DisplayName ?? profiles.FirstOrDefault()?.DisplayName ?? throw new KeyNotFoundException($"Not match Profile ID: '{ActiveProfileId}'");
+            var profiles = API.GetAllWindowProfiles();
+            var profileNames = profiles.Select(p => p.DisplayName()).ToList();
+            var profileDesc = profiles.Select(p => p.Description()).ToList();
+            var currentProfile = profiles.FirstOrDefault(p => p.Id == ActiveProfileId)?.DisplayName() ?? profiles.FirstOrDefault()?.DisplayName() ?? throw new KeyNotFoundException($"Not match Profile ID: '{ActiveProfileId}'");
 
             l.Dropdown("Profile:", profileNames, currentProfile, selectedName =>
             {
-                var targetProfile = profiles.FirstOrDefault(p => p.DisplayName == selectedName);
+                var targetProfile = profiles.FirstOrDefault(p => p.DisplayName() == selectedName);
                 if (targetProfile != null && targetProfile.Id != ActiveProfileId)
                 {
                     API.Emit<string>(CommKeys.ChangeProfile, targetProfile.Id);

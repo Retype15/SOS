@@ -376,12 +376,12 @@ namespace SOS
                     Logger.LogWarning("[SOS] Profile not encountered. Trying to use default profile.");
                     v = _profileFactories.First();
                 }
-                Logger.LogDebug($"GetWindowProfile >> Name: '{v?.DisplayName ?? "null"}'", level: LogLevel.Trace);
+                Logger.LogDebug($"GetWindowProfile >> Name: '{v?.DisplayName() ?? "null"}'", level: LogLevel.Trace);
             }
             if (v == null)
             {
                 var color = Microsoft.Xna.Framework.Color.LightSkyBlue;
-                Logger.LogDebugError($"[SOS] No one profile encountered.\n => Profile list: {string.Join(',', GetAllWindowProfiles().Select(p => p.DisplayName))}\n => Profile _dict => {string.Join(',', _profileFactories.GetSorted().Select(f => $"[{f.Id}, {f.Order}]"))}");
+                Logger.LogDebugError($"[SOS] No one profile encountered.\n => Profile list: {string.Join(',', GetAllWindowProfiles().Select(p => p.DisplayName()))}\n => Profile _dict => {string.Join(',', _profileFactories.GetSorted().Select(f => $"[{f.Id}, {f.Order}]"))}");
                 Logger.LogReleaseError($"[SOS] No one profile encountered. Try reinstall 'S.O.S - Standard Operation Schematics' Mod, report that in steam mod page or create an issue on Git project(‖color:{color.R},{color.G},{color.B}‖https://github.com/retype15/SOS‖end‖).");
             }
             return v;
