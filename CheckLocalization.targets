@@ -210,10 +210,11 @@
   </UsingTask>
 
   <Target Name="VerifyLocalization" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Assets'">
+    <!-- Non-publishable drafts (files and folders starting with '_*') are excluded from the scan. -->
     <ItemGroup>
-      <_LocalizationSources Include="$(MSBuildThisFileDirectory)/SDK/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/SDK/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/SDK/**/obj/**/*.cs" />
-      <_LocalizationSources Include="$(MSBuildThisFileDirectory)/ClientProject/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/ClientProject/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/ClientProject/**/obj/**/*.cs" />
-      <_LocalizationSources Include="$(MSBuildThisFileDirectory)/SharedProject/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/SharedProject/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/SharedProject/**/obj/**/*.cs" />
+      <_LocalizationSources Include="$(MSBuildThisFileDirectory)/SDK/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/SDK/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/SDK/**/obj/**/*.cs;$(MSBuildThisFileDirectory)/SDK/**/_*;$(MSBuildThisFileDirectory)/SDK/**/_*/**" />
+      <_LocalizationSources Include="$(MSBuildThisFileDirectory)/ClientProject/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/ClientProject/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/ClientProject/**/obj/**/*.cs;$(MSBuildThisFileDirectory)/ClientProject/**/_*;$(MSBuildThisFileDirectory)/ClientProject/**/_*/**" />
+      <_LocalizationSources Include="$(MSBuildThisFileDirectory)/SharedProject/**/*.cs" Exclude="$(MSBuildThisFileDirectory)/SharedProject/**/bin/**/*.cs;$(MSBuildThisFileDirectory)/SharedProject/**/obj/**/*.cs;$(MSBuildThisFileDirectory)/SharedProject/**/_*;$(MSBuildThisFileDirectory)/SharedProject/**/_*/**" />
     </ItemGroup>
 
     <VerifyLocalizationTask
