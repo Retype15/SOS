@@ -237,6 +237,13 @@
 	<sos.prefab.afflictionprefabhusk.header>Недуги Хуска</sos.prefab.afflictionprefabhusk.header>
 	<sos.prefab.itemprefab.header>Предметы</sos.prefab.itemprefab.header>
 
+	<!-- Profiles -->
+	<sos.profile.default3column.name>Трёхколоночное окно (по умолчанию)</sos.profile.default3column.name>
+	<sos.profile.default3column.desc>Классический профиль с тремя колонками:
+Слева: список всех игровых объектов.
+В центре: панель вкладок с расширенным содержимым.
+Справа: подробная информация о выбранном объекте.</sos.profile.default3column.desc>
+
 	<!-- List -->
 	<sos.list.separator_tooltip>Нажмите, чтобы отфильтровать список по этому типу объекта.</sos.list.separator_tooltip>
 

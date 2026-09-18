@@ -237,6 +237,13 @@ Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.prefab.afflictionprefabhusk.header>Afflictions Husk</sos.prefab.afflictionprefabhusk.header>
 	<sos.prefab.itemprefab.header>Objets</sos.prefab.itemprefab.header>
 
+	<!-- Profiles -->
+	<sos.profile.default3column.name>Fenêtre à trois colonnes (par défaut)</sos.profile.default3column.name>
+	<sos.profile.default3column.desc>Profil classique en trois colonnes :
+Gauche : liste de tous les objets du jeu.
+Centre : panneau d'onglets au contenu avancé.
+Droite : informations détaillées sur l'objet sélectionné.</sos.profile.default3column.desc>
+
 	<!-- List -->
 	<sos.list.separator_tooltip>Cliquez pour filtrer la liste par ce type d'objet.</sos.list.separator_tooltip>
 

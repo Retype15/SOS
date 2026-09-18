@@ -237,6 +237,13 @@
 	<sos.prefab.afflictionprefabhusk.header>Husk 病症</sos.prefab.afflictionprefabhusk.header>
 	<sos.prefab.itemprefab.header>物品</sos.prefab.itemprefab.header>
 
+	<!-- Profiles -->
+	<sos.profile.default3column.name>三列窗口（默认）</sos.profile.default3column.name>
+	<sos.profile.default3column.desc>经典三列布局：
+左侧：所有游戏对象列表。
+中间：带高级内容的选项卡面板。
+右侧：所选对象的详细信息。</sos.profile.default3column.desc>
+
 	<!-- List -->
 	<sos.list.separator_tooltip>点击按此对象类型筛选列表。</sos.list.separator_tooltip>
 
