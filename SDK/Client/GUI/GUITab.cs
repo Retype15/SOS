@@ -109,18 +109,15 @@ namespace SOS.GUI
         /// </remarks>
         public void RegisterTab(ITab<T> tab)
         {
-            if (tab.Id.IsNullOrEmpty()) throw new NullReferenceException($"ITab<{typeof(T)}>.Id Must be have a valid non-empty Id string.");
+            ArgumentNullException.ThrowIfNull(tab);
+            ArgumentNullException.ThrowIfNullOrEmpty(tab.Id, nameof(tab.Id));
 
             GUIFrame? content = null;
             GUIButton? button = null;
             try
             {
-                bool canHandle = _currentTarget != null && tab.CanHandle(_currentTarget);
 
                 button = tab.CreateTabButton(_buttonArea.Content.RectTransform, tab.Id);
-                button.Visible = canHandle;
-                button.UserData = tab;
-                button.OnClicked += WhenClicked;
 
                 content = new GUIFrame(new RectTransform(Vector2.One, _contentArea.RectTransform), style: null)
                 {
@@ -129,6 +126,11 @@ namespace SOS.GUI
                 };
 
                 tab.Init(content, button);
+
+                bool canHandle = _currentTarget != null && tab.CanHandle(_currentTarget);
+                button.Visible = canHandle;
+                button.UserData = tab;
+                button.OnClicked += WhenClicked;
 
                 if (canHandle) tab.Update(_currentTarget!);
 
@@ -205,6 +207,7 @@ namespace SOS.GUI
         /// </remarks>
         public void UpdateTabs(T target)
         {
+            ArgumentNullException.ThrowIfNull(target);
             int countValidTabs = 0;
             TabData? first = null;
             bool activeStillValid = false;

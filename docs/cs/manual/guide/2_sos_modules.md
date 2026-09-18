@@ -66,27 +66,44 @@ namespace MyMod;
 [AutoRegister("MyMod.BiomeTab", order: 10)]
 public class BiomeTab : ISOSTab
 {
-    public string Id => "MyMod.BiomeTab"; // Identificador único del Tab.
+    public string Id => "MyMod.BiomeTab"; // Identificador único del Tab. No puede estar vacío.
 
-    public bool CanHandle(Prefab prefab) => prefab is Biome; // Si es true, dibuja su Tab Button, si es False no se mostrará.
+    private GUITextBlock? text = null;
 
-    public void Init(GUIFrame container, GUIButton tabButton) // Recibe las instancias del contenedor y el botón creado usando CreateTabButton.
+    // Si es true, dibuja su Tab Button, si es False no se mostrará. Es opcional, y si no se define siempre retornará true.
+    public bool CanHandle(Prefab prefab) => prefab is Biome;
+
+    // Recibe las instancias del contenedor y el botón creado usando el metodo opcional CreateTabButton. Es tratado como un constructor para GUITab.
+    public void Init(GUIFrame container, GUIButton tabButton) 
     {
+        // Si no define su propio metodo `CreateTabButton`, puede definir las propiedades usando la instancia devuelta.
+        // tabButton.Text = "Biome Visualizer";
+        // tabButton.ToolTip = "A Biome information...";
+
         // Inicializa y crea los componentes que necesite.
-        tabButton.Text = "Biome Visualizer";
-        tabButton.ToolTip = "A Biome information...";
+        text = GUITextBlock(GUI.RectTransform(new Vector2(1f, 0.1f), container.RectTransform, 4), "", null,
+        GUI.Style.LargeFont, GUI.Alignment.Center)
     }
 
-    // Llamado cuando sea el Tab principal, CanHandle retorne true y el prefab haya cambiado.
+    // Llamado cuando sea el Tab principal, CanHandle retorne true y el prefab haya cambiado. Es opcional.
     public void Update(Prefab prefab)
     {
+        if (text == null) return;
+        var biome = GameMain.GameSession.LevelData.Biome;
+        text.Text = 
+        $"""Actual Biome is: {biome.DisplayName}
+        With difficulty: {biome.ActualMaxDificulty}
+        Description: {biome.Description}""";
         // ...
     }
+
+    // Es opcional, y permite definir la forma en que se crea el botón de la barra de Tabs. Recibe el rectT de la lista, y el Id del objeto donde si no se define el método, se usará como nombre básico.
+    public GUIButton CreateTabButton(RectTransform rectT, string Id) => TabDefaults.CreateTabButton(rectT, "Biome Visualizer", "A Biome information...");
 }
 ```
 
 > [!NOTE]
-> `Init` se llama una sola vez al construir el widget, `Show`/`Hide` cada vez que se cambia de pestaña o de objetivo.
+> GUITab asegura de que `Update` nunca se llame antes de `Init`, pero siempre es buena práctica comprobar nulos.
 
 ## 3. Prefab Providers ([`ISOSPrefab`](interface_s_o_s_1_1_i_s_o_s_prefab.html))
 

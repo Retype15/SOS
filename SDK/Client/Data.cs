@@ -89,7 +89,7 @@ namespace SOS
     #region Interfaces
 
     /// <summary>
-    /// Exposes an identifier property used to uniquely distinguish an SOS module within the S.O.S. ecosystem.
+    /// Exposes an identifier property used to uniquely distinguish an object.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IIdentifier
