@@ -379,5 +379,8 @@ namespace SOS
                 return false;
             }
         }
+
+        internal static T? TryCast<T>(this object target) where T : class => target.TryCast<T>(out var instance) ? instance : null;
+
     }
 }
