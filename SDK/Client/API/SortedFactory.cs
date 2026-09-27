@@ -6,11 +6,23 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Barotrauma;
 using Barotrauma.LuaCs;
 
 namespace SOS
 {
+    public interface IFactoryEntry<T> : IDisposable
+    {
+        Identifier Id { get; }
+        double Order { get; }
+        T? Value { get; }
+        T? Instance(bool fresh);
+        T? Instantiate();
+        void Drop();
+    }
+
     /// <summary>
     /// Thread-safe, ordered service registry managing component discovery, sorting, activation, and instance lifecycle.
     /// </summary>
@@ -28,19 +40,93 @@ namespace SOS
     /// </remarks>
     internal sealed class SortedFactory<T> where T : class
     {
-        private readonly Dictionary<string, (double Order, bool IsActive, Func<T?> Factory)> _dict = [];
-        private readonly Dictionary<string, T> _instances = [];
-        private (string Id, double Order, bool IsActive, Func<T?> Factory)[] _cache = [];
-        private bool _isDirty = false;
-
-        private void Add(string id, double order, bool active, Func<T?> Factory)
+        public class Entry(Identifier id, Func<T?>? factory = null, double order = 0, bool active = true) : IFactoryEntry<T>, IComparable<Entry>, IEquatable<Entry>, IEquatable<Identifier>
         {
-            lock (_dict)
+            public Identifier Id
             {
-                _dict[id] = (order, active, Factory);
-                _instances.Remove(id);
-                _isDirty = true;
+                get => id;
+                private set => id = value;
             }
+
+            public double Order => order;
+
+            public bool Active
+            {
+                get => active;
+                set => active = value;
+            }
+
+            private T? _cache = null;
+
+            public T? Value => Instance();
+
+            private readonly object _sync = new();
+
+            public T? Instance(bool fresh = false)
+            {
+                lock (_sync)
+                    return (fresh) ? _cache = Instantiate() : _cache ??= Instantiate();
+            }
+
+            public T? Instantiate()
+            {
+                try
+                {
+                    return factory?.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning($"[SOS.API] Failed to instantiate type '{typeof(T).Name}' of Id '{Id}'. \nException: {ex.Message}");
+                    Logger.LogDebugError(ex.StackTrace);
+                    return null;
+                }
+            }
+
+            public int CompareTo(Entry? other)
+            {
+                var idEqual = Id.CompareTo(other?.Id);
+                if (idEqual == 0) return 0;
+                var a = Order.CompareTo(other?.Order);
+                return (a == 0) ? idEqual : a;
+            }
+
+            public bool Equals(Entry? other) => other != null && Id.Equals(other.Id);
+
+            public bool Equals([AllowNull] Identifier other) => other != null && Id == other;
+
+            public override bool Equals(object? obj) => Equals(obj as Entry);
+
+            public override int GetHashCode() => Id.GetHashCode();
+
+            public void Drop()
+            {
+                lock (_sync)
+                {
+                    if (_cache?.TryCast<IDisposable>(out var disposableInstance) ?? false)
+                        disposableInstance?.Dispose();
+                    _cache = null;
+                }
+            }
+
+            public void Dispose()
+            {
+                Drop();
+                GC.SuppressFinalize(this);
+            }
+
+            ~Entry() => Dispose();
+
+            public static implicit operator Entry(Identifier key) => new(key);
+
+            public static implicit operator Entry(string key) => new(key);
+        }
+
+        private readonly SortedSet<Entry> entries = [];
+
+        private void Add(string id, double order, bool active, Func<T?> factory)
+        {
+            lock (entries)
+                entries.Add(new(id, factory, order, active));
         }
 
         /// <summary>
@@ -55,13 +141,15 @@ namespace SOS
         /// </remarks>
         public bool Remove(string key, bool onlyInstance = false)
         {
-            lock (_dict)
+
+            if (entries.TryGetValue(key, out var entry))
             {
-                var isSuccess = !onlyInstance && _dict.Remove(key);
-                _instances.Remove(key);
-                _isDirty |= isSuccess;
-                return isSuccess;
+                entry.Drop();
+                if (onlyInstance) return true;
+                lock (entries)
+                    return entries.Remove(key);
             }
+            return false;
         }
 
         /// <summary>
@@ -105,7 +193,7 @@ namespace SOS
 
             try
             {
-                Add(id, order, active, () => Activator.CreateInstance(type)?.Cast<T>());
+                Add(id, order, active, () => Activator.CreateInstance(type)?.Cast<T>()); // TODO: Añadir el resto de comprobaciones antes de registrar para evitar que CreateInstance devuelva nulo.
 
                 return true;
             }
@@ -128,7 +216,7 @@ namespace SOS
         {
             id ??= func.Method.ReturnType.FullOrName();
 
-            Add(id, order, active, () => func().Cast<T>());
+            Add(id, order, active, () => func()?.Cast<T>());
             return true;
         }
 
@@ -195,21 +283,28 @@ namespace SOS
         /// </remarks>
         public bool SetActive(string id, bool active)
         {
-            lock (_dict)
+            if (entries.TryGetValue(id, out var entry))
             {
-                if (!_dict.TryGetValue(id, out var entry)) return false;
-                if (entry.IsActive == active) return true;
-
-                _dict[id] = (entry.Order, active, entry.Factory);
-                _isDirty = true;
-
-                if (!active && _instances.Remove(id, out var instance))
-                {
-                    if (instance is IDisposable d) d.Dispose();
-                }
-
+                entry.Active = active;
                 return true;
             }
+
+            return false;
+            //lock (_dict)
+            //{
+            //    if (!_dict.TryGetValue(id, out var entry)) return false;
+            //    if (entry.IsActive == active) return true;
+            //
+            //    _dict[id] = (entry.Order, active, entry.Factory);
+            //    _isDirty = true;
+            //
+            //    if (!active && _instances.Remove(id, out var instance))
+            //    {
+            //        if (instance is IDisposable d) d.Dispose();
+            //    }
+            //
+            //    return true;
+            //}
         }
 
         /// <summary>
@@ -219,34 +314,13 @@ namespace SOS
         /// <returns><c>true</c> if registered and active; otherwise, <c>false</c>.</returns>
         public bool IsActive(string id)
         {
-            lock (_dict)
-                return _dict.TryGetValue(id, out var entry) && entry.IsActive;
+            return entries.TryGetValue(id, out var entry) && entry.Active;
         }
 
-        /// <summary>
-        /// Generates or retrieves an ordered snapshot array of all active registrations.
-        /// </summary>
-        /// <returns>An array of active entries sorted by order ascending, then alphabetically by key.</returns>
-        /// <remarks>
-        /// Results are cached internally. If no registrations have been added, removed, or toggled since the last call,
-        /// returns the precomputed array directly with zero allocations.
-        /// </remarks>
-        public (string Id, double Order, bool IsActive, Func<T?> Factory)[] GetSorted()
+        public IEnumerable<Entry> GetAll(bool onlyActives = true)
         {
-            if (_isDirty)
-            {
-                lock (_dict)
-                {
-                    _cache = [.. _dict
-                        .Where(kvp => kvp.Value.IsActive)
-                        .OrderBy(kvp => kvp.Value.Order)
-                        .ThenBy(kvp => kvp.Key)
-                        .Select(kvp => (kvp.Key, kvp.Value.Order, kvp.Value.IsActive, kvp.Value.Factory))];
-
-                    _isDirty = false;
-                }
-            }
-            return _cache;
+            foreach (var entry in entries) if (!onlyActives || entry.Active)
+                yield return entry;
         }
 
         /// <summary>
@@ -265,37 +339,17 @@ namespace SOS
         /// skips to the next entry without aborting the sequence.
         /// </para>
         /// </remarks>
-        public IEnumerable<T> GetAll(bool onlyActives = true, bool keepInstance = true)
+        public IEnumerable<T> GetAllInstances(bool onlyActives = true, bool fresh = false)
         {
-            foreach (var (Id, _, isActive, factory) in GetSorted())
+            foreach (var entry in GetAll(onlyActives))
             {
-                if (onlyActives && !isActive) continue;
-
-                T? instance = null;
-                lock (_dict)
-                    _instances.TryGetValue(Id, out instance);
-
-                if (instance != null) { yield return instance; continue; }
-
-                try
-                {
-                    instance ??= factory();
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogWarning($"[SOS.API] Failed to instantiate section '{typeof(T).Name}' of Id '{Id}'. \nException: {ex.Message}");
-                    continue;
-                }
-
-                if (instance != null)
-                {
-                    if (keepInstance)
-                        lock (_dict)
-                            _instances[Id] = instance;
-                    yield return instance;
-                }
+                T? result = entry.Instance(fresh);
+                if (result != null) yield return result;
             }
         }
+
+        public Entry? Get(string id)
+            => (id != null && entries.TryGetValue(id, out var entry)) ? entry : null;
 
         /// <summary>
         /// Resolves an active component instance by its unique identifier.
@@ -311,49 +365,21 @@ namespace SOS
         /// <item><description>If <paramref name="keepInstance"/> is <c>true</c>, stores the new instance back in the cache under lock.</description></item>
         /// </list>
         /// </remarks>
-        public T? Get(string id, bool keepInstance = true)
-        {
-            Func<T?>? factory;
-            lock (_dict)
-            {
-                if (_instances.TryGetValue(id, out var cached))
-                    return cached;
+        public T? GetInstance(string id, bool fresh = false)
+            => Get(id)?.Instance(fresh);
 
-                if (!_dict.TryGetValue(id, out var entry))
-                    return null;
-
-                factory = entry.Factory;
-            }
-
-            T? instance;
-
-            try
-            {
-                instance = factory();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogWarning($"[SOS.API] Failed to instantiate factory of Id '{id}'. \nException: {ex.Message}");
-                return null;
-            }
-
-            lock (_dict)
-                if (keepInstance && instance != null)
-                    _instances[id] = instance;
-
-            return instance;
-        }
+        public Entry? First() => entries.FirstOrDefault();
 
         /// <summary>
         /// Resolves the first active component according to registration order.
         /// </summary>
         /// <param name="keepInstance">If <c>true</c>, caches the resolved instance.</param>
         /// <returns>The first active component instance, or <c>null</c> if no active components are registered.</returns>
-        public T? First(bool keepInstance = true)
-        {
-            var sorted = GetSorted();
-            return sorted.Length > 0 ? Get(sorted[0].Id, keepInstance) : null;
-        }
+        public T? FirstInstance(bool fresh = false)
+            => First()?.Instance(fresh);
+
+        public Entry? GetOrFirst(string? id = null)
+            => id == null ? First() : Get(id);
 
         /// <summary>
         /// Resolves the active component matching <paramref name="id"/>, falling back to the first active component if not found.
@@ -361,8 +387,9 @@ namespace SOS
         /// <param name="id">The unique identifier to look up. If <c>null</c> or not found, falls back to <see cref="First"/>.</param>
         /// <param name="keepInstance">If <c>true</c>, caches the resolved instance.</param>
         /// <returns>The resolved instance, or <c>null</c> if no active registrations exist.</returns>
-        public T? GetOrFirst(string? id, bool keepInstance = true)
-            => (id != null && Get(id, keepInstance) is { } instance) ? instance : First(keepInstance);
+        public T? GetOrFirstInstance(string? id, bool fresh = false)
+            => GetOrFirst(id)?.Instance(fresh);
+        //  => (id != null && Get(id, keepInstance) is { } instance) ? instance : First(keepInstance);
 
         /// <summary>
         /// Clears the factory contents, disposing cached instances and optionally removing all registrations.
@@ -372,22 +399,23 @@ namespace SOS
         /// Any cached instance implementing <see cref="IDisposable"/> has its <see cref="IDisposable.Dispose"/> method called under lock.
         /// When <paramref name="onlyInstances"/> is <c>false</c>, the internal sorted snapshot is emptied and the dirty flag is cleared.
         /// </remarks>
-        public void Clear(bool onlyInstances = false)
+        public void Clear()
         {
-            lock (_dict)
+            Clean();
+            lock (entries)
             {
-                if (!onlyInstances)
-                {
-                    _dict.Clear();
-                    _cache = [];
-                    _isDirty = false;
-                    Logger.LogDebugWarning($"Cleaning factory to type: '{typeof(T).FullOrName()}'");
-                }
-                foreach (var kv in _instances)
-                    if (kv.Value.TryCast<IDisposable>(out var disposableInstance))
-                        disposableInstance?.Dispose();
+                entries.Clear();
+                Logger.LogDebugWarning($"Cleaning factory to type: '{typeof(T).FullOrName()}'");
+                return;
+            }
+        }
 
-                _instances.Clear();
+        public void Clean()
+        {
+            lock (entries)
+            {
+                foreach (var entry in entries)
+                    entry.Drop();
             }
         }
     }
