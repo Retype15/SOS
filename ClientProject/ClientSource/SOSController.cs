@@ -120,9 +120,9 @@ namespace SOS
             {
                 if (Cfg.SOSOpenKeyHit)
                 {
-                    if (PlayerInput.IsCtrlDown())
+                    if (PlayerInput.IsCtrlDown() && !IsSOSBlocked)
                     {
-                        if (!IsSOSBlocked) CrossThread.RequestExecutionOnMainThread(() => Tracker.ToggleTracker());
+                        CrossThread.RequestExecutionOnMainThread(() => Tracker.ToggleTracker());
                     }
                     else
                     {
