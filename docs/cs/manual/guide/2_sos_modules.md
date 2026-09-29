@@ -66,8 +66,6 @@ namespace MyMod;
 [AutoRegister("MyMod.BiomeTab", order: 10)]
 public class BiomeTab : ISOSTab
 {
-    public string Id => "MyMod.BiomeTab"; // Identificador único del Tab. No puede estar vacío.
-
     private GUITextBlock? text = null;
 
     // Si es true, dibuja su Tab Button, si es False no se mostrará. Es opcional, y si no se define siempre retornará true.

@@ -65,8 +65,6 @@ local HelloTab  = {}
 
 local text      = nil
 
-HelloTab.Id     = "MyMod.HelloTab"
-
 function HelloTab.CanHandle(prefab)
     return true
 end
@@ -90,7 +88,7 @@ function HelloTab.Dispose() -- Opcionalmente, si necesita liberar recursos, pued
     text = nil
 end
 
-API.RegisterTab(HelloTab, HelloTab.Id, 105)
+API.RegisterTab(HelloTab, "MyMod.HelloTab", 105)
 ```
 
 > [!NOTE]
