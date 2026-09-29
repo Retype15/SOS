@@ -39,9 +39,19 @@ public class RadiationStatInfo : ISOSStatInfo
     {
         if (prefab is not ItemPrefab item || !item.Tags.Contains("radioactive"))
             return;
-        // ...
+
+        using var l = new GUILayoutBuilder(rectT);
+        l.Header(Texts.Get("mymod.radiation.header", "RADIATION HAZARD").Value, Color.GreenYellow);
+        l.Row(Texts.Get("mymod.radiation.output", "Radiation Output:").Value, "High", Color.Red);
     }
 }
+```
+
+Y su localización en el `Localization/English.xml` de tu mod:
+
+```xml
+<mymod.radiation.header>RADIATION HAZARD</mymod.radiation.header>
+<mymod.radiation.output>Radiation Output:</mymod.radiation.output>
 ```
 
 > [!TIP]
@@ -51,7 +61,7 @@ public class RadiationStatInfo : ISOSStatInfo
 
 Pestaña central de inspección para un tipo de entidad. Aparece en la tab bar solo cuando `SOS.ISOSTab.CanHandle` devuelve `true` para el objetivo actual.
 
-### Ejemplo de uso {#ej1} <!-- TODO: Arreglar correctamente los ejemplos con info real.-->
+### Ejemplo de uso {#ej1}
 
 ```csharp
 using Barotrauma;
@@ -79,8 +89,8 @@ public class BiomeTab : ISOSTab
         // tabButton.ToolTip = "A Biome information...";
 
         // Inicializa y crea los componentes que necesite.
-        text = GUITextBlock(GUI.RectTransform(new Vector2(1f, 0.1f), container.RectTransform, 4), "", null,
-        GUI.Style.LargeFont, GUI.Alignment.Center)
+        text = new GUITextBlock(new RectTransform(new Vector2(1f, 0.1f), container.RectTransform, 4), "", null,
+        GUIStyle.LargeFont, Alignment.Center);
     }
 
     // Llamado cuando sea el Tab principal, CanHandle retorne true y el prefab haya cambiado. Es opcional.
@@ -88,9 +98,9 @@ public class BiomeTab : ISOSTab
     {
         if (text == null) return;
         var biome = GameMain.GameSession.LevelData.Biome;
-        text.Text = 
+        text.Text =
         $"""Actual Biome is: {biome.DisplayName}
-        With difficulty: {biome.ActualMaxDificulty}
+        With difficulty: {biome.ActualMaxDifficulty}
         Description: {biome.Description}""";
         // ...
     }
@@ -98,6 +108,13 @@ public class BiomeTab : ISOSTab
     // Es opcional, y permite definir la forma en que se crea el botón de la barra de Tabs. Recibe el rectT de la lista, y el Id del objeto donde si no se define el método, se resolverá desde localización ({Id}.title/.tooltip).
     public GUIButton CreateTabButton(RectTransform rectT, string Id) => TabDefaults.CreateTabButton(rectT, "Biome Visualizer", "A Biome information...");
 }
+```
+
+Y su localización en el `Localization/English.xml`.
+
+```xml
+<mymod.biometab.title>BIOME</mymod.biometab.title>
+<mymod.biometab.tooltip>Shows the current level biome.</mymod.biometab.tooltip>
 ```
 
 > [!NOTE]
@@ -160,38 +177,54 @@ public class MyModSettings : ConfigDirtySaver, ISOSConfig
 {
     // ISettingBase Properties
 
-    private readonly ISettingBase<string> property;
-    public string Property
+    private readonly ISettingBase<bool> showHints;
+    public bool ShowHints
     {
-        get => property.Value;
-        set => property.SetIfNotEqual(value);
+        get => showHints.Value;
+        set => showHints.SetIfNotEqual(value);
     }
 
     public MyModSettings()
     {
+        // Plugin es tu propio IAssemblyPlugin: expone los servicios LuaCs de tu mod.
         var configService = Plugin.Instance.ConfigService;
         var package = Plugin.Instance.Package;
 
-        TryInitConfig("ActiveProfileId", out property, configService, package);
+        TryInitConfig("ShowHints", out showHints, configService, package);
     }
 
     // Se ejecuta cuando SOS decide que debe cargar datos, por ejemplo al abrir la ventana S.O.S.
-    public void Load() { /* ... */ }
-    
-    // Se ejecuta cuando SOS decide que debe guardar los datos, por ejemplo al cerrar la ventana S.O.S.
-    public void Save() { /* ... */ }
+    // Los valores ya viven en el servicio; úsalo para sincronizar UI propia si la tienes.
+    public void Load() { }
 
-    // Se ejecuta cuando el usuario decide limpiar la configuración desde un nivel superior, por ejemplo, desde la configuración `SOS.WindowProfile` o general.
-    public void Reset() { /* ... */ }
+    // Se ejecuta cuando SOS decide que debe guardar los datos, por ejemplo al cerrar la ventana S.O.S.
+    // Solo persiste lo marcado como dirty (vía SetIfNotEqual).
+    public void Save() => SaveChanges(Plugin.Instance.ConfigService);
+
+    // Restaura los valores de fábrica de esta configuración.
+    public void Reset() => ShowHints = true;
 
     // Dibuja las opciones de configuración personalizada para esta configuración directamente en el panel de configuración.
     public void Draw(RectTransform rectT)
     {
         using var l = new GUILayoutBuilder(rectT);
         l.Header("MY MOD CONFIG", Color.Gold);
+        l.TickBox(Texts.Get("mymod.settings.showhints", "Show Hints").Value, ShowHints, v => ShowHints = v);
         l.ButtonToResetSection(this);
     }
 }
+```
+
+Cada setting debe declararse en el XML de configuración de tu mod:
+
+```xml
+<Setting Name="ShowHints" Type="bool" Value="true" ShowInMenus="false" />
+```
+
+Y su localización en el `Localization/English.xml` de tu mod:
+
+```xml
+<mymod.settings.showhints>Show Hints</mymod.settings.showhints>
 ```
 
 > [!TIP]
@@ -211,6 +244,7 @@ Es completamente libre de modificar la apariencia por completo de la ventana.
 ### Ejemplo de uso {#ej4}
 
 ```csharp
+using Barotrauma;
 using SOS;
 
 # pragma warning disable IDE0130
@@ -218,16 +252,55 @@ using SOS;
 
 namespace MyMod;
 
-[AutoRegister("MyMod.LeftFixedWindow", order: 10)]
-public class LeftFixedWindow : GUIWindow, ISOSWindowProfile
+[AutoRegister("MyMod.CompactProfile", order: 20)]
+public class CompactProfile : GUIWindow, ISOSWindowProfile
 {
-    public string DisplayName => "Left Fixed Window";
-    public string Description => "Fixed window located in top-Left Panel.";
+    private bool _eventsRegistered;
 
-    public void Init() { /* Build UI */ }
-    public void Update() { /* Frame update */ }
+    public CompactProfile() : base(
+        new RectTransform(new Vector2(0.5f, 0.8f), GUI.Canvas, Anchor.Center),
+        Texts.Get("mymod.compact.title", "Compact Inspector"),
+        style: "CircuitBoxFrame",
+        color: Color.Black * 0.85f)
+    {
+    }
+
+    public void Init()
+    {
+        if (_eventsRegistered) return;
+        API.On(CommKeys.ToggleWindow, Toggle, EventPriority.UI);
+        API.On(CommKeys.OpenWindow, Open, EventPriority.UI);
+        API.On<Prefab?>(CommKeys.SelectTarget, OnTarget, EventPriority.UI);
+        _eventsRegistered = true;
+
+        // Construye tu UI aquí y ponte al día con la selección actual:
+        OnTarget(API.GetState<Prefab?>(CommKeys.SelectTarget));
+    }
+
+    public void Update() { /* Lógica por frame: layout, input, etc... */ }
+
+    public void Dispose()
+    {
+        API.Off(CommKeys.ToggleWindow, Toggle, EventPriority.UI);
+        API.Off(CommKeys.OpenWindow, Open, EventPriority.UI);
+        API.Off<Prefab?>(CommKeys.SelectTarget, OnTarget, EventPriority.UI);
+        _eventsRegistered = false;
+    }
+
+    private void Toggle() => Visible = !Visible;
+    private void Open() => Visible = true;
+    private void OnTarget(Prefab? target) { /* Reconstruye el contenido para target... */ }
 }
 ```
+
+El nombre y la descripción del desplegable se resuelven desde localización (`{id}.name` / `{id}.desc`), en el `Localization/English.xml` de tu mod:
+
+```xml
+<mymod.compactprofile.name>Compact Inspector</mymod.compactprofile.name>
+<mymod.compactprofile.desc>Minimalist floating window.</mymod.compactprofile.desc>
+```
+
+Puede leer el código actual en el repositorio para más detalle.
 
 > [!TIP]
 > Opcionalmente, puede definir *SOS.ISOSWindowProfile.ProfileConfig*, una configuracion específica para este Módulo, donde se llamará luego de guardarse el módulo SOS.ISOSConfig **WindowProfileConfig**, y dibujará su *SOS.ISOSConfig.Draw()* dentro de esta configuración en el área específica dada por esta.
@@ -235,10 +308,10 @@ public class LeftFixedWindow : GUIWindow, ISOSWindowProfile
 > **Ejemplo de definición:**
 >
 > ```csharp
-> public class LeftFixedWindow : GUIWindow, ISOSWindowProfile
+> public class CompactProfile : GUIWindow, ISOSWindowProfile
 > {
 >   // ...
->   private LeftFixedWindowConfig? config; 
+>   private CompactProfileConfig? config; 
 >   public ISOSConfig ProfileConfig => config ??= new();
 >   // ...
 > }
