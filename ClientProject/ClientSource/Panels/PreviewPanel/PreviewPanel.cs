@@ -17,7 +17,6 @@ namespace SOS.Panels.PreviewPanel
     //[AutoRegister("SOS.Tab.PreviewPanel", 10)]
     public class PreviewPanelTab : ISOSTab
     {
-        public string Id => "SOS.Tab.PreviewPanel";
 
         private GUITextBlock _nameBlock = null!;
         private GUITextBlock _idBlock = null!;

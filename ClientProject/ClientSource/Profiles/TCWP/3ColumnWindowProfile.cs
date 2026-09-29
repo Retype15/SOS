@@ -19,8 +19,6 @@ namespace SOS.Profiles.TCWP
     [AutoRegister("SOS.Profile.Default3Column", -1)]
     internal sealed class ThreeColumnWindowProfile : GUIWindow, ISOSWindowProfile
     {
-        public string Id => "SOS.Profile.Default3Column";
-
         private Configs.TCWP.TCWPConfig? config;
         public ISOSConfig ProfileConfig => config ??= new();
 
@@ -432,7 +430,7 @@ namespace SOS.Profiles.TCWP
                 RectTransform = { MinSize = new Point(0, 65), MaxSize = new Point(int.MaxValue, 65) }
             };
 
-            centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform), API.GetAllTabs());
+            centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform));
 
             // Right panel
             int initialRightW = (config != null && config.RightPanelWidth > 0) ? config.RightPanelWidth : 300;
@@ -521,7 +519,7 @@ namespace SOS.Profiles.TCWP
 
             var candidates = new List<Prefab>();
 
-            foreach (var provider in API.GetAllPrefabProviders()) // TODO: Optimize using .Next() in LoadNextChunk for consuming in place.
+            foreach (var provider in API.GetAllPrefabProviderInstances()) // TODO: Optimize using .Next() in LoadNextChunk for consuming in place.
             {
                 try
                 {

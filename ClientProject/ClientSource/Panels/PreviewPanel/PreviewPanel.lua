@@ -11,8 +11,6 @@ local nameBlock  = nil
 local idBlock    = nil
 local sprite     = nil
 
-PreviewTab.Id    = "SOS.Tab.PreviewPanel"
-
 function PreviewTab.CanHandle(prefab)
     if prefab == nil then return false end
 
@@ -80,6 +78,6 @@ function PreviewTab.Dispose()
     idBlock = nil
 end
 
-API.RegisterTab(PreviewTab, PreviewTab.Id, 100)
+API.RegisterTab(PreviewTab, "SOS.Tab.PreviewPanel", 100)
 
 Logger.LogDebug("[SOS] PreviewPanel registered!", Color.LightGreen)

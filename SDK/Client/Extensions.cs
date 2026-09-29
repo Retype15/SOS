@@ -680,20 +680,20 @@ namespace SOS
     #region SOS Module Extensions
 
     /// <summary>
-    /// Display helpers for <see cref="ISOSWindowProfile"/>, resolved from localization
-    /// (<c>{Id}.name</c> / <c>{Id}.desc</c>) with a humanized <see cref="IIdentifier.Id"/> fallback for the name.
+    /// Display helpers for <see cref="ISOSWindowProfile"/> factory entries, resolved from localization
+    /// (<c>{Id}.name</c> / <c>{Id}.desc</c>) with a humanized identifier fallback for the name.
     /// </summary>
     public static class ISOSWindowProfileExt
     {
         /// <summary>
         /// Gets the localized display name of the profile, shown in the profile selection dropdown.
         /// </summary>
-        public static string DisplayName(this ISOSWindowProfile profile) => Texts.Get($"{profile.Id}.name", profile.Id.Split('.')[^1].FormatCamelCaseWithSpaces()).Value;
+        public static string DisplayName(this IFactoryEntry<ISOSWindowProfile> entry) => Texts.Get($"{entry.Id}.name", entry.Id.Value.Split('.')[^1].FormatCamelCaseWithSpaces()).Value;
 
         /// <summary>
         /// Gets the localized description of the profile. Empty when untranslated.
         /// </summary>
-        public static string Description(this ISOSWindowProfile profile) => Texts.Get($"{profile.Id}.desc").Value;
+        public static string Description(this IFactoryEntry<ISOSWindowProfile> entry) => Texts.Get($"{entry.Id}.desc").Value;
     }
 
     #endregion

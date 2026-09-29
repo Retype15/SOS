@@ -98,7 +98,7 @@ namespace SOS
 
             API.Initialize(Plugin.Instance.PluginManagementService);
 
-            ActiveProfile = API.GetWindowProfile(WindowProfileConfig.Instance.ActiveProfileId);
+            ActiveProfile = API.GetWindowProfileInstance(WindowProfileConfig.Instance.ActiveProfileId);
         }
 
         private void CloseSOS()

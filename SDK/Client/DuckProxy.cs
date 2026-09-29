@@ -125,6 +125,9 @@ namespace SOS
     /// resolution via <see cref="DefaultClassAttributeBase"/> if methods are missing.</description></item>
     /// <item><term>MoonSharp Lua tables:</term><description>Extracts values from the Lua table, supporting property access (get/set)
     /// and function calls. Falls back to static helper methods if table entries are missing.</description></item>
+    /// <item><term>Disposal:</term><description>The proxy always implements <see cref="IDisposable"/>. The target's dispose
+    /// affordance (an <see cref="IDisposable"/> implementation or a <c>Dispose</c> Lua function) is subscribed once at
+    /// creation; if absent, disposal is a silent no-op. A missing target <c>Dispose</c> never fails adaptation.</description></item>
     /// </list>
     /// Thread-safety: The proxy uses a handler map (_handlerMap) to cache method-to-delegate mappings. The map is populated
     /// during initialization and read-only thereafter, ensuring thread-safe invocation.
@@ -140,13 +143,21 @@ namespace SOS
     /// var service2 = DuckProxy&lt;IMyService&gt;.Create(clrObject);
     /// </code>
     /// </example>
-    internal class DuckProxy<T> : DispatchProxy, IDuckProxy where T : class
+    internal class DuckProxy<T> : DispatchProxy, IDuckProxy, IDisposable where T : class
     {
         public object ProxyTarget { get; private set; } = null!;
 
         private readonly Dictionary<MethodInfo, Func<object?[], object?>> _handlerMap = [];
 
+        private Action? _disposeAction;
+
         public DuckProxy() { }
+
+        /// <summary>
+        /// Disposes the wrapped target if it exposed a dispose affordance at creation time;
+        /// otherwise a silent no-op. Target exceptions propagate.
+        /// </summary>
+        public void Dispose() => _disposeAction?.Invoke();
 
         public static T Create(object target)
         {
@@ -184,14 +195,29 @@ namespace SOS
                     yield return method;
         }
 
+        private static bool IsDisposeMethod(MethodInfo method)
+            => method.DeclaringType == typeof(IDisposable)
+                && method.Name == nameof(IDisposable.Dispose)
+                && method.ReturnType == typeof(void)
+                && method.GetParameters().Length == 0;
+
         private void ConfigureClrObject(object target)
         {
+            // Subscribe the target's dispose affordance once (public or explicit). Absent => silent no-op.
+            _disposeAction = target is IDisposable disposable ? disposable.Dispose : null;
+
             var targetType = target.GetType();
             var interfaceType = typeof(T);
             var errors = new StringBuilder();
 
             foreach (var interfaceMethod in GetAllInterfaceMethods(interfaceType))
             {
+                if (IsDisposeMethod(interfaceMethod))
+                {
+                    _handlerMap[interfaceMethod] = _ => { _disposeAction?.Invoke(); return null; };
+                    continue;
+                }
+
                 var parameterTypes = interfaceMethod.GetParameters()
                     .Select(p => p.ParameterType)
                     .ToArray();
@@ -227,11 +253,21 @@ namespace SOS
 
         private void ConfigureLuaTable(Table table)
         {
+            var disposeFunc = table.Get("Dispose");
+            if (disposeFunc.Type == DataType.Function || disposeFunc.Type == DataType.ClrFunction)
+                _disposeAction = () => table.OwnerScript.Call(disposeFunc);
+
             var interfaceType = typeof(T);
             var errors = new StringBuilder();
 
             foreach (var interfaceMethod in GetAllInterfaceMethods(interfaceType))
             {
+                if (IsDisposeMethod(interfaceMethod))
+                {
+                    _handlerMap[interfaceMethod] = _ => { _disposeAction?.Invoke(); return null; };
+                    continue;
+                }
+
                 var methodName = interfaceMethod.Name;
                 var returnType = interfaceMethod.ReturnType;
 

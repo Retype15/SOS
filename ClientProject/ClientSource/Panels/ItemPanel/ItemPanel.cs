@@ -15,7 +15,6 @@ namespace SOS.Panels.ItemPanel
     [AutoRegister("SOS.Tab.ItemRecipe", 0)]
     public class ItemPanelTab : ISOSTab
     {
-        public string Id => "SOS.Tab.ItemRecipe";
         private GUIFrame? _container;
         private GUIListBox? _colObtain;
         private GUIListBox? _colUsage;

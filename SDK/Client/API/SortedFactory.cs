@@ -6,6 +6,7 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Barotrauma;
@@ -13,14 +14,56 @@ using Barotrauma.LuaCs;
 
 namespace SOS
 {
+    /// <summary>
+    /// Public handle to a single <see cref="SortedFactory{T}"/> registration.
+    /// Exposes the registration key without instantiating, with lazy cached resolution via <see cref="IFactoryEntry{T}.Value"/>.
+    /// </summary>
+    /// <typeparam name="T">The contract type managed by the registry.</typeparam>
     public interface IFactoryEntry<T> : IDisposable
     {
+        /// <summary>Gets the unique registration key.</summary>
         Identifier Id { get; }
+        /// <summary>Gets the sort order (ascending).</summary>
         double Order { get; }
+        /// <summary>Gets the cached instance, creating and caching it on first use.</summary>
         T? Value { get; }
+        /// <summary>Gets the cached instance, or forces re-instantiation when <paramref name="fresh"/> is <c>true</c>.</summary>
+        /// <param name="fresh">If <c>true</c>, replaces and disposes the cached instance.</param>
         T? Instance(bool fresh);
+        /// <summary>Invokes the factory once without touching the cache. Failures are logged and return <c>null</c>.</summary>
         T? Instantiate();
+        /// <summary>Evicts the cached instance, disposing it if it implements <see cref="IDisposable"/>.</summary>
         void Drop();
+    }
+
+    internal abstract class SortedFactory
+    {
+        protected static readonly ConcurrentDictionary<Type, SortedFactory> factories = [];
+
+        public abstract bool AutoRegister(IPluginManagementService pluginManagementService);
+        public abstract bool Register(object obj, string? id, double order, bool active);
+        public abstract bool Remove(string key, bool onlyInstance);
+        public abstract bool SetActive(string id, bool state);
+        public abstract void Clean();
+        public abstract void CleanInstances();
+
+        protected SortedFactory() { }
+
+        public static SortedFactory<T>? TryGet<T>() where T : class
+            => factories.TryGetValue(typeof(T), out var factory) ? (SortedFactory<T>)factory : null;
+
+        public static SortedFactory<T> GetOrInstantiate<T>() where T : class
+            => SortedFactory<T>.GetOrInstantiate();
+
+        public static SortedFactory[] GetAllFactories()
+            => [.. factories.Values];
+
+        internal static void CleanFactory()
+        {
+            foreach (var factory in factories)
+                factory.Value.Clean();
+            factories.Clear();
+        }
     }
 
     /// <summary>
@@ -33,12 +76,12 @@ namespace SOS
     /// <list type="bullet">
     /// <item><description><b>Ordered Discovery:</b> Stores component factories paired with a priority order. Output queries are sorted ascending by order, then alphabetically by identifier.</description></item>
     /// <item><description><b>Automated Assembly Scanning:</b> Discovers classes decorated with <see cref="AutoRegisterAttribute"/> via <see cref="AutoRegister(IPluginManagementService)"/> without premature instantiation.</description></item>
-    /// <item><description><b>Instance Lifecycle Management:</b> Tracks singletons or transient instances based on the <c>keepInstance</c> parameter. Deactivating or evicting an entry disposes cached instances if they implement <see cref="IDisposable"/>.</description></item>
-    /// <item><description><b>Thread-Safety &amp; Reentrancy:</b> Internal maps are guarded by monitor locks during mutations. Factory invocations occur outside locks, guaranteeing deadlock immunity during nested registrations.</description></item>
+    /// <item><description><b>Instance Lifecycle Management:</b> Each entry owns its cached instance. Resolved instances are cached and shared; deactivating, replacing or evicting an entry disposes the cached instance if it implements <see cref="IDisposable"/>.</description></item>
+    /// <item><description><b>Thread-Safety &amp; Reentrancy:</b> Lookups and cache publication are guarded by fine-grained locks. Factory invocations and disposals always run outside locks, guaranteeing deadlock immunity during nested registrations. Same-thread self-resolution fails fast.</description></item>
     /// </list>
     /// </para>
     /// </remarks>
-    internal sealed class SortedFactory<T> where T : class
+    internal sealed class SortedFactory<T> : SortedFactory where T : class
     {
         public class Entry(Identifier id, Func<T?>? factory = null, double order = 0, bool active = true) : IFactoryEntry<T>, IComparable<Entry>, IEquatable<Entry>, IEquatable<Identifier>
         {
@@ -50,10 +93,16 @@ namespace SOS
 
             public double Order => order;
 
+            /// <summary>Gets or sets activation. Setting to <c>false</c> also evicts and disposes the cached instance.</summary>
             public bool Active
             {
                 get => active;
-                set => active = value;
+                set
+                {
+                    active = value;
+                    if (active == false)
+                        Drop();
+                }
             }
 
             private T? _cache = null;
@@ -62,14 +111,41 @@ namespace SOS
 
             private readonly object _sync = new();
 
+            private readonly ThreadLocal<bool> _resolving = new();
+
             public T? Instance(bool fresh = false)
             {
+                T? sn = Volatile.Read(ref _cache);
+                if (!fresh && sn is not null) return sn;
+
+                T? instance = Instantiate();
+                if (instance is null) return null;
+
+                IDisposable? toDispose = null;
+                T? result;
                 lock (_sync)
-                    return (fresh) ? _cache = Instantiate() : _cache ??= Instantiate();
+                {
+                    if (fresh || _cache is null)
+                    {
+                        toDispose = _cache as IDisposable;
+                        _cache = instance;
+                        result = instance;
+                    }
+                    else
+                    {
+                        toDispose = instance as IDisposable;
+                        result = _cache;
+                    }
+                }
+                toDispose?.Dispose();
+                return result;
             }
 
             public T? Instantiate()
             {
+                if (_resolving.Value)
+                    throw new InvalidOperationException($"[SOS.API] Reentrant instantiation of '{Id}' ({typeof(T).Name}). A factory must not resolve its own entry.");
+                _resolving.Value = true;
                 try
                 {
                     return factory?.Invoke();
@@ -80,6 +156,7 @@ namespace SOS
                     Logger.LogDebugError(ex.StackTrace);
                     return null;
                 }
+                finally { _resolving.Value = false; }
             }
 
             public int CompareTo(Entry? other)
@@ -100,12 +177,13 @@ namespace SOS
 
             public void Drop()
             {
+                T? drop;
                 lock (_sync)
                 {
-                    if (_cache?.TryCast<IDisposable>(out var disposableInstance) ?? false)
-                        disposableInstance?.Dispose();
+                    drop = _cache;
                     _cache = null;
                 }
+                if (drop is IDisposable disposable) disposable.Dispose();
             }
 
             public void Dispose()
@@ -114,8 +192,6 @@ namespace SOS
                 GC.SuppressFinalize(this);
             }
 
-            ~Entry() => Dispose();
-
             public static implicit operator Entry(Identifier key) => new(key);
 
             public static implicit operator Entry(string key) => new(key);
@@ -123,33 +199,44 @@ namespace SOS
 
         private readonly SortedSet<Entry> entries = [];
 
+        internal SortedFactory() { }
+
+        public static SortedFactory<T> GetOrInstantiate()
+            => (SortedFactory<T>)factories.GetOrAdd(typeof(T), static _ => new SortedFactory<T>());
+
         private void Add(string id, double order, bool active, Func<T?> factory)
         {
+            Entry? replaced;
             lock (entries)
+            {
+                replaced = entries.TryGetValue(id, out var existing) ? existing : null;
+                if (replaced != null) entries.Remove(replaced);
                 entries.Add(new(id, factory, order, active));
+            }
+            replaced?.Drop();
+            if (replaced != null)
+                Logger.LogDebug($"[SOS.API] Re-registered '{id}' as '{typeof(T).Name}'.", level: LogLevel.Trace);
         }
 
         /// <summary>
-        /// Unregisters an entry or evicts its cached instance by identifier.
+        /// Unregisters an entry and evicts its cached instance by identifier.
         /// </summary>
         /// <param name="key">The unique string identifier of the component to remove.</param>
-        /// <param name="onlyInstance">If <c>true</c>, evicts and disposes only the cached instance, preserving the factory registration. If <c>false</c>, completely removes both the registration and the instance.</param>
-        /// <returns><c>true</c> if the entry or instance was found and removed; otherwise, <c>false</c>.</returns>
+        /// <param name="onlyInstance">If <c>true</c>, evicts and disposes only the cached instance, preserving the factory registration. If <c>false</c>, disposes the cached instance and completely removes the registration.</param>
+        /// <returns><c>true</c> if the entry was found; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// If <paramref name="onlyInstance"/> is <c>false</c>, the internal sorted cache is marked dirty so subsequent queries regenerate the output list.
-        /// Any evicted instance implementing <see cref="IDisposable"/> has its <see cref="IDisposable.Dispose"/> method called immediately under lock.
+        /// Any evicted instance implementing <see cref="IDisposable"/> is disposed outside locks.
         /// </remarks>
-        public bool Remove(string key, bool onlyInstance = false)
+        public override bool Remove(string key, bool onlyInstance = false)
         {
-
-            if (entries.TryGetValue(key, out var entry))
+            Entry? entry;
+            lock (entries)
             {
-                entry.Drop();
-                if (onlyInstance) return true;
-                lock (entries)
-                    return entries.Remove(key);
+                if (!entries.TryGetValue(key, out entry)) return false;
+                if (!onlyInstance) entries.Remove(key);
             }
-            return false;
+            entry.Drop();
+            return true;
         }
 
         /// <summary>
@@ -162,9 +249,9 @@ namespace SOS
         /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is null or fails type contract validation.</returns>
         /// <remarks>
         /// When registering a <see cref="Type"/>, it must be a non-abstract class with a public parameterless constructor.
-        /// Registering an entry marks the sorted snapshot cache as dirty and invalidates any prior cached instance under <paramref name="id"/>.
+        /// Re-registering an existing identifier replaces the previous factory and disposes its cached instance.
         /// </remarks>
-        public bool Register(object obj, string? id = null, double order = 0, bool active = true)
+        public override bool Register(object obj, string? id = null, double order = 0, bool active = true)
         {
             bool isSuccess = obj switch
             {
@@ -242,7 +329,7 @@ namespace SOS
         /// </summary>
         /// <param name="pluginManagementService">The LuaCs plugin management service used for assembly reflection scanning.</param>
         /// <returns><c>true</c> if at least one component was registered; otherwise, <c>false</c>.</returns>
-        public bool AutoRegister(IPluginManagementService pluginManagementService) => AutoRegister<T>(pluginManagementService);
+        public override bool AutoRegister(IPluginManagementService pluginManagementService) => AutoRegister<T>(pluginManagementService);
 
         /// <summary>
         /// Automatically discovers and registers all loaded types implementing or deriving from <typeparamref name="TAuto"/> decorated with <see cref="AutoRegisterAttribute"/>.
@@ -267,6 +354,8 @@ namespace SOS
                     if (attr != null)
                         anySuccess |= RegisterType(attr.Id ?? t.FullOrName(), attr.Order, attr.Active, t);
                 }
+            else
+                Logger.LogError($"[SOS.API] Type scan failed for '{typeof(TAuto).FullOrName()}': {string.Join("; ", result.Errors.Select(e => e.Message))}");
 
             return anySuccess;
         }
@@ -275,36 +364,19 @@ namespace SOS
         /// Updates the activation state of a registered component by identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the component.</param>
-        /// <param name="active">The new activation state. If <c>false</c>, the component is omitted from sorted queries.</param>
+        /// <param name="state">The new activation state. If <c>false</c>, the component is omitted from sorted queries.</param>
         /// <returns><c>true</c> if the component was found; <c>false</c> if no registration exists under <paramref name="id"/>.</returns>
         /// <remarks>
-        /// If a component is deactivated and has an active cached instance implementing <see cref="IDisposable"/>,
-        /// it is disposed and evicted immediately. Marks the sorted snapshot cache as dirty.
+        /// If a component is deactivated and has a cached instance implementing <see cref="IDisposable"/>,
+        /// it is disposed and evicted immediately (outside locks).
         /// </remarks>
-        public bool SetActive(string id, bool active)
+        public override bool SetActive(string id, bool state)
         {
-            if (entries.TryGetValue(id, out var entry))
-            {
-                entry.Active = active;
-                return true;
-            }
-
-            return false;
-            //lock (_dict)
-            //{
-            //    if (!_dict.TryGetValue(id, out var entry)) return false;
-            //    if (entry.IsActive == active) return true;
-            //
-            //    _dict[id] = (entry.Order, active, entry.Factory);
-            //    _isDirty = true;
-            //
-            //    if (!active && _instances.Remove(id, out var instance))
-            //    {
-            //        if (instance is IDisposable d) d.Dispose();
-            //    }
-            //
-            //    return true;
-            //}
+            Entry? entry;
+            lock (entries) entries.TryGetValue(id, out entry);
+            if (entry is null) return false;
+            entry.Active = state;
+            return true;
         }
 
         /// <summary>
@@ -314,25 +386,25 @@ namespace SOS
         /// <returns><c>true</c> if registered and active; otherwise, <c>false</c>.</returns>
         public bool IsActive(string id)
         {
-            return entries.TryGetValue(id, out var entry) && entry.Active;
+            lock (entries) return entries.TryGetValue(id, out var entry) && entry.Active;
         }
 
         public IEnumerable<Entry> GetAll(bool onlyActives = true)
         {
-            foreach (var entry in entries) if (!onlyActives || entry.Active)
-                yield return entry;
+            lock (entries)
+                return onlyActives ? entries.Where(e => e.Active).ToArray() : [.. entries];
         }
 
         /// <summary>
         /// Resolves and enumerates all currently active components in registration order.
         /// </summary>
         /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
-        /// <param name="keepInstance">If <c>true</c>, resolved instances are stored in the internal cache for future queries.</param>
-        /// <returns>An enumerable sequence of resolved (Id, Instance) pairs for active components.</returns>
+        /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. If <c>false</c>, returns the cached instance.</param>
+        /// <returns>An enumerable sequence of resolved instances for active components.</returns>
         /// <remarks>
         /// <para>
-        /// <b>Safe Resolution:</b> For each active entry, checks the instance cache first. If missing, invokes the factory delegate
-        /// and caches the result if <paramref name="keepInstance"/> is <c>true</c>.
+        /// <b>Safe Resolution:</b> For each entry, checks the instance cache first (lock-free fast path). If missing, invokes the factory delegate
+        /// outside locks and caches the result.
         /// </para>
         /// <para>
         /// If a factory throws an exception during construction, a warning is logged via <see cref="Logger"/> and enumeration
@@ -349,59 +421,61 @@ namespace SOS
         }
 
         public Entry? Get(string id)
-            => (id != null && entries.TryGetValue(id, out var entry)) ? entry : null;
+        {
+            lock (entries) return entries.TryGetValue(id, out var entry) ? entry : null;
+        }
 
         /// <summary>
         /// Resolves an active component instance by its unique identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the component to retrieve.</param>
-        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance in memory for subsequent calls.</param>
+        /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. If <c>false</c>, returns the cached instance.</param>
         /// <returns>The resolved instance if found and active; otherwise, <c>null</c>.</returns>
         /// <remarks>
         /// Execution order:
         /// <list type="number">
-        /// <item><description>Checks if an instance is already cached in memory under lock.</description></item>
-        /// <item><description>If not cached, extracts the factory delegate under lock and executes it <i>outside the monitor lock</i> to prevent deadlocks.</description></item>
-        /// <item><description>If <paramref name="keepInstance"/> is <c>true</c>, stores the new instance back in the cache under lock.</description></item>
+        /// <item><description>Checks if an instance is already cached (lock-free fast path).</description></item>
+        /// <item><description>If not cached, executes the factory delegate <i>outside any lock</i> to prevent deadlocks.</description></item>
+        /// <item><description>Publishes the new instance back into the cache; a losing racer's instance is disposed.</description></item>
         /// </list>
         /// </remarks>
         public T? GetInstance(string id, bool fresh = false)
             => Get(id)?.Instance(fresh);
 
-        public Entry? First() => entries.FirstOrDefault();
+        public Entry? First()
+        {
+            lock (entries) return entries.FirstOrDefault(e => e.Active);
+        }
 
         /// <summary>
         /// Resolves the first active component according to registration order.
         /// </summary>
-        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance.</param>
+        /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. If <c>false</c>, returns the cached instance.</param>
         /// <returns>The first active component instance, or <c>null</c> if no active components are registered.</returns>
         public T? FirstInstance(bool fresh = false)
             => First()?.Instance(fresh);
 
         public Entry? GetOrFirst(string? id = null)
-            => id == null ? First() : Get(id);
+            => (id is null ? null : Get(id)) ?? First();
 
         /// <summary>
         /// Resolves the active component matching <paramref name="id"/>, falling back to the first active component if not found.
         /// </summary>
         /// <param name="id">The unique identifier to look up. If <c>null</c> or not found, falls back to <see cref="First"/>.</param>
-        /// <param name="keepInstance">If <c>true</c>, caches the resolved instance.</param>
+        /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. If <c>false</c>, returns the cached instance.</param>
         /// <returns>The resolved instance, or <c>null</c> if no active registrations exist.</returns>
         public T? GetOrFirstInstance(string? id, bool fresh = false)
             => GetOrFirst(id)?.Instance(fresh);
-        //  => (id != null && Get(id, keepInstance) is { } instance) ? instance : First(keepInstance);
 
         /// <summary>
-        /// Clears the factory contents, disposing cached instances and optionally removing all registrations.
+        /// Clears the factory contents, disposing all cached instances and removing all registrations.
         /// </summary>
-        /// <param name="onlyInstances">If <c>true</c>, disposes and clears only cached instances while preserving factory registrations and sorted cache. If <c>false</c>, completely clears all registrations and resets the factory.</param>
         /// <remarks>
-        /// Any cached instance implementing <see cref="IDisposable"/> has its <see cref="IDisposable.Dispose"/> method called under lock.
-        /// When <paramref name="onlyInstances"/> is <c>false</c>, the internal sorted snapshot is emptied and the dirty flag is cleared.
+        /// Any cached instance implementing <see cref="IDisposable"/> is disposed outside locks.
         /// </remarks>
-        public void Clear()
+        public override void Clean()
         {
-            Clean();
+            CleanInstances();
             lock (entries)
             {
                 entries.Clear();
@@ -410,13 +484,11 @@ namespace SOS
             }
         }
 
-        public void Clean()
+        public override void CleanInstances()
         {
-            lock (entries)
-            {
-                foreach (var entry in entries)
-                    entry.Drop();
-            }
+            Entry[] sn;
+            lock (entries) sn = [.. entries];
+            foreach (var entry in sn) entry.Drop();
         }
     }
 }
