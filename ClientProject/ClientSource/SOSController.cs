@@ -122,15 +122,12 @@ namespace SOS
                 {
                     if (PlayerInput.IsCtrlDown() && !IsSOSBlocked)
                     {
-                        CrossThread.RequestExecutionOnMainThread(() => Tracker.ToggleTracker());
+                        Tracker.ToggleTracker();
                     }
                     else
                     {
-                        CrossThread.RequestExecutionOnMainThread(() =>
-                        {
-                            Prefab? detected = GetPrefabUnderMouse();
-                            ToggleUI(detected);
-                        });
+                        Prefab? detected = GetPrefabUnderMouse();
+                        ToggleUI(detected);
                     }
                 }
 
@@ -140,11 +137,11 @@ namespace SOS
                     {
                         if (ProfileHelper.IsSettingsOpen)
                         {
-                            CrossThread.RequestExecutionOnMainThread(ProfileHelper.CloseSettings);
+                            ProfileHelper.CloseSettings();
                             return;
                         }
 
-                        CrossThread.RequestExecutionOnMainThread(() => API.Emit(CommKeys.CloseWindow));
+                        API.Emit(CommKeys.CloseWindow);
                         return;
                     }
                     else if
@@ -152,13 +149,13 @@ namespace SOS
                         (PlayerInput.KeyHit(Keys.Right) && PlayerInput.IsAltDown()) ||
                         (PlayerInput.KeyHit(Keys.Back) && PlayerInput.IsShiftDown()) ||
                         PlayerInput.Mouse5ButtonClicked()
-                    ) CrossThread.RequestExecutionOnMainThread(() => API.Emit(CommKeys.NavigateForward));
+                    ) API.Emit(CommKeys.NavigateForward);
                     else if
                     (
                         (PlayerInput.KeyHit(Keys.Left) && PlayerInput.IsAltDown()) ||
                         PlayerInput.KeyHit(Keys.Back) ||
                         PlayerInput.Mouse4ButtonClicked()
-                    ) CrossThread.RequestExecutionOnMainThread(() => API.Emit(CommKeys.NavigateBack));
+                    ) API.Emit(CommKeys.NavigateBack);
                 }
             }
 
