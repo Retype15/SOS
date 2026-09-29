@@ -70,6 +70,7 @@ namespace SOS
         {
             if (!_sosStarted) ConfigHelper.LoadConfigs();
             _sosStarted = true;
+            ProfileHelper.OnTargetSelected(prefab);
 
             if (ActiveProfile == null)
             {
@@ -119,9 +120,9 @@ namespace SOS
             {
                 if (Cfg.SOSOpenKeyHit)
                 {
-                    if (PlayerInput.IsCtrlDown() && !IsSOSBlocked)
+                    if (PlayerInput.IsCtrlDown())
                     {
-                        CrossThread.RequestExecutionOnMainThread(() => Tracker.ToggleTracker());
+                        if (!IsSOSBlocked) CrossThread.RequestExecutionOnMainThread(() => Tracker.ToggleTracker());
                     }
                     else
                     {
