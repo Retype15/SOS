@@ -176,7 +176,7 @@ namespace SOS.Prefabs
         public static void OpenContextMenu(Prefab target, Vector2? position = null)
         {
             if (target == null) return;
-            var options = API.GetAllPrefabProviders()
+            var options = API.GetAllPrefabProviderInstances()
                 .SelectMany(p => p.GetContextOptions(target))
                 .ToList();
             options.AddRange(GetDefaultContextOptions(target));

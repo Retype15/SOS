@@ -26,10 +26,11 @@ namespace SOS.GUI
         /// <summary>
         /// A registered tab alongside its owned content frame and tab bar button.
         /// </summary>
+        /// <param name="Id">The registration identifier of the tab (registry key, case-insensitive).</param>
         /// <param name="Tab">The tab SOS module.</param>
         /// <param name="Content">The content frame owned by the widget.</param>
         /// <param name="Button">The tab bar button owned by the widget.</param>
-        protected record TabData(SOS.ITab<T> Tab, Barotrauma.GUIFrame Content, Barotrauma.GUIButton Button);
+        protected record TabData(Identifier Id, SOS.ITab<T> Tab, Barotrauma.GUIFrame Content, Barotrauma.GUIButton Button);
 
         /// <summary>
         /// The layout group arranging the button area and content area vertically.
@@ -59,9 +60,9 @@ namespace SOS.GUI
         /// Event invoked when the active tab changes.
         /// </summary>
         /// <remarks>
-        /// The parameter is the newly selected tab.
+        /// The parameter is the registration identifier of the newly selected tab.
         /// </remarks>
-        public Action<ITab<T>>? OnTabSelected;
+        public Action<string>? OnTabSelected;
 
         /// <summary>
         /// The currently selected item being displayed in the active tab.
@@ -105,25 +106,26 @@ namespace SOS.GUI
         /// Registers a tab with the tab container.
         /// </summary>
         /// <param name="tab">The tab to register.</param>
+        /// <param name="id">The registration identifier of the tab. Used for localization and selection history.</param>
         /// <remarks>
         /// Creates the owned content frame, asks the tab for its button via
         /// <see cref="ITab{T}.CreateTabButton"/>, calls <see cref="ITab{T}.Init"/>, wires the click
-        /// handler once, stores all three in the internal list, and catches up with
+        /// handler once, stores all four in the internal list, and catches up with
         /// <see cref="ITab{T}.Update"/> when a valid target already exists.
         /// If initialization throws an exception, the created frames are discarded, the error is logged
         /// via <see cref="Logger"/>, and the tab is ignored.
         /// </remarks>
-        public void RegisterTab(ITab<T> tab)
+        public void RegisterTab(ITab<T> tab, string id)
         {
             ArgumentNullException.ThrowIfNull(tab);
-            ArgumentNullException.ThrowIfNullOrEmpty(tab.Id, nameof(tab.Id));
+            ArgumentNullException.ThrowIfNullOrEmpty(id);
 
             GUIFrame? content = null;
             GUIButton? button = null;
             try
             {
 
-                button = tab.CreateTabButton(_buttonArea.Content.RectTransform, tab.Id);
+                button = tab.CreateTabButton(_buttonArea.Content.RectTransform, id);
 
                 content = new GUIFrame(new RectTransform(Vector2.One, _contentArea.RectTransform), style: null)
                 {
@@ -140,11 +142,20 @@ namespace SOS.GUI
 
                 if (canHandle) tab.Update(_currentTarget!);
 
-                tabs.Add(new(tab, content, button));
+                int existing = tabs.FindIndex((t) => t.Id == id);
+                if (existing >= 0)
+                {
+                    Logger.LogWarning($"Tab with Id '{id}' is already registered in this widget. Replacing it.");
+                    var old = tabs[existing];
+                    try { _contentArea.RemoveChild(old.Content); } catch { }
+                    try { _buttonArea.Content.RemoveChild(old.Button); } catch { }
+                    tabs[existing] = new(id, tab, content, button);
+                }
+                else tabs.Add(new(id, tab, content, button));
             }
             catch (Exception ex)
             {
-                Logger.LogWarning($"Exception as ocurred when tryed to register tab '{tab.Id}', this tab was ignored to prevent more errors...\n {ex.Message}");
+                Logger.LogWarning($"Exception as ocurred when tryed to register tab '{id}', this tab was ignored to prevent more errors...\n {ex.Message}");
                 Logger.LogDebugError(ex.StackTrace);
                 try
                 {
@@ -184,20 +195,20 @@ namespace SOS.GUI
         /// <returns>The stored <see cref="GUIButton"/>; or <c>null</c> if the tab is not registered.</returns>
         public GUIButton? GetTabButton(ITab<T> tab)
         {
-            foreach (var (t, _, b) in tabs)
-                if (t == tab) return b;
+            foreach (var t in tabs)
+                if (t.Tab == tab) return t.Button;
             return null;
         }
 
         /// <summary>
         /// Gets the button stored for the tab matching the given identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the tab (see <see cref="IIdentifier.Id"/>).</param>
+        /// <param name="id">The registration identifier of the tab.</param>
         /// <returns>The stored <see cref="GUIButton"/>; or <c>null</c> if no tab matches <paramref name="id"/>.</returns>
         public GUIButton? GetTabButton(string id)
         {
-            foreach (var (t, _, b) in tabs)
-                if (t.Id == id) return b;
+            foreach (var t in tabs)
+                if (t.Id == id) return t.Button;
             return null;
         }
 
@@ -259,7 +270,7 @@ namespace SOS.GUI
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogWarning($"Exception as ocurred when called 'Update' in tab '{ActiveTab.Id}', was removed to prevent more errors...\n {ex.Message}");
+                    Logger.LogWarning($"Exception as ocurred when called 'Update' in tab '{IdOf(ActiveTab)}', was removed to prevent more errors...\n {ex.Message}");
                     Logger.LogDebugError(ex.StackTrace);
                     RemoveTab(ActiveTab);
                     ActiveTab = tabs.FirstOrDefault()?.Tab;
@@ -325,15 +336,22 @@ namespace SOS.GUI
             return true;
         }
 
+        private Identifier IdOf(ITab<T> tab)
+        {
+            var found = tabs.FirstOrDefault((t) => t.Tab == tab);
+            if (found != null) return found.Id;
+            return tab.GetType().FullName ?? tab.GetType().Name;
+        }
+
         /// <summary>
         /// Selects the tab matching the given identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the tab (see <see cref="IIdentifier.Id"/>).</param>
+        /// <param name="id">The registration identifier of the tab.</param>
         /// <exception cref="ArgumentException">No registered tab matches <paramref name="id"/>.</exception>
         /// <exception cref="InvalidOperationException">There is no current target, or the tab cannot handle it.</exception>
         public void SelectTab(string id)
         {
-            foreach (var tabData in tabs) if (tabData.Tab.Id == id)
+            foreach (var tabData in tabs) if (tabData.Id == id)
             {
                 SelectTab(tabData.Tab);
                 return;
@@ -357,18 +375,19 @@ namespace SOS.GUI
         {
             ArgumentNullException.ThrowIfNull(tab);
 
+            Identifier tabId = IdOf(tab);
             if (tabs.All((t) => t.Tab != tab))
-                throw new ArgumentException($"Tab '{tab.Id}' is not registered in this widget.", nameof(tab));
+                throw new ArgumentException($"Tab '{tabId}' is not registered in this widget.", nameof(tab));
             if (_currentTarget == null)
-                throw new InvalidOperationException($"Cannot select tab '{tab.Id}' without a current target.");
+                throw new InvalidOperationException($"Cannot select tab '{tabId}' without a current target.");
             if (!tab.CanHandle(_currentTarget))
-                throw new InvalidOperationException($"Tab '{tab.Id}' cannot handle the current target.");
+                throw new InvalidOperationException($"Tab '{tabId}' cannot handle the current target.");
 
             if (ActiveTab == tab) return;
 
             ActiveTab = tab;
 
-            OnTabSelected?.Invoke(tab);
+            OnTabSelected?.Invoke(tabId.Value);
 
             foreach (var tabData in tabs)
             {
@@ -383,7 +402,7 @@ namespace SOS.GUI
             }
             catch (Exception ex)
             {
-                Logger.LogWarning($"Exception as ocurred when trying to update the tab '{tab.Id}', its content was removed to prevent more errors...\n {ex.Message}");
+                Logger.LogWarning($"Exception as ocurred when trying to update the tab '{tabId}', its content was removed to prevent more errors...\n {ex.Message}");
                 Logger.LogDebugError(ex.StackTrace);
                 RemoveTab(tab);
                 ITab<T>? fallback = tabs.FirstOrDefault()?.Tab;
@@ -398,17 +417,17 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="tab">The tab to hide.</param>
         /// <returns><c>true</c> if the tab was found; otherwise, <c>false</c>.</returns>
-        public bool HideTab(ITab<T> tab) => HideTab((t) => t == tab);
+        public bool HideTab(ITab<T> tab) => HideTab((t) => t.Tab == tab);
         /// <summary>
         /// Hides the content frame and tab bar button of the tab matching the given identifier, without unregistering it.
         /// </summary>
-        /// <param name="id">The unique identifier of the tab (see <see cref="IIdentifier.Id"/>).</param>
+        /// <param name="id">The registration identifier of the tab.</param>
         /// <returns><c>true</c> if a matching tab was found; otherwise, <c>false</c>.</returns>
         public bool HideTab(string id) => HideTab((t) => t.Id == id);
 
-        private bool HideTab(Func<ITab<T>, bool> comparer)
+        private bool HideTab(Func<TabData, bool> comparer)
         {
-            foreach (var tab in tabs) if (comparer(tab.Tab))
+            foreach (var tab in tabs) if (comparer(tab))
             {
                 tab.Content.Visible = false;
                 tab.Button.Visible = false;
@@ -422,17 +441,17 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="tab">The tab to remove.</param>
         /// <returns><c>true</c> if the tab was found and removed; otherwise, <c>false</c>.</returns>
-        public bool RemoveTab(ITab<T> tab) => RemoveTab((t) => t == tab);
+        public bool RemoveTab(ITab<T> tab) => RemoveTab((t) => t.Tab == tab);
         /// <summary>
         /// Removes the tab matching the given identifier from the widget, retiring its content frame and tab bar button from the layout.
         /// </summary>
-        /// <param name="id">The unique identifier of the tab (see <see cref="IIdentifier.Id"/>).</param>
-        /// <returns><c>true</c> if a matching tab was found and removed; otherwise, <c>false</c>.</returns>
+        /// <param name="id">The registration identifier of the tab.</param>
+        /// <returns><c>true</c> if a matching tab was found; otherwise, <c>false</c>.</returns>
         public bool RemoveTab(string id) => RemoveTab((t) => t.Id == id);
 
-        private bool RemoveTab(Func<ITab<T>, bool> comparer)
+        private bool RemoveTab(Func<TabData, bool> comparer)
         {
-            TabData? tabData = tabs.FirstOrDefault((t) => comparer(t.Tab));
+            TabData? tabData = tabs.FirstOrDefault(comparer);
             if (tabData != null)
             {
                 try { _contentArea.RemoveChild(tabData.Content); } catch { }

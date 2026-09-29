@@ -89,19 +89,6 @@ namespace SOS
     #region Interfaces
 
     /// <summary>
-    /// Exposes an identifier property used to uniquely distinguish an object.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IIdentifier
-    {
-        /// <summary>
-        /// Gets the unique string identifier of this instance.
-        /// By default, returns the full name of the implementing runtime type.
-        /// </summary>
-        string Id => GetType().FullOrName();
-    }
-
-    /// <summary>
     /// Defines an SOS module acting as a modular, generic UI tab capable of inspecting and interacting with entities of type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The data entity type inspected by this tab (e.g., <see cref="Barotrauma.Prefab"/> or <see cref="Barotrauma.Character"/>).</typeparam>
@@ -138,7 +125,7 @@ namespace SOS
     /// </code>
     /// </example>
     [EditorBrowsable(EditorBrowsableState.Never), DefaultClass<TabDefaults>]
-    public interface ITab<T> : IIdentifier
+    public interface ITab<T>
     {
         /// <summary>
         /// Evaluates whether this tab is capable of displaying meaningful information for the given <paramref name="item"/>.
@@ -400,7 +387,7 @@ namespace SOS
     /// </code>
     /// </example>
     [DefaultClass<WindowProfileDefaults>]
-    public interface ISOSWindowProfile : IIdentifier, IDisposable
+    public interface ISOSWindowProfile : IDisposable
     {
 
         /// <summary>

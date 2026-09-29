@@ -82,7 +82,7 @@ namespace SOS.Configs
         /// </remarks>
         public static void LoadConfigs()
         {
-            foreach (var config in API.GetAllConfigs())
+            foreach (var config in API.GetAllConfigInstances())
             {
                 try { config.Load(); }
                 catch (Exception ex)
@@ -104,7 +104,7 @@ namespace SOS.Configs
         /// </remarks>
         public static void SaveConfigs()
         {
-            foreach (var config in API.GetAllConfigs())
+            foreach (var config in API.GetAllConfigInstances())
             {
                 try { config.Save(); }
                 catch (Exception ex)
@@ -120,13 +120,13 @@ namespace SOS.Configs
         /// Resets all registered SOS modules implementing <see cref="ISOSConfig"/> by calling <see cref="ISOSConfig.Reset"/> on each one.
         /// </summary>
         /// <remarks>
-        /// Iterates over all active configurations retrieved via <see cref="API.GetAllConfigs"/>.
+        /// Iterates over all active configurations retrieved via <see cref="API.GetAllConfigInstances"/>.
         /// If an implementation throws an exception during reset, it is caught and logged via <see cref="Logger.LogError"/>,
         /// allowing the remaining configurations to reset without interrupting execution.
         /// </remarks>
         public static void ResetConfigs()
         {
-            foreach (var config in API.GetAllConfigs())
+            foreach (var config in API.GetAllConfigInstances())
             {
                 try { config.Reset(); }
                 catch (Exception ex)

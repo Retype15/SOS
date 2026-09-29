@@ -46,7 +46,7 @@ namespace SOS.Configs
 
         public void Reset()
         {
-            ActiveProfileId = "SOS.Default3Column";
+            ActiveProfileId = "SOS.Profile.Default3Column";
             _settingsWindowSizeX.SetIfNotEqual(_settingsWindowSizeX.DefaultValue);
             _settingsWindowSizeY.SetIfNotEqual(_settingsWindowSizeY.DefaultValue);
             _settingsWindowPositionX.SetIfNotEqual(_settingsWindowPositionX.DefaultValue);
@@ -60,17 +60,17 @@ namespace SOS.Configs
             using var l = new GUILayoutBuilder(rectT);
             l.Header("ACTIVE VISUAL PROFILE", Color.Gold);
 
-            var profiles = API.GetAllWindowProfiles();
-            var profileNames = profiles.Select(p => p.DisplayName()).ToList();
-            var profileDesc = profiles.Select(p => p.Description()).ToList();
-            var currentProfile = profiles.FirstOrDefault(p => p.Id == ActiveProfileId)?.DisplayName() ?? profiles.FirstOrDefault()?.DisplayName() ?? throw new KeyNotFoundException($"Not match Profile ID: '{ActiveProfileId}'");
+            var entries = API.GetAllWindowProfiles();
+            var profileNames = entries.Select(p => p.DisplayName()).ToList();
+            var profileDesc = entries.Select(p => p.Description()).ToList();
+            var currentProfile = entries.FirstOrDefault(p => p.Id == ActiveProfileId)?.DisplayName() ?? entries.FirstOrDefault()?.DisplayName() ?? throw new KeyNotFoundException($"Not match Profile ID: '{ActiveProfileId}'");
 
             l.Dropdown("Profile:", profileNames, currentProfile, selectedName =>
             {
-                var targetProfile = profiles.FirstOrDefault(p => p.DisplayName() == selectedName);
-                if (targetProfile != null && targetProfile.Id != ActiveProfileId)
+                var targetProfile = entries.FirstOrDefault(p => p.DisplayName() == selectedName);
+                if (targetProfile != null && targetProfile.Id.Value != ActiveProfileId)
                 {
-                    API.Emit<string>(CommKeys.ChangeProfile, targetProfile.Id);
+                    API.Emit<string>(CommKeys.ChangeProfile, targetProfile.Id.Value);
                 }
             }, profileDesc);
 

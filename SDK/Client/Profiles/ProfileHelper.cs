@@ -327,7 +327,7 @@ namespace SOS.Profiles
                 SettingsWindowPosition = _settingsWindow.NormalOffset;
 
                 //TODO: Revisar si vale la pena un GetCountConfigs() más eficiente...
-                var configs = API.GetAllConfigs();
+                var configs = API.GetAllConfigInstances();
                 int targetColumns = CalculateColumnCount(_contentContainer.Rect.Width, configs.Count(), MinColumnWidth);
                 if (targetColumns != _currentColumnCount)
                     RefreshSettings();
@@ -392,13 +392,13 @@ namespace SOS.Profiles
                 if (_contentContainer != null)
                 {
                     _contentContainer.ClearChildren();
-                    DrawSettings(_contentContainer, API.GetAllConfigs(), MinColumnWidth);
+                    DrawSettings(_contentContainer, API.GetAllConfigInstances(), MinColumnWidth);
                 }
                 else if (_contentLists != null)
                 {
                     foreach (var list in _contentLists)
                         list.Content.ClearChildren();
-                    DrawSettings(_contentLists, API.GetAllConfigs());
+                    DrawSettings(_contentLists, API.GetAllConfigInstances());
                 }
             }
             catch (Exception ex)
@@ -539,28 +539,31 @@ namespace SOS.Profiles
         /// Creates a tab widget for the given tabs.
         /// </summary>
         /// <param name="parent">The parent rectangle transform.</param>
-        /// <param name="tabs">The tabs to register in the widget.</param>
+        /// <param name="tabs">The tab factory entries to instantiate and register in the widget.</param>
         /// <returns>The created <see cref="GUITab{Prefab}"/> widget.</returns>
         /// <remarks>
-        /// Registers each <paramref name="tabs"/> and sets <see cref="GUITab{Prefab}.OnTabSelected"/>
-        /// to push the tab ID onto the history stack.
+        /// Instantiates each <paramref name="tabs"/> entry and sets <see cref="GUITab{Prefab}.OnTabSelected"/>
+        /// to push the tab id onto the history stack.
         /// </remarks>
-        public static GUITab<Prefab> CreateTabWidget(RectTransform parent, IEnumerable<ITab<Prefab>> tabs)
+        public static GUITab<Prefab> CreateTabWidget(RectTransform parent, IEnumerable<IFactoryEntry<ISOSTab>>? tabs = null)
         {
             var widget = new GUITab<Prefab>(parent);
-            foreach (var tab in tabs)
+            foreach (var entry in tabs ?? API.GetAllTabs())
             {
+                string id = entry.Id.Value;
+                ITab<Prefab>? tab = entry.Value;
+                if (tab == null) continue;
                 try
                 {
-                    widget.RegisterTab(tab);
+                    widget.RegisterTab(tab, id);
 
                 }
                 catch (Exception ex)
                 {
                     try
                     {
-                        API.RemoveTab(tab.Id);
-                        Logger.LogWarning($"The tab '{tab.Id}' was launched an error when tried to register to GUITab. For safety reasons was removed.\n  {ex.Message}");
+                        API.RemoveTab(id);
+                        Logger.LogWarning($"The tab '{id}' was launched an error when tried to register to GUITab. For safety reasons was removed.\n  {ex.Message}");
                         Logger.LogDebugError(ex.StackTrace ?? ex.Message);
                     }
                     catch (Exception ex2)
@@ -570,7 +573,7 @@ namespace SOS.Profiles
                     }
                 }
             }
-            widget.OnTabSelected = tab => PushTabHistory(tab.Id);
+            widget.OnTabSelected = PushTabHistory;
             return widget;
         }
 
@@ -613,7 +616,7 @@ namespace SOS.Profiles
         {
             drawSection ??= (rectT, section, prefab) => TryDraw(rectT, section, prefab);
             int drawn = 0;
-            foreach (var section in API.GetAllStatInfo())
+            foreach (var section in API.GetAllStatInfoInstances())
             {
                 try
                 {
