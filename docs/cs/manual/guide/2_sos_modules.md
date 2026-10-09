@@ -323,6 +323,7 @@ Puede leer el código actual en el repositorio para más detalle.
 
 ## Recomendaciones y buenas prácticas
 
+> [!HINT]
 > NO recomendamos implementar en una misma clase varios tipos de módulos SOS, esto lo consideramos un anti-patrón y actualmente llevará a crear 2 instancias de la misma clase para cada tipo de contrato(A menos que registre manualmente una misma instancia o delegado para ambos, pero igualmente no lo recomendamos).
 
 <!-- - -->
