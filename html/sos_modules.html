@@ -85,10 +85,11 @@ $(document).ready(function(){initNavTree('sos_modules.html',''); initResizable()
 <p>&zwj;[!TIP] Para crear sus propios módulos <a class="el" href="namespace_s_o_s.html">SOS</a>, necesita crear una clase pública que implemente el contrato correspondiente ya sea directa o indirectamente(genérico por nombre/parámetros de métodos) y posteriormente registrarla vía <code><a class="el" href="class_s_o_s_1_1_auto_register_attribute.html" title="Instructs the S.O.S. discovery engine to automatically register the decorated class as an SOS module ...">SOS.AutoRegisterAttribute</a></code> o <a href="class_s_o_s_1_1_a_p_i.html"><code>API.Register*</code></a>. Ver: <a href="registration.html">Registration</a>. </p>
 </blockquote>
 <h1><a class="anchor" id="autotoc_md8"></a>
-1. Stat Info (&lt;a href="interface_s_o_s_1_1_i_s_o_s_stat_info.html" &gt;&lt;tt&gt;ISOSStatInfo&lt;/tt&gt;&lt;/a&gt;)</h1>
+1. Stat Info</h1>
+<p><a href="interface_s_o_s_1_1_i_s_o_s_stat_info.html"><code>ISOSStatInfo</code></a></p>
 <p>Sección de la wiki del inspector que dibuja filas de informacion sobre el prefab seleccionado. Si el <em>rectT</em> no tiene hijos, se limpia.</p>
 <h2><a class="anchor" id="autotoc_md9"></a>
-Ejemplo de uso &lt;!-- TODO: Arreglar correctamente los ejemplos con info real.--&gt;</h2>
+Ejemplo de uso</h2>
 <div class="fragment"><div class="line"><span class="keyword">using </span>Barotrauma;</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">using </span>Microsoft.Xna.Framework;</div>
@@ -128,7 +129,8 @@ Ejemplo de uso &lt;!-- TODO: Arreglar correctamente los ejemplos con info real.-
 <p>&zwj;[!TIP] Recomendamos devolver pronto con <code>return</code> cuando el prefab no contenga datos relevantes, así la sección no se dibuja sin nada relevante. </p>
 </blockquote>
 <h1><a class="anchor" id="autotoc_md10"></a>
-2. Central Tabs (&lt;a href="interface_s_o_s_1_1_i_s_o_s_tab.html" &gt;&lt;tt&gt;ISOSTab&lt;/tt&gt;&lt;/a&gt;)</h1>
+2. Central Tabs</h1>
+<p><a href="interface_s_o_s_1_1_i_s_o_s_tab.html"><code>ISOSTab</code></a></p>
 <p>Pestaña central de inspección para un tipo de entidad. Aparece en la tab bar solo cuando <code><a class="el" href="interface_s_o_s_1_1_i_tab.html#a87fe9706a61b0f81b8fb520087b036e0" title="Evaluates whether this tab is capable of displaying meaningful information for the given item .">SOS.ISOSTab.CanHandle</a></code> devuelve <code>true</code> para el objetivo actual.</p>
 <h2><a class="anchor" id="ej1"></a>
 Ejemplo de uso</h2>
@@ -184,7 +186,8 @@ Ejemplo de uso</h2>
 <p>&zwj;[!NOTE] GUITab asegura de que <code>Update</code> nunca se llame antes de <code>Init</code>, pero siempre es buena práctica comprobar nulos. </p>
 </blockquote>
 <h1><a class="anchor" id="autotoc_md11"></a>
-3. Prefab Providers (&lt;a href="interface_s_o_s_1_1_i_s_o_s_prefab.html" &gt;&lt;tt&gt;ISOSPrefab&lt;/tt&gt;&lt;/a&gt;)</h1>
+3. Prefab Providers</h1>
+<p><a href="interface_s_o_s_1_1_i_s_o_s_prefab.html"><code>ISOSPrefab</code></a></p>
 <p>Proveedor de datos que alimenta el navegador lateral con un nuevo tipo de entidad (e.g: <a href="https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_job_prefab.html"><code>JobPrefab</code></a>, <a href="https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_event_prefab.html"><code>EventPrefab</code></a>, <a href="https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_talent_prefab.html"><code>TalentPrefab</code></a>, <a href="https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_character_prefab.html"><code>CharacterPrefab</code></a>, etc). El navegador agrupa sus prefabs por tipo de runtime y resuelve cada cabecera desde localización (<code>{Type}.header</code>); solo necesita servirlos con <code><a class="el" href="interface_s_o_s_1_1_i_s_o_s_prefab.html#aa349b1d29bd7dcdadde703277b55a120" title="Queries and yields all prefabs provided by this source that satisfy the specified filter ....">SOS.ISOSPrefab.GetPrefabs</a></code>.</p>
 <h2><a class="anchor" id="ej2"></a>
 Ejemplo de uso</h2>
@@ -215,7 +218,8 @@ Ejemplo de uso</h2>
 <p>Use los tokens del filtro (<code>filter.General</code>, <code>filter.Mod</code>, <code>filter.Category</code>, etc.) para que su proveedor responda a la búsqueda avanzada del navegador. </p>
 </blockquote>
 <h1><a class="anchor" id="autotoc_md12"></a>
-4. Configs (&lt;a href="interface_s_o_s_1_1_i_s_o_s_config.html" &gt;&lt;tt&gt;ISOSConfig&lt;/tt&gt;&lt;/a&gt;)</h1>
+4. Configs</h1>
+<p><a href="interface_s_o_s_1_1_i_s_o_s_config.html"><code>ISOSConfig</code></a></p>
 <p>Unidad de configuración extensible con persistencia y renderizado declarativo en la ventana de settings. Herede de <code><a class="el" href="class_s_o_s_1_1_configs_1_1_config_dirty_saver.html" title="A unit-of-work base class that buffers configuration modifications and persists only changed settings...">SOS.Configs.ConfigDirtySaver</a></code> para gestión automatizada y guardado de cambios.</p>
 <h2><a class="anchor" id="ej3"></a>
 Ejemplo de uso</h2>
@@ -288,7 +292,8 @@ Ejemplo de uso</h2>
 </ol>
 </blockquote>
 <h1><a class="anchor" id="autotoc_md13"></a>
-5. Window Profiles (&lt;a href="interface_s_o_s_1_1_i_s_o_s_window_profile.html" &gt;&lt;tt&gt;ISOSWindowProfile&lt;/tt&gt;&lt;/a&gt;)</h1>
+5. Window Profiles</h1>
+<p><a href="interface_s_o_s_1_1_i_s_o_s_window_profile.html"><code>ISOSWindowProfile</code></a></p>
 <p>Layout visual intercambiable de la ventana <a class="el" href="namespace_s_o_s.html">SOS</a>. Puede crear cualquier estilo visual, ejemplo una vista de una única columna, un inspector compacto, o una herramienta flotante con solo lo esencial. Hereda de <code><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_window.html" title="Standardized resizable window with a fixed top bar (toolbox, title, custom and system buttons) and a ...">SOS.GUI.GUIWindow</a></code> y se puede cambiar vía <b>SOS.API.Emit(<a class="el" href="class_s_o_s_1_1_comm_keys.html#a26a53a3d4e4dbcfb2704147a53dd6ebe" title="Channel emitted to request switching the active visual presentation profile.">SOS.CommKeys.ChangeProfile</a>, id)</b>.</p>
 <p>Es completamente libre de modificar la apariencia por completo de la ventana.</p>
 <h2><a class="anchor" id="ej4"></a>
@@ -366,16 +371,12 @@ Ejemplo de uso</h2>
 </div><!-- fragment --><p>Reset es afectado por <b>WindowProfileConfig</b> y el reset general. </p>
 </blockquote>
 <h1><a class="anchor" id="autotoc_md14"></a>
-&lt;/blockquote&gt;</h1>
-<h1><a class="anchor" id="autotoc_md15"></a>
 Recomendaciones y buenas prácticas</h1>
-<blockquote class="doxtable">
-<p>&zwj;[!HINT] NO recomendamos implementar en una misma clase varios tipos de módulos <a class="el" href="namespace_s_o_s.html">SOS</a>, esto lo consideramos un anti-patrón y actualmente llevará a crear 2 instancias de la misma clase para cada tipo de contrato(A menos que registre manualmente una misma instancia o delegado para ambos, pero igualmente no lo recomendamos). </p>
-</blockquote>
+<p>NO recomendamos implementar en una misma clase varios tipos de módulos <a class="el" href="namespace_s_o_s.html">SOS</a>, esto lo consideramos un anti-patrón y actualmente llevará a crear 2 instancias de la misma clase para cada tipo de contrato(A menos que registre manualmente una misma instancia o delegado para ambos, pero igualmente no lo recomendamos).</p>
 <blockquote class="doxtable">
 <p>&zwj;[!IMPORTANT] Cada módulo <a class="el" href="namespace_s_o_s.html">SOS</a> funciona como un builder de instancia única por defecto, lo que significa que se usa la misma instancia hasta cerrar/reabrir la ventana <a class="el" href="namespace_s_o_s.html">SOS</a>. Téngalo en cuenta si considera guardar informacion en la clase, que esta no interfiera al ser llamada en diferentes contextos. </p>
 </blockquote>
-<h1><a class="anchor" id="autotoc_md16"></a>
+<h1><a class="anchor" id="autotoc_md15"></a>
 Otros recursos</h1>
 <p><b>Next to: <a href="registration.html">Registration</a></b></p>
 <p><b>Back to: <a href="getting_started.html">Getting Started</a></b> </p>

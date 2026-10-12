@@ -78,7 +78,7 @@ $(document).ready(function(){initNavTree('registration.html',''); initResizable(
 <div class="contents">
 <div class="textblock"><p>Luego de crear y definir tu clase, deberás registrarla a la API de <a class="el" href="namespace_s_o_s.html">SOS</a> para que sea reconocida y validada.</p>
 <p>Para ello, hay dos formas principales de registrar un nuevo módulo a <a class="el" href="namespace_s_o_s.html">SOS</a>:</p>
-<h1><a class="anchor" id="autotoc_md17"></a>
+<h1><a class="anchor" id="autotoc_md16"></a>
 1. Registro Automático</h1>
 <p>Usando el atributo <code><a class="el" href="class_s_o_s_1_1_auto_register_attribute.html" title="Instructs the S.O.S. discovery engine to automatically register the decorated class as an SOS module ...">SOS.AutoRegisterAttribute</a></code> sobre un módulo <a class="el" href="namespace_s_o_s.html">SOS</a> (clase que implemente alguna interfaz <a href="sos_modules.html">ISOS*</a>), para registro automático la primera vez que se abra la ventana de <a class="el" href="namespace_s_o_s.html">SOS</a> (nunca antes) pasando las propiedades opcionales de registro:</p>
 <ul>
@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('registration.html',''); initResizable(
 <p>&zwj;[!TIP] Usando este método, la clase se descubre automáticamente. Es la forma idiomática de registrar clases que implementen nuestras interfaces.</p>
 <p>Dado que este método no requiere ejecutar código manual para registrar las clases, se puede obviar por completo la clase Plugin si el objetivo de tu mod es únicamente añadir contenenido a <a class="el" href="namespace_s_o_s.html">SOS</a>. </p>
 </blockquote>
-<h1><a class="anchor" id="autotoc_md18"></a>
+<h1><a class="anchor" id="autotoc_md17"></a>
 2. Registro manual</h1>
 <p>Usando cualquier método <code>API.Register*</code> (ej: <a class="el" href="class_s_o_s_1_1_a_p_i.html#af6889131fc0d27b1ec59af61d7ea3c62" title="Registers an SOS module acting as a stat section provider into the S.O.S. inspector sidebar registry.">SOS.API.RegisterStatInfo</a>) y pasando un objeto que represente el método de instanciación y las mismas propiedades opcionales anteriormente descritas luego del objeto (<em><b>obj</b></em>, id, order, active). Puede registrar objetos genéricos y tablas Lua que implementen de forma directa o indirecta los métodos del contrato.</p>
 <p>Hay varias formas de registrar un módulo <a class="el" href="namespace_s_o_s.html">SOS</a></p>
@@ -151,7 +151,7 @@ $(document).ready(function(){initNavTree('registration.html',''); initResizable(
 <div class="fragment"><div class="line">registerMethod.Invoke(apiType, [typeof(MyStatInfoSoft), MyStatInfoSoft.ID]);</div>
 </div><!-- fragment --></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md19"></a>
+<h1><a class="anchor" id="autotoc_md18"></a>
 Otros recursos</h1>
 <p><b>Next to: <a href="data_sharing.html">Data Sharing</a></b></p>
 <p><b>Back to: <a href="sos_modules.html">SOS Modules</a></b> </p>

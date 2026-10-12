@@ -44,43 +44,42 @@ var NAVTREE =
         [ "Otros recursos", "getting_started.html#autotoc_md7", null ]
       ] ],
       [ "SOS Modules", "sos_modules.html", [
-        [ "1. Stat Info (<a href=\"interface_s_o_s_1_1_i_s_o_s_stat_info.html\" ><tt>ISOSStatInfo</tt></a>)", "sos_modules.html#autotoc_md8", [
-          [ "Ejemplo de uso <!-- TODO: Arreglar correctamente los ejemplos con info real.-->", "sos_modules.html#autotoc_md9", null ]
+        [ "1. Stat Info", "sos_modules.html#autotoc_md8", [
+          [ "Ejemplo de uso", "sos_modules.html#autotoc_md9", null ]
         ] ],
-        [ "2. Central Tabs (<a href=\"interface_s_o_s_1_1_i_s_o_s_tab.html\" ><tt>ISOSTab</tt></a>)", "sos_modules.html#autotoc_md10", [
+        [ "2. Central Tabs", "sos_modules.html#autotoc_md10", [
           [ "Ejemplo de uso", "sos_modules.html#ej1", null ]
         ] ],
-        [ "3. Prefab Providers (<a href=\"interface_s_o_s_1_1_i_s_o_s_prefab.html\" ><tt>ISOSPrefab</tt></a>)", "sos_modules.html#autotoc_md11", [
+        [ "3. Prefab Providers", "sos_modules.html#autotoc_md11", [
           [ "Ejemplo de uso", "sos_modules.html#ej2", null ]
         ] ],
-        [ "4. Configs (<a href=\"interface_s_o_s_1_1_i_s_o_s_config.html\" ><tt>ISOSConfig</tt></a>)", "sos_modules.html#autotoc_md12", [
+        [ "4. Configs", "sos_modules.html#autotoc_md12", [
           [ "Ejemplo de uso", "sos_modules.html#ej3", null ]
         ] ],
-        [ "5. Window Profiles (<a href=\"interface_s_o_s_1_1_i_s_o_s_window_profile.html\" ><tt>ISOSWindowProfile</tt></a>)", "sos_modules.html#autotoc_md13", [
+        [ "5. Window Profiles", "sos_modules.html#autotoc_md13", [
           [ "Ejemplo de uso", "sos_modules.html#ej4", null ]
         ] ],
-        [ "</blockquote>", "sos_modules.html#autotoc_md14", null ],
-        [ "Recomendaciones y buenas prácticas", "sos_modules.html#autotoc_md15", null ],
-        [ "Otros recursos", "sos_modules.html#autotoc_md16", null ]
+        [ "Recomendaciones y buenas prácticas", "sos_modules.html#autotoc_md14", null ],
+        [ "Otros recursos", "sos_modules.html#autotoc_md15", null ]
       ] ],
       [ "Registration", "registration.html", [
-        [ "1. Registro Automático", "registration.html#autotoc_md17", null ],
-        [ "2. Registro manual", "registration.html#autotoc_md18", null ],
-        [ "Otros recursos", "registration.html#autotoc_md19", null ]
+        [ "1. Registro Automático", "registration.html#autotoc_md16", null ],
+        [ "2. Registro manual", "registration.html#autotoc_md17", null ],
+        [ "Otros recursos", "registration.html#autotoc_md18", null ]
       ] ],
       [ "Data Sharing", "data_sharing.html", [
-        [ "1. Transmisores de datos compartido", "data_sharing.html#autotoc_md20", [
+        [ "1. Transmisores de datos compartido", "data_sharing.html#autotoc_md19", [
           [ "Ejemplos", "data_sharing.html#examples_1", null ]
         ] ],
-        [ "2. Almacén de datos", "data_sharing.html#autotoc_md21", [
+        [ "2. Almacén de datos", "data_sharing.html#autotoc_md20", [
           [ "Ejemplos", "data_sharing.html#examples_2", null ]
         ] ],
-        [ "Otros recursos", "data_sharing.html#autotoc_md22", null ]
+        [ "Otros recursos", "data_sharing.html#autotoc_md21", null ]
       ] ],
       [ "Helpers and GUI Components", "ui_comps.html", [
-        [ "GUIs personalizados", "ui_comps.html#autotoc_md23", null ],
-        [ "GUILayoutBuilder", "ui_comps.html#autotoc_md24", null ],
-        [ "Otros recursos", "ui_comps.html#autotoc_md25", null ]
+        [ "GUIs personalizados", "ui_comps.html#autotoc_md22", null ],
+        [ "GUILayoutBuilder", "ui_comps.html#autotoc_md23", null ],
+        [ "Otros recursos", "ui_comps.html#autotoc_md24", null ]
       ] ]
     ] ],
     [ "Packages", "namespaces.html", [

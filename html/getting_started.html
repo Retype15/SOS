@@ -86,7 +86,6 @@ $(document).ready(function(){initNavTree('getting_started.html',''); initResizab
 <p>&zwj;[!TIP] Si su proyecto es Lua, puede saltar este paso. </p>
 </blockquote>
 <p>La forma más fácil de iniciar un mod que dependa del nuestro es linkear el binario <code>SOS.SDK.dll</code> compilado para DEBUG a su proyecto o mod. Si ha seguido la guía de LuaCsForBarotrauma para <a href="https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/html/md_manual_assemblymod.html">Assembly CSharp Mods</a>, recomendamos incluir el binario en la carpeta /Refs y referenciar desde ahí , si no es el caso o desea una referencia opcional usando reflexión puede ignorar este paso. (Más información a continuación y en la <a href="registration.html">sección Registration</a>.)</p>
-<p>Puede el binario con la flag DEBUG <a href="//">AQUÍ</a>.</p>
 <h1><a class="anchor" id="autotoc_md3"></a>
 Example mod</h1>
 <p>Cualquier mod que desee implementar una pestaña de información solamente necesita crear una clase base que herede de la interfaz <b>ISOS*</b> correspondiente e implemente el contenido que quiera añadir (e.g: Una nueva sección en los stat sections necesita una clase pública que implemente el contrato <code><a class="el" href="interface_s_o_s_1_1_i_s_o_s_stat_info.html" title="Defines an SOS module acting as a modular, completely stateless wiki inspector section rendered in th...">SOS.ISOSStatInfo</a></code>), y posteriormente registrarla.</p>
