@@ -12,11 +12,13 @@ Un módulo SOS es cualquier clase que implemente alguna interfaz **ISOS\*** (`SO
 > [!TIP]
 > Para crear sus propios módulos SOS, necesita crear una clase pública que implemente el contrato correspondiente ya sea directa o indirectamente(genérico por nombre/parámetros de métodos) y posteriormente registrarla vía `SOS.AutoRegisterAttribute` o [`API.Register*`](class_s_o_s_1_1_a_p_i.html). Ver: [Registration](registration.html).
 
-## 1. Stat Info ([`ISOSStatInfo`](interface_s_o_s_1_1_i_s_o_s_stat_info.html))
+## 1. Stat Info
+
+[`ISOSStatInfo`](interface_s_o_s_1_1_i_s_o_s_stat_info.html)
 
 Sección de la wiki del inspector que dibuja filas de informacion sobre el prefab seleccionado. Si el *rectT* no tiene hijos, se limpia.
 
-### Ejemplo de uso <!-- TODO: Arreglar correctamente los ejemplos con info real.-->
+### Ejemplo de uso
 
 ```csharp
 using Barotrauma;
@@ -57,7 +59,9 @@ Y su localización en el `Localization/English.xml` de tu mod:
 > [!TIP]
 > Recomendamos devolver pronto con `return` cuando el prefab no contenga datos relevantes, así la sección no se dibuja sin nada relevante.
 
-## 2. Central Tabs ([`ISOSTab`](interface_s_o_s_1_1_i_s_o_s_tab.html))
+## 2. Central Tabs
+
+[`ISOSTab`](interface_s_o_s_1_1_i_s_o_s_tab.html)
 
 Pestaña central de inspección para un tipo de entidad. Aparece en la tab bar solo cuando `SOS.ISOSTab.CanHandle` devuelve `true` para el objetivo actual.
 
@@ -120,7 +124,9 @@ Y su localización en el `Localization/English.xml`.
 > [!NOTE]
 > GUITab asegura de que `Update` nunca se llame antes de `Init`, pero siempre es buena práctica comprobar nulos.
 
-## 3. Prefab Providers ([`ISOSPrefab`](interface_s_o_s_1_1_i_s_o_s_prefab.html))
+## 3. Prefab Providers
+
+[`ISOSPrefab`](interface_s_o_s_1_1_i_s_o_s_prefab.html)
 
 Proveedor de datos que alimenta el navegador lateral con un nuevo tipo de entidad (e.g: [`JobPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_job_prefab.html), [`EventPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_event_prefab.html), [`TalentPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_talent_prefab.html), [`CharacterPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_character_prefab.html), etc). El navegador agrupa sus prefabs por tipo de runtime y resuelve cada cabecera desde localización (`{Type}.header`); solo necesita servirlos con `SOS.ISOSPrefab.GetPrefabs`.
 
@@ -153,7 +159,9 @@ public class JobPrefabProvider : ISOSPrefab
 >
 > Use los tokens del filtro (`filter.General`, `filter.Mod`, `filter.Category`, etc.) para que su proveedor responda a la búsqueda avanzada del navegador.
 
-## 4. Configs ([`ISOSConfig`](interface_s_o_s_1_1_i_s_o_s_config.html))
+## 4. Configs
+
+[`ISOSConfig`](interface_s_o_s_1_1_i_s_o_s_config.html)
 
 Unidad de configuración extensible con persistencia y renderizado declarativo en la ventana de settings. Herede de `SOS.Configs.ConfigDirtySaver` para gestión automatizada y guardado de cambios.
 
@@ -235,7 +243,9 @@ Y su localización en el `Localization/English.xml` de tu mod:
 >
 > 3. *SOS.ISOSConfig.Reset* y *SOS.ISOSConfig.Draw* traen implementación por defecto, puede obviarlos si su módulo SOS no necesita settings visibles.
 
-## 5. Window Profiles ([`ISOSWindowProfile`](interface_s_o_s_1_1_i_s_o_s_window_profile.html))
+## 5. Window Profiles
+
+[`ISOSWindowProfile`](interface_s_o_s_1_1_i_s_o_s_window_profile.html)
 
 Layout visual intercambiable de la ventana SOS. Puede crear cualquier estilo visual, ejemplo una vista de una única columna, un inspector compacto, o una herramienta flotante con solo lo esencial. Hereda de `SOS.GUI.GUIWindow` y se puede cambiar vía **SOS.API.Emit(SOS.CommKeys.ChangeProfile, id)**.
 
@@ -319,12 +329,9 @@ Puede leer el código actual en el repositorio para más detalle.
 >
 > Reset es afectado por **WindowProfileConfig** y el reset general.
 
----
-
 ## Recomendaciones y buenas prácticas
 
-> [!HINT]
-> NO recomendamos implementar en una misma clase varios tipos de módulos SOS, esto lo consideramos un anti-patrón y actualmente llevará a crear 2 instancias de la misma clase para cada tipo de contrato(A menos que registre manualmente una misma instancia o delegado para ambos, pero igualmente no lo recomendamos).
+NO recomendamos implementar en una misma clase varios tipos de módulos SOS, esto lo consideramos un anti-patrón y actualmente llevará a crear 2 instancias de la misma clase para cada tipo de contrato(A menos que registre manualmente una misma instancia o delegado para ambos, pero igualmente no lo recomendamos).
 
 <!-- - -->
 

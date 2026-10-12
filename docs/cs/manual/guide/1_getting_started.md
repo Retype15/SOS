@@ -13,7 +13,7 @@ Requisitos específicos del proyecto dependen de LuaCsForBarotrauma, véase la [
 
 La forma más fácil de iniciar un mod que dependa del nuestro es linkear el binario `SOS.SDK.dll` compilado para DEBUG a su proyecto o mod. Si ha seguido la guía de LuaCsForBarotrauma para [Assembly CSharp Mods](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/html/md_manual_assemblymod.html), recomendamos incluir el binario en la carpeta /Refs y referenciar desde ahí , si no es el caso o desea una referencia opcional usando reflexión puede ignorar este paso. (Más información a continuación y en la [sección Registration](registration.html).)
 
-Puede el binario con la flag DEBUG [AQUÍ](//). <!-- TODO: FALTA RUTA AQUÍ -->
+<!-- Puede el binario con el flag DEBUG [AQUÍ](//). <!-- TODO: FALTA RUTA AQUÍ -->
 
 ## Example mod
 

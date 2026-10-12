@@ -10,9 +10,6 @@ Esta guía manual abarcará con el mayor detalle posible todo lo que necesita sa
 4. @subpage data_sharing - Para una comunicación efectiva entre mods de forma descentralizada, es que aquí se explica la forma canónica para enganchar sus delegados como hooks para una ejecución predecible y ordenada justo cuando lo necesites, además de también cómo guardar datos compartidos para todos de forma sencilla y thread-safe.
 5. @subpage ui_comps - Para liberar todo el poder del SDK, este expone varios componentes GUIs personalizados y varios helpers para hacer la vida del modder más fácil, esta sección se encarga de explicar todos los miembros nuevos más importantes que debería conocer.
 
-**Recomended to start:** [**Getting Started**](getting_started.html)
+> Ante cualquier duda, recomendamos unirte al [Discord oficial](https://discord.gg/pjZ3SQjgM) de SOS y pedir ayuda.
 
-> [!NOTE]
-> Esta documentación aún está en construccion. Puede ver la documentacion auto-generada para conocer a detalle cada clase y uso a partir del *namespace SOS*.
->
-> Ante cualquier duda, recomendamos unirte al [Discord oficial](getting_started.html) de SOS y pedir ayuda.
+**Recomended to start:** [**Getting Started**](getting_started.html)

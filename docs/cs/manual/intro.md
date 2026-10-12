@@ -13,8 +13,6 @@ Depende del ecosistema de [LuaCsForBarotrauma](https://github.com/evilfactory/Lu
 > [!TIP]
 > If you are wondering how to get started with CSharp/Lua modding, please read [LuaCsForBarotrauma Guide](https://evilfactory.github.io/LuaCsForBarotrauma) to get you started making Barotrauma mods.
 
----
-
 ## Lista de Contenido
 
 **Recomended to start:** [**Introductory Guide**](guide.html)
@@ -36,4 +34,4 @@ Depende del ecosistema de [LuaCsForBarotrauma](https://github.com/evilfactory/Lu
 
 [![Download Latest Mod Version](https://img.shields.io/badge/GitHub-Download_Latest_Version-181717?style=for-the-badge&logo=github&logoSize=auto)](https://github.com/Retype15/SOS/releases/latest/download/SOS.zip)
 
-[![Discord](https://img.shields.io/badge/Unavailable-181717?style=for-the-badge&logo=discord&logoSize=auto&label=Discord&color=red)](https://google.com) <!--116699 -->
+[![Discord](https://img.shields.io/badge/Unavailable-181717?style=for-the-badge&logo=discord&logoSize=auto&label=Discord&color=red)](https://discord.gg/pjZ3SQjgM) <!--116699 -->
