@@ -76,7 +76,8 @@ $(document).ready(function(){initNavTree('namespace_s_o_s.html',''); initResizab
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#enum-members">Enumerations</a>  </div>
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">SOS Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -94,14 +95,14 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>API</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Primary static facade providing access to S.O.S. mod extensibility points, component registries, prioritized event dispatching, and shared runtime state. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_a_p_i.html">API</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Primary static facade providing access to S.O.S. mod extensibility points, <a class="el" href="namespace_s_o_s.html">SOS</a> module registries, prioritized event dispatching, and shared runtime state.  <a href="class_s_o_s_1_1_a_p_i.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_auto_register_attribute.html">AutoRegisterAttribute</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instructs the S.O.S. discovery engine to automatically register the decorated class into its corresponding API factory.  <a href="class_s_o_s_1_1_auto_register_attribute.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instructs the S.O.S. discovery engine to automatically register the decorated class as an <a class="el" href="namespace_s_o_s.html">SOS</a> module into its corresponding API factory.  <a href="class_s_o_s_1_1_auto_register_attribute.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>CommKeys</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Centralized registry of standardized communication channel identifiers for the decoupled S.O.S. event bus (API). <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_comm_keys.html">CommKeys</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Centralized registry of standardized communication channel identifiers for the decoupled S.O.S. event bus (API).  <a href="class_s_o_s_1_1_comm_keys.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>ConfigDefaults</b></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides default fallback implementations for configuration contracts when adapted via DuckProxy&lt;T&gt;. <br /></td></tr>
@@ -118,47 +119,56 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>DuckProxy</b></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A DispatchProxy-based adapter that dynamic MoonSharp Lua tables and external assemblies to C# interfaces at runtime. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>EventPriority</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines canonical priority constants for deterministic execution ordering within the S.O.S. event bus (API). <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_event_priority.html">EventPriority</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines canonical priority constants for deterministic execution ordering within the S.O.S. event bus (API).  <a href="class_s_o_s_1_1_event_priority.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>FloatExt</b></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides extension methods for floating-point number formatting and conversion. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>HyperlinkExtensions</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides methods for binding hyperlinks to GUI text blocks and joining enumerable items to rich strings. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_hyperlink_extensions.html">HyperlinkExtensions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides methods for binding hyperlinks to GUI text blocks and joining enumerable items to rich strings.  <a href="class_s_o_s_1_1_hyperlink_extensions.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>IDictionaryExt</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides extension methods for IDictionary&lt;TKey, TValue&gt;. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_i_dictionary_ext.html">IDictionaryExt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides extension methods for IDictionary&lt;TKey, TValue&gt;.  <a href="class_s_o_s_1_1_i_dictionary_ext.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>IEnumerableExt</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides extension methods for IEnumerable&lt;T&gt;. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_duck_proxy.html">IDuckProxy</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exposes the wrapped target of a DuckProxy&lt;T&gt;-based adapter.  <a href="interface_s_o_s_1_1_i_duck_proxy.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_identifier.html">IIdentifier</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exposes an identifier property used to uniquely distinguish a component within the S.O.S. ecosystem.  <a href="interface_s_o_s_1_1_i_identifier.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_i_enumerable_ext.html">IEnumerableExt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides extension methods for IEnumerable&lt;T&gt;.  <a href="class_s_o_s_1_1_i_enumerable_ext.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>ISettingBaseExt</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides extension methods for ISettingBase&lt;T&gt; and ISettingControl. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_factory_entry.html">IFactoryEntry</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Public handle to a single SortedFactory&lt;T&gt; registration. Exposes the registration key without instantiating, with lazy cached resolution via IFactoryEntry&lt;T&gt;.Value.  <a href="interface_s_o_s_1_1_i_factory_entry.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_prefab_filter.html">IPrefabFilter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents parsed search criteria used by ISOSPrefab.GetPrefabs(IPrefabFilter) to filter entities in the browser.  <a href="interface_s_o_s_1_1_i_prefab_filter.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_i_setting_base_ext.html">ISettingBaseExt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides extension methods for ISettingBase&lt;T&gt; and ISettingControl.  <a href="class_s_o_s_1_1_i_setting_base_ext.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_config.html">ISOSConfig</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines a modular prefab inspection tab (type alias for ITab&lt;T&gt; where <code>T</code> is Barotrauma.Prefab).  <a href="interface_s_o_s_1_1_i_s_o_s_config.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines an <a class="el" href="namespace_s_o_s.html">SOS</a> module acting as an extensible configuration unit with lifecycle persistence, factory defaults, and declarative UI rendering.  <a href="interface_s_o_s_1_1_i_s_o_s_config.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_prefab.html">ISOSPrefab</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines an extensible prefab data source that feeds entities into the S.O.S. left sidebar browser.  <a href="interface_s_o_s_1_1_i_s_o_s_prefab.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines an <a class="el" href="namespace_s_o_s.html">SOS</a> module acting as an extensible prefab data source that feeds entities into the S.O.S. left sidebar browser.  <a href="interface_s_o_s_1_1_i_s_o_s_prefab.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_prefab_filter.html">ISOSPrefabFilter</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents parsed search criteria used by ISOSPrefab.GetAll(ISOSPrefabFilter) to filter entities in the browser.  <a href="interface_s_o_s_1_1_i_s_o_s_prefab_filter.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_stat_info.html">ISOSStatInfo</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines an <a class="el" href="namespace_s_o_s.html">SOS</a> module acting as a modular, completely stateless wiki inspector section rendered in the right-hand panel of S.O.S.  <a href="interface_s_o_s_1_1_i_s_o_s_stat_info.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_stat_section.html">ISOSStatSection</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines a modular, completely stateless wiki inspector section rendered in the right-hand panel of S.O.S.  <a href="interface_s_o_s_1_1_i_s_o_s_stat_section.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_tab.html">ISOSTab</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines an <a class="el" href="namespace_s_o_s.html">SOS</a> module acting as a modular prefab inspection tab (type alias for ITab&lt;T&gt; where <code>T</code> is Barotrauma.Prefab).  <a href="interface_s_o_s_1_1_i_s_o_s_tab.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_window_profile.html">ISOSWindowProfile</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines an interchangeable visual presentation layout for the S.O.S. window.  <a href="interface_s_o_s_1_1_i_s_o_s_window_profile.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines an <a class="el" href="namespace_s_o_s.html">SOS</a> module acting as an interchangeable visual presentation layout for the S.O.S. window.  <a href="interface_s_o_s_1_1_i_s_o_s_window_profile.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_i_s_o_s_window_profile_ext.html">ISOSWindowProfileExt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Display helpers for ISOSWindowProfile factory entries, resolved from localization (<code>{Id}.name</code> / <code>{Id}.desc</code>) with a humanized identifier fallback for the name.  <a href="class_s_o_s_1_1_i_s_o_s_window_profile_ext.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines a modular, generic UI tab capable of inspecting and interacting with entities of type <em>T</em> .  <a href="interface_s_o_s_1_1_i_tab.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines an <a class="el" href="namespace_s_o_s.html">SOS</a> module acting as a modular, generic UI tab capable of inspecting and interacting with entities of type <em>T</em> .  <a href="interface_s_o_s_1_1_i_tab.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>Logger</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides logging functionality for the S.O.S mod with support for multiple log levels, conditional compilation (DEBUG/RELEASE), and integrated logger services. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_logger.html">Logger</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides logging functionality for the S.O.S mod with support for multiple log levels, conditional compilation (DEBUG/RELEASE), and integrated logger services.  <a href="class_s_o_s_1_1_logger.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>LogLevelStates</b></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">String representations for each LogLevel, used for display and serialization. <br /></td></tr>
@@ -169,11 +179,11 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>PrefabExt</b></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides extension methods for working with prefabs, including name resolution, icon retrieval, and config element access. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>PrefabFilterHelper</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides helper methods for filtering prefabs based on search criteria. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_prefab_filter_helper.html">PrefabFilterHelper</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides helper methods for filtering prefabs based on search criteria.  <a href="class_s_o_s_1_1_prefab_filter_helper.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>RichStringExt</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rich text formatting extension methods utilizing Barotrauma's native RichText formatting tags. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_rich_string_ext.html">RichStringExt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rich text formatting extension methods utilizing Barotrauma's native RichText formatting tags.  <a href="class_s_o_s_1_1_rich_string_ext.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>SearchFilter</b></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents a parsed search filter for prefabs, supporting typed search terms. <br /></td></tr>
@@ -182,10 +192,10 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread-safe, ordered service registry managing component discovery, sorting, activation, and instance lifecycle. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>TabDefaults</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides default fallback implementations for tab components when adapted via DuckProxy&lt;T&gt;. <br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides default fallback implementations for tab <a class="el" href="namespace_s_o_s.html">SOS</a> modules when adapted via DuckProxy&lt;T&gt;. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>Texts</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides localized text lookup with fallback support for S.O.S mod. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_texts.html">Texts</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides localized text lookup with fallback support for S.O.S mod.  <a href="class_s_o_s_1_1_texts.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>TypeExt</b></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides extension methods for Type. <br /></td></tr>
@@ -193,8 +203,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>WindowProfileDefaults</b></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides default fallback implementations for window profiles when adapted via DuckProxy&lt;T&gt;. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>XMLHighlighter</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides syntax highlighting for XML code strings, coloring nodes, attributes, values, comments, and punctuation. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_x_m_l_highlighter.html">XMLHighlighter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides syntax highlighting for XML code strings, coloring nodes, attributes, values, comments, and punctuation.  <a href="class_s_o_s_1_1_x_m_l_highlighter.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
@@ -212,6 +222,60 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a2ac6885f83a40a19c7c4162c99878ec0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Severity levels for log messages produced by Logger.  <a href="namespace_s_o_s.html#a2ac6885f83a40a19c7c4162c99878ec0">More...</a><br /></td></tr>
 <tr class="separator:a2ac6885f83a40a19c7c4162c99878ec0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a12fc5359616e4120963d3a0d65ea92d3" id="r_a12fc5359616e4120963d3a0d65ea92d3"><td class="memItemLeft" align="right" valign="top">static IEnumerable&lt; <a class="el" href="interface_s_o_s_1_1_i_factory_entry.html">IFactoryEntry</a>&lt; <a class="el" href="interface_s_o_s_1_1_i_s_o_s_window_profile.html">ISOSWindowProfile</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a12fc5359616e4120963d3a0d65ea92d3">GetAllWindowProfiles</a> (bool onlyActives=true)</td></tr>
+<tr class="memdesc:a12fc5359616e4120963d3a0d65ea92d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets all registered window profile factory entries in ascending registration order, without instantiating them.  <br /></td></tr>
+<tr class="separator:a12fc5359616e4120963d3a0d65ea92d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5808d8156ed506d1b6a4b9a193dbeb29" id="r_a5808d8156ed506d1b6a4b9a193dbeb29"><td class="memItemLeft" align="right" valign="top">static IEnumerable&lt; <a class="el" href="interface_s_o_s_1_1_i_s_o_s_window_profile.html">ISOSWindowProfile</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a5808d8156ed506d1b6a4b9a193dbeb29">GetAllWindowProfileInstances</a> (bool onlyActives=true, bool fresh=false)</td></tr>
+<tr class="memdesc:a5808d8156ed506d1b6a4b9a193dbeb29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resolves and enumerates all currently active window profiles in ascending registration order.  <br /></td></tr>
+<tr class="separator:a5808d8156ed506d1b6a4b9a193dbeb29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c1cd023104b81121c94da0748d883fa" id="r_a2c1cd023104b81121c94da0748d883fa"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a2c1cd023104b81121c94da0748d883fa">RemoveWindowProfile</a> (string id, bool onlyInstance=false)</td></tr>
+<tr class="memdesc:a2c1cd023104b81121c94da0748d883fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a window profile registration or its cached instance by identifier.  <br /></td></tr>
+<tr class="separator:a2c1cd023104b81121c94da0748d883fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d81349b583cb595caab493ceabfd14e" id="r_a8d81349b583cb595caab493ceabfd14e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a8d81349b583cb595caab493ceabfd14e">On</a> (string key, Action handler, double order=0)</td></tr>
+<tr class="memdesc:a8d81349b583cb595caab493ceabfd14e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subscribes a parameterless callback to the specified event channel with priority-based execution ordering.  <br /></td></tr>
+<tr class="separator:a8d81349b583cb595caab493ceabfd14e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a046e9cb0c359a0ae3de78413552a572d" id="r_a046e9cb0c359a0ae3de78413552a572d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a046e9cb0c359a0ae3de78413552a572d">On&lt; T &gt;</a> (string key, Action&lt; T &gt; handler, double order=0)</td></tr>
+<tr class="memdesc:a046e9cb0c359a0ae3de78413552a572d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subscribes a strongly-typed callback to the specified event channel with priority-based execution ordering.  <br /></td></tr>
+<tr class="separator:a046e9cb0c359a0ae3de78413552a572d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef6622397a730015c36427c156bf8bd5" id="r_aef6622397a730015c36427c156bf8bd5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#aef6622397a730015c36427c156bf8bd5">Off</a> (string key, Action handler, double? order=null, bool removeState=false)</td></tr>
+<tr class="memdesc:aef6622397a730015c36427c156bf8bd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsubscribes a parameterless callback from the specified event channel.  <br /></td></tr>
+<tr class="separator:aef6622397a730015c36427c156bf8bd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a838411e8d2761f35da52d8fe274fb6fa" id="r_a838411e8d2761f35da52d8fe274fb6fa"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a838411e8d2761f35da52d8fe274fb6fa">Off&lt; T &gt;</a> (string key, Action&lt; T &gt; handler, double? order=null, bool removeState=false)</td></tr>
+<tr class="memdesc:a838411e8d2761f35da52d8fe274fb6fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsubscribes a strongly-typed callback from the specified event channel.  <br /></td></tr>
+<tr class="separator:a838411e8d2761f35da52d8fe274fb6fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a637f1cd70111e82ff91f2d2cd3cccfdf" id="r_a637f1cd70111e82ff91f2d2cd3cccfdf"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a637f1cd70111e82ff91f2d2cd3cccfdf">Emit</a> (string key)</td></tr>
+<tr class="memdesc:a637f1cd70111e82ff91f2d2cd3cccfdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emits a parameterless event across all priority tiers on the specified channel.  <br /></td></tr>
+<tr class="separator:a637f1cd70111e82ff91f2d2cd3cccfdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6821a916f10fdb0e0d09e44275e6b55" id="r_aa6821a916f10fdb0e0d09e44275e6b55"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#aa6821a916f10fdb0e0d09e44275e6b55">Emit</a> (string key, double? order=null)</td></tr>
+<tr class="memdesc:aa6821a916f10fdb0e0d09e44275e6b55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emits an event on the specified channel with an optional order parameter.  <br /></td></tr>
+<tr class="separator:aa6821a916f10fdb0e0d09e44275e6b55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55190da00f514b96fb2b27649b84e08b" id="r_a55190da00f514b96fb2b27649b84e08b"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a55190da00f514b96fb2b27649b84e08b">Emit&lt; T &gt;</a> (string key, T value, double? order=null, bool setState=true)</td></tr>
+<tr class="memdesc:a55190da00f514b96fb2b27649b84e08b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emits a strongly-typed event across all priority tiers or within a specific tier, optionally persisting state.  <br /></td></tr>
+<tr class="separator:a55190da00f514b96fb2b27649b84e08b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b6ee62bc19e7d0594c9caea2bbc0035" id="r_a7b6ee62bc19e7d0594c9caea2bbc0035"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a7b6ee62bc19e7d0594c9caea2bbc0035">EmitRange</a> (string key, double min=double.MinValue, double max=double.MaxValue)</td></tr>
+<tr class="memdesc:a7b6ee62bc19e7d0594c9caea2bbc0035"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emits a parameterless event to handlers whose priority order falls within [<em>min</em> , <em>max</em> ].  <br /></td></tr>
+<tr class="separator:a7b6ee62bc19e7d0594c9caea2bbc0035"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e6bf1bd362965663aa1e9e08771398e" id="r_a1e6bf1bd362965663aa1e9e08771398e"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a1e6bf1bd362965663aa1e9e08771398e">EmitRange&lt; T &gt;</a> (string key, T value, double min=double.MinValue, double max=double.MaxValue, bool setState=true)</td></tr>
+<tr class="memdesc:a1e6bf1bd362965663aa1e9e08771398e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emits a strongly-typed event to handlers whose priority order falls within [<em>min</em> , <em>max</em> ], optionally persisting state.  <br /></td></tr>
+<tr class="separator:a1e6bf1bd362965663aa1e9e08771398e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e4b97a579a492edc2576771293d489f" id="r_a4e4b97a579a492edc2576771293d489f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a4e4b97a579a492edc2576771293d489f">SetState&lt; T &gt;</a> (string key, T value, bool emit=false)</td></tr>
+<tr class="memdesc:a4e4b97a579a492edc2576771293d489f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a value in the shared state cache, optionally emitting it across the channel.  <br /></td></tr>
+<tr class="separator:a4e4b97a579a492edc2576771293d489f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13b05109ae945be4cdd732e7b9c97ce3" id="r_a13b05109ae945be4cdd732e7b9c97ce3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a13b05109ae945be4cdd732e7b9c97ce3">SetState&lt; T &gt;</a> (string key, Func&lt; T &gt; method, bool emit=false)</td></tr>
+<tr class="memdesc:a13b05109ae945be4cdd732e7b9c97ce3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a dynamic state generator evaluated on-demand when read via <a class="el" href="namespace_s_o_s.html#af85bd39ed2e1eb3bc6249617c2615c99" title="Retrieves the current state value stored under the specified channel key.">GetState&lt;T&gt;(string)</a>.  <br /></td></tr>
+<tr class="separator:a13b05109ae945be4cdd732e7b9c97ce3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af85bd39ed2e1eb3bc6249617c2615c99" id="r_af85bd39ed2e1eb3bc6249617c2615c99"><td class="memItemLeft" align="right" valign="top">static ? T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#af85bd39ed2e1eb3bc6249617c2615c99">GetState&lt; T &gt;</a> (string key)</td></tr>
+<tr class="memdesc:af85bd39ed2e1eb3bc6249617c2615c99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the current state value stored under the specified channel key.  <br /></td></tr>
+<tr class="separator:af85bd39ed2e1eb3bc6249617c2615c99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a595804cc5f90a1def91db918fa35d599" id="r_a595804cc5f90a1def91db918fa35d599"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a595804cc5f90a1def91db918fa35d599">RemoveState</a> (string key)</td></tr>
+<tr class="memdesc:a595804cc5f90a1def91db918fa35d599"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evicts the state value stored under the specified channel key.  <br /></td></tr>
+<tr class="separator:a595804cc5f90a1def91db918fa35d599"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a4e72d48a6cab62958c2968bf05b72f" id="r_a2a4e72d48a6cab62958c2968bf05b72f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_s_o_s.html#a2a4e72d48a6cab62958c2968bf05b72f">SetSearchFilter</a> (string tag)</td></tr>
+<tr class="memdesc:a2a4e72d48a6cab62958c2968bf05b72f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Requests the active window profile to populate the search box with the given filter token.  <br /></td></tr>
+<tr class="separator:a2a4e72d48a6cab62958c2968bf05b72f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="a2ac6885f83a40a19c7c4162c99878ec0" name="a2ac6885f83a40a19c7c4162c99878ec0"></a>
@@ -226,7 +290,7 @@ Enumerations</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Severity levels for log messages produced by Logger. </p>
+<p>Severity levels for log messages produced by <a class="el" href="class_s_o_s_1_1_logger.html" title="Provides logging functionality for the S.O.S mod with support for multiple log levels,...">Logger</a>. </p>
 <p>Log levels determine which messages are actually output based on the active <code>ActualLogLevel</code>. Lower numeric values include all higher severity messages (e.g., <a class="el" href="namespace_s_o_s.html#a2ac6885f83a40a19c7c4162c99878ec0a902b0d55fddef6f8d651fe1035b7d4bd" title="Error messages indicating a problem that needs attention.">Error</a> includes <a class="el" href="namespace_s_o_s.html#a2ac6885f83a40a19c7c4162c99878ec0a278d01e5af56273bae1bb99a98b370cd" title="Critical messages that indicate a fatal failure.">Critical</a>). In DEBUG mode, the default threshold is <a class="el" href="namespace_s_o_s.html#a2ac6885f83a40a19c7c4162c99878ec0aa603905470e2a5b8c13e96b579ef0dba" title="Debug messages for development-time diagnostics.">LogLevel.Debug</a>; in RELEASE, it is <a class="el" href="namespace_s_o_s.html#a2ac6885f83a40a19c7c4162c99878ec0aa82be0f551b8708bc08eb33cd9ded0cf" title="Informational messages about normal operation.">LogLevel.Information</a>. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a2ac6885f83a40a19c7c4162c99878ec0a6adf97f83acf6453d4a6a4b1070f3754" name="a2ac6885f83a40a19c7c4162c99878ec0a6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc"><p>No messages are logged. </p>
@@ -246,6 +310,876 @@ Enumerations</h2></td></tr>
 </table>
 
 <p class="definition">Definition at line <a class="el" href="_logger_8cs_source.html#l00024">24</a> of file <a class="el" href="_logger_8cs_source.html">Logger.cs</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a637f1cd70111e82ff91f2d2cd3cccfdf" name="a637f1cd70111e82ff91f2d2cd3cccfdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a637f1cd70111e82ff91f2d2cd3cccfdf">&#9670;&#160;</a></span>Emit() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool SOS.Emit </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Emits a parameterless event across all priority tiers on the specified channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The unique event channel identifier (see <a class="el" href="class_s_o_s_1_1_comm_keys.html" title="Centralized registry of standardized communication channel identifiers for the decoupled S....">CommKeys</a>).</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if at least one handler was invoked; otherwise, <code>false</code>.</dd></dl>
+
+</div>
+</div>
+<a id="aa6821a916f10fdb0e0d09e44275e6b55" name="aa6821a916f10fdb0e0d09e44275e6b55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6821a916f10fdb0e0d09e44275e6b55">&#9670;&#160;</a></span>Emit() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool SOS.Emit </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double?&#160;</td>
+          <td class="paramname"><em>order</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Emits an event on the specified channel with an optional order parameter. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The unique event identifier channel.</td></tr>
+    <tr><td class="paramname">order</td><td>Optional execution order override.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the event was emitted to at least one handler; <code>false</code> otherwise.</dd></dl>
+
+</div>
+</div>
+<a id="a55190da00f514b96fb2b27649b84e08b" name="a55190da00f514b96fb2b27649b84e08b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55190da00f514b96fb2b27649b84e08b">&#9670;&#160;</a></span>Emit&lt; T &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool <a class="el" href="namespace_s_o_s.html#a637f1cd70111e82ff91f2d2cd3cccfdf">SOS.Emit</a>&lt; T &gt; </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double?&#160;</td>
+          <td class="paramname"><em>order</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>setState</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Emits a strongly-typed event across all priority tiers or within a specific tier, optionally persisting state. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The payload type.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The unique event channel identifier (see <a class="el" href="class_s_o_s_1_1_comm_keys.html" title="Centralized registry of standardized communication channel identifiers for the decoupled S....">CommKeys</a>).</td></tr>
+    <tr><td class="paramname">value</td><td>The payload value delivered to subscribers.</td></tr>
+    <tr><td class="paramname">order</td><td>Optional exact priority tier to invoke. If <code>null</code>, delivers to handlers across all priority tiers.</td></tr>
+    <tr><td class="paramname">setState</td><td>If <code>true</code>, updates the internal state store with <em>value</em>  <em>after</em> all handlers have finished executing.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if at least one handler was invoked; otherwise, <code>false</code>.</dd></dl>
+<p>Handlers execute in ascending order of their priority weights. Delegate invocation occurs outside internal locks. </p>
+
+</div>
+</div>
+<a id="a7b6ee62bc19e7d0594c9caea2bbc0035" name="a7b6ee62bc19e7d0594c9caea2bbc0035"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b6ee62bc19e7d0594c9caea2bbc0035">&#9670;&#160;</a></span>EmitRange()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool SOS.EmitRange </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>min</em> = <code>double.MinValue</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>max</em> = <code>double.MaxValue</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Emits a parameterless event to handlers whose priority order falls within [<em>min</em> , <em>max</em> ]. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The unique event channel identifier.</td></tr>
+    <tr><td class="paramname">min</td><td>Minimum priority order (inclusive). Defaults to double.MinValue.</td></tr>
+    <tr><td class="paramname">max</td><td>Maximum priority order (inclusive). Defaults to double.MaxValue.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if at least one handler was invoked; otherwise, <code>false</code>.</dd></dl>
+
+</div>
+</div>
+<a id="a1e6bf1bd362965663aa1e9e08771398e" name="a1e6bf1bd362965663aa1e9e08771398e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e6bf1bd362965663aa1e9e08771398e">&#9670;&#160;</a></span>EmitRange&lt; T &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool <a class="el" href="namespace_s_o_s.html#a7b6ee62bc19e7d0594c9caea2bbc0035">SOS.EmitRange</a>&lt; T &gt; </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>min</em> = <code>double.MinValue</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>max</em> = <code>double.MaxValue</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>setState</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Emits a strongly-typed event to handlers whose priority order falls within [<em>min</em> , <em>max</em> ], optionally persisting state. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The payload type.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The unique event channel identifier.</td></tr>
+    <tr><td class="paramname">value</td><td>The payload value delivered to subscribers.</td></tr>
+    <tr><td class="paramname">min</td><td>Minimum priority order (inclusive). Defaults to double.MinValue.</td></tr>
+    <tr><td class="paramname">max</td><td>Maximum priority order (inclusive). Defaults to double.MaxValue.</td></tr>
+    <tr><td class="paramname">setState</td><td>If <code>true</code>, updates the internal state store with <em>value</em>  <em>after</em> all handlers have finished executing.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if at least one handler was invoked; otherwise, <code>false</code>.</dd></dl>
+
+</div>
+</div>
+<a id="a5808d8156ed506d1b6a4b9a193dbeb29" name="a5808d8156ed506d1b6a4b9a193dbeb29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5808d8156ed506d1b6a4b9a193dbeb29">&#9670;&#160;</a></span>GetAllWindowProfileInstances()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static IEnumerable&lt; <a class="el" href="interface_s_o_s_1_1_i_s_o_s_window_profile.html">ISOSWindowProfile</a> &gt; SOS.GetAllWindowProfileInstances </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>onlyActives</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>fresh</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Resolves and enumerates all currently active window profiles in ascending registration order. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onlyActives</td><td>If <code>true</code>, returns only instances that marked with in <code>IsActive</code>. If <code>false</code>, returns all instances.</td></tr>
+    <tr><td class="paramname">fresh</td><td>If <code>true</code>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <code>false</code> for visual profiles.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An enumerable sequence of active <a class="el" href="interface_s_o_s_1_1_i_s_o_s_window_profile.html" title="Defines an SOS module acting as an interchangeable visual presentation layout for the S....">ISOSWindowProfile</a> instances.</dd></dl>
+
+</div>
+</div>
+<a id="a12fc5359616e4120963d3a0d65ea92d3" name="a12fc5359616e4120963d3a0d65ea92d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12fc5359616e4120963d3a0d65ea92d3">&#9670;&#160;</a></span>GetAllWindowProfiles()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static IEnumerable&lt; <a class="el" href="interface_s_o_s_1_1_i_factory_entry.html">IFactoryEntry</a>&lt; <a class="el" href="interface_s_o_s_1_1_i_s_o_s_window_profile.html">ISOSWindowProfile</a> &gt; &gt; SOS.GetAllWindowProfiles </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>onlyActives</em> = <code>true</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets all registered window profile factory entries in ascending registration order, without instantiating them. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">onlyActives</td><td>If <code>true</code>, returns only entries marked active. If <code>false</code>, returns all entries.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An enumerable sequence of window profile factory entries.</dd></dl>
+
+</div>
+</div>
+<a id="af85bd39ed2e1eb3bc6249617c2615c99" name="af85bd39ed2e1eb3bc6249617c2615c99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af85bd39ed2e1eb3bc6249617c2615c99">&#9670;&#160;</a></span>GetState&lt; T &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static ? T SOS.GetState&lt; T &gt; </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieves the current state value stored under the specified channel key. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The expected type of the state value.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The state channel identifier.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The stored value if found; otherwise, <code>default</code>.</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">System.Runtime.InteropServices.SafeArrayTypeMismatchException</td><td>Thrown when the stored value cannot be cast to <em>T</em> .</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aef6622397a730015c36427c156bf8bd5" name="aef6622397a730015c36427c156bf8bd5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef6622397a730015c36427c156bf8bd5">&#9670;&#160;</a></span>Off()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void SOS.Off </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&#160;</td>
+          <td class="paramname"><em>handler</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double?&#160;</td>
+          <td class="paramname"><em>order</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>removeState</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Unsubscribes a parameterless callback from the specified event channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The unique event channel identifier.</td></tr>
+    <tr><td class="paramname">handler</td><td>The callback delegate to remove.</td></tr>
+    <tr><td class="paramname">order</td><td>Optional. If specified, removes the handler only from this exact priority tier; if <code>null</code>, removes it across all tiers.</td></tr>
+    <tr><td class="paramname">removeState</td><td>If <code>true</code>, also evicts any state stored under <em>key</em> .</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a838411e8d2761f35da52d8fe274fb6fa" name="a838411e8d2761f35da52d8fe274fb6fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a838411e8d2761f35da52d8fe274fb6fa">&#9670;&#160;</a></span>Off&lt; T &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void <a class="el" href="namespace_s_o_s.html#aef6622397a730015c36427c156bf8bd5">SOS.Off</a>&lt; T &gt; </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double?&#160;</td>
+          <td class="paramname"><em>order</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>removeState</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Unsubscribes a strongly-typed callback from the specified event channel. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The payload type associated with the event.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The unique event channel identifier.</td></tr>
+    <tr><td class="paramname">handler</td><td>The callback delegate to remove.</td></tr>
+    <tr><td class="paramname">order</td><td>Optional. If specified, removes the handler only from this exact priority tier; if <code>null</code>, removes it across all tiers.</td></tr>
+    <tr><td class="paramname">removeState</td><td>If <code>true</code>, also evicts any state stored under <em>key</em> .</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a8d81349b583cb595caab493ceabfd14e" name="a8d81349b583cb595caab493ceabfd14e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d81349b583cb595caab493ceabfd14e">&#9670;&#160;</a></span>On()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void SOS.On </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&#160;</td>
+          <td class="paramname"><em>handler</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>order</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subscribes a parameterless callback to the specified event channel with priority-based execution ordering. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The unique event channel identifier (see <a class="el" href="class_s_o_s_1_1_comm_keys.html" title="Centralized registry of standardized communication channel identifiers for the decoupled S....">CommKeys</a>).</td></tr>
+    <tr><td class="paramname">handler</td><td>The callback delegate invoked when the event is emitted.</td></tr>
+    <tr><td class="paramname">order</td><td>The execution priority weight. Lower values execute earlier (see <a class="el" href="class_s_o_s_1_1_event_priority.html" title="Defines canonical priority constants for deterministic execution ordering within the S....">EventPriority</a>). Defaults to <code>0.0</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Handlers execute outside internal locks, ensuring safe reentrancy and zero deadlocks. </p>
+
+</div>
+</div>
+<a id="a046e9cb0c359a0ae3de78413552a572d" name="a046e9cb0c359a0ae3de78413552a572d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a046e9cb0c359a0ae3de78413552a572d">&#9670;&#160;</a></span>On&lt; T &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void <a class="el" href="namespace_s_o_s.html#a8d81349b583cb595caab493ceabfd14e">SOS.On</a>&lt; T &gt; </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>order</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subscribes a strongly-typed callback to the specified event channel with priority-based execution ordering. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The payload type associated with the event.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The unique event channel identifier (see <a class="el" href="class_s_o_s_1_1_comm_keys.html" title="Centralized registry of standardized communication channel identifiers for the decoupled S....">CommKeys</a>).</td></tr>
+    <tr><td class="paramname">handler</td><td>The callback delegate invoked with the payload when the event is emitted.</td></tr>
+    <tr><td class="paramname">order</td><td>The execution priority weight. Lower values execute earlier (see <a class="el" href="class_s_o_s_1_1_event_priority.html" title="Defines canonical priority constants for deterministic execution ordering within the S....">EventPriority</a>). Defaults to <code>0.0</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Handlers execute outside internal locks, ensuring safe reentrancy and zero deadlocks. </p>
+
+</div>
+</div>
+<a id="a595804cc5f90a1def91db918fa35d599" name="a595804cc5f90a1def91db918fa35d599"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a595804cc5f90a1def91db918fa35d599">&#9670;&#160;</a></span>RemoveState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool SOS.RemoveState </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evicts the state value stored under the specified channel key. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The state channel identifier.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if an entry was removed; otherwise, <code>false</code>.</dd></dl>
+
+</div>
+</div>
+<a id="a2c1cd023104b81121c94da0748d883fa" name="a2c1cd023104b81121c94da0748d883fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c1cd023104b81121c94da0748d883fa">&#9670;&#160;</a></span>RemoveWindowProfile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool SOS.RemoveWindowProfile </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>onlyInstance</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Removes a window profile registration or its cached instance by identifier. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>The unique identifier of the profile.</td></tr>
+    <tr><td class="paramname">onlyInstance</td><td>If <code>true</code>, evicts only the cached instance without unregistering. Defaults to <code>false</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if found and removed; otherwise, <code>false</code>.</dd></dl>
+
+</div>
+</div>
+<a id="a2a4e72d48a6cab62958c2968bf05b72f" name="a2a4e72d48a6cab62958c2968bf05b72f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a4e72d48a6cab62958c2968bf05b72f">&#9670;&#160;</a></span>SetSearchFilter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void SOS.SetSearchFilter </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>tag</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Requests the active window profile to populate the search box with the given filter token. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td>The search token (e.g. <code>"#Medical"</code>, <code>"$surgery"</code> or <code>"@Vanilla"</code>).</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a13b05109ae945be4cdd732e7b9c97ce3" name="a13b05109ae945be4cdd732e7b9c97ce3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13b05109ae945be4cdd732e7b9c97ce3">&#9670;&#160;</a></span>SetState&lt; T &gt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void SOS.SetState&lt; T &gt; </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Func&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>method</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>emit</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Stores a dynamic state generator evaluated on-demand when read via <a class="el" href="namespace_s_o_s.html#af85bd39ed2e1eb3bc6249617c2615c99" title="Retrieves the current state value stored under the specified channel key.">GetState&lt;T&gt;(string)</a>. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The state payload type.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The state channel identifier.</td></tr>
+    <tr><td class="paramname">method</td><td>The delegate invoked on each retrieval to compute the state value.</td></tr>
+    <tr><td class="paramname">emit</td><td>If <code>true</code>, invokes the delegate immediately and emits the resulting value.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4e4b97a579a492edc2576771293d489f" name="a4e4b97a579a492edc2576771293d489f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e4b97a579a492edc2576771293d489f">&#9670;&#160;</a></span>SetState&lt; T &gt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void SOS.SetState&lt; T &gt; </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>emit</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Stores a value in the shared state cache, optionally emitting it across the channel. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The state payload type.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The state channel identifier.</td></tr>
+    <tr><td class="paramname">value</td><td>The value to store.</td></tr>
+    <tr><td class="paramname">emit</td><td>If <code>true</code>, also emits the value across the channel.</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

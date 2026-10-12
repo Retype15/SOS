@@ -80,7 +80,7 @@ $(document).ready(function(){initNavTree('interface_s_o_s_1_1_i_s_o_s_config.htm
 </div><!--header-->
 <div class="contents">
 
-<p>Defines a modular prefab inspection tab (type alias for ITab&lt;T&gt; where <code>T</code> is Barotrauma.Prefab).  
+<p>Defines an <a class="el" href="namespace_s_o_s.html">SOS</a> module acting as an extensible configuration unit with lifecycle persistence, factory defaults, and declarative UI rendering.  
  <a href="interface_s_o_s_1_1_i_s_o_s_config.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -94,13 +94,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4d7e56895a05fa42a4f66844bc9187cb" id="r_a4d7e56895a05fa42a4f66844bc9187cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_config.html#a4d7e56895a05fa42a4f66844bc9187cb">Reset</a> ()</td></tr>
 <tr class="memdesc:a4d7e56895a05fa42a4f66844bc9187cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reverts all settings managed by this configuration back to their factory default values.  <br /></td></tr>
 <tr class="separator:a4d7e56895a05fa42a4f66844bc9187cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7deffc2a4d6e1288a5538f815b94141a" id="r_a7deffc2a4d6e1288a5538f815b94141a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_config.html#a7deffc2a4d6e1288a5538f815b94141a">DrawSettings</a> (GUIListBox container)</td></tr>
-<tr class="memdesc:a7deffc2a4d6e1288a5538f815b94141a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declaratively draws the interactive settings controls for this configuration unit into the specified container.  <br /></td></tr>
-<tr class="separator:a7deffc2a4d6e1288a5538f815b94141a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8920e83a8dde18c7214a0aeac9ad68c4" id="r_a8920e83a8dde18c7214a0aeac9ad68c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_config.html#a8920e83a8dde18c7214a0aeac9ad68c4">Draw</a> (RectTransform rectT)</td></tr>
+<tr class="memdesc:a8920e83a8dde18c7214a0aeac9ad68c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the interactive configuration UI in the settings window.  <br /></td></tr>
+<tr class="separator:a8920e83a8dde18c7214a0aeac9ad68c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Defines a modular prefab inspection tab (type alias for ITab&lt;T&gt; where <code>T</code> is Barotrauma.Prefab). </p>
-<p>Defines an extensible configuration unit with lifecycle persistence, factory defaults, and declarative UI rendering.</p>
+<div class="textblock"><p>Defines an <a class="el" href="namespace_s_o_s.html">SOS</a> module acting as an extensible configuration unit with lifecycle persistence, factory defaults, and declarative UI rendering. </p>
 <p>Implementations are managed through API and integrate with Configs.ConfigDirtySaver to buffer changes and persist them safely using Barotrauma's LuaCs config service. </p>
 <p><b>Lifecycle Methods:</b> </p><ul>
 <li>
@@ -110,7 +109,7 @@ Save:Invoked on window dismissal or round transitions to serialize modified valu
 <li>
 Reset:Restores all settings managed by this unit to their default values. </li>
 <li>
-DrawSettings:Constructs the interactive configuration UI in the settings window using GUI.GUILayoutBuilder. </li>
+Draw:Constructs the interactive configuration UI in the settings window using GUI.GUILayoutBuilder. </li>
 </ul>
 <div class="fragment"><div class="line">[AutoRegister(<span class="stringliteral">&quot;MyMod.Settings&quot;</span>, order: 5.0)]</div>
 <div class="line">public class MyModSettings : ConfigDirtySaver, <a class="code hl_interface" href="interface_s_o_s_1_1_i_s_o_s_config.html">ISOSConfig</a></div>
@@ -118,42 +117,43 @@ DrawSettings:Constructs the interactive configuration UI in the settings window 
 <div class="line">    <span class="keyword">public</span> <span class="keywordtype">void</span> Load() { <span class="comment">/* ... &lt;em&gt;&amp;zwj;/ }</span></div>
 <div class="line"><span class="comment">    public void Save() { /&lt;/em&gt; ... &lt;em&gt;&amp;zwj;/ }</span></div>
 <div class="line"><span class="comment">    public void Reset() { /&lt;/em&gt; ... *&amp;zwj;/ }</span></div>
-<div class="line"><span class="comment">    public bool DrawSettings(GUIListBox container)</span></div>
+<div class="line"><span class="comment">    public void Draw(RectTransform rectT)</span></div>
 <div class="line"><span class="comment">    {</span></div>
 <div class="line"><span class="comment">        using var l = new GUILayoutBuilder(container);</span></div>
 <div class="line"><span class="comment">        l.Header(&quot;MY MOD CONFIG&quot;, Color.Gold);</span></div>
 <div class="line"><span class="comment">        l.ButtonToResetSection(this);</span></div>
-<div class="line"><span class="comment">        return true;</span></div>
+<div class="line"><span class="comment">        return;</span></div>
 <div class="line"><span class="comment">    }</span></div>
 <div class="line"><span class="comment">}</span></div>
-<div class="ttc" id="ainterface_s_o_s_1_1_i_s_o_s_config_html"><div class="ttname"><a href="interface_s_o_s_1_1_i_s_o_s_config.html">SOS.ISOSConfig</a></div><div class="ttdoc">Defines a modular prefab inspection tab (type alias for ITab&lt;T&gt; where T is Barotrauma....</div><div class="ttdef"><b>Definition</b> <a href="_data_8cs_source.html#l00272">Data.cs:273</a></div></div>
+<div class="ttc" id="ainterface_s_o_s_1_1_i_s_o_s_config_html"><div class="ttname"><a href="interface_s_o_s_1_1_i_s_o_s_config.html">SOS.ISOSConfig</a></div><div class="ttdoc">Defines an SOS module acting as an extensible configuration unit with lifecycle persistence,...</div><div class="ttdef"><b>Definition</b> <a href="_data_8cs_source.html#l00248">Data.cs:249</a></div></div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="_data_8cs_source.html#l00272">272</a> of file <a class="el" href="_data_8cs_source.html">Data.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_data_8cs_source.html#l00248">248</a> of file <a class="el" href="_data_8cs_source.html">Data.cs</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a7deffc2a4d6e1288a5538f815b94141a" name="a7deffc2a4d6e1288a5538f815b94141a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7deffc2a4d6e1288a5538f815b94141a">&#9670;&#160;</a></span>DrawSettings()</h2>
+<a id="a8920e83a8dde18c7214a0aeac9ad68c4" name="a8920e83a8dde18c7214a0aeac9ad68c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8920e83a8dde18c7214a0aeac9ad68c4">&#9670;&#160;</a></span>Draw()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool SOS.ISOSConfig.DrawSettings </td>
+          <td class="memname">void SOS.ISOSConfig.Draw </td>
           <td>(</td>
-          <td class="paramtype">GUIListBox&#160;</td>
-          <td class="paramname"><em>container</em></td><td>)</td>
+          <td class="paramtype">RectTransform&#160;</td>
+          <td class="paramname"><em>rectT</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Declaratively draws the interactive settings controls for this configuration unit into the specified container. </p>
+<p>Constructs the interactive configuration UI in the settings window. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">container</td><td>The list box container in the settings window where controls will be appended.</td></tr>
+    <tr><td class="paramname">rectT</td><td>Dedicated layout space provided by the host. Build a GUI.GUILayoutBuilder on it.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if any UI controls were drawn; otherwise, <code>false</code>.</dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_data_8cs_source.html#l00269">269</a> of file <a class="el" href="_data_8cs_source.html">Data.cs</a>.</p>
 
 </div>
 </div>
@@ -193,7 +193,7 @@ DrawSettings:Constructs the interactive configuration UI in the settings window 
 
 <p>Reverts all settings managed by this configuration back to their factory default values. </p>
 
-<p class="definition">Definition at line <a class="el" href="_data_8cs_source.html#l00287">287</a> of file <a class="el" href="_data_8cs_source.html">Data.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_data_8cs_source.html#l00263">263</a> of file <a class="el" href="_data_8cs_source.html">Data.cs</a>.</p>
 
 </div>
 </div>

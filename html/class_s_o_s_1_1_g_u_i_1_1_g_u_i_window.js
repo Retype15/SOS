@@ -11,6 +11,7 @@ var class_s_o_s_1_1_g_u_i_1_1_g_u_i_window =
     [ "CloseButton", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_window.html#a24108a3236529223d8c5da27a7ec6338", null ],
     [ "ContentArea", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_window.html#a2b1f2653241ef363bda77753ac6ad205", null ],
     [ "ControlBox", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_window.html#acf6713df82c8514d5bfe00f24f5b125b", null ],
+    [ "DefaultHeaderHeight", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_window.html#ae7859f3f072b030c829dce2f495fdaa9", null ],
     [ "MaximizeButton", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_window.html#add0f6d44fa9d844f38623b4b49f124fc", null ],
     [ "MinimizeButton", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_window.html#a7afe7863d55b66d8d9458af5789b7947", null ],
     [ "RightArea", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_window.html#a43dc55f0e8ea17d32c09a5ad590e17ab", null ],

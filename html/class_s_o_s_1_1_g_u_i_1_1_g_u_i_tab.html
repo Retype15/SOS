@@ -76,6 +76,8 @@ $(document).ready(function(){initNavTree('class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.ht
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#properties">Properties</a> &#124;
 <a href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">SOS.GUI.GUITab&lt; T &gt; Class Template Reference</div></div>
@@ -93,39 +95,66 @@ Inheritance diagram for SOS.GUI.GUITab&lt; T &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa8414300c2834d49a48d51e5ed091890" id="r_aa8414300c2834d49a48d51e5ed091890"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#aa8414300c2834d49a48d51e5ed091890">GUITab</a> (RectTransform rectT, Action&lt; T &gt; onPrimary, Action&lt; T &gt; onSecondary)</td></tr>
-<tr class="memdesc:aa8414300c2834d49a48d51e5ed091890"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new tabbed interface container.  <br /></td></tr>
-<tr class="separator:aa8414300c2834d49a48d51e5ed091890"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07b0d7bfb1ee1dfe4adfafa57fab04c5" id="r_a07b0d7bfb1ee1dfe4adfafa57fab04c5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a07b0d7bfb1ee1dfe4adfafa57fab04c5">RegisterTab</a> (<a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt; tab)</td></tr>
-<tr class="memdesc:a07b0d7bfb1ee1dfe4adfafa57fab04c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a tab with the tab container.  <br /></td></tr>
-<tr class="separator:a07b0d7bfb1ee1dfe4adfafa57fab04c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9384158a088dba87005316a923730a0e" id="r_a9384158a088dba87005316a923730a0e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a9384158a088dba87005316a923730a0e">GUITab</a> (RectTransform rectT)</td></tr>
+<tr class="memdesc:a9384158a088dba87005316a923730a0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new tabbed interface container.  <br /></td></tr>
+<tr class="separator:a9384158a088dba87005316a923730a0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaae4bc8c5865c7cb08f67f0b514a904e" id="r_aaae4bc8c5865c7cb08f67f0b514a904e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#aaae4bc8c5865c7cb08f67f0b514a904e">RegisterTab</a> (<a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt; tab, string id)</td></tr>
+<tr class="memdesc:aaae4bc8c5865c7cb08f67f0b514a904e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a tab with the tab container.  <br /></td></tr>
+<tr class="separator:aaae4bc8c5865c7cb08f67f0b514a904e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a339f858482505ef8429702323ade74d6" id="r_a339f858482505ef8429702323ade74d6"><td class="memItemLeft" align="right" valign="top">GUIButton?&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a339f858482505ef8429702323ade74d6">GetTabButton</a> (<a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt; tab)</td></tr>
+<tr class="memdesc:a339f858482505ef8429702323ade74d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the button stored for the given tab.  <br /></td></tr>
+<tr class="separator:a339f858482505ef8429702323ade74d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ebc78dcfa023ea0bd6a095e941af7ae" id="r_a9ebc78dcfa023ea0bd6a095e941af7ae"><td class="memItemLeft" align="right" valign="top">GUIButton?&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a9ebc78dcfa023ea0bd6a095e941af7ae">GetTabButton</a> (string id)</td></tr>
+<tr class="memdesc:a9ebc78dcfa023ea0bd6a095e941af7ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the button stored for the tab matching the given identifier.  <br /></td></tr>
+<tr class="separator:a9ebc78dcfa023ea0bd6a095e941af7ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd1327d93f9659d2a8d34953e191041c" id="r_acd1327d93f9659d2a8d34953e191041c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#acd1327d93f9659d2a8d34953e191041c">UpdateTabs</a> (T target)</td></tr>
 <tr class="memdesc:acd1327d93f9659d2a8d34953e191041c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the tab list for a new target item, filtering tabs by their ITab&lt;T&gt;.CanHandle method.  <br /></td></tr>
 <tr class="separator:acd1327d93f9659d2a8d34953e191041c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa0bee2f9599e5369b35fc51d1fc3409" id="r_afa0bee2f9599e5369b35fc51d1fc3409"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#afa0bee2f9599e5369b35fc51d1fc3409">TrySelectTab</a> (string tabId)</td></tr>
-<tr class="memdesc:afa0bee2f9599e5369b35fc51d1fc3409"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to select a tab by its identifier.  <br /></td></tr>
-<tr class="separator:afa0bee2f9599e5369b35fc51d1fc3409"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a001d9a026b8eb7331596afda8ed48f74" id="r_a001d9a026b8eb7331596afda8ed48f74"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a001d9a026b8eb7331596afda8ed48f74">TrySelectTab</a> (string id)</td></tr>
+<tr class="memdesc:a001d9a026b8eb7331596afda8ed48f74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to select a tab by its identifier.  <br /></td></tr>
+<tr class="separator:a001d9a026b8eb7331596afda8ed48f74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37300d59cd81e0eecde2e5f91c90121b" id="r_a37300d59cd81e0eecde2e5f91c90121b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a37300d59cd81e0eecde2e5f91c90121b">TrySelectTab</a> (<a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt; tab)</td></tr>
 <tr class="memdesc:a37300d59cd81e0eecde2e5f91c90121b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to select a specific tab instance.  <br /></td></tr>
 <tr class="separator:a37300d59cd81e0eecde2e5f91c90121b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adde8aa3fdb85b420c2630a459f871fa0" id="r_adde8aa3fdb85b420c2630a459f871fa0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#adde8aa3fdb85b420c2630a459f871fa0">SelectTab</a> (<a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt; tab)</td></tr>
-<tr class="memdesc:adde8aa3fdb85b420c2630a459f871fa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Selects the specified tab as the active tab.  <br /></td></tr>
-<tr class="separator:adde8aa3fdb85b420c2630a459f871fa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa40a3bc906c985b7a2ffcd202da3ee2c" id="r_aa40a3bc906c985b7a2ffcd202da3ee2c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#aa40a3bc906c985b7a2ffcd202da3ee2c">SelectTab</a> (string id)</td></tr>
+<tr class="memdesc:aa40a3bc906c985b7a2ffcd202da3ee2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Selects the tab matching the given identifier.  <br /></td></tr>
+<tr class="separator:aa40a3bc906c985b7a2ffcd202da3ee2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a383ac77f4d10c0a0c0a0f4b91f00d576" id="r_a383ac77f4d10c0a0c0a0f4b91f00d576"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a383ac77f4d10c0a0c0a0f4b91f00d576">SelectTab</a> (<a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt; tab)</td></tr>
+<tr class="memdesc:a383ac77f4d10c0a0c0a0f4b91f00d576"><td class="mdescLeft">&#160;</td><td class="mdescRight">Selects the specified tab as the active tab.  <br /></td></tr>
+<tr class="separator:a383ac77f4d10c0a0c0a0f4b91f00d576"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a254b53f88e9c22422afe98872b7898f9" id="r_a254b53f88e9c22422afe98872b7898f9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a254b53f88e9c22422afe98872b7898f9">HideTab</a> (<a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt; tab)</td></tr>
+<tr class="memdesc:a254b53f88e9c22422afe98872b7898f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hides the content frame and tab bar button of the given tab without unregistering it.  <br /></td></tr>
+<tr class="separator:a254b53f88e9c22422afe98872b7898f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a355ba383961cdc44c8bd4e31f1b6c832" id="r_a355ba383961cdc44c8bd4e31f1b6c832"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a355ba383961cdc44c8bd4e31f1b6c832">HideTab</a> (string id)</td></tr>
+<tr class="memdesc:a355ba383961cdc44c8bd4e31f1b6c832"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hides the content frame and tab bar button of the tab matching the given identifier, without unregistering it.  <br /></td></tr>
+<tr class="separator:a355ba383961cdc44c8bd4e31f1b6c832"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8955d697af2c87e3a904dec22062ebbc" id="r_a8955d697af2c87e3a904dec22062ebbc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a8955d697af2c87e3a904dec22062ebbc">RemoveTab</a> (<a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt; tab)</td></tr>
+<tr class="memdesc:a8955d697af2c87e3a904dec22062ebbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the given tab from the widget, retiring its content frame and tab bar button from the layout.  <br /></td></tr>
+<tr class="separator:a8955d697af2c87e3a904dec22062ebbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a900bc0535a6990e3f22fa957eb093720" id="r_a900bc0535a6990e3f22fa957eb093720"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a900bc0535a6990e3f22fa957eb093720">RemoveTab</a> (string id)</td></tr>
+<tr class="memdesc:a900bc0535a6990e3f22fa957eb093720"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the tab matching the given identifier from the widget, retiring its content frame and tab bar button from the layout.  <br /></td></tr>
+<tr class="separator:a900bc0535a6990e3f22fa957eb093720"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73d1b07cc4bae23dd33cedbc708c4d57" id="r_a73d1b07cc4bae23dd33cedbc708c4d57"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a73d1b07cc4bae23dd33cedbc708c4d57">Dispose</a> ()</td></tr>
 <tr class="memdesc:a73d1b07cc4bae23dd33cedbc708c4d57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disposes the tab container and all registered tabs.  <br /></td></tr>
 <tr class="separator:a73d1b07cc4bae23dd33cedbc708c4d57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a145eebbb943b76bd0472c6f2830cc856" id="r_a145eebbb943b76bd0472c6f2830cc856"><td class="memItemLeft" align="right" valign="top">Action&lt; <a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt; &gt;?&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a145eebbb943b76bd0472c6f2830cc856">OnTabSelected</a></td></tr>
-<tr class="memdesc:a145eebbb943b76bd0472c6f2830cc856"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event invoked when the active tab changes.  <br /></td></tr>
-<tr class="separator:a145eebbb943b76bd0472c6f2830cc856"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a387eaeb5ba43cdbf26255dc1306fc36e" id="r_a387eaeb5ba43cdbf26255dc1306fc36e"><td class="memItemLeft" align="right" valign="top">Action&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a387eaeb5ba43cdbf26255dc1306fc36e">OnPrimary</a></td></tr>
-<tr class="memdesc:a387eaeb5ba43cdbf26255dc1306fc36e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Action invoked when a primary interaction occurs on a prefab in the active tab.  <br /></td></tr>
-<tr class="separator:a387eaeb5ba43cdbf26255dc1306fc36e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e39acd468b40fc8227db134cabeab6a" id="r_a6e39acd468b40fc8227db134cabeab6a"><td class="memItemLeft" align="right" valign="top">Action&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a6e39acd468b40fc8227db134cabeab6a">OnSecondary</a></td></tr>
-<tr class="memdesc:a6e39acd468b40fc8227db134cabeab6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Action invoked when a secondary interaction occurs on a prefab in the active tab.  <br /></td></tr>
-<tr class="separator:a6e39acd468b40fc8227db134cabeab6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f6ed7de105f5694e5b0b6170681081b" id="r_a3f6ed7de105f5694e5b0b6170681081b"><td class="memItemLeft" align="right" valign="top">Action&lt; string &gt;?&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a3f6ed7de105f5694e5b0b6170681081b">OnTabSelected</a></td></tr>
+<tr class="memdesc:a3f6ed7de105f5694e5b0b6170681081b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event invoked when the active tab changes.  <br /></td></tr>
+<tr class="separator:a3f6ed7de105f5694e5b0b6170681081b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:ac4ed53422e1c56727a0108c9d01966ff" id="r_ac4ed53422e1c56727a0108c9d01966ff"><td class="memItemLeft" align="right" valign="top">record&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#ac4ed53422e1c56727a0108c9d01966ff">TabData</a> (Identifier Id, <a class="el" href="interface_s_o_s_1_1_i_tab.html">SOS.ITab</a>&lt; T &gt; Tab, Barotrauma.GUIFrame Content, Barotrauma.GUIButton Button)</td></tr>
+<tr class="memdesc:ac4ed53422e1c56727a0108c9d01966ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">A registered tab alongside its owned content frame and tab bar button.  <br /></td></tr>
+<tr class="separator:ac4ed53422e1c56727a0108c9d01966ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a4fc7d42357e6f19fcfd1010b627611be" id="r_a4fc7d42357e6f19fcfd1010b627611be"><td class="memItemLeft" align="right" valign="top">readonly List&lt; <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#ac4ed53422e1c56727a0108c9d01966ff">TabData</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#a4fc7d42357e6f19fcfd1010b627611be">tabs</a> = []</td></tr>
+<tr class="memdesc:a4fc7d42357e6f19fcfd1010b627611be"><td class="mdescLeft">&#160;</td><td class="mdescRight">The registered tabs alongside their content frames and buttons.  <br /></td></tr>
+<tr class="separator:a4fc7d42357e6f19fcfd1010b627611be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="properties" name="properties"></a>
 Properties</h2></td></tr>
@@ -141,12 +170,12 @@ Properties</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>Manages a list of ITab&lt;T&gt; instances, providing a button bar for tab selection and a content area for the active tab. Tabs are filtered by their ITab&lt;T&gt;.CanHandle method. </p>
+<p>Manages a list of ITab&lt;T&gt; instances, providing a button bar for tab selection and a content area for the active tab. Tabs are filtered by their ITab&lt;T&gt;.CanHandle method. Each tab owns a dedicated content frame and button, both created once in RegisterTab and stored alongside the tab; the widget owns their visibility exclusively. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00022">22</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00024">24</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aa8414300c2834d49a48d51e5ed091890" name="aa8414300c2834d49a48d51e5ed091890"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8414300c2834d49a48d51e5ed091890">&#9670;&#160;</a></span>GUITab()</h2>
+<a id="a9384158a088dba87005316a923730a0e" name="a9384158a088dba87005316a923730a0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9384158a088dba87005316a923730a0e">&#9670;&#160;</a></span>GUITab()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -155,24 +184,8 @@ Properties</h2></td></tr>
           <td class="memname"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.<a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">GUITab</a> </td>
           <td>(</td>
           <td class="paramtype">RectTransform&#160;</td>
-          <td class="paramname"><em>rectT</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>rectT</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">Action&lt; T &gt;&#160;</td>
-          <td class="paramname"><em>onPrimary</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Action&lt; T &gt;&#160;</td>
-          <td class="paramname"><em>onSecondary</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -181,14 +194,12 @@ Properties</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">rectT</td><td>The rectangle transform for positioning and sizing.</td></tr>
-    <tr><td class="paramname">onPrimary</td><td>Action to invoke on primary interaction with a tab item.</td></tr>
-    <tr><td class="paramname">onSecondary</td><td>Action to invoke on secondary interaction with a tab item.</td></tr>
   </table>
   </dd>
 </dl>
 <p>Initializes a vertical layout with a button area (8% height) and content area (92% height). The button area is a horizontal list box with 32px fixed height for tab buttons. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00081">81</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00080">80</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
 
 </div>
 </div>
@@ -209,20 +220,20 @@ Properties</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Disposes the tab container and all registered tabs. </p>
-<p>Clears the button area, disposes all tabs that implement IDisposable, clears the tab list, and suppresses finalization. </p>
+<p>Clears the button area and the owned content frames, disposes all tabs that implement IDisposable, clears the tab list, and suppresses finalization. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00267">267</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00471">471</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
 
 </div>
 </div>
-<a id="a07b0d7bfb1ee1dfe4adfafa57fab04c5" name="a07b0d7bfb1ee1dfe4adfafa57fab04c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a07b0d7bfb1ee1dfe4adfafa57fab04c5">&#9670;&#160;</a></span>RegisterTab()</h2>
+<a id="a339f858482505ef8429702323ade74d6" name="a339f858482505ef8429702323ade74d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a339f858482505ef8429702323ade74d6">&#9670;&#160;</a></span>GetTabButton() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.RegisterTab </td>
+          <td class="memname">GUIButton? <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.GetTabButton </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt;&#160;</td>
           <td class="paramname"><em>tab</em></td><td>)</td>
@@ -231,27 +242,204 @@ Properties</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Registers a tab with the tab container. </p>
+<p>Gets the button stored for the given tab. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">tab</td><td>The tab to register.</td></tr>
+    <tr><td class="paramname">tab</td><td>The tab whose button to retrieve.</td></tr>
   </table>
   </dd>
 </dl>
-<p>Calls ITab&lt;T&gt;.Init with the content area, then adds the tab to the internal list. If initialization throws an exception, it is caught and logged via Logger. </p>
+<dl class="section return"><dt>Returns</dt><dd>The stored GUIButton; or <code>null</code> if the tab is not registered.</dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00116">116</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00196">196</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
 
 </div>
 </div>
-<a id="adde8aa3fdb85b420c2630a459f871fa0" name="adde8aa3fdb85b420c2630a459f871fa0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adde8aa3fdb85b420c2630a459f871fa0">&#9670;&#160;</a></span>SelectTab()</h2>
+<a id="a9ebc78dcfa023ea0bd6a095e941af7ae" name="a9ebc78dcfa023ea0bd6a095e941af7ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ebc78dcfa023ea0bd6a095e941af7ae">&#9670;&#160;</a></span>GetTabButton() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.SelectTab </td>
+          <td class="memname">GUIButton? <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.GetTabButton </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the button stored for the tab matching the given identifier. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>The registration identifier of the tab.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The stored GUIButton; or <code>null</code> if no tab matches <em>id</em> .</dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00208">208</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+
+</div>
+</div>
+<a id="a254b53f88e9c22422afe98872b7898f9" name="a254b53f88e9c22422afe98872b7898f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a254b53f88e9c22422afe98872b7898f9">&#9670;&#160;</a></span>HideTab() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.HideTab </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>tab</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Hides the content frame and tab bar button of the given tab without unregistering it. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tab</td><td>The tab to hide.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the tab was found; otherwise, <code>false</code>.</dd></dl>
+
+</div>
+</div>
+<a id="a355ba383961cdc44c8bd4e31f1b6c832" name="a355ba383961cdc44c8bd4e31f1b6c832"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a355ba383961cdc44c8bd4e31f1b6c832">&#9670;&#160;</a></span>HideTab() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.HideTab </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Hides the content frame and tab bar button of the tab matching the given identifier, without unregistering it. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>The registration identifier of the tab.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if a matching tab was found; otherwise, <code>false</code>.</dd></dl>
+
+</div>
+</div>
+<a id="aaae4bc8c5865c7cb08f67f0b514a904e" name="aaae4bc8c5865c7cb08f67f0b514a904e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaae4bc8c5865c7cb08f67f0b514a904e">&#9670;&#160;</a></span>RegisterTab()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.RegisterTab </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>tab</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Registers a tab with the tab container. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tab</td><td>The tab to register.</td></tr>
+    <tr><td class="paramname">id</td><td>The registration identifier of the tab. Used for localization and selection history.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Creates the owned content frame, asks the tab for its button via ITab&lt;T&gt;.CreateTabButton, calls ITab&lt;T&gt;.Init, wires the click handler once, stores all four in the internal list, and catches up with ITab&lt;T&gt;.Update when a valid target already exists. If initialization throws an exception, the created frames are discarded, the error is logged via Logger, and the tab is ignored. </p>
+
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00118">118</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+
+</div>
+</div>
+<a id="a8955d697af2c87e3a904dec22062ebbc" name="a8955d697af2c87e3a904dec22062ebbc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8955d697af2c87e3a904dec22062ebbc">&#9670;&#160;</a></span>RemoveTab() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.RemoveTab </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>tab</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Removes the given tab from the widget, retiring its content frame and tab bar button from the layout. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tab</td><td>The tab to remove.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the tab was found and removed; otherwise, <code>false</code>.</dd></dl>
+
+</div>
+</div>
+<a id="a900bc0535a6990e3f22fa957eb093720" name="a900bc0535a6990e3f22fa957eb093720"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a900bc0535a6990e3f22fa957eb093720">&#9670;&#160;</a></span>RemoveTab() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.RemoveTab </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Removes the tab matching the given identifier from the widget, retiring its content frame and tab bar button from the layout. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>The registration identifier of the tab.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if a matching tab was found; otherwise, <code>false</code>.</dd></dl>
+
+</div>
+</div>
+<a id="a383ac77f4d10c0a0c0a0f4b91f00d576" name="a383ac77f4d10c0a0c0a0f4b91f00d576"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a383ac77f4d10c0a0c0a0f4b91f00d576">&#9670;&#160;</a></span>SelectTab() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.SelectTab </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt; T &gt;&#160;</td>
           <td class="paramname"><em>tab</em></td><td>)</td>
@@ -263,14 +451,114 @@ Properties</h2></td></tr>
 <p>Selects the specified tab as the active tab. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">tab</td><td>The tab to select.</td></tr>
+    <tr><td class="paramname">tab</td><td>The tab to select. Must be registered in the widget.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the tab was selected (or was already active).</dd></dl>
-<p>If the tab is already active, returns <code>true</code> immediately. Otherwise, sets the tab as active, invokes OnTabSelected, rebuilds the button area with the new active state, and refreshes the tab content. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">ArgumentException</td><td>The tab is not registered in the widget.</td></tr>
+    <tr><td class="paramname">InvalidOperationException</td><td>There is no current target, or the tab cannot handle it.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>If the tab is already active, returns immediately. Otherwise, sets the tab as active, invokes OnTabSelected, flips the stored content visibility and button selection states, and rebuilds the tab via ITab&lt;T&gt;.Update. Buttons are never rebuilt here. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00216">216</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00374">374</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+
+</div>
+</div>
+<a id="aa40a3bc906c985b7a2ffcd202da3ee2c" name="aa40a3bc906c985b7a2ffcd202da3ee2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa40a3bc906c985b7a2ffcd202da3ee2c">&#9670;&#160;</a></span>SelectTab() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.SelectTab </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Selects the tab matching the given identifier. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>The registration identifier of the tab.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">ArgumentException</td><td>No registered tab matches <em>id</em> .</td></tr>
+    <tr><td class="paramname">InvalidOperationException</td><td>There is no current target, or the tab cannot handle it.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00352">352</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+
+</div>
+</div>
+<a id="ac4ed53422e1c56727a0108c9d01966ff" name="ac4ed53422e1c56727a0108c9d01966ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4ed53422e1c56727a0108c9d01966ff">&#9670;&#160;</a></span>TabData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">record <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.TabData </td>
+          <td>(</td>
+          <td class="paramtype">Identifier&#160;</td>
+          <td class="paramname"><em>Id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="interface_s_o_s_1_1_i_tab.html">SOS.ITab</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>Tab</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Barotrauma.GUIFrame&#160;</td>
+          <td class="paramname"><em>Content</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Barotrauma.GUIButton&#160;</td>
+          <td class="paramname"><em>Button</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A registered tab alongside its owned content frame and tab bar button. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Id</td><td>The registration identifier of the tab (registry key, case-insensitive).</td></tr>
+    <tr><td class="paramname">Tab</td><td>The tab <a class="el" href="namespace_s_o_s.html">SOS</a> module.</td></tr>
+    <tr><td class="paramname">Content</td><td>The content frame owned by the widget.</td></tr>
+    <tr><td class="paramname">Button</td><td>The tab bar button owned by the widget.</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -298,14 +586,14 @@ Properties</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the tab was found and selected; <code>false</code> otherwise.</dd></dl>
-<p>Returns <code>false</code> if the tab is not registered, or if it cannot handle the current target. </p>
+<p>Returns <code>false</code> if the tab cannot be selected; implemented on top of SelectTab(ITab&lt;T&gt;) with selection errors swallowed. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00199">199</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00331">331</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
 
 </div>
 </div>
-<a id="afa0bee2f9599e5369b35fc51d1fc3409" name="afa0bee2f9599e5369b35fc51d1fc3409"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa0bee2f9599e5369b35fc51d1fc3409">&#9670;&#160;</a></span>TrySelectTab() <span class="overload">[2/2]</span></h2>
+<a id="a001d9a026b8eb7331596afda8ed48f74" name="a001d9a026b8eb7331596afda8ed48f74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a001d9a026b8eb7331596afda8ed48f74">&#9670;&#160;</a></span>TrySelectTab() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -314,7 +602,7 @@ Properties</h2></td></tr>
           <td class="memname">bool <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.TrySelectTab </td>
           <td>(</td>
           <td class="paramtype">string&#160;</td>
-          <td class="paramname"><em>tabId</em></td><td>)</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -323,14 +611,14 @@ Properties</h2></td></tr>
 <p>Attempts to select a tab by its identifier. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">tabId</td><td>The identifier of the tab to select.</td></tr>
+    <tr><td class="paramname">id</td><td>The identifier of the tab to select.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the tab was found and selected; <code>false</code> otherwise.</dd></dl>
-<p>Returns <code>false</code> if there is no current target, the tab ID is not found, or the tab cannot handle the current target. </p>
+<p>Returns <code>false</code> if the tab ID is not found or cannot be selected; implemented on top of SelectTab(string) with selection errors swallowed. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00182">182</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00314">314</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
 
 </div>
 </div>
@@ -357,65 +645,55 @@ Properties</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>Clears the button area and rebuilds it with tabs that can handle the target. If the current active tab can't handle the new target, the first valid tab is selected. If there's only one valid tab, the button area is hidden and the content area fills the full height. </p>
+<p>Broadcasts the target to every tab via ITab&lt;T&gt;.CanHandle, falls back ActiveTab when it no longer applies, flips stored content and button visibility, then rebuilds the active tab only via ITab&lt;T&gt;.Update. If there's only one valid tab, the button area is hidden and the content area fills the full height. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00139">139</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00225">225</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a387eaeb5ba43cdbf26255dc1306fc36e" name="a387eaeb5ba43cdbf26255dc1306fc36e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a387eaeb5ba43cdbf26255dc1306fc36e">&#9670;&#160;</a></span>OnPrimary</h2>
+<a id="a3f6ed7de105f5694e5b0b6170681081b" name="a3f6ed7de105f5694e5b0b6170681081b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f6ed7de105f5694e5b0b6170681081b">&#9670;&#160;</a></span>OnTabSelected</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Action&lt;T&gt; <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.OnPrimary</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Action invoked when a primary interaction occurs on a prefab in the active tab. </p>
-
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00064">64</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
-
-</div>
-</div>
-<a id="a6e39acd468b40fc8227db134cabeab6a" name="a6e39acd468b40fc8227db134cabeab6a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e39acd468b40fc8227db134cabeab6a">&#9670;&#160;</a></span>OnSecondary</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Action&lt;T&gt; <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.OnSecondary</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Action invoked when a secondary interaction occurs on a prefab in the active tab. </p>
-
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00069">69</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
-
-</div>
-</div>
-<a id="a145eebbb943b76bd0472c6f2830cc856" name="a145eebbb943b76bd0472c6f2830cc856"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a145eebbb943b76bd0472c6f2830cc856">&#9670;&#160;</a></span>OnTabSelected</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Action&lt;<a class="el" href="interface_s_o_s_1_1_i_tab.html">ITab</a>&lt;T&gt; &gt;? <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.OnTabSelected</td>
+          <td class="memname">Action&lt;string&gt;? <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.OnTabSelected</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Event invoked when the active tab changes. </p>
-<p>The parameter is the newly selected tab. </p>
+<p>The parameter is the registration identifier of the newly selected tab. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00054">54</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00065">65</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+
+</div>
+</div>
+<a id="a4fc7d42357e6f19fcfd1010b627611be" name="a4fc7d42357e6f19fcfd1010b627611be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fc7d42357e6f19fcfd1010b627611be">&#9670;&#160;</a></span>tabs</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">readonly List&lt;<a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html#ac4ed53422e1c56727a0108c9d01966ff">TabData</a>&gt; <a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_tab.html">SOS.GUI.GUITab</a>&lt; T &gt;.tabs = []</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The registered tabs alongside their content frames and buttons. </p>
+
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00052">52</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
 
 </div>
 </div>
@@ -442,7 +720,7 @@ Properties</h2></td></tr>
 
 <p>Gets the currently active tab, or null if no tab is selected. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00046">46</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_tab_8cs_source.html#l00057">57</a> of file <a class="el" href="_g_u_i_tab_8cs_source.html">GUITab.cs</a>.</p>
 
 </div>
 </div>

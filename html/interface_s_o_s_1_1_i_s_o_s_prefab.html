@@ -75,60 +75,48 @@ $(document).ready(function(){initNavTree('interface_s_o_s_1_1_i_s_o_s_prefab.htm
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#properties">Properties</a> &#124;
 <a href="interface_s_o_s_1_1_i_s_o_s_prefab-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">SOS.ISOSPrefab Interface Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Defines an extensible prefab data source that feeds entities into the S.O.S. left sidebar browser.  
+<p>Defines an <a class="el" href="namespace_s_o_s.html">SOS</a> module acting as an extensible prefab data source that feeds entities into the S.O.S. left sidebar browser.  
  <a href="interface_s_o_s_1_1_i_s_o_s_prefab.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a14d973bbf813328217c15357786e90c5" id="r_a14d973bbf813328217c15357786e90c5"><td class="memItemLeft" align="right" valign="top">IEnumerable&lt; Prefab &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_prefab.html#a14d973bbf813328217c15357786e90c5">GetAll</a> (<a class="el" href="interface_s_o_s_1_1_i_s_o_s_prefab_filter.html">ISOSPrefabFilter</a> filter)</td></tr>
-<tr class="memdesc:a14d973bbf813328217c15357786e90c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queries and yields all prefabs provided by this source that satisfy the specified <em>filter</em> .  <br /></td></tr>
-<tr class="separator:a14d973bbf813328217c15357786e90c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35f486f23fbe0895d4000bfc2511ac31" id="r_a35f486f23fbe0895d4000bfc2511ac31"><td class="memItemLeft" align="right" valign="top">List&lt; ContextMenuOption &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_prefab.html#a35f486f23fbe0895d4000bfc2511ac31">BuildContextOptions</a> (Prefab prefab)</td></tr>
-<tr class="memdesc:a35f486f23fbe0895d4000bfc2511ac31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs right-click contextual action options for an entity belonging to this provider.  <br /></td></tr>
-<tr class="separator:a35f486f23fbe0895d4000bfc2511ac31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="properties" name="properties"></a>
-Properties</h2></td></tr>
-<tr class="memitem:a9fec31c1522e429722826e54e628cd13" id="r_a9fec31c1522e429722826e54e628cd13"><td class="memItemLeft" align="right" valign="top">Type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_prefab.html#a9fec31c1522e429722826e54e628cd13">PrefabType</a><code> [get]</code></td></tr>
-<tr class="memdesc:a9fec31c1522e429722826e54e628cd13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the base entity type provided by this source (e.g., Barotrauma.ItemPrefab or Barotrauma.AfflictionPrefab).  <br /></td></tr>
-<tr class="separator:a9fec31c1522e429722826e54e628cd13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5897d2f1927b03c024f0a925e81cdeca" id="r_a5897d2f1927b03c024f0a925e81cdeca"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_prefab.html#a5897d2f1927b03c024f0a925e81cdeca">Header</a><code> [get]</code></td></tr>
-<tr class="memdesc:a5897d2f1927b03c024f0a925e81cdeca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the section header title rendered above this provider's items in the browser list.  <br /></td></tr>
-<tr class="separator:a5897d2f1927b03c024f0a925e81cdeca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa349b1d29bd7dcdadde703277b55a120" id="r_aa349b1d29bd7dcdadde703277b55a120"><td class="memItemLeft" align="right" valign="top">IEnumerable&lt; Prefab &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_prefab.html#aa349b1d29bd7dcdadde703277b55a120">GetPrefabs</a> (<a class="el" href="interface_s_o_s_1_1_i_prefab_filter.html">IPrefabFilter</a> filter)</td></tr>
+<tr class="memdesc:aa349b1d29bd7dcdadde703277b55a120"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queries and yields all prefabs provided by this source that satisfy the specified <em>filter</em> . A provider serves its own prefabs whatever their runtime types are; related subtypes stay grouped by the browser.  <br /></td></tr>
+<tr class="separator:aa349b1d29bd7dcdadde703277b55a120"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19a4f93014c4be4d1a41531b5e095d35" id="r_a19a4f93014c4be4d1a41531b5e095d35"><td class="memItemLeft" align="right" valign="top">List&lt; ContextMenuOption &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_prefab.html#a19a4f93014c4be4d1a41531b5e095d35">GetContextOptions</a> (Prefab prefab)</td></tr>
+<tr class="memdesc:a19a4f93014c4be4d1a41531b5e095d35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs right-click contextual action options for an entity belonging to this provider.  <br /></td></tr>
+<tr class="separator:a19a4f93014c4be4d1a41531b5e095d35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Defines an extensible prefab data source that feeds entities into the S.O.S. left sidebar browser. </p>
+<div class="textblock"><p>Defines an <a class="el" href="namespace_s_o_s.html">SOS</a> module acting as an extensible prefab data source that feeds entities into the S.O.S. left sidebar browser. </p>
 <p>By implementing this interface and decorating the class with AutoRegisterAttribute, third-party mods can introduce new browsable entity types (such as custom subassemblies, event prefabs, or jobs) into the main S.O.S. interface. </p>
 <div class="fragment"><div class="line">[AutoRegister(<span class="stringliteral">&quot;MyMod.JobProvider&quot;</span>, order: 3.0)]</div>
 <div class="line">public class JobPrefabProvider : <a class="code hl_interface" href="interface_s_o_s_1_1_i_s_o_s_prefab.html">ISOSPrefab</a></div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">public</span> Type PrefabType =&gt; typeof(JobPrefab);</div>
-<div class="line">    <span class="keyword">public</span> <span class="keywordtype">string</span> Header =&gt; <span class="stringliteral">&quot;Jobs &amp;amp; Roles&quot;</span>;</div>
-<div class="line">    <span class="keyword">public</span> IEnumerable&lt;Prefab&gt; GetAll(<a class="code hl_interface" href="interface_s_o_s_1_1_i_s_o_s_prefab_filter.html">ISOSPrefabFilter</a> filter)</div>
+<div class="line">    <span class="keyword">public</span> IEnumerable&lt;Prefab&gt; GetPrefabs(<a class="code hl_interface" href="interface_s_o_s_1_1_i_prefab_filter.html">IPrefabFilter</a> filter)</div>
 <div class="line">    {</div>
-<div class="line">        <span class="keywordflow">return</span> JobPrefab.Prefabs.Where(j =&gt; filter.<a class="code hl_property" href="interface_s_o_s_1_1_i_s_o_s_prefab_filter.html#a640730f724bf144da6d7b54fa965660c">General</a>.Count == 0 || j.Name.Value.Contains(filter.<a class="code hl_property" href="interface_s_o_s_1_1_i_s_o_s_prefab_filter.html#a640730f724bf144da6d7b54fa965660c">General</a>[0]));</div>
+<div class="line">        <span class="keywordflow">return</span> JobPrefab.Prefabs.Where(j =&gt; filter.<a class="code hl_property" href="interface_s_o_s_1_1_i_prefab_filter.html#a2512f507b114433a2caa2a7a3dee012f">General</a>.Count == 0 || j.Name.Value.Contains(filter.<a class="code hl_property" href="interface_s_o_s_1_1_i_prefab_filter.html#a2512f507b114433a2caa2a7a3dee012f">General</a>[0]));</div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="ttc" id="ainterface_s_o_s_1_1_i_s_o_s_prefab_filter_html"><div class="ttname"><a href="interface_s_o_s_1_1_i_s_o_s_prefab_filter.html">SOS.ISOSPrefabFilter</a></div><div class="ttdoc">Represents parsed search criteria used by ISOSPrefab.GetAll(ISOSPrefabFilter) to filter entities in t...</div><div class="ttdef"><b>Definition</b> <a href="_data_8cs_source.html#l00311">Data.cs:312</a></div></div>
-<div class="ttc" id="ainterface_s_o_s_1_1_i_s_o_s_prefab_filter_html_a640730f724bf144da6d7b54fa965660c"><div class="ttname"><a href="interface_s_o_s_1_1_i_s_o_s_prefab_filter.html#a640730f724bf144da6d7b54fa965660c">SOS.ISOSPrefabFilter.General</a></div><div class="ttdeci">List&lt; string &gt; General</div><div class="ttdoc">Gets general search keywords that match across names, identifiers, or content package titles.</div><div class="ttdef"><b>Definition</b> <a href="_data_8cs_source.html#l00316">Data.cs:316</a></div></div>
-<div class="ttc" id="ainterface_s_o_s_1_1_i_s_o_s_prefab_html"><div class="ttname"><a href="interface_s_o_s_1_1_i_s_o_s_prefab.html">SOS.ISOSPrefab</a></div><div class="ttdoc">Defines an extensible prefab data source that feeds entities into the S.O.S. left sidebar browser.</div><div class="ttdef"><b>Definition</b> <a href="_data_8cs_source.html#l00371">Data.cs:372</a></div></div>
+<div class="ttc" id="ainterface_s_o_s_1_1_i_prefab_filter_html"><div class="ttname"><a href="interface_s_o_s_1_1_i_prefab_filter.html">SOS.IPrefabFilter</a></div><div class="ttdoc">Represents parsed search criteria used by ISOSPrefab.GetPrefabs(IPrefabFilter) to filter entities in ...</div><div class="ttdef"><b>Definition</b> <a href="_data_8cs_source.html#l00286">Data.cs:287</a></div></div>
+<div class="ttc" id="ainterface_s_o_s_1_1_i_prefab_filter_html_a2512f507b114433a2caa2a7a3dee012f"><div class="ttname"><a href="interface_s_o_s_1_1_i_prefab_filter.html#a2512f507b114433a2caa2a7a3dee012f">SOS.IPrefabFilter.General</a></div><div class="ttdeci">List&lt; string &gt; General</div><div class="ttdoc">Gets general search keywords that match across names, identifiers, or content package titles.</div><div class="ttdef"><b>Definition</b> <a href="_data_8cs_source.html#l00291">Data.cs:291</a></div></div>
+<div class="ttc" id="ainterface_s_o_s_1_1_i_s_o_s_prefab_html"><div class="ttname"><a href="interface_s_o_s_1_1_i_s_o_s_prefab.html">SOS.ISOSPrefab</a></div><div class="ttdoc">Defines an SOS module acting as an extensible prefab data source that feeds entities into the S....</div><div class="ttdef"><b>Definition</b> <a href="_data_8cs_source.html#l00344">Data.cs:345</a></div></div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="_data_8cs_source.html#l00371">371</a> of file <a class="el" href="_data_8cs_source.html">Data.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_data_8cs_source.html#l00344">344</a> of file <a class="el" href="_data_8cs_source.html">Data.cs</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a35f486f23fbe0895d4000bfc2511ac31" name="a35f486f23fbe0895d4000bfc2511ac31"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a35f486f23fbe0895d4000bfc2511ac31">&#9670;&#160;</a></span>BuildContextOptions()</h2>
+<a id="a19a4f93014c4be4d1a41531b5e095d35" name="a19a4f93014c4be4d1a41531b5e095d35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19a4f93014c4be4d1a41531b5e095d35">&#9670;&#160;</a></span>GetContextOptions()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">List&lt; ContextMenuOption &gt; SOS.ISOSPrefab.BuildContextOptions </td>
+          <td class="memname">List&lt; ContextMenuOption &gt; SOS.ISOSPrefab.GetContextOptions </td>
           <td>(</td>
           <td class="paramtype">Prefab&#160;</td>
           <td class="paramname"><em>prefab</em></td><td>)</td>
@@ -144,27 +132,27 @@ Properties</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A list of context menu options (e.g., "View Recipes", "Add to Favorites", "Track to HUD").</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Provider-specific context menu options (e.g., "Track to HUD"). The hosting browser appends the baseline actions once.</dd></dl>
 
 </div>
 </div>
-<a id="a14d973bbf813328217c15357786e90c5" name="a14d973bbf813328217c15357786e90c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a14d973bbf813328217c15357786e90c5">&#9670;&#160;</a></span>GetAll()</h2>
+<a id="aa349b1d29bd7dcdadde703277b55a120" name="aa349b1d29bd7dcdadde703277b55a120"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa349b1d29bd7dcdadde703277b55a120">&#9670;&#160;</a></span>GetPrefabs()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">IEnumerable&lt; Prefab &gt; SOS.ISOSPrefab.GetAll </td>
+          <td class="memname">IEnumerable&lt; Prefab &gt; SOS.ISOSPrefab.GetPrefabs </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_prefab_filter.html">ISOSPrefabFilter</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="interface_s_o_s_1_1_i_prefab_filter.html">IPrefabFilter</a>&#160;</td>
           <td class="paramname"><em>filter</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Queries and yields all prefabs provided by this source that satisfy the specified <em>filter</em> . </p>
+<p>Queries and yields all prefabs provided by this source that satisfy the specified <em>filter</em> . A provider serves its own prefabs whatever their runtime types are; related subtypes stay grouped by the browser. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">filter</td><td>The structured search filter containing text, category, tag, and mod tokens.</td></tr>
@@ -172,59 +160,6 @@ Properties</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An enumerable sequence of matching Barotrauma.Prefab instances.</dd></dl>
-
-</div>
-</div>
-<h2 class="groupheader">Property Documentation</h2>
-<a id="a5897d2f1927b03c024f0a925e81cdeca" name="a5897d2f1927b03c024f0a925e81cdeca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5897d2f1927b03c024f0a925e81cdeca">&#9670;&#160;</a></span>Header</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">string SOS.ISOSPrefab.Header</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Gets the section header title rendered above this provider's items in the browser list. </p>
-
-<p class="definition">Definition at line <a class="el" href="_data_8cs_source.html#l00381">381</a> of file <a class="el" href="_data_8cs_source.html">Data.cs</a>.</p>
-
-</div>
-</div>
-<a id="a9fec31c1522e429722826e54e628cd13" name="a9fec31c1522e429722826e54e628cd13"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9fec31c1522e429722826e54e628cd13">&#9670;&#160;</a></span>PrefabType</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Type SOS.ISOSPrefab.PrefabType</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Gets the base entity type provided by this source (e.g., Barotrauma.ItemPrefab or Barotrauma.AfflictionPrefab). </p>
-
-<p class="definition">Definition at line <a class="el" href="_data_8cs_source.html#l00376">376</a> of file <a class="el" href="_data_8cs_source.html">Data.cs</a>.</p>
 
 </div>
 </div>

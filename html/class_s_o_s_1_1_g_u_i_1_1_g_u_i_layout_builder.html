@@ -75,6 +75,7 @@ $(document).ready(function(){initNavTree('class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">SOS.GUI.GUILayoutBuilder Class Reference</div></div>
 </div><!--header-->
@@ -97,6 +98,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac0fe0b04a41a5b96253a680f69395aa5" id="r_ac0fe0b04a41a5b96253a680f69395aa5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#ac0fe0b04a41a5b96253a680f69395aa5">GUILayoutBuilder</a> (GUIListBox listBox)</td></tr>
 <tr class="memdesc:ac0fe0b04a41a5b96253a680f69395aa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new layout builder for the specified list box.  <br /></td></tr>
 <tr class="separator:ac0fe0b04a41a5b96253a680f69395aa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e3b96c50d3506577c7bc39d4b45f987" id="r_a9e3b96c50d3506577c7bc39d4b45f987"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a9e3b96c50d3506577c7bc39d4b45f987">GUILayoutBuilder</a> (RectTransform rectT)</td></tr>
+<tr class="memdesc:a9e3b96c50d3506577c7bc39d4b45f987"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new layout builder with a custom rectangle transform as the parent container.  <br /></td></tr>
+<tr class="separator:a9e3b96c50d3506577c7bc39d4b45f987"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb4d3b69bfb090732f2538a8f96515c6" id="r_acb4d3b69bfb090732f2538a8f96515c6"><td class="memItemLeft" align="right" valign="top">RectTransform&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#acb4d3b69bfb090732f2538a8f96515c6">NewDefaultRectTransform</a> (int height)</td></tr>
+<tr class="memdesc:acb4d3b69bfb090732f2538a8f96515c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates the default RectTransform for rows built with this builder.  <br /></td></tr>
+<tr class="separator:acb4d3b69bfb090732f2538a8f96515c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad40b4fc609945af4a6f8c4aaa84811fa" id="r_ad40b4fc609945af4a6f8c4aaa84811fa"><td class="memItemLeft" align="right" valign="top">RectTransform&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#ad40b4fc609945af4a6f8c4aaa84811fa">NewDefaultRectTransform</a> ()</td></tr>
+<tr class="memdesc:ad40b4fc609945af4a6f8c4aaa84811fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates the default auto-height RectTransform for rows built with this builder.  <br /></td></tr>
+<tr class="separator:ad40b4fc609945af4a6f8c4aaa84811fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab624b58c10ad53eb76f099f80ab9e51c" id="r_ab624b58c10ad53eb76f099f80ab9e51c"><td class="memItemLeft" align="right" valign="top">GUITextBlock&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#ab624b58c10ad53eb76f099f80ab9e51c">Header</a> (string title, Color color)</td></tr>
 <tr class="memdesc:ab624b58c10ad53eb76f099f80ab9e51c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a header text block with the specified title and color.  <br /></td></tr>
 <tr class="separator:ab624b58c10ad53eb76f099f80ab9e51c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -109,36 +119,40 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a73cb827045357b2cef258b34ad780441" id="r_a73cb827045357b2cef258b34ad780441"><td class="memItemLeft" align="right" valign="top">GUIButton?&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a73cb827045357b2cef258b34ad780441">SelectorRow</a> (string label, IEnumerable&lt; string &gt; ids, IEnumerable&lt; string &gt;? displayNames=null, char? fallbackFilterPrefix=null, Color? labelColor=null, Action&lt; Prefab &gt;? onPrimary=null, Action&lt; Prefab &gt;? onSecondary=null, Action&lt; string &gt;? onSearchFilter=null)</td></tr>
 <tr class="memdesc:a73cb827045357b2cef258b34ad780441"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a row with a label and multiple selectable items (prefabs or prefixed strings) acting as hyperlinks.  <br /></td></tr>
 <tr class="separator:a73cb827045357b2cef258b34ad780441"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a085ee6610d135a1dcd9ee93b403dbd62" id="r_a085ee6610d135a1dcd9ee93b403dbd62"><td class="memItemLeft" align="right" valign="top">GUITextBlock?&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a085ee6610d135a1dcd9ee93b403dbd62">RichText</a> (RichString text)</td></tr>
-<tr class="memdesc:a085ee6610d135a1dcd9ee93b403dbd62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a rich text block with the specified content.  <br /></td></tr>
-<tr class="separator:a085ee6610d135a1dcd9ee93b403dbd62"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24da509425fbbc8a230310c6070d8a8a" id="r_a24da509425fbbc8a230310c6070d8a8a"><td class="memItemLeft" align="right" valign="top">GUIFrame&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a24da509425fbbc8a230310c6070d8a8a">Separator</a> ()</td></tr>
-<tr class="memdesc:a24da509425fbbc8a230310c6070d8a8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a horizontal separator line spanning the full width of the builder.  <br /></td></tr>
-<tr class="separator:a24da509425fbbc8a230310c6070d8a8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a022646944def5062ed8ae7418bb1952a" id="r_a022646944def5062ed8ae7418bb1952a"><td class="memItemLeft" align="right" valign="top">GUIButton&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a022646944def5062ed8ae7418bb1952a">Button</a> (string text, Action onClick, string? tooltip=null, Color? color=null, string style=&quot;GUIButtonSmall&quot;)</td></tr>
-<tr class="memdesc:a022646944def5062ed8ae7418bb1952a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a simple button with the specified text, click handler, and optional tooltip, color, and style.  <br /></td></tr>
-<tr class="separator:a022646944def5062ed8ae7418bb1952a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35e9a49f3c1e97f97c2b8d81cdbe2a14" id="r_a35e9a49f3c1e97f97c2b8d81cdbe2a14"><td class="memItemLeft" align="right" valign="top">GUIButton&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a35e9a49f3c1e97f97c2b8d81cdbe2a14">Button</a> (string text, Action onClick, string applyTooltip, Action onDeleteClick, string deleteTooltip, Color? color=null, string style=&quot;GUIButtonSmall&quot;)</td></tr>
-<tr class="memdesc:a35e9a49f3c1e97f97c2b8d81cdbe2a14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a composite button row with an apply button and a red delete button.  <br /></td></tr>
-<tr class="separator:a35e9a49f3c1e97f97c2b8d81cdbe2a14"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6f3be17718b6b0d3e20a28fc0e66eee" id="r_ac6f3be17718b6b0d3e20a28fc0e66eee"><td class="memItemLeft" align="right" valign="top">GUITextBox&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#ac6f3be17718b6b0d3e20a28fc0e66eee">TextBox</a> (string label, string initialValue, Action&lt; string &gt; onChange)</td></tr>
-<tr class="memdesc:ac6f3be17718b6b0d3e20a28fc0e66eee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a labeled text box with an on-change handler.  <br /></td></tr>
-<tr class="separator:ac6f3be17718b6b0d3e20a28fc0e66eee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a252d9e39aa097540ad2c8df939c21bb9" id="r_a252d9e39aa097540ad2c8df939c21bb9"><td class="memItemLeft" align="right" valign="top">GUIDropDown&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a252d9e39aa097540ad2c8df939c21bb9">Dropdown</a> (string label, IReadOnlyList&lt; string &gt; items, string? selected, Action&lt; string &gt; onSelect, IReadOnlyList&lt; string?&gt;? tooltips=null)</td></tr>
-<tr class="memdesc:a252d9e39aa097540ad2c8df939c21bb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a labeled dropdown with the specified items and selection handler.  <br /></td></tr>
-<tr class="separator:a252d9e39aa097540ad2c8df939c21bb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e7f01ff3d482d2db4b9aaee9ad385d7" id="r_a0e7f01ff3d482d2db4b9aaee9ad385d7"><td class="memItemLeft" align="right" valign="top">GUITickBox&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a0e7f01ff3d482d2db4b9aaee9ad385d7">TickBox</a> (string label, bool selected, Action&lt; bool &gt; onToggle)</td></tr>
-<tr class="memdesc:a0e7f01ff3d482d2db4b9aaee9ad385d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a labeled tick box (checkbox) with a toggle handler.  <br /></td></tr>
-<tr class="separator:a0e7f01ff3d482d2db4b9aaee9ad385d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4943d32a93d162f03f6cf96066f9f8c" id="r_aa4943d32a93d162f03f6cf96066f9f8c"><td class="memItemLeft" align="right" valign="top">GUIScrollBar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#aa4943d32a93d162f03f6cf96066f9f8c">Slider</a> (string label, float min, float max, float value, Action&lt; float &gt; onChange)</td></tr>
-<tr class="memdesc:aa4943d32a93d162f03f6cf96066f9f8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a labeled horizontal slider with a live value display and change handler.  <br /></td></tr>
-<tr class="separator:aa4943d32a93d162f03f6cf96066f9f8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6182c5f852cff714e1123eafcb5e3c1" id="r_ac6182c5f852cff714e1123eafcb5e3c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html">GUILayoutBuilder</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#ac6182c5f852cff714e1123eafcb5e3c1">Accordion</a> (string title, string? tooltip=null, bool collapsed=false, Action&lt; bool &gt;? onToggle=null, Anchor iconAnchor=Anchor.CenterRight)</td></tr>
-<tr class="memdesc:ac6182c5f852cff714e1123eafcb5e3c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an accordion (collapsible section) with a text header and returns its content builder for further composition.  <br /></td></tr>
-<tr class="separator:ac6182c5f852cff714e1123eafcb5e3c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1bdfc79f38b9b06a75fb4af6a322dd1a" id="r_a1bdfc79f38b9b06a75fb4af6a322dd1a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html">GUILayoutBuilder</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a1bdfc79f38b9b06a75fb4af6a322dd1a">Accordion</a> (GUIComponent header, bool collapsed=false, Action&lt; bool &gt;? onToggle=null, Anchor iconAnchor=Anchor.CenterRight)</td></tr>
-<tr class="memdesc:a1bdfc79f38b9b06a75fb4af6a322dd1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an accordion (collapsible section) with a custom header component and returns its content builder.  <br /></td></tr>
-<tr class="separator:a1bdfc79f38b9b06a75fb4af6a322dd1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f4d60ec6479682416b0231650c26cad" id="r_a9f4d60ec6479682416b0231650c26cad"><td class="memItemLeft" align="right" valign="top">GUITextBlock?&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a9f4d60ec6479682416b0231650c26cad">Text</a> (RichString text)</td></tr>
+<tr class="memdesc:a9f4d60ec6479682416b0231650c26cad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a rich text block with the specified content.  <br /></td></tr>
+<tr class="separator:a9f4d60ec6479682416b0231650c26cad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec53c4001b560049843cc8c318d0a509" id="r_aec53c4001b560049843cc8c318d0a509"><td class="memItemLeft" align="right" valign="top">GUITextBlock GUIScrollBar GUITextBlock ValueLabel&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#aec53c4001b560049843cc8c318d0a509">Slider</a> (string label, Vector2 range, float value, Action&lt; float &gt; onChange, float step=0f, Func&lt; float, string &gt;? format=null, string? tooltip=null, int height=28)</td></tr>
+<tr class="separator:aec53c4001b560049843cc8c318d0a509"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d021737fc6b0056d22cbf90fdd28117" id="r_a8d021737fc6b0056d22cbf90fdd28117"><td class="memItemLeft" align="right" valign="top">GUIFrame&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a8d021737fc6b0056d22cbf90fdd28117">Separator</a> (int spacing=12, Color? color=null)</td></tr>
+<tr class="memdesc:a8d021737fc6b0056d22cbf90fdd28117"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a horizontal separator line spanning the full width of the builder.  <br /></td></tr>
+<tr class="separator:a8d021737fc6b0056d22cbf90fdd28117"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca51153619eea35e00abc32c806ece7f" id="r_aca51153619eea35e00abc32c806ece7f"><td class="memItemLeft" align="right" valign="top">GUIButton&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#aca51153619eea35e00abc32c806ece7f">Button</a> (string text, Action onClick, string? tooltip=null, Color? color=null, string style=&quot;GUIButtonSmallFreeScale&quot;, int height=20)</td></tr>
+<tr class="memdesc:aca51153619eea35e00abc32c806ece7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a simple button with the specified text, click handler, and optional tooltip, color, and style.  <br /></td></tr>
+<tr class="separator:aca51153619eea35e00abc32c806ece7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dc976080c9998aa154e6dc39e7afb75" id="r_a0dc976080c9998aa154e6dc39e7afb75"><td class="memItemLeft" align="right" valign="top">GUIButton GUIButton DeleteBtn&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a0dc976080c9998aa154e6dc39e7afb75">Button</a> (string text, Action onClick, string applyTooltip, Action onDeleteClick, string deleteTooltip, Color? color=null, string style=&quot;GUIButtonSmallFreeScale&quot;, int height=20)</td></tr>
+<tr class="separator:a0dc976080c9998aa154e6dc39e7afb75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6ee9be9a7601db5f4985a2daedcbbd4" id="r_ab6ee9be9a7601db5f4985a2daedcbbd4"><td class="memItemLeft" align="right" valign="top">GUITextBox&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#ab6ee9be9a7601db5f4985a2daedcbbd4">TextBox</a> (string label, string initialValue, Action&lt; string &gt; onChange, string? tooltip=null, int? maxLength=null, int height=28)</td></tr>
+<tr class="memdesc:ab6ee9be9a7601db5f4985a2daedcbbd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a labeled text box with an on-change handler.  <br /></td></tr>
+<tr class="separator:ab6ee9be9a7601db5f4985a2daedcbbd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd3664a9e4603e66fb775300dcf1e310" id="r_afd3664a9e4603e66fb775300dcf1e310"><td class="memItemLeft" align="right" valign="top">GUIDropDown&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#afd3664a9e4603e66fb775300dcf1e310">Dropdown</a> (string label, IReadOnlyList&lt; string &gt; items, string? selected, Action&lt; string &gt; onSelect, IReadOnlyList&lt; string?&gt;? tooltips=null, string? tooltip=null, int height=28)</td></tr>
+<tr class="memdesc:afd3664a9e4603e66fb775300dcf1e310"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a labeled dropdown with the specified items and selection handler.  <br /></td></tr>
+<tr class="separator:afd3664a9e4603e66fb775300dcf1e310"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a63fedec656e2cc6ec14fab342fe3fa" id="r_a0a63fedec656e2cc6ec14fab342fe3fa"><td class="memItemLeft" align="right" valign="top">GUITickBox&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a0a63fedec656e2cc6ec14fab342fe3fa">TickBox</a> (string label, bool selected, Action&lt; bool &gt; onToggle, string? tooltip=null, int height=26)</td></tr>
+<tr class="memdesc:a0a63fedec656e2cc6ec14fab342fe3fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a labeled tick box (checkbox) with a toggle handler.  <br /></td></tr>
+<tr class="separator:a0a63fedec656e2cc6ec14fab342fe3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad482f8aa4d7da96cdaa8ddddb1122ff3" id="r_ad482f8aa4d7da96cdaa8ddddb1122ff3"><td class="memItemLeft" align="right" valign="top">GUINumberInput&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#ad482f8aa4d7da96cdaa8ddddb1122ff3">NumberInput</a> (string label, int value, Action&lt; int &gt; onChange, int? min=null, int? max=null, int step=1, string? tooltip=null, int height=28)</td></tr>
+<tr class="memdesc:ad482f8aa4d7da96cdaa8ddddb1122ff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a labeled integer number input with +/- buttons.  <br /></td></tr>
+<tr class="separator:ad482f8aa4d7da96cdaa8ddddb1122ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6835e5179e674d082117819c2939b547" id="r_a6835e5179e674d082117819c2939b547"><td class="memItemLeft" align="right" valign="top">GUINumberInput&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a6835e5179e674d082117819c2939b547">NumberInput</a> (string label, float value, Action&lt; float &gt; onChange, float? min=null, float? max=null, float step=0f, int decimals=1, string? tooltip=null, int height=28)</td></tr>
+<tr class="memdesc:a6835e5179e674d082117819c2939b547"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a labeled float number input with +/- buttons.  <br /></td></tr>
+<tr class="separator:a6835e5179e674d082117819c2939b547"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a919b4cc0baf97af54ec2c0f36fc5ccda" id="r_a919b4cc0baf97af54ec2c0f36fc5ccda"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_accordion.html">GUIAccordion</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a919b4cc0baf97af54ec2c0f36fc5ccda">Accordion</a> (string title, string? tooltip=null, bool collapsed=false, Action&lt; bool &gt;? onToggle=null, Anchor iconAnchor=Anchor.CenterRight)</td></tr>
+<tr class="memdesc:a919b4cc0baf97af54ec2c0f36fc5ccda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an accordion (collapsible section) with a text header and returns its content builder for further composition.  <br /></td></tr>
+<tr class="separator:a919b4cc0baf97af54ec2c0f36fc5ccda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37f8c24c1ef2074df107c6f3ef7a3ea7" id="r_a37f8c24c1ef2074df107c6f3ef7a3ea7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_accordion.html">GUIAccordion</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a37f8c24c1ef2074df107c6f3ef7a3ea7">Accordion</a> (GUIComponent header, bool collapsed=false, Action&lt; bool &gt;? onToggle=null, Anchor iconAnchor=Anchor.CenterRight)</td></tr>
+<tr class="memdesc:a37f8c24c1ef2074df107c6f3ef7a3ea7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an accordion (collapsible section) with a custom header component and returns its content builder.  <br /></td></tr>
+<tr class="separator:a37f8c24c1ef2074df107c6f3ef7a3ea7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa03986836cbf1dabc6176aa376ed462f" id="r_aa03986836cbf1dabc6176aa376ed462f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#aa03986836cbf1dabc6176aa376ed462f">Dispose</a> ()</td></tr>
 <tr class="memdesc:aa03986836cbf1dabc6176aa376ed462f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disposes the layout builder, removing it from its parent if empty or recalculating layout.  <br /></td></tr>
 <tr class="separator:aa03986836cbf1dabc6176aa376ed462f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,6 +166,17 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a76b494e750ae6285c4c15b8261442467 inherit pub_methods_class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_group_auto" id="r_a76b494e750ae6285c4c15b8261442467"><td class="memItemLeft" align="right" valign="top">new bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_group_auto.html#a76b494e750ae6285c4c15b8261442467">Recalculate</a> ()</td></tr>
 <tr class="memdesc:a76b494e750ae6285c4c15b8261442467 inherit pub_methods_class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_group_auto"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recalculates the layout group's preferred height based on visible children.  <br /></td></tr>
 <tr class="separator:a76b494e750ae6285c4c15b8261442467 inherit pub_methods_class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_group_auto"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a888fe3b6354e8591cc594cb41a112295" id="r_a888fe3b6354e8591cc594cb41a112295"><td class="memItemLeft" align="right" valign="top">GUITextBlock&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a888fe3b6354e8591cc594cb41a112295">Label</a></td></tr>
+<tr class="memdesc:a888fe3b6354e8591cc594cb41a112295"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a labeled horizontal slider with a live value display and change handler.  <br /></td></tr>
+<tr class="separator:a888fe3b6354e8591cc594cb41a112295"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90ac9f54f3d043462a8e387c471acbf1" id="r_a90ac9f54f3d043462a8e387c471acbf1"><td class="memItemLeft" align="right" valign="top">GUITextBlock GUIScrollBar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a90ac9f54f3d043462a8e387c471acbf1">Slider</a></td></tr>
+<tr class="separator:a90ac9f54f3d043462a8e387c471acbf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a802ddc84927745884174c45117e1186a" id="r_a802ddc84927745884174c45117e1186a"><td class="memItemLeft" align="right" valign="top">GUIButton&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a802ddc84927745884174c45117e1186a">ApplyBtn</a></td></tr>
+<tr class="memdesc:a802ddc84927745884174c45117e1186a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a composite button row with an apply button and a red delete button.  <br /></td></tr>
+<tr class="separator:a802ddc84927745884174c45117e1186a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A fluent declarative UI builder for creating standard Barotrauma GUI components in a list box. </p>
@@ -167,7 +192,7 @@ Public Member Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00034">34</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac0fe0b04a41a5b96253a680f69395aa5" name="ac0fe0b04a41a5b96253a680f69395aa5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac0fe0b04a41a5b96253a680f69395aa5">&#9670;&#160;</a></span>GUILayoutBuilder()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0fe0b04a41a5b96253a680f69395aa5">&#9670;&#160;</a></span>GUILayoutBuilder() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -201,15 +226,44 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a id="a1bdfc79f38b9b06a75fb4af6a322dd1a" name="a1bdfc79f38b9b06a75fb4af6a322dd1a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1bdfc79f38b9b06a75fb4af6a322dd1a">&#9670;&#160;</a></span>Accordion() <span class="overload">[1/2]</span></h2>
+<a id="a9e3b96c50d3506577c7bc39d4b45f987" name="a9e3b96c50d3506577c7bc39d4b45f987"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e3b96c50d3506577c7bc39d4b45f987">&#9670;&#160;</a></span>GUILayoutBuilder() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html">GUILayoutBuilder</a> SOS.GUI.GUILayoutBuilder.Accordion </td>
+          <td class="memname">SOS.GUI.GUILayoutBuilder.GUILayoutBuilder </td>
+          <td>(</td>
+          <td class="paramtype">RectTransform&#160;</td>
+          <td class="paramname"><em>rectT</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new layout builder with a custom rectangle transform as the parent container. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rectT</td><td>The rectangle transform to use as the parent for built components. Must not be null.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Internal constructor used by <code>Accordion</code> methods to create nested builders. The <em>rectT</em>  becomes the root container for all components added through the returned builder instance. </p>
+
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00060">60</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a37f8c24c1ef2074df107c6f3ef7a3ea7" name="a37f8c24c1ef2074df107c6f3ef7a3ea7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37f8c24c1ef2074df107c6f3ef7a3ea7">&#9670;&#160;</a></span>Accordion() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_accordion.html">GUIAccordion</a> SOS.GUI.GUILayoutBuilder.Accordion </td>
           <td>(</td>
           <td class="paramtype">GUIComponent&#160;</td>
           <td class="paramname"><em>header</em>, </td>
@@ -230,7 +284,7 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Anchor&#160;</td>
-          <td class="paramname"><em>iconAnchor</em> = <code>Anchor::CenterRight</code>&#160;</td>
+          <td class="paramname"><em>iconAnchor</em> = <code>Anchor.CenterRight</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -250,21 +304,19 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A new GUILayoutBuilder for adding content inside the accordion's content area.</dd></dl>
-<p>Creates a GUIAccordion with the specified custom header component and settings. The returned builder can be used to add content inside the accordion using the fluent API. Use this overload when the default text header is insufficient and a custom GUI component is required. </p>
-
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00699">699</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<dl class="section return"><dt>Returns</dt><dd>The created GUIAccordion container. Use its GUIAccordion.Content to add inner content.</dd></dl>
+<p>Creates a GUIAccordion with the specified custom header component and settings. Use this overload when the default text header is insufficient and a custom GUI component is required. </p>
 
 </div>
 </div>
-<a id="ac6182c5f852cff714e1123eafcb5e3c1" name="ac6182c5f852cff714e1123eafcb5e3c1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac6182c5f852cff714e1123eafcb5e3c1">&#9670;&#160;</a></span>Accordion() <span class="overload">[2/2]</span></h2>
+<a id="a919b4cc0baf97af54ec2c0f36fc5ccda" name="a919b4cc0baf97af54ec2c0f36fc5ccda"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a919b4cc0baf97af54ec2c0f36fc5ccda">&#9670;&#160;</a></span>Accordion() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html">GUILayoutBuilder</a> SOS.GUI.GUILayoutBuilder.Accordion </td>
+          <td class="memname"><a class="el" href="class_s_o_s_1_1_g_u_i_1_1_g_u_i_accordion.html">GUIAccordion</a> SOS.GUI.GUILayoutBuilder.Accordion </td>
           <td>(</td>
           <td class="paramtype">string&#160;</td>
           <td class="paramname"><em>title</em>, </td>
@@ -291,7 +343,7 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Anchor&#160;</td>
-          <td class="paramname"><em>iconAnchor</em> = <code>Anchor::CenterRight</code>&#160;</td>
+          <td class="paramname"><em>iconAnchor</em> = <code>Anchor.CenterRight</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -312,14 +364,11 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A new GUILayoutBuilder for adding content inside the accordion's content area.</dd></dl>
-<p>Creates a GUIAccordion with the specified title and settings. The returned builder can be used to add content inside the accordion using the fluent API. The accordion header is rendered within the current builder's RectTransform. </p>
-<div class="fragment"><div class="line"><span class="keyword">using </span>var content = builder.Accordion(<span class="stringliteral">&quot;Settings&quot;</span>, tooltip: <span class="stringliteral">&quot;Configure options&quot;</span>, collapsed: true);</div>
-<div class="line">content.TickBox(<span class="stringliteral">&quot;Enable Feature:&quot;</span>, <span class="keyword">true</span>, checked =&gt; featureEnabled = checked);</div>
-<div class="line">content.Slider(<span class="stringliteral">&quot;Volume:&quot;</span>, 0f, 100f, 80f, value =&gt; volume = value);</div>
+<dl class="section return"><dt>Returns</dt><dd>The created GUIAccordion container. Use its GUIAccordion.Content to add inner content.</dd></dl>
+<p>Creates a GUIAccordion with the specified title and settings. The accordion header is rendered within the current builder's RectTransform. </p>
+<div class="fragment"><div class="line">var acc = builder.Accordion(<span class="stringliteral">&quot;Settings&quot;</span>, tooltip: <span class="stringliteral">&quot;Configure options&quot;</span>, collapsed: true);</div>
+<div class="line">acc.Content.TickBox(<span class="stringliteral">&quot;Enable Feature:&quot;</span>, <span class="keyword">true</span>, checked =&gt; featureEnabled = checked);</div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00680">680</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
-
 </div>
 </div>
 <a id="a98b5618e6f6f590a2462dcba12b9c537" name="a98b5618e6f6f590a2462dcba12b9c537"></a>
@@ -387,20 +436,23 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The created GUIButton row, or null if <em>values</em>  is empty.</dd></dl>
 <div class="fragment"><div class="line">builder.BadgeRow(<span class="stringliteral">&quot;Tags:&quot;</span>, <span class="keyword">new</span>[] { <span class="stringliteral">&quot;smallitem&quot;</span>, <span class="stringliteral">&quot;medical&quot;</span> },</div>
 <div class="line">    filterPrefix: <span class="charliteral">&#39;$&#39;</span>,</div>
-<div class="line">    onSearchFilter: filter =&gt; API.Emit(CommKeys.SetSearchFilter, filter));</div>
+<div class="line">    onSearchFilter: filter =&gt; <a class="code hl_class" href="class_s_o_s_1_1_a_p_i.html">API</a>.Emit(<a class="code hl_class" href="class_s_o_s_1_1_comm_keys.html">CommKeys</a>.<a class="code hl_property" href="class_s_o_s_1_1_comm_keys.html#a739f85326a177fb1b2a4a7688eba1b94">SetSearchFilter</a>, filter));</div>
+<div class="ttc" id="aclass_s_o_s_1_1_a_p_i_html"><div class="ttname"><a href="class_s_o_s_1_1_a_p_i.html">SOS.API</a></div><div class="ttdoc">Primary static facade providing access to S.O.S. mod extensibility points, SOS module registries,...</div><div class="ttdef"><b>Definition</b> <a href="_a_p_i_8cs_source.html#l00045">API.cs:46</a></div></div>
+<div class="ttc" id="aclass_s_o_s_1_1_comm_keys_html"><div class="ttname"><a href="class_s_o_s_1_1_comm_keys.html">SOS.CommKeys</a></div><div class="ttdoc">Centralized registry of standardized communication channel identifiers for the decoupled S....</div><div class="ttdef"><b>Definition</b> <a href="_comm_keys_8cs_source.html#l00034">CommKeys.cs:35</a></div></div>
+<div class="ttc" id="aclass_s_o_s_1_1_comm_keys_html_a739f85326a177fb1b2a4a7688eba1b94"><div class="ttname"><a href="class_s_o_s_1_1_comm_keys.html#a739f85326a177fb1b2a4a7688eba1b94">SOS.CommKeys.SetSearchFilter</a></div><div class="ttdeci">static string SetSearchFilter</div><div class="ttdoc">Channel emitted to populate the search query box with a specific filter token.</div><div class="ttdef"><b>Definition</b> <a href="_comm_keys_8cs_source.html#l00154">CommKeys.cs:154</a></div></div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00153">153</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00177">177</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
-<a id="a35e9a49f3c1e97f97c2b8d81cdbe2a14" name="a35e9a49f3c1e97f97c2b8d81cdbe2a14"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a35e9a49f3c1e97f97c2b8d81cdbe2a14">&#9670;&#160;</a></span>Button() <span class="overload">[1/2]</span></h2>
+<a id="a0dc976080c9998aa154e6dc39e7afb75" name="a0dc976080c9998aa154e6dc39e7afb75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0dc976080c9998aa154e6dc39e7afb75">&#9670;&#160;</a></span>Button() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GUIButton SOS.GUI.GUILayoutBuilder.Button </td>
+          <td class="memname">GUIButton GUIButton DeleteBtn SOS.GUI.GUILayoutBuilder.Button </td>
           <td>(</td>
           <td class="paramtype">string&#160;</td>
           <td class="paramname"><em>text</em>, </td>
@@ -439,7 +491,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">string&#160;</td>
-          <td class="paramname"><em>style</em> = <code>&quot;GUIButtonSmall&quot;</code>&#160;</td>
+          <td class="paramname"><em>style</em> = <code>&quot;GUIButtonSmallFreeScale&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>height</em> = <code>20</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -449,28 +507,12 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Adds a composite button row with an apply button and a red delete button. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">text</td><td>The text displayed on the apply button.</td></tr>
-    <tr><td class="paramname">onClick</td><td>The action to invoke when the apply button is clicked.</td></tr>
-    <tr><td class="paramname">applyTooltip</td><td>Tooltip text for the apply button.</td></tr>
-    <tr><td class="paramname">onDeleteClick</td><td>The action to invoke when the delete button is clicked.</td></tr>
-    <tr><td class="paramname">deleteTooltip</td><td>Tooltip text for the delete button.</td></tr>
-    <tr><td class="paramname">color</td><td>Optional tint color for the apply button. If null, the style's default color is used.</td></tr>
-    <tr><td class="paramname">style</td><td>The GUI style name for the apply button. Defaults to "GUIButtonSmall".</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The apply GUIButton. The delete button is created as a child of the same row but is not returned.</dd></dl>
-<p>Creates a horizontal GUIFrame row containing the apply button (90% width) and a red "x" delete button (28x28 pixels). The delete button uses the "GUICancelButton" style with Color.IndianRed tint. Both buttons are focusable and invoke their respective callbacks when clicked. </p>
-
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00456">456</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00546">546</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
-<a id="a022646944def5062ed8ae7418bb1952a" name="a022646944def5062ed8ae7418bb1952a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a022646944def5062ed8ae7418bb1952a">&#9670;&#160;</a></span>Button() <span class="overload">[2/2]</span></h2>
+<a id="aca51153619eea35e00abc32c806ece7f" name="aca51153619eea35e00abc32c806ece7f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca51153619eea35e00abc32c806ece7f">&#9670;&#160;</a></span>Button() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -503,7 +545,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">string&#160;</td>
-          <td class="paramname"><em>style</em> = <code>&quot;GUIButtonSmall&quot;</code>&#160;</td>
+          <td class="paramname"><em>style</em> = <code>&quot;GUIButtonSmallFreeScale&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>height</em> = <code>20</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -520,14 +568,15 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">onClick</td><td>The action to invoke when the button is clicked.</td></tr>
     <tr><td class="paramname">tooltip</td><td>Optional tooltip text displayed when the mouse hovers over the button.</td></tr>
     <tr><td class="paramname">color</td><td>Optional tint color for the button. If null, the style's default color is used.</td></tr>
-    <tr><td class="paramname">style</td><td>The GUI style name to apply. Defaults to "GUIButtonSmall".</td></tr>
+    <tr><td class="paramname">style</td><td>The GUI style name to apply. Defaults to "GUIButtonSmallFreeScale".</td></tr>
+    <tr><td class="paramname">height</td><td>Height of the button in pixels. Defaults to 20.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The created GUIButton with a 28-pixel minimum height.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The created GUIButton with the specified height.</dd></dl>
 <p>The button is focusable and invokes <em>onClick</em>  when clicked. If <em>tooltip</em>  is not null, it is assigned to GUIButton.ToolTip. If <em>color</em>  has a value, it is assigned to GUIButton.Color. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00428">428</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00517">517</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
@@ -549,12 +598,12 @@ Public Member Functions</h2></td></tr>
 <p>Disposes the layout builder, removing it from its parent if empty or recalculating layout. </p>
 <p>If the builder has no children, it is removed from its parent GUIComponent via GUIComponent.Parent.GUIComponent.RemoveChild. Otherwise, <code>Recalculate</code> is called to update the layout geometry of this builder and its ancestors. Calls GC.SuppressFinalize to prevent the finalizer from running, as disposal has already handled all cleanup. This method is safe to call multiple times; subsequent calls after the first are no-ops because the finalizer suppression prevents re-entry. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00718">718</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00833">833</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
-<a id="a252d9e39aa097540ad2c8df939c21bb9" name="a252d9e39aa097540ad2c8df939c21bb9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a252d9e39aa097540ad2c8df939c21bb9">&#9670;&#160;</a></span>Dropdown()</h2>
+<a id="afd3664a9e4603e66fb775300dcf1e310" name="afd3664a9e4603e66fb775300dcf1e310"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd3664a9e4603e66fb775300dcf1e310">&#9670;&#160;</a></span>Dropdown()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -587,7 +636,19 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">IReadOnlyList&lt; string?&gt;?&#160;</td>
-          <td class="paramname"><em>tooltips</em> = <code>null</code>&#160;</td>
+          <td class="paramname"><em>tooltips</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string?&#160;</td>
+          <td class="paramname"><em>tooltip</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>height</em> = <code>28</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -605,13 +666,15 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">selected</td><td>The initially selected item string, or null to have no pre-selection.</td></tr>
     <tr><td class="paramname">onSelect</td><td>Action invoked when an item is selected, receiving the selected string as a parameter.</td></tr>
     <tr><td class="paramname">tooltips</td><td>Optional tooltips for each item. Must match the count of <em>items</em>  if provided.</td></tr>
+    <tr><td class="paramname">tooltip</td><td>Optional tooltip for the dropdown itself.</td></tr>
+    <tr><td class="paramname">height</td><td>Height of the row in pixels. Defaults to 28.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The created GUIDropDown with GUIStyle.SmallFont.</dd></dl>
 <p>Creates a row with the label occupying 35% of the width and the dropdown occupying 60%. The dropdown shows up to the number of items, with each item having an optional tooltip. If <em>selected</em>  matches an item string, that item is pre-selected. The GUIDropDown.OnSelected event is wired to invoke <em>onSelect</em>  when a string is selected. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00514">514</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00617">617</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
@@ -652,37 +715,227 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The created GUITextBlock with subheading font, left alignment, and 30px fixed height.</dd></dl>
 <p>The header has a left padding of 10 pixels and spans the full width of the builder. The block is not focusable (<code>CanBeFocused</code> = false). The height is fixed at 30 pixels via RectTransform.MinSize and RectTransform.MaxSize. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00074">74</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00098">98</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
-<a id="a085ee6610d135a1dcd9ee93b403dbd62" name="a085ee6610d135a1dcd9ee93b403dbd62"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a085ee6610d135a1dcd9ee93b403dbd62">&#9670;&#160;</a></span>RichText()</h2>
+<a id="ad40b4fc609945af4a6f8c4aaa84811fa" name="ad40b4fc609945af4a6f8c4aaa84811fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad40b4fc609945af4a6f8c4aaa84811fa">&#9670;&#160;</a></span>NewDefaultRectTransform() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GUITextBlock? SOS.GUI.GUILayoutBuilder.RichText </td>
+          <td class="memname">RectTransform SOS.GUI.GUILayoutBuilder.NewDefaultRectTransform </td>
           <td>(</td>
-          <td class="paramtype">RichString&#160;</td>
-          <td class="paramname"><em>text</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Adds a rich text block with the specified content. </p>
+<p>Creates the default auto-height RectTransform for rows built with this builder. </p>
+<dl class="section return"><dt>Returns</dt><dd>A new RectTransform with full width (<code>(1f, 0f)</code>), parented to this builder, and no height constraint.</dd></dl>
+<p>Use for dynamic-height rows where the height is determined by content (e.g. Header, Row, Text). External custom creation: <code>var row = new GUIFrame(l.NewDefaultRectTransform(), style:null);</code> </p>
+
+</div>
+</div>
+<a id="acb4d3b69bfb090732f2538a8f96515c6" name="acb4d3b69bfb090732f2538a8f96515c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb4d3b69bfb090732f2538a8f96515c6">&#9670;&#160;</a></span>NewDefaultRectTransform() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">RectTransform SOS.GUI.GUILayoutBuilder.NewDefaultRectTransform </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>height</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates the default RectTransform for rows built with this builder. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">text</td><td>The rich text content to display. If null or empty, the method returns null.</td></tr>
+    <tr><td class="paramname">height</td><td>Fixed height in pixels. Constrained via <code>MinSize</code> and <code>MaxSize</code> to exactly <em>height</em> .</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The created GUITextBlock, or null if <em>text</em>  is null or empty.</dd></dl>
-<p>Uses GUIStyle.SmallFont with left alignment and wrapping enabled. The block height auto-adjusts to fit the text content with 10 pixels of vertical padding. The block listens to RectTransform.SizeChanged to recalculate height dynamically. </p>
+<dl class="section return"><dt>Returns</dt><dd>A new RectTransform with full width (<code>(1f, 0f)</code>), parented to this builder, and fixed height.</dd></dl>
+<p>Centralizes <code>new((1f, 0f), RectTransform, minSize:(0,height), maxSize:(int.MaxValue,height))</code> to avoid duplication. Use for fixed-height custom rows (e.g. 28px like <code>Slider</code>/<code>TextBox</code> or 20px like <code>Button</code>). External custom creation: <code>var row = new GUIFrame(l.NewDefaultRectTransform(28), style:null);</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00373">373</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+</div>
+</div>
+<a id="a6835e5179e674d082117819c2939b547" name="a6835e5179e674d082117819c2939b547"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6835e5179e674d082117819c2939b547">&#9670;&#160;</a></span>NumberInput() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GUINumberInput SOS.GUI.GUILayoutBuilder.NumberInput </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>label</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; float &gt;&#160;</td>
+          <td class="paramname"><em>onChange</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float?&#160;</td>
+          <td class="paramname"><em>min</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float?&#160;</td>
+          <td class="paramname"><em>max</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>step</em> = <code>0f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>decimals</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string?&#160;</td>
+          <td class="paramname"><em>tooltip</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>height</em> = <code>28</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a labeled float number input with +/- buttons. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">label</td><td>The label text displayed on the left side in gray.</td></tr>
+    <tr><td class="paramname">value</td><td>The initial float value.</td></tr>
+    <tr><td class="paramname">onChange</td><td>Action invoked when the value changes.</td></tr>
+    <tr><td class="paramname">min</td><td>Optional minimum value.</td></tr>
+    <tr><td class="paramname">max</td><td>Optional maximum value.</td></tr>
+    <tr><td class="paramname">step</td><td>Increment step for +/- buttons. Zero means automatic (1% of range).</td></tr>
+    <tr><td class="paramname">decimals</td><td>Number of decimals to display. Defaults to 1.</td></tr>
+    <tr><td class="paramname">tooltip</td><td>Optional tooltip shown when hovering the input.</td></tr>
+    <tr><td class="paramname">height</td><td>Height of the row in pixels. Defaults to 28.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The created GUINumberInput.</dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00717">717</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+
+</div>
+</div>
+<a id="ad482f8aa4d7da96cdaa8ddddb1122ff3" name="ad482f8aa4d7da96cdaa8ddddb1122ff3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad482f8aa4d7da96cdaa8ddddb1122ff3">&#9670;&#160;</a></span>NumberInput() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GUINumberInput SOS.GUI.GUILayoutBuilder.NumberInput </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>label</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Action&lt; int &gt;&#160;</td>
+          <td class="paramname"><em>onChange</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int?&#160;</td>
+          <td class="paramname"><em>min</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int?&#160;</td>
+          <td class="paramname"><em>max</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>step</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string?&#160;</td>
+          <td class="paramname"><em>tooltip</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>height</em> = <code>28</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a labeled integer number input with +/- buttons. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">label</td><td>The label text displayed on the left side in gray.</td></tr>
+    <tr><td class="paramname">value</td><td>The initial integer value.</td></tr>
+    <tr><td class="paramname">onChange</td><td>Action invoked when the value changes.</td></tr>
+    <tr><td class="paramname">min</td><td>Optional minimum value. Null means no lower bound.</td></tr>
+    <tr><td class="paramname">max</td><td>Optional maximum value. Null means no upper bound.</td></tr>
+    <tr><td class="paramname">step</td><td>Increment step for +/- buttons. Defaults to 1.</td></tr>
+    <tr><td class="paramname">tooltip</td><td>Optional tooltip shown when hovering the input.</td></tr>
+    <tr><td class="paramname">height</td><td>Height of the row in pixels. Defaults to 28.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The created GUINumberInput.</dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00687">687</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
@@ -730,7 +983,7 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The created GUIButton row acting as a label-value pair, or null if <em>value</em>  is null or empty.</dd></dl>
 <p>Creates a button-style row with a label on the left (gray) and value on the right (colored). The label width is automatically calculated based on the label text length, capped at 70% of the row width. The row height auto-adjusts to fit the taller of the label or value text, with a minimum of 4 pixels of vertical padding. Both the label and value text blocks are not focusable. The row listens to RectTransform.SizeChanged events on both text blocks to recalculate height dynamically. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00100">100</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00124">124</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
@@ -818,12 +1071,12 @@ Public Member Functions</h2></td></tr>
 <div class="line">    onPrimary: prefab =&gt; SelectMaterial(prefab),</div>
 <div class="line">    onSecondary: prefab =&gt; ShowInfo(prefab));</div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00254">254</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00278">278</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
-<a id="a24da509425fbbc8a230310c6070d8a8a" name="a24da509425fbbc8a230310c6070d8a8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24da509425fbbc8a230310c6070d8a8a">&#9670;&#160;</a></span>Separator()</h2>
+<a id="a8d021737fc6b0056d22cbf90fdd28117" name="a8d021737fc6b0056d22cbf90fdd28117"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d021737fc6b0056d22cbf90fdd28117">&#9670;&#160;</a></span>Separator()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -831,28 +1084,46 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">GUIFrame SOS.GUI.GUILayoutBuilder.Separator </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>spacing</em> = <code>12</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">Color?&#160;</td>
+          <td class="paramname"><em>color</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Adds a horizontal separator line spanning the full width of the builder. </p>
-<dl class="section return"><dt>Returns</dt><dd>A 2px tall GUIFrame with a gray color, spanning the full width.</dd></dl>
-<p>Uses the "GUIFrameBottom" style and sets the tint color to 40% gray via <code>GUIFrame.Color</code>. The frame is not focusable and acts as a purely visual divider. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">spacing</td><td>Height of the divider in pixels. Defaults to 12.</td></tr>
+    <tr><td class="paramname">color</td><td>Optional tint for the line. Defaults to gray.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A GUIFrame using the "HorizontalLine" style.</dd></dl>
+<p>Uses the vanilla "HorizontalLine" divider style. The frame is not focusable and acts as a purely visual divider. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00405">405</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00489">489</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
-<a id="aa4943d32a93d162f03f6cf96066f9f8c" name="aa4943d32a93d162f03f6cf96066f9f8c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa4943d32a93d162f03f6cf96066f9f8c">&#9670;&#160;</a></span>Slider()</h2>
+<a id="aec53c4001b560049843cc8c318d0a509" name="aec53c4001b560049843cc8c318d0a509"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec53c4001b560049843cc8c318d0a509">&#9670;&#160;</a></span>Slider()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GUIScrollBar SOS.GUI.GUILayoutBuilder.Slider </td>
+          <td class="memname">GUITextBlock GUIScrollBar GUITextBlock ValueLabel SOS.GUI.GUILayoutBuilder.Slider </td>
           <td>(</td>
           <td class="paramtype">string&#160;</td>
           <td class="paramname"><em>label</em>, </td>
@@ -860,14 +1131,8 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>min</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>max</em>, </td>
+          <td class="paramtype">Vector2&#160;</td>
+          <td class="paramname"><em>range</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -879,7 +1144,31 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Action&lt; float &gt;&#160;</td>
-          <td class="paramname"><em>onChange</em>&#160;</td>
+          <td class="paramname"><em>onChange</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>step</em> = <code>0f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Func&lt; float, string &gt;?&#160;</td>
+          <td class="paramname"><em>format</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string?&#160;</td>
+          <td class="paramname"><em>tooltip</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>height</em> = <code>28</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -889,27 +1178,42 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Adds a labeled horizontal slider with a live value display and change handler. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">label</td><td>The label text displayed on the left side in gray.</td></tr>
-    <tr><td class="paramname">min</td><td>The minimum value of the slider range.</td></tr>
-    <tr><td class="paramname">max</td><td>The maximum value of the slider range.</td></tr>
-    <tr><td class="paramname">value</td><td>The initial value of the slider.</td></tr>
-    <tr><td class="paramname">onChange</td><td>Action invoked when the slider value changes, receiving the new value as a parameter.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The created GUIScrollBar styled as a horizontal slider.</dd></dl>
-<p>Creates a row with the label occupying 35% of the width, the slider occupying 55%, and the value display occupying 10%. The slider uses the "GUISlider" style with a bar size of 0.1. The value display shows the current value formatted with zero decimal places via <code>FormatZeroDecimal</code>. The <em>onChange</em>  callback is invoked on every slider movement with the computed float value. </p>
-<div class="fragment"><div class="line">builder.Slider(<span class="stringliteral">&quot;Volume:&quot;</span>, 0f, 100f, 50f, value =&gt; SetVolume(value));</div>
-</div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00580">580</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00436">436</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
-<a id="ac6f3be17718b6b0d3e20a28fc0e66eee" name="ac6f3be17718b6b0d3e20a28fc0e66eee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac6f3be17718b6b0d3e20a28fc0e66eee">&#9670;&#160;</a></span>TextBox()</h2>
+<a id="a9f4d60ec6479682416b0231650c26cad" name="a9f4d60ec6479682416b0231650c26cad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f4d60ec6479682416b0231650c26cad">&#9670;&#160;</a></span>Text()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GUITextBlock? SOS.GUI.GUILayoutBuilder.Text </td>
+          <td>(</td>
+          <td class="paramtype">RichString&#160;</td>
+          <td class="paramname"><em>text</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a rich text block with the specified content. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">text</td><td>The rich text content to display. If null or empty, the method returns null.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The created GUITextBlock, or null if <em>text</em>  is null or empty.</dd></dl>
+<p>Uses GUIStyle.SmallFont with left alignment and wrapping enabled. The block height auto-adjusts to fit the text content with 10 pixels of vertical padding. The block listens to RectTransform.SizeChanged to recalculate height dynamically. </p>
+
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00397">397</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+
+</div>
+</div>
+<a id="ab6ee9be9a7601db5f4985a2daedcbbd4" name="ab6ee9be9a7601db5f4985a2daedcbbd4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6ee9be9a7601db5f4985a2daedcbbd4">&#9670;&#160;</a></span>TextBox()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -930,7 +1234,25 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Action&lt; string &gt;&#160;</td>
-          <td class="paramname"><em>onChange</em>&#160;</td>
+          <td class="paramname"><em>onChange</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string?&#160;</td>
+          <td class="paramname"><em>tooltip</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int?&#160;</td>
+          <td class="paramname"><em>maxLength</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>height</em> = <code>28</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -946,18 +1268,21 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">label</td><td>The label text displayed on the left side in gray.</td></tr>
     <tr><td class="paramname">initialValue</td><td>The initial text value to populate the text box with.</td></tr>
     <tr><td class="paramname">onChange</td><td>Action invoked when the text changes, receiving the new text value as a parameter.</td></tr>
+    <tr><td class="paramname">tooltip</td><td>Optional tooltip shown when hovering the text box.</td></tr>
+    <tr><td class="paramname">maxLength</td><td>Optional maximum text length. Null means unlimited.</td></tr>
+    <tr><td class="paramname">height</td><td>Height of the row in pixels. Defaults to 28.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The created GUITextBox with GUIStyle.SmallFont.</dd></dl>
-<p>Creates a row with the label occupying 35% of the width and the text box occupying 60%. The GUITextBox.OnTextChanged event is wired to invoke <em>onChange</em> . The row frame is not focusable. </p>
+<dl class="section return"><dt>Returns</dt><dd>The created GUITextBox with GUIStyle.SmallFont. Return value lets the caller attach <code>OnDeselected</code>/<code>OnEnterPressed</code> etc. for commit handling.</dd></dl>
+<p>Creates a row with the label occupying 35% of the width and the text box occupying 60%. The GUITextBox.OnTextChanged event is wired to invoke <em>onChange</em> . GUITextBox.OverflowClip is enabled. The row frame is not focusable. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00490">490</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00586">586</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>
-<a id="a0e7f01ff3d482d2db4b9aaee9ad385d7" name="a0e7f01ff3d482d2db4b9aaee9ad385d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0e7f01ff3d482d2db4b9aaee9ad385d7">&#9670;&#160;</a></span>TickBox()</h2>
+<a id="a0a63fedec656e2cc6ec14fab342fe3fa" name="a0a63fedec656e2cc6ec14fab342fe3fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a63fedec656e2cc6ec14fab342fe3fa">&#9670;&#160;</a></span>TickBox()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -978,7 +1303,19 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Action&lt; bool &gt;&#160;</td>
-          <td class="paramname"><em>onToggle</em>&#160;</td>
+          <td class="paramname"><em>onToggle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string?&#160;</td>
+          <td class="paramname"><em>tooltip</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>height</em> = <code>26</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -994,13 +1331,99 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">label</td><td>The label text displayed on the tick box.</td></tr>
     <tr><td class="paramname">selected</td><td>The initial checked state of the tick box.</td></tr>
     <tr><td class="paramname">onToggle</td><td>Action invoked when the tick box state changes, receiving the new checked state as a parameter.</td></tr>
+    <tr><td class="paramname">tooltip</td><td>Optional tooltip shown when hovering the tick box.</td></tr>
+    <tr><td class="paramname">height</td><td>Height of the row in pixels. Defaults to 26.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The created GUITickBox with GUIStyle.SmallFont.</dd></dl>
 <p>Creates a row with the tick box spanning the full width (100%). The <em>label</em>  serves as the tick box's text rather than a separate label column. The tick box is focusable and invokes <em>onToggle</em>  when the selected state changes. The row frame has a minimum height of 26 pixels. </p>
 
-<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00548">548</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00662">662</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a802ddc84927745884174c45117e1186a" name="a802ddc84927745884174c45117e1186a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a802ddc84927745884174c45117e1186a">&#9670;&#160;</a></span>ApplyBtn</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GUIButton SOS.GUI.GUILayoutBuilder.ApplyBtn</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a composite button row with an apply button and a red delete button. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">text</td><td>The text displayed on the apply button.</td></tr>
+    <tr><td class="paramname">onClick</td><td>The action to invoke when the apply button is clicked.</td></tr>
+    <tr><td class="paramname">applyTooltip</td><td>Tooltip text for the apply button.</td></tr>
+    <tr><td class="paramname">onDeleteClick</td><td>The action to invoke when the delete button is clicked.</td></tr>
+    <tr><td class="paramname">deleteTooltip</td><td>Tooltip text for the delete button.</td></tr>
+    <tr><td class="paramname">color</td><td>Optional tint color for the apply button. If null, the style's default color is used.</td></tr>
+    <tr><td class="paramname">style</td><td>The GUI style name for the apply button. Defaults to "GUIButtonSmallFreeScale".</td></tr>
+    <tr><td class="paramname">height</td><td>Height of the row in pixels. Defaults to 20.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A tuple with the apply GUIButton and the delete GUIButton.</dd></dl>
+<p>Creates a horizontal GUILayoutGroup row containing the apply button and a square delete button. The delete button uses the "GUICancelButton" style with Color.IndianRed tint and stays square via ScaleBasis.BothHeight. Both buttons are focusable and invoke their respective callbacks when clicked. </p>
+
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00546">546</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+
+</div>
+</div>
+<a id="a888fe3b6354e8591cc594cb41a112295" name="a888fe3b6354e8591cc594cb41a112295"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a888fe3b6354e8591cc594cb41a112295">&#9670;&#160;</a></span>Label</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GUITextBlock SOS.GUI.GUILayoutBuilder.Label</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a labeled horizontal slider with a live value display and change handler. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">label</td><td>The label text displayed on the left side in gray.</td></tr>
+    <tr><td class="paramname">range</td><td>The value range as <code>(min, max)</code>. Degenerate ranges are normalized.</td></tr>
+    <tr><td class="paramname">value</td><td>The initial value, clamped into <em>range</em> .</td></tr>
+    <tr><td class="paramname">onChange</td><td>Action invoked when the slider value changes, receiving the snapped value.</td></tr>
+    <tr><td class="paramname">step</td><td>Snap increment in value units (e.g. 0.2 snaps 0.6 -&gt; 0.8). Zero or negative means continuous.</td></tr>
+    <tr><td class="paramname">format</td><td>Formats the value display. Defaults to zero decimals when range and step are whole numbers, single decimal otherwise.</td></tr>
+    <tr><td class="paramname">tooltip</td><td>Optional tooltip shown when hovering the slider.</td></tr>
+    <tr><td class="paramname">height</td><td>Height of the row in pixels. Defaults to 28.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A tuple with the label, the slider and its live value label.</dd></dl>
+<div class="fragment"><div class="line">builder.Slider(<span class="stringliteral">&quot;Volume:&quot;</span>, <span class="keyword">new</span> Vector2(0f, 1f), 0.8f, v =&gt; SetVolume(v));</div>
+<div class="line">builder.Slider(<span class="stringliteral">&quot;Count:&quot;</span>, <span class="keyword">new</span> Vector2(0f, 3f), 1f, v =&gt; SetCount(v), step: 1f);</div>
+</div><!-- fragment --> 
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00436">436</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
+
+</div>
+</div>
+<a id="a90ac9f54f3d043462a8e387c471acbf1" name="a90ac9f54f3d043462a8e387c471acbf1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90ac9f54f3d043462a8e387c471acbf1">&#9670;&#160;</a></span>Slider</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GUITextBlock GUIScrollBar SOS.GUI.GUILayoutBuilder.Slider</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_g_u_i_layout_builder_8cs_source.html#l00436">436</a> of file <a class="el" href="_g_u_i_layout_builder_8cs_source.html">GUILayoutBuilder.cs</a>.</p>
 
 </div>
 </div>

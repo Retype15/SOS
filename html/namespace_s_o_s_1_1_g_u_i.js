@@ -2,6 +2,7 @@ var namespace_s_o_s_1_1_g_u_i =
 [
     [ "GUIAccordion", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_accordion.html", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_accordion" ],
     [ "GUIAnimSequence", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_anim_sequence.html", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_anim_sequence" ],
+    [ "GUIComponentExt", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_component_ext.html", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_component_ext" ],
     [ "GUIDropDown2", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_drop_down2.html", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_drop_down2" ],
     [ "GUILayoutBuilder", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder" ],
     [ "GUILayoutGroupAuto", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_group_auto.html", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_group_auto" ],
