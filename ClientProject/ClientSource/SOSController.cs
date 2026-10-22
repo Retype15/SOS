@@ -188,6 +188,7 @@ namespace SOS
                 {
                     // Any direct
                     if (curr.UserData is Prefab prefab) return prefab;
+                    if (curr.UserData is Affliction aff) return aff.Prefab;
 
                     // Shop
                     if (curr.UserData is PurchasedItem purchasedItem) return purchasedItem.ItemPrefab;
