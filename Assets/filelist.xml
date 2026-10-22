@@ -6,4 +6,5 @@
 	<Text file="%ModDir%/Localization/Russian.xml" />
 	<Text file="%ModDir%/Localization/ChineseSimplified.xml" />
 	<Text file="%ModDir%/Localization/French.xml" />
+	<UIStyle file="%ModDir%/Styles/GUIStyles.xml" />
 </contentpackage>
