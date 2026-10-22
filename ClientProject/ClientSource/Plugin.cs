@@ -24,7 +24,7 @@ namespace SOS
             try
             {
                 controller = SOSController.Instance;
-                API.RegisterConfig(() => CoreConfig.Instance, CoreConfig.ID, 0);
+                API.RegisterConfig(() => CoreConfig.Instance, CoreConfig.ID, 1);
                 API.RegisterConfig(() => WindowProfileConfig.Instance, WindowProfileConfig.ID, 0);
 
 #if DEBUG
