@@ -11,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Barotrauma;
 using Barotrauma.LuaCs;
+using SOS.DuckProxy;
 
 namespace SOS
 {

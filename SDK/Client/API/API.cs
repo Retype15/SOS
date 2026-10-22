@@ -7,6 +7,7 @@
 #pragma warning disable IDE0290
 
 using Barotrauma.LuaCs;
+using SOS.DuckProxy;
 
 namespace SOS
 {

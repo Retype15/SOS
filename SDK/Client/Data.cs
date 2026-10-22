@@ -9,7 +9,7 @@
 using System.ComponentModel;
 using Barotrauma;
 using Microsoft.Xna.Framework;
-using SOS.Prefabs;
+using SOS.DuckProxy;
 
 namespace SOS
 {

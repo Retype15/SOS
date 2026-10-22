@@ -9,6 +9,7 @@
 using System.Reflection;
 using System.Text;
 using MoonSharp.Interpreter;
+using SOS.DuckProxy;
 
 namespace SOS
 {
@@ -112,6 +113,10 @@ namespace SOS
         /// </summary>
         public object ProxyTarget { get; }
     }
+}
+
+namespace SOS.DuckProxy
+{
 
     /// <summary>
     /// A DispatchProxy-based adapter that dynamic MoonSharp Lua tables and external assemblies to C# interfaces at runtime.
