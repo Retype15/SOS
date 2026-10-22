@@ -84,8 +84,6 @@ namespace SOS.Configs
             }
 
             l.ButtonToResetSection(this);
-
-            return;
         }
 
         private readonly ISettingBase<string> _activeProfileId;

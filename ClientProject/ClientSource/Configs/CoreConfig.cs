@@ -85,19 +85,8 @@ namespace SOS.Configs
         public void Draw(RectTransform rectT)
         {
             using var l = new SOS.GUI.GUILayoutBuilder(rectT);
-            l.Header("CORE SETTINGS", Microsoft.Xna.Framework.Color.Gold);
-            l.Separator();
-            l.Button(
-                Texts.Get("sos.config.reset_section", "Reset Section Defaults").Value,
-                onClick: () =>
-                {
-                    Reset();
-                    Save();
-                    Profiles.ProfileHelper.RefreshSettings();
-                },
-                style: "GUIButtonSmall",
-                color: Microsoft.Xna.Framework.Color.IndianRed * 0.8f);
-            return;
+            l.Header("CORE SETTINGS", Microsoft.Xna.Framework.Color.Gold); // TODO: To Translate.
+            l.ButtonToResetSection(this, Texts.Get("sos.config.reset_section", "Reset Base Config to Default").Value);
         }
 
         private readonly ISettingControl _sosOpenKey;

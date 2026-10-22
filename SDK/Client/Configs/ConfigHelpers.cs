@@ -157,7 +157,7 @@ namespace SOS.Configs
         /// The button click handler calls <see cref="ISOSConfig.Reset"/>, then <see cref="ISOSConfig.Save"/>,
         /// and finally <see cref="Profiles.ProfileHelper.RefreshSettings"/> to refresh the settings UI.
         /// </remarks>
-        public static void ButtonToResetSection(this GUILayoutBuilder l, ISOSConfig cfg, string? text = null, Action? onClick = null, string? tooltip = null, Color? color = null, string? style = null)
+        public static void ButtonToResetSection(this GUILayoutBuilder l, ISOSConfig cfg, string? text = null, Action? onClick = null, string? tooltip = null, Color? color = null, string style = "GUIButtonSmall")
         {
             Action onClickFinal;
             if (onClick != null) onClickFinal = onClick;
@@ -172,7 +172,7 @@ namespace SOS.Configs
                 onClick: onClickFinal,
                 tooltip: tooltip,
                 color: color ?? (Color.IndianRed * 0.8f),
-                style: style ?? "GUIButtonSmall"
+                style: style
             );
         }
 
