@@ -152,21 +152,19 @@ namespace SOS.Configs
         /// <param name="onClick">Optional additional action to perform after resetting and saving the config.</param>
         /// <param name="tooltip">Optional tool tip for the button. If <c>null</c>, no tool tip is set.</param>
         /// <param name="color">Optional button color. If <c>null</c>, uses the default (IndianRed with 0.8 alpha).</param>
-        /// <param name="style">Optional button style. If <c>null</c>, uses "GUIButtonSmall".</param>
+        /// <param name="style">Optional button style. "GUIButtonSmall" as Default.</param>
         /// <remarks>
         /// The button click handler calls <see cref="ISOSConfig.Reset"/>, then <see cref="ISOSConfig.Save"/>,
         /// and finally <see cref="Profiles.ProfileHelper.RefreshSettings"/> to refresh the settings UI.
         /// </remarks>
         public static void ButtonToResetSection(this GUILayoutBuilder l, ISOSConfig cfg, string? text = null, Action? onClick = null, string? tooltip = null, Color? color = null, string style = "GUIButtonSmall")
         {
-            Action onClickFinal;
-            if (onClick != null) onClickFinal = onClick;
-            else onClickFinal = () =>
+            Action onClickFinal = onClick ?? (onClickFinal = () =>
             {
                 cfg.Reset();
                 cfg.Save();
                 Profiles.ProfileHelper.RefreshSettings(); //TODO: Revisar para hacer esta llamada más limpia.
-            };
+            });
             l.Button(
                 text: text ?? Texts.Get("sos.config.reset_section", "Reset Section Defaults").Value,
                 onClick: onClickFinal,

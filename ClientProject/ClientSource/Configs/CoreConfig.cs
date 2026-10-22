@@ -87,6 +87,7 @@ namespace SOS.Configs
             using var l = new SOS.GUI.GUILayoutBuilder(rectT);
             l.Header("CORE SETTINGS", Microsoft.Xna.Framework.Color.Gold); // TODO: To Translate.
             l.ButtonToResetSection(this, Texts.Get("sos.config.reset_section", "Reset Base Config to Default").Value);
+            l.Separator();
         }
 
         private readonly ISettingControl _sosOpenKey;

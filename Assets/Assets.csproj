@@ -50,6 +50,7 @@
       <RunConfig Include="$(ProjectDir)RunConfig.xml" />
       <Content Include="$(ProjectDir)Content\**\*.*" />
 	    <Localization Include="$(ProjectDir)Localization\**\*.*" />
+	    <Styles Include="$(ProjectDir)Styles\**\*.*" />
 	    <Config Include="$(ProjectDir)Config\**\*.*" />
 	    <ModConfig Include="$(ProjectDir)ModConfig.xml" />
     </ItemGroup>
@@ -59,6 +60,7 @@
     <Copy SourceFiles="@(RunConfig)" DestinationFiles="$(ModDeployDir)CSharp\RunConfig.xml" />
     <Copy SourceFiles="@(Content)" DestinationFolder="$(ModDeployDir)Content\%(RecursiveDir)" />
     <Copy SourceFiles="@(Localization)" DestinationFolder="$(ModDeployDir)Localization\%(RecursiveDir)" />
+    <Copy SourceFiles="@(Styles)" DestinationFolder="$(ModDeployDir)Styles\%(RecursiveDir)" />
     <Copy SourceFiles="@(Config)" DestinationFolder="$(ModDeployDir)Config\%(RecursiveDir)" />
     <Copy SourceFiles="@(ModConfig)" DestinationFiles="$(ModDeployDir)ModConfig.xml" />
   </Target>
