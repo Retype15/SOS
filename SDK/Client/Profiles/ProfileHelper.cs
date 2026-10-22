@@ -215,7 +215,7 @@ namespace SOS.Profiles
         /// <summary>
         /// Gets or sets the saved window offset for settings.
         /// </summary>
-        public static Point SettingsWindowPosition { get; set; } = new(-1, -1);
+        public static Point SettingsWindowPosition { get; set; } = new(0, 0);
 
         /// <summary>
         /// Creates a settings gear button in the given parent rect.
@@ -283,8 +283,7 @@ namespace SOS.Profiles
                     _settingsWindow.Title.TextAlignment = Alignment.CenterLeft;
                     _settingsWindow.Title.Padding = new Vector4(32, 0, 32, 0);
 
-                    if (SettingsWindowPosition.X >= 0 && SettingsWindowPosition.Y >= 0)
-                        _settingsWindow.RectTransform.AbsoluteOffset = SettingsWindowPosition;
+                    _settingsWindow.RectTransform.AbsoluteOffset = SettingsWindowPosition;
 
                     _settingsWindow.OnClose += CloseSettings;
                     _settingsWindow.RectTransform.SizeChanged += OnSettingsWindowResized;

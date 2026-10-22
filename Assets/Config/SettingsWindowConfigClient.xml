@@ -8,7 +8,7 @@
         <!-- Settings Window Dimensions -->
         <Setting Name="SettingsWindowSizeX" Type="int" Value="550" ShowInMenus="false" />
         <Setting Name="SettingsWindowSizeY" Type="int" Value="600" ShowInMenus="false" />
-        <Setting Name="SettingsWindowPositionX" Type="int" Value="-1" ShowInMenus="false" />
-        <Setting Name="SettingsWindowPositionY" Type="int" Value="-1" ShowInMenus="false" />
+        <Setting Name="SettingsWindowPositionX" Type="int" Value="0" ShowInMenus="false" />
+        <Setting Name="SettingsWindowPositionY" Type="int" Value="0" ShowInMenus="false" />
     </Settings>
 </Configuration>
