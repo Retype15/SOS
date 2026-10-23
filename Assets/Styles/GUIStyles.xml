@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style>
     <GUIRecipeTracker color="0,0,0,153" />
+
+    <GUIKeyInput color="169,212,187,255" hovercolor="255,255,255,255" selectedcolor="169,212,187,255" disabledcolor="125,125,125,125" textcolor="228,217,167,255" outlinecolor="255,218,185,255">
+        <Sprite name="GUIKeyInput.None" texture="Content/UI/UIAtlasGeneral.png" state="None" sourcerect="520,212,126,126" slice="524,216,642,334" origin="0.5,0.5" minborderscale="1"/>
+        <Sprite name="GUIKeyInput.Hover" texture="Content/UI/UIAtlasGeneral.png" state="Hover" sourcerect="391,344,126,126" slice="395,348,513,466" origin="0.5,0.5" minborderscale="1"/>
+        <Sprite name="GUIKeyInput.Selected" texture="Content/UI/UIAtlasGeneral.png" state="Selected" sourcerect="391,344,126,126" slice="395,348,513,466" origin="0.5,0.5" minborderscale="1"/>
+        <GUITextBlock textcolor="255,255,255,255" disabledtextcolor="125,125,125,125" padding="10.0, 0.0, 10.0, 0.0"/>
+        <Size maxresolution="1024,768" height="22"/>
+        <Size maxresolution="1280,800" height="25"/>
+        <Size maxresolution="1920,1080" height="30"/>
+        <Size maxresolution="2048,1440" height="32"/>
+        <Size maxresolution="2560,1600" height="45"/>
+        <Size height="2.7vh"/>
+  </GUIKeyInput>
 </style>

@@ -732,6 +732,17 @@ namespace SOS.GUI
             return input;
         }
 
+        public GUIKeyInput KeyInput(LocalizedString label, KeyOrMouse value, Action<KeyOrMouse> onChangedValue, int height = 28, string style = "")
+        {
+            var row = new GUIFrame(NewDefaultRectTransform(height), style: null) { CanBeFocused = false };
+            _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };
+            var inputButton = new GUIKeyInput(new(new Vector2(0.6f, 1f), row.RectTransform, Anchor.CenterRight), value, style: style)
+            {
+                OnChangedValue = onChangedValue
+            };
+            return inputButton;
+        }
+
         /// <summary>
         /// Binds hyperlink click handlers to the clickable areas of a rich text block based on the provided items.
         /// </summary>
