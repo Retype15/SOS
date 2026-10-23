@@ -42,6 +42,7 @@ namespace SOS
         private SOSController()
         {
             API.On(CommKeys.CloseWindow, CloseSOS, EventPriority.System);
+            API.On(CommKeys.OpenWindow, OpenSOS, EventPriority.System);
             API.On<string>(CommKeys.ChangeProfile, ChangeProfile, EventPriority.System);
             Profiles.ProfileHelper.Subscribe();
         }
@@ -97,9 +98,25 @@ namespace SOS
 
             if (Screen.Selected == null || IsSOSBlocked) return;
 
-            API.Initialize(Plugin.Instance.PluginManagementService);
+            ActiveProfile = GetOrCreateProfile();
+        }
 
-            ActiveProfile = API.GetWindowProfileInstance(WindowProfileConfig.Instance.ActiveProfileId);
+        internal ISOSWindowProfile? GetOrCreateProfile()
+        {
+            if (ActiveProfile != null) return ActiveProfile;
+            if (HaveOldConfigFile || BGUI.Canvas == null || IsSOSBlocked) return null;
+
+            API.Initialize(Plugin.Instance.PluginManagementService);
+            return API.GetWindowProfileInstance(WindowProfileConfig.Instance.ActiveProfileId);
+        }
+
+        private void OpenSOS()
+        {
+            if (ActiveProfile == null)
+            {
+                Prefab? detected = GetPrefabUnderMouse();
+                ToggleUI(detected);
+            }
         }
 
         private void CloseSOS()
@@ -225,6 +242,7 @@ namespace SOS
             Profiles.ProfileHelper.Unsubscribe();
             API.Off<string>(CommKeys.ChangeProfile, ChangeProfile, EventPriority.System);
             API.Off(CommKeys.CloseWindow, CloseSOS, EventPriority.System);
+            API.Off(CommKeys.OpenWindow, OpenSOS, EventPriority.System);
 
             SOS.Prefabs.Item.ItemPrefabProvider.Destroy();
             ProfileHelper.CloseWindow();

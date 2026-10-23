@@ -19,5 +19,8 @@
         <!-- Tracker -->
         <Setting Name="TrackedRecipes" Type="string" Value="" ShowInMenus="false" />
         <Setting Name="TrackerVisible" Type="bool" Value="false" ShowInMenus="true" />
+
+        <!-- Resetting all to default -->
+        <Setting Name= "SettingsAllResetToDefault" Type="bool" Value="false" ShowInMenus="true" />
     </Settings>
 </Configuration>

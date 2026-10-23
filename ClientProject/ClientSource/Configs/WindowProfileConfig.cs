@@ -18,7 +18,7 @@ namespace SOS.Configs
         public const string ID = "SOS.WindowProfile";
 
         private static WindowProfileConfig? _instance;
-        public static WindowProfileConfig Instance = _instance ??= new();
+        public static WindowProfileConfig Instance => _instance ??= new();
 
         private bool _loaded = false;
 
@@ -46,13 +46,21 @@ namespace SOS.Configs
 
         public void Reset()
         {
-            ActiveProfileId = "SOS.Profile.Default3Column";
+            ResetSettingsWindowGeometry();
+
+            SOSController.Instance.GetOrCreateProfile()?.ProfileConfig?.Reset();
+        }
+
+        private void ResetSettingsWindowGeometry()
+        {
             _settingsWindowSizeX.SetIfNotEqual(_settingsWindowSizeX.DefaultValue);
             _settingsWindowSizeY.SetIfNotEqual(_settingsWindowSizeY.DefaultValue);
             _settingsWindowPositionX.SetIfNotEqual(_settingsWindowPositionX.DefaultValue);
             _settingsWindowPositionY.SetIfNotEqual(_settingsWindowPositionY.DefaultValue);
-            ProfileHelper.SettingsWindowSize = new(_settingsWindowSizeX.DefaultValue, _settingsWindowSizeY.DefaultValue);
-            ProfileHelper.SettingsWindowPosition = new(_settingsWindowPositionX.DefaultValue, _settingsWindowPositionY.DefaultValue);
+
+            var size = new Point(_settingsWindowSizeX.DefaultValue, _settingsWindowSizeY.DefaultValue);
+            var position = new Point(_settingsWindowPositionX.DefaultValue, _settingsWindowPositionY.DefaultValue);
+            ProfileHelper.ApplySettingsWindowGeometry(size, position);
         }
 
         public void Draw(RectTransform rectT)
@@ -86,6 +94,8 @@ namespace SOS.Configs
             l.ButtonToResetSection(this);
         }
 
+        //MARK: Settings
+
         private readonly ISettingBase<string> _activeProfileId;
 
         internal string ActiveProfileId
@@ -94,12 +104,15 @@ namespace SOS.Configs
             set => _activeProfileId.SetIfNotEqual(value);
         }
 
-        //MARK: Settings Window Dimensions
+        // Window Dimensions
 
         private readonly ISettingBase<int> _settingsWindowSizeX;
         private readonly ISettingBase<int> _settingsWindowSizeY;
         private readonly ISettingBase<int> _settingsWindowPositionX;
         private readonly ISettingBase<int> _settingsWindowPositionY;
+
+        // Reset Button
+        private readonly ISettingBase<bool> _settingsWindowReset;
 
         private WindowProfileConfig()
         {
@@ -112,6 +125,18 @@ namespace SOS.Configs
             TryInitConfig("SettingsWindowSizeY", out _settingsWindowSizeY);
             TryInitConfig("SettingsWindowPositionX", out _settingsWindowPositionX);
             TryInitConfig("SettingsWindowPositionY", out _settingsWindowPositionY);
+
+            TryInitConfig("SettingsWindowResetToDefault", out _settingsWindowReset);
+            _settingsWindowReset.OnValueChanged += (_) =>
+            {
+                if (!_settingsWindowReset.Value) return;
+
+                _settingsWindowReset.TrySetValue(false);
+                Reset();
+                Save();
+                ProfileHelper.RefreshSettings();
+                Logger.LogDebug("Profile configs reset to defaults.");
+            };
         }
 
         public static void Destroy()

@@ -7,6 +7,7 @@
 #pragma warning disable IDE0290
 
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Barotrauma;
 using Barotrauma.LuaCs.Data;
@@ -661,7 +662,7 @@ namespace SOS
         /// Only calls <see cref="ISettingBase{T}.TrySetValue(T)"/> if the values differ.
         /// </remarks>
         public static bool SetIfNotEqual<T>([NotNullWhen(false)] this ISettingBase<T> setting, T value) where T : IEquatable<T>, IConvertible
-                    => (!setting.Value?.Equals(value) ?? true) && setting.TrySetValue(value);
+            => (!setting.Value?.Equals(value) ?? true) && setting.TrySetValue(value);
 
         /// <summary>
         /// Sets the key or mouse binding only if it differs from the current value.
@@ -674,7 +675,42 @@ namespace SOS
         /// Only calls <see cref="ISettingControl.TrySetValue(KeyOrMouse)"/> if the values differ.
         /// </remarks>
         public static bool SetIfNotEqual([NotNullWhen(false)] this ISettingControl setting, KeyOrMouse value)
-                    => (!setting.Value?.Equals(value) ?? true) && setting.TrySetValue(value);
+            => (!setting.Value?.Equals(value) ?? true) && setting.TrySetValue(value);
+
+        public static bool SetIfNotEqual([NotNullWhen(false)] this ISettingControl setting, string value)
+        {
+            var result = GetKeyOrMouse(value);
+            if (result == null) return false;
+            return setting.SetIfNotEqual(result);
+        }
+
+        private static KeyOrMouse? GetKeyOrMouse(string strValue)
+        {
+            strValue ??= string.Empty;
+            if (Enum.TryParse(strValue, true, out Microsoft.Xna.Framework.Input.Keys key))
+            {
+                return key;
+            }
+            else if (Enum.TryParse(strValue, out MouseButton mouseButton))
+            {
+                return mouseButton;
+            }
+            else if (int.TryParse(strValue, NumberStyles.Any, CultureInfo.InvariantCulture, out int mouseButtonInt) &&
+                     Enum.GetValues<MouseButton>().Contains((MouseButton)mouseButtonInt))
+            {
+                return (MouseButton)mouseButtonInt;
+            }
+            else if (string.Equals(strValue, "LeftMouse", StringComparison.OrdinalIgnoreCase))
+            {
+                return !PlayerInput.MouseButtonsSwapped() ? MouseButton.PrimaryMouse : MouseButton.SecondaryMouse;
+            }
+            else if (string.Equals(strValue, "RightMouse", StringComparison.OrdinalIgnoreCase))
+            {
+                return !PlayerInput.MouseButtonsSwapped() ? MouseButton.SecondaryMouse : MouseButton.PrimaryMouse;
+            }
+
+            return null;
+        }
     }
 
     #region SOS Module Extensions

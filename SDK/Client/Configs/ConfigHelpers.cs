@@ -128,7 +128,7 @@ namespace SOS.Configs
         {
             foreach (var config in API.GetAllConfigInstances())
             {
-                try { config.Reset(); }
+                try { config.Reset(); config.Save(); }
                 catch (Exception ex)
                 {
                     Logger.LogError(ex.Message);
@@ -136,6 +136,7 @@ namespace SOS.Configs
                 }
                 Logger.LogDebug($"Reseted config to defaults : '{config.GetType().FullOrName()}'", level: LogLevel.Trace);
             }
+            Profiles.ProfileHelper.RefreshSettings();
         }
 
         #endregion
@@ -159,15 +160,15 @@ namespace SOS.Configs
         /// </remarks>
         public static void ButtonToResetSection(this GUILayoutBuilder l, ISOSConfig cfg, string? text = null, Action? onClick = null, string? tooltip = null, Color? color = null, string style = "GUIButtonSmall")
         {
-            Action onClickFinal = onClick ?? (onClickFinal = () =>
+            Action reset = onClick ?? (() =>
             {
                 cfg.Reset();
                 cfg.Save();
-                Profiles.ProfileHelper.RefreshSettings(); //TODO: Revisar para hacer esta llamada más limpia.
+                Profiles.ProfileHelper.RefreshSettings(); // OK
             });
             l.Button(
-                text: text ?? Texts.Get("sos.config.reset_section", "Reset Section Defaults").Value,
-                onClick: onClickFinal,
+                text: text ?? Texts.Get("sos.config.reset_section", "Reset this Config Section to Default").Value,
+                onClick: reset,
                 tooltip: tooltip,
                 color: color ?? (Color.IndianRed * 0.8f),
                 style: style
@@ -234,6 +235,15 @@ namespace SOS.Configs
 #endif
             return true;
         }
+
+        /// <summary>
+        /// Calculates the top-left offset that centers a child rectangle inside a parent rectangle.
+        /// </summary>
+        /// <param name="parent">The parent rectangle size.</param>
+        /// <param name="child">The child rectangle size.</param>
+        /// <returns>The centered offset].</returns>
+        public static Point NewDefaultCenterPoint(Point parent, Point child)
+            => new((parent.X - child.X) / 2, (parent.Y - child.Y) / 2);
 
         #endregion
     }

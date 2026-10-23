@@ -53,17 +53,21 @@ namespace SOS.Configs.TCWP
 
         public void Reset()
         {
-            _windowSize = null;
-            _windowPosition = null;
-            _windowSizeX.SetIfNotEqual(_windowSizeX.DefaultValue);
-            _windowSizeY.SetIfNotEqual(_windowSizeY.DefaultValue);
-            _windowPositionX.SetIfNotEqual(_windowPositionX.DefaultValue);
-            _windowPositionY.SetIfNotEqual(_windowPositionY.DefaultValue);
-            _leftPanelWidth.SetIfNotEqual(_leftPanelWidth.DefaultValue);
-            _rightPanelWidth.SetIfNotEqual(_rightPanelWidth.DefaultValue);
-            _isMaximized.SetIfNotEqual(_isMaximized.DefaultValue);
+            _windowSize = new Point(_windowSizeX.DefaultValue, _windowSizeY.DefaultValue);
+            _windowPosition = new Point(_windowPositionX.DefaultValue, _windowPositionY.DefaultValue);
+            LeftPanelWidth = _leftPanelWidth.DefaultValue;
+            RightPanelWidth = _rightPanelWidth.DefaultValue;
+            IsMaximized = _isMaximized.DefaultValue;
             _customLayoutsRaw.SetIfNotEqual(_customLayoutsRaw.DefaultValue);
             CustomLayouts.Clear();
+
+            if (SOSController.Instance.ActiveProfile is ThreeColumnWindowProfile profile &&
+                ReferenceEquals(profile.ProfileConfig, this))
+            {
+                profile.ApplyConfig();
+            }
+
+            Logger.LogDebug("Profile Config Reseted.");
         }
 
         public void Draw(RectTransform rectT)
@@ -131,7 +135,7 @@ namespace SOS.Configs.TCWP
         }
 
         private void ApplyPreset(int? winW, int? winH, int? leftW, int? rightW)
-            => ApplyPreset(new(winW ?? WindowPosition.X, winH ?? WindowPosition.Y), leftW, rightW);
+            => ApplyPreset(new(winW ?? WindowSize.X, winH ?? WindowSize.Y), leftW, rightW);
 
         private void ApplyPreset(Point? windowSize, int? leftW, int? rightW)
         {
@@ -162,10 +166,10 @@ namespace SOS.Configs.TCWP
         private readonly ISettingBase<string> _customLayoutsRaw;
 
         private Point? _windowSize;
-        internal Point WindowSize { get => _windowSize ??= new(_windowSizeX.DefaultValue, _windowSizeY.DefaultValue); set => _windowSize = value; }
+        internal Point WindowSize { get => _windowSize ??= new(_windowSizeX.Value, _windowSizeY.Value); set => _windowSize = value; }
 
         private Point? _windowPosition;
-        internal Point WindowPosition { get => _windowPosition ??= new(_windowPositionX.DefaultValue, _windowPositionY.DefaultValue); set => _windowPosition = value; }
+        internal Point WindowPosition { get => _windowPosition ??= new(_windowPositionX.Value, _windowPositionY.Value); set => _windowPosition = value; }
 
         internal int LeftPanelWidth { get => _leftPanelWidth.Value; set => _leftPanelWidth.SetIfNotEqual(value); }
         internal int RightPanelWidth { get => _rightPanelWidth.Value; set => _rightPanelWidth.SetIfNotEqual(value); }

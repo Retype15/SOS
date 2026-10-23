@@ -218,6 +218,20 @@ namespace SOS.Profiles
         public static Point SettingsWindowPosition { get; set; } = new(0, 0);
 
         /// <summary>
+        /// Applies the given size and position to the settings window, if it is currently open.
+        /// </summary>
+        internal static void ApplySettingsWindowGeometry(Point size, Point position)
+        {
+            SettingsWindowSize = size;
+            SettingsWindowPosition = position;
+
+            if (_settingsWindow == null) return;
+
+            _settingsWindow.RectTransform.NonScaledSize = size;
+            _settingsWindow.RectTransform.AbsoluteOffset = position;
+        }
+
+        /// <summary>
         /// Creates a settings gear button in the given parent rect.
         /// </summary>
         /// <param name="parent">The parent rectangle transform for the button.</param>
@@ -301,7 +315,6 @@ namespace SOS.Profiles
                         OnClicked = (_, _) =>
                         {
                             ConfigHelper.ResetConfigs();
-                            ProfileHelper.RefreshSettings();
                             return true;
                         }
                     };
@@ -322,8 +335,8 @@ namespace SOS.Profiles
             if (_settingsWindow == null || _contentContainer == null) return;
             try
             {
-                SettingsWindowSize = _settingsWindow.NormalSize;
-                SettingsWindowPosition = _settingsWindow.NormalOffset;
+                SettingsWindowSize = _settingsWindow.RectTransform.NonScaledSize;
+                SettingsWindowPosition = _settingsWindow.RectTransform.AbsoluteOffset;
 
                 //TODO: Revisar si vale la pena un GetCountConfigs() más eficiente...
                 var configs = API.GetAllConfigInstances();
@@ -354,8 +367,8 @@ namespace SOS.Profiles
             {
                 if (_settingsWindow != null)
                 {
-                    SettingsWindowSize = _settingsWindow.NormalSize;
-                    SettingsWindowPosition = _settingsWindow.NormalOffset;
+                    SettingsWindowSize = _settingsWindow.RectTransform.NonScaledSize;
+                    SettingsWindowPosition = _settingsWindow.RectTransform.AbsoluteOffset;
 
                     _settingsWindow.OnClose -= CloseSettings;
                     _settingsWindow.RectTransform.SizeChanged -= OnSettingsWindowResized;

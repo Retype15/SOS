@@ -65,28 +65,36 @@ namespace SOS.Configs
         public void Reset()
         {
             SOSOpenKey = new KeyOrMouse(Keys.J);
-            LastSearchQuery = "";
-            _lastItemId.SetIfNotEqual("");
-            RawXmlMode = false;
-            XmlFontScale = 1.0f;
-            TrackedRecipesRaw = "";
-            TrackerVisible = true;
-            ProfileHelper.ClearTabHistory();
-            TabHistoryRaw = "";
-
-            _currentTarget = null;
+            LastSearchQuery = _lastSearchQuery.DefaultValue;
+            _lastItemId.SetIfNotEqual(_lastItemId.DefaultValue);
+            RawXmlMode = _rawXmlMode.DefaultValue;
+            XmlFontScale = _xmlFontScale.DefaultValue;
+            TrackedRecipesRaw = _trackedRecipesRaw.DefaultValue;
+            TrackerVisible = _trackerVisible.DefaultValue;
+            TabHistoryRaw = _tabHistoryRaw.DefaultValue;
             _favoritesRaw.SetIfNotEqual(_favoritesRaw.DefaultValue);
+
+            ProfileHelper.ClearTabHistory();
+            PrefabHelper.ClearFavorites(false);
 
             var ctr = SOSController.Instance;
             ctr.Tracker.Clear();
             ctr.Tracker.Visible = TrackerVisible;
+
+            _currentTarget = null;
+            API.Emit<Prefab?>(CommKeys.SelectTarget, CurrentTarget);
+            API.SetSearchFilter(LastSearchQuery);
+
+            ProfileHelper.RefreshSettings();
         }
 
         public void Draw(RectTransform rectT)
         {
             using var l = new SOS.GUI.GUILayoutBuilder(rectT);
             l.Header("CORE SETTINGS", Microsoft.Xna.Framework.Color.Gold); // TODO: To Translate.
-            l.ButtonToResetSection(this, Texts.Get("sos.config.reset_section", "Reset Base Config to Default").Value);
+            l.KeyInput(Texts.Get("S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName"), _sosOpenKey.Value, value => _sosOpenKey.SetIfNotEqual(value))
+            .ToolTip = Texts.Get("S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip");
+            l.ButtonToResetSection(this);
             l.Separator();
         }
 
@@ -147,14 +155,18 @@ namespace SOS.Configs
             remove => _trackerVisible.OnValueChanged -= value;
         }
 
-        // ─── Batch-save (complex serialized) ───
+        // Batch-save
 
         private readonly ISettingBase<string> _favoritesRaw;
         private readonly ISettingBase<string> _tabHistoryRaw;
 
         public string TabHistoryRaw { get => _tabHistoryRaw.Value; set => _tabHistoryRaw.SetIfNotEqual(value); }
 
-        // ─── Constructor ───
+        // Resetting to Default
+
+        private readonly ISettingBase<bool> _resetConfig;
+
+        // Constructor
 
         private CoreConfig()
         {
@@ -171,6 +183,15 @@ namespace SOS.Configs
             TryInitConfig("TabHistory", out _tabHistoryRaw);
             TryInitConfig("TrackedRecipes", out _trackedRecipesRaw);
             TryInitConfig("TrackerVisible", out _trackerVisible);
+
+            TryInitConfig("SettingsAllResetToDefault", out _resetConfig);
+            _resetConfig.OnValueChanged += (_) =>
+            {
+                if (!_resetConfig.Value) return;
+
+                _resetConfig.TrySetValue(false);
+                ConfigHelper.ResetConfigs();
+            };
 
             API.On<Prefab?>(CommKeys.SelectTarget, SetCurrentTarget, EventPriority.State);
         }

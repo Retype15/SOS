@@ -23,6 +23,7 @@ namespace SOS.Profiles.TCWP
         public ISOSConfig ProfileConfig => config ??= new();
 
         private bool _windowEventsRegistered;
+        private bool _initialized;
 
         #region Vars
 
@@ -100,7 +101,7 @@ namespace SOS.Profiles.TCWP
             }
 
             ProfileConfig.Load();
-            ApplySavedSizeAndPosition();
+            ApplyWindowSizeAndPosition();
             Mode = (config?.IsMaximized ?? false) ? WindowMode.Fullscreen : WindowMode.Windowed;
             BuildMainUI();
 
@@ -109,6 +110,8 @@ namespace SOS.Profiles.TCWP
                 BuildLoadingUI();
                 needsShowLogo = false;
             }
+
+            _initialized = true;
         }
 
         private void OnToggleWindow()
@@ -176,6 +179,8 @@ namespace SOS.Profiles.TCWP
             API.Off(CommKeys.RefreshSearch, RefreshSearch, EventPriority.UI);
 
             SaveSettings();
+            _initialized = false;
+            Mode = WindowMode.Windowed;
 
             if (centerTabWidget is IDisposable d) d.Dispose();
             centerTabWidget = null;
@@ -191,7 +196,7 @@ namespace SOS.Profiles.TCWP
 
         private void SaveSettings()
         {
-            if (config != null)
+            if (_initialized && config != null)
             {
                 config.WindowSize = NormalSize;
                 config.WindowPosition = NormalOffset;
@@ -307,21 +312,16 @@ namespace SOS.Profiles.TCWP
             //centerPanel?.ExFadeIn(duration, alsoChildren: true);
         }
 
-        private void ApplySavedSizeAndPosition()
+        private void ApplyWindowSizeAndPosition()
         {
             if (config == null) return;
 
             RectTransform.NonScaledSize = config.WindowSize;
 
-            var wp = config.WindowPosition;
-            if (wp.X >= 0 && wp.Y >= 0)
-                RectTransform.AbsoluteOffset = wp;
-            else
-            {
-                int cx = (GameMain.GraphicsWidth / 2) - (Rect.Width / 2);
-                int cy = (GameMain.GraphicsHeight / 2) - (Rect.Height / 2);
-                RectTransform.AbsoluteOffset = new Point(cx, cy);
-            }
+            var position = config.WindowPosition;
+            RectTransform.AbsoluteOffset = position.X != -1 && position.Y != -1
+                ? position
+                : ConfigHelper.NewDefaultCenterPoint(BGUI.Canvas.Rect.Size, config.WindowSize);
 
             NormalSize = RectTransform.NonScaledSize;
             NormalOffset = RectTransform.AbsoluteOffset;
@@ -696,15 +696,39 @@ namespace SOS.Profiles.TCWP
 
         public void ForceLayoutUpdate()
         {
-            if (leftPanel == null || rightPanel == null) return;
             if (config == null) return;
 
-            RectTransform.NonScaledSize = config.WindowSize;
-            if (config.WindowPosition.X >= 0 && config.WindowPosition.Y >= 0)
-                RectTransform.AbsoluteOffset = config.WindowPosition;
-            if (config.LeftPanelWidth > 0) leftPanel.RectTransform.NonScaledSize = new Point(config.LeftPanelWidth, leftPanel.Rect.Height);
-            if (config.RightPanelWidth > 0) rightPanel.RectTransform.NonScaledSize = new Point(config.RightPanelWidth, rightPanel.Rect.Height);
+            ApplyWindowSizeAndPosition();
+            ApplyPanelWidths();
             UpdateLayout();
+        }
+
+        internal void ApplyConfig()
+        {
+            if (!_initialized || config == null) return;
+
+            if (config.IsMaximized)
+            {
+                if (Mode != WindowMode.Fullscreen) Mode = WindowMode.Fullscreen;
+            }
+            else
+            {
+                if (Mode == WindowMode.Fullscreen) Mode = WindowMode.Windowed;
+                ApplyWindowSizeAndPosition();
+            }
+
+            ApplyPanelWidths();
+            UpdateLayout();
+        }
+
+        private void ApplyPanelWidths()
+        {
+            if (config == null) return;
+
+            if (leftPanel != null && config.LeftPanelWidth > 0)
+                leftPanel.RectTransform.NonScaledSize = new Point(config.LeftPanelWidth, leftPanel.Rect.Height);
+            if (rightPanel != null && config.RightPanelWidth > 0)
+                rightPanel.RectTransform.NonScaledSize = new Point(config.RightPanelWidth, rightPanel.Rect.Height);
         }
 
         private void ForceLayoutTo(Point? windowSize, int? leftW, int? rightW)

@@ -10,5 +10,8 @@
         <Setting Name="SettingsWindowSizeY" Type="int" Value="600" ShowInMenus="false" />
         <Setting Name="SettingsWindowPositionX" Type="int" Value="0" ShowInMenus="false" />
         <Setting Name="SettingsWindowPositionY" Type="int" Value="0" ShowInMenus="false" />
+
+        <!-- Resetting -->
+        <Setting Name= "SettingsWindowResetToDefault" Type="bool" Value="false" ShowInMenus="true" />
     </Settings>
 </Configuration>
