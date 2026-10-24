@@ -43,9 +43,8 @@ namespace SOS.Configs
         {
             if (!HasChanges) return;
 
-            foreach (ISettingBase setting in _dirtySettings)
-                configService.SaveConfigValue(setting);
-
+            var result = configService.SaveBatch(_dirtySettings);
+            if (result.IsFailed) Logger.LogError(string.Join('\n', result.Errors));
             _dirtySettings.Clear();
         }
 

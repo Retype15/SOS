@@ -24,6 +24,7 @@
     <Reference Include="MoonSharp.Interpreter" HintPath="$(RefsPath)\MoonSharp.Interpreter.dll" />
     <Reference Include="XNATypes" HintPath="$(RefsPath)\XNATypes.dll" />
     <Reference Include="MonoMod.Utils" HintPath="$(RefsPath)\MonoMod.Utils.dll" />
+    <PackageReference Include="OneOf" Version="3.0.271" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <PropertyGroup>

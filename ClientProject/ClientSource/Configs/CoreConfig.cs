@@ -92,7 +92,7 @@ namespace SOS.Configs
         {
             using var l = new SOS.GUI.GUILayoutBuilder(rectT);
             l.Header("CORE SETTINGS", Microsoft.Xna.Framework.Color.Gold); // TODO: To Translate.
-            l.KeyInput(Texts.Get("S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName"), _sosOpenKey.Value, value => _sosOpenKey.SetIfNotEqual(value))
+            l.KeyInput(Texts.Get("S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.DisplayName"), _sosOpenKey.Value, value => _sosOpenKey.SetIfNotEqual(value ?? Keys.J)) // TODO: Cambiar clave default hardcodeada.
             .ToolTip = Texts.Get("S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SOSOpenKey.Tooltip");
             l.ButtonToResetSection(this);
             l.Separator();
