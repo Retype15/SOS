@@ -732,7 +732,7 @@ namespace SOS.GUI
             return input;
         }
 
-        public GUIKeyInput KeyInput(LocalizedString label, KeyOrMouse value, Action<KeyOrMouse> onChangedValue, int height = 28, string style = "")
+        public GUIKeyInput KeyInput(LocalizedString label, KeyOrMouse value, Action<KeyOrMouse?> onChangedValue, int height = 28, string style = "")
         {
             var row = new GUIFrame(NewDefaultRectTransform(height), style: null) { CanBeFocused = false };
             _ = new GUITextBlock(new RectTransform(new Vector2(0.35f, 1f), row.RectTransform, Anchor.CenterLeft), label, font: GUIStyle.SmallFont, textColor: Color.Gray) { CanBeFocused = false };

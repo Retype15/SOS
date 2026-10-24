@@ -44,6 +44,8 @@ namespace SOS.Configs
 
         public void Save()
         {
+            if (!_loaded) return;
+
             var ctr = SOSController.Instance;
 
             var prefab = API.GetState<Prefab?>(CommKeys.SelectTarget);
