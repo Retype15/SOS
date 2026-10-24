@@ -97,9 +97,9 @@ S.O.S. can now be extended: other mods can add inspector tabs, wiki sections, ne
 
 - **A:** At the moment, yes. It should be compatible with ALL content mods. If you encounter any error or bug with any other mods, please report them on GitHub or the Steam page.
 
-**Q:** *Soy modder y tengo un mod donde quiero mostrar informacion especial o comportamientos personalizados a los items de mi mod, puedo?*
+**Q:** *I'm a modder and I have a mod where I want to show special information or custom behaviors for my mod's items — can I?*
 
-- **A:** *Por supuesto que si! S.O.S está pensado para ser fácilmente extensible para cualquier otro mod que lo desee de forma nativa. Podrá añadir comportamientos personalizados sobre casi cualquier ventana de información y añadir tus propias ventanas con informacion organizada, reactiva y completamente personalizada! Puede ver la documentacion oficial donde explicamos a detalle cómo lograrlo.*
+- **A:** *Of course you can! S.O.S. is designed to be easily extensible by any other mod that wants it, natively. You can add custom behaviors to almost any information window and add your own windows with organized, reactive, and fully customized information! Check the official documentation where we explain in detail how to do it.*
 
 ## License & Copyright
 
