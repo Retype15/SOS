@@ -8,6 +8,8 @@
 using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework.Input;
+
+using SOS.Extensions;
 using SOS.Prefabs;
 using SOS.Profiles;
 

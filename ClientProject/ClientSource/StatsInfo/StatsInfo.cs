@@ -8,6 +8,8 @@
 using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
+
+using SOS.Extensions;
 using SOS.GUI;
 using SOS.Profiles;
 

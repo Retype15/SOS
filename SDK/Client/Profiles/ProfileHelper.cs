@@ -9,6 +9,7 @@
 using Barotrauma;
 using Microsoft.Xna.Framework;
 using SOS.Configs;
+using SOS.Extensions;
 using SOS.GUI;
 
 using BGUI = Barotrauma.GUI;

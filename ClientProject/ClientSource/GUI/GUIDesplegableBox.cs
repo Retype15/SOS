@@ -8,6 +8,8 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
+
+using SOS.Extensions;
 using SOS.Panels.ItemPanel;
 using SOS.Prefabs;
 

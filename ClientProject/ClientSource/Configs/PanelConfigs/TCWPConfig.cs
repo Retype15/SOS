@@ -9,6 +9,8 @@ using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 using MonoMod.Utils;
+
+using SOS.Extensions;
 using SOS.GUI;
 using SOS.Profiles;
 using SOS.Profiles.TCWP;

@@ -11,6 +11,7 @@ using Barotrauma;
 using Barotrauma.LuaCs;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
+using SOS.Extensions;
 using SOS.GUI;
 
 namespace SOS.Configs

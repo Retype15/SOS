@@ -6,6 +6,7 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
+using SOS.Extensions;
 
 namespace SOS.Prefabs.Affliction
 {

@@ -6,6 +6,8 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
+
+using SOS.Extensions;
 using SOS.GUI;
 
 namespace SOS.Prefabs.Item

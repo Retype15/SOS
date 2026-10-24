@@ -7,6 +7,7 @@
 
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using SOS.Extensions;
 
 namespace SOS.Panels.ItemPanel
 {

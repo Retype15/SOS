@@ -8,7 +8,9 @@
 using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
+
 using SOS.Configs;
+using SOS.Extensions;
 using SOS.GUI;
 using SOS.Panels.ItemPanel;
 using SOS.Prefabs;

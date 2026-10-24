@@ -13,7 +13,7 @@ using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
 
-namespace SOS
+namespace SOS.Extensions
 {
     /// <summary>
     /// Rich text formatting extension methods utilizing Barotrauma's native RichText formatting tags.

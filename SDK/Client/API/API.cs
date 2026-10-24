@@ -8,6 +8,7 @@
 
 using Barotrauma.LuaCs;
 using SOS.DuckProxy;
+using SOS.Extensions;
 
 namespace SOS
 {
