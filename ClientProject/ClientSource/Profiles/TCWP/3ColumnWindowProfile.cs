@@ -224,8 +224,8 @@ namespace SOS.Profiles.TCWP
 
             if (target == null) return;
 
-            Sprite? icon = target.Icon();
-
+            Sprite? icon = target.GetIcon();
+            Color? iconColor = target.GetIconColor();
             if (icon != null)
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.15f, 0.9f), headerLayout.RectTransform, Anchor.CenterLeft), style: null)
@@ -234,17 +234,22 @@ namespace SOS.Profiles.TCWP
                 };
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true)
                 {
-                    Color = target.IconColor(),
+                    Color = iconColor ?? Color.White,
                     CanBeFocused = true,
                     OnSecondaryClicked = (_, _) => { ProfileHelper.OnSecondary(target); return true; }
                 };
             }
 
-            var (headerName, headerColor) = target.SafeName(Color.White);
+            var headerName = target.GetName();
+            var headerColor = Color.White;
+            if (headerName.IsNullOrEmpty())
+            {
+                headerName = target.GetNameFallback();
+                headerColor = Color.Red;
+            }
             _ = new GUITextBlock(
                 new RectTransform(new Vector2(0.8f, 1f), headerLayout.RectTransform),
-                headerName,
-                font: GUIStyle.LargeFont, textColor: headerColor, textAlignment: Alignment.CenterLeft)
+                headerName, font: GUIStyle.LargeFont, textColor: headerColor, textAlignment: Alignment.CenterLeft)
             {
                 Wrap = false,
                 AutoScaleHorizontal = true,
@@ -530,6 +535,7 @@ namespace SOS.Profiles.TCWP
                 catch (Exception ex)
                 {
                     Logger.LogWarning($"[SOS] Provider '{provider.GetType().FullOrName()}' failed: {ex.Message}");
+                    Logger.LogDebugWarning(ex.StackTrace, level: LogLevel.Trace);
                 }
             }
 

@@ -40,7 +40,7 @@ namespace SOS.Panels.PreviewPanel
             var __ = new GUICustomComponent(new RectTransform(Vector2.One, spriteContainer.RectTransform),
                 onDraw: (sb, comp) =>
                 {
-                    var sprite = _currentPrefab.Icon();
+                    var sprite = _currentPrefab.GetIcon();
                     if (sprite == null) return;
                     Vector2 center = comp.Rect.Location.ToVector2() + comp.Rect.Size.ToVector2() * 0.5f;
                     float scale = Math.Min(
@@ -53,7 +53,7 @@ namespace SOS.Panels.PreviewPanel
         public void Update(Prefab target)
         {
             _currentPrefab = target;
-            _nameBlock.Text = target.Name();
+            _nameBlock.Text = target.GetNameOrFallback();
             _idBlock.Text = target.Identifier.Value;
         }
     }

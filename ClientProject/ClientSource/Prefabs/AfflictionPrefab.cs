@@ -6,6 +6,8 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
+using Barotrauma.Extensions;
+using Microsoft.Xna.Framework;
 using SOS.Extensions;
 
 namespace SOS.Prefabs.Affliction
@@ -17,7 +19,7 @@ namespace SOS.Prefabs.Affliction
         {
             return AfflictionPrefab.List
                 .Where(a => Matches(a, filter))
-                .OrderBy(a => a is AfflictionPrefabHusk ? 1 : 0).ThenBy(p => p.Name());
+                .OrderBy(a => a is AfflictionPrefabHusk ? 1 : 0).ThenBy(p => p.GetNameOrFallback());
         }
 
         private static bool Matches(AfflictionPrefab a, IPrefabFilter filter)
@@ -57,6 +59,31 @@ namespace SOS.Prefabs.Affliction
             }
 
             return true;
+        }
+    }
+
+    [AutoRegister("SOS.Prefab.AfflictionPrefab.Info", 2)]
+    public sealed class AfflictionPrefabInfo : ISOSPrefabInfo
+    {
+        public bool CanHandle(Prefab prefab)
+            => prefab is AfflictionPrefab;
+
+        public LocalizedString? GetName(Prefab prefab)
+            => prefab is AfflictionPrefab aff ? aff.Name : null;
+
+        public Sprite? GetIcon(Prefab prefab)
+            => prefab is AfflictionPrefab aff ? aff.Icon : null;
+
+        public Color? GetIconColor(Prefab prefab)
+            => prefab is AfflictionPrefab aff ? aff.IconColors?.FirstOrNull() : null;
+
+        public ContentXElement? GetConfigElement(Prefab prefab)
+            => prefab is AfflictionPrefab aff ? aff.configElement : null;
+
+        public LocalizedString? GetDescription(Prefab prefab)
+        {
+            if (prefab is not AfflictionPrefab affliction) return null;
+            return string.Join("\n\n", affliction.Descriptions?.Select(static d => $"({d.MinStrength.ToString().SetColor(Color.Orange)}-{d.MaxStrength.ToString().SetColor(Color.OrangeRed)}) {d.Target.ToString().SetColor(Color.BlueViolet)}: {d.Text}") ?? []);
         }
     }
 }

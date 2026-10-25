@@ -9,6 +9,7 @@
 using Barotrauma.LuaCs;
 using SOS.DuckProxy;
 using SOS.Extensions;
+using SOS.Prefabs;
 
 namespace SOS
 {
@@ -53,6 +54,7 @@ namespace SOS
         private static readonly SortedFactory<ISOSTab> TabFactories = SortedFactory.GetOrInstantiate<ISOSTab>();
         private static readonly SortedFactory<ISOSConfig> ConfigFactories = SortedFactory.GetOrInstantiate<ISOSConfig>();
         private static readonly SortedFactory<ISOSPrefab> PrefabFactories = SortedFactory.GetOrInstantiate<ISOSPrefab>();
+        private static readonly SortedFactory<ISOSPrefabInfo> PrefabInfoFactories = SortedFactory.GetOrInstantiate<ISOSPrefabInfo>();
         private static readonly SortedFactory<ISOSWindowProfile> ProfileFactories = SortedFactory.GetOrInstantiate<ISOSWindowProfile>();
 
         private static bool _scanned = false;
@@ -387,7 +389,58 @@ namespace SOS
         /// <param name="onlyInstance">If <c>true</c>, evicts only the cached instance without unregistering. Defaults to <c>false</c>.</param>
         /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemovePrefabProvider(string id, bool onlyInstance = false)
-                    => PrefabFactories.Remove(id, onlyInstance);
+        {
+            if (!PrefabFactories.Remove(id, onlyInstance)) return false;
+            PrefabHelper.CleanCache();
+            return true;
+        }
+
+        #endregion
+
+        #region Prefab Info Getters
+
+        public static bool RegisterPrefabInfo(object obj, string? id = null, double order = 0.0, bool active = true)
+        {
+            bool registered = PrefabInfoFactories.Register(obj, id, order, active);
+            if (registered) PrefabHelper.CleanCache();
+            return registered;
+        }
+
+        public static bool ActivatePrefabInfo(string id)
+        {
+            bool activated = PrefabInfoFactories.SetActive(id, true);
+            if (activated) PrefabHelper.CleanCache();
+            return activated;
+        }
+
+        public static bool DeactivatePrefabInfo(string id)
+        {
+            bool deactivated = PrefabInfoFactories.SetActive(id, false);
+            if (deactivated) PrefabHelper.CleanCache();
+            return deactivated;
+        }
+
+        public static IFactoryEntry<ISOSPrefabInfo>? GetPrefabInfo(string id)
+            => PrefabInfoFactories.Get(id);
+
+        public static T? GetPrefabInfoInstance<T>(string id, bool fresh = false)
+            => GetPrefabInfoInstance(id, fresh) is T t ? t : default;
+
+        public static ISOSPrefabInfo? GetPrefabInfoInstance(string id, bool fresh = false)
+            => PrefabInfoFactories.GetInstance(id, fresh);
+
+        public static IEnumerable<IFactoryEntry<ISOSPrefabInfo>> GetAllPrefabInfo(bool onlyActives = true)
+            => PrefabInfoFactories.GetAll(onlyActives);
+
+        public static IEnumerable<ISOSPrefabInfo> GetAllPrefabInfoInstances(bool onlyActives = true, bool fresh = false)
+                    => PrefabInfoFactories.GetAllInstances(onlyActives, fresh);
+
+        public static bool RemovePrefabInfo(string id, bool onlyInstance = false)
+        {
+            bool removed = PrefabInfoFactories.Remove(id, onlyInstance);
+            if (removed) PrefabHelper.CleanCache();
+            return removed;
+        }
 
         #endregion
 
@@ -653,6 +706,7 @@ namespace SOS
             foreach (var factory in SortedFactory.GetAllFactories())
                 factory.AutoRegister(pluginManagementService);
 
+            PrefabHelper.CleanCache();
             _scanned = true;
         }
 
@@ -683,6 +737,7 @@ namespace SOS
         internal static void Clear()
         {
             SortedFactory.CleanFactory();
+            PrefabHelper.CleanCache();
             _scanned = false;
             eventBus = new();
         }

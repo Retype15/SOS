@@ -350,14 +350,38 @@ namespace SOS
         /// <param name="filter">The structured search filter containing text, category, tag, and mod tokens.</param>
         /// <returns>An enumerable sequence of matching <see cref="Barotrauma.Prefab"/> instances.</returns>
         IEnumerable<Prefab> GetPrefabs(IPrefabFilter filter);
+    }
+
+    [DefaultClass<PrefabInfoDefaults>]
+    public interface ISOSPrefabInfo
+    {
+        bool CanHandle(Prefab prefab);
+
+        LocalizedString? GetName(Prefab prefab)
+            => PrefabInfoDefaults.GetName(prefab);
+
+        LocalizedString? GetDescription(Prefab prefab)
+            => PrefabInfoDefaults.GetDescription(prefab);
+
+        Sprite? GetIcon(Prefab prefab)
+            => PrefabInfoDefaults.GetIcon(prefab);
+
+        Color? GetIconColor(Prefab prefab)
+            => PrefabInfoDefaults.GetIconColor(prefab);
+
+        ContentXElement? GetConfigElement(Prefab prefab)
+            => PrefabInfoDefaults.GetConfigElement(prefab);
 
         /// <summary>
         /// Constructs right-click contextual action options for an entity belonging to this provider.
         /// </summary>
         /// <param name="prefab">The prefab being right-clicked.</param>
         /// <returns>Provider-specific context menu options (e.g., "Track to HUD"). The hosting browser appends the baseline actions once.</returns>
-        [DefaultClass<PrefabDefaults>]
-        List<ContextMenuOption> GetContextOptions(Prefab prefab) => [];
+        List<ContextMenuOption> GetContextOptions(Prefab prefab)
+            => PrefabInfoDefaults.GetContextOptions(prefab);
+
+        Dictionary<Tuple<Identifier, Type>, Func<Prefab, object>> Metadata(Prefab prefab)
+            => PrefabInfoDefaults.Metadata(prefab);
     }
 
     /// <summary>
@@ -485,11 +509,29 @@ namespace SOS
     }
 
     /// <summary>
-    /// Provides default fallback implementations for prefab right-click contextual actions.
+    /// Provides default fallback implementations for prefab extra information and metadata.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal sealed class PrefabDefaults
+    internal class PrefabInfoDefaults
     {
+        public static LocalizedString? GetName(Prefab _)
+            => null;
+
+        public static LocalizedString? GetDescription(Prefab _)
+            => null;
+
+        public static Sprite? GetIcon(Prefab _)
+            => null;
+
+        public static Color? GetIconColor(Prefab _)
+            => null;
+
+        public static ContentXElement? GetConfigElement(Prefab _)
+            => null;
+
+        public static Dictionary<Tuple<Identifier, Type>, Func<Prefab, object>> Metadata(Prefab _)
+            => [];
+
         /// <summary>
         /// Default empty contextual actions for prefab providers adapted via <see cref="DuckProxy{T}"/>.
         /// The hosting browser appends the baseline actions once.

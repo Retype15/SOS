@@ -22,6 +22,29 @@ namespace SOS.Prefabs
     /// </remarks>
     public static class PrefabHelper
     {
+        private sealed record PrefabInfo
+        {
+            public readonly LocalizedString? Name;
+            public readonly LocalizedString? Description;
+            public readonly Sprite? Icon;
+            public readonly Color? IconColor;
+
+            public PrefabInfo(Prefab prefab)
+            {
+                var dataList = API.GetAllPrefabInfoInstances().Where((meta) => meta.CanHandle(prefab));
+                if (dataList == null) return;
+                foreach (var data in dataList)
+                {
+                    Name ??= data.GetName(prefab);
+                    Description ??= data.GetDescription(prefab);
+                    Icon ??= data.GetIcon(prefab);
+                    IconColor ??= data.GetIconColor(prefab);
+                }
+            }
+        }
+
+        private static readonly Dictionary<Prefab, PrefabInfo> cacheInfo = [];
+
         private static readonly HashSet<string> favorites = [];
 
         /// <summary>
@@ -177,29 +200,69 @@ namespace SOS.Prefabs
         public static void OpenContextMenu(Prefab target, Vector2? position = null)
         {
             if (target == null) return;
-            var options = API.GetAllPrefabProviderInstances()
-                .SelectMany(p => p.GetContextOptions(target))
-                .ToList();
-            options.AddRange(GetDefaultContextOptions(target));
+            var options = GetContextOptions(target);
             if (options.Count == 0) return;
-            RichString name = target.Name();
+            RichString name = GetNameOrFallback(target);
             _ = GUIContextMenu.CreateContextMenu(position ?? PlayerInput.MousePosition, name, null, [.. options]);
         }
 
-        private static List<ContextMenuOption> GetDefaultContextOptions(Prefab prefab)
+        internal static void CleanCache()
         {
-            var options = new List<ContextMenuOption>
+            cacheInfo.Clear();
+        }
+
+        public static LocalizedString? GetName(Prefab prefab)
+            => cacheInfo.GetOrCreate(prefab, () => new(prefab)).Name;
+
+        public static LocalizedString GetNameFallback(Prefab prefab)
+            => prefab.Identifier.Value.Trim();
+
+        public static LocalizedString GetNameOrFallback(Prefab prefab)
+        {
+            var name = GetName(prefab);
+            if (name.IsNullOrEmpty())
+                name = GetNameFallback(prefab);
+            return name;
+        }
+
+        public static LocalizedString GetNameOrFallback(Prefab prefab, Color color)
+        {
+            var name = GetName(prefab);
+            if (name.IsNullOrEmpty())
+                return GetNameFallback(prefab).SetColor(Color.Red);
+            else
+                return name.SetColor(color);
+        }
+
+        public static LocalizedString? GetDescription(Prefab prefab)
+            => cacheInfo.GetOrCreate(prefab, () => new(prefab)).Description;
+
+        public static Sprite? GetIcon(Prefab prefab)
+            => cacheInfo.GetOrCreate(prefab, () => new(prefab)).Icon;
+
+        public static Color? GetIconColor(Prefab prefab)
+            => cacheInfo.GetOrCreate(prefab, () => new(prefab)).IconColor;
+
+        public static ContentXElement? GetConfigElement(Prefab prefab)
+        {
+            foreach (var metadata in API.GetAllPrefabInfoInstances())
+                if (metadata.CanHandle(prefab) && metadata.GetConfigElement(prefab) is { } configElement)
+                    return configElement;
+            return null;
+        }
+
+        public static List<ContextMenuOption> GetContextOptions(Prefab prefab)
+            => [.. API.GetAllPrefabInfoInstances().Where(meta => meta.CanHandle(prefab)).SelectMany((meta) => meta.GetContextOptions(prefab))];
+
+
+        private static TValue GetOrCreate<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Func<TValue> creator) where TKey : notnull
+        {
+            if (!dictionary.TryGetValue(key, out var value))
             {
-                new(Texts.Get("sos.context.view_recipes", "View Recipes").Value, isEnabled: true, onSelected: () => API.Emit(CommKeys.SelectTarget, prefab))
-            };
-
-            string targetId = prefab.Identifier.Value;
-            bool isFav = PrefabHelper.IsFavorite(targetId);
-            string favText = isFav ? Texts.Get("sos.context.remove_favorite", "Remove from Favorites").Value : Texts.Get("sos.context.add_favorite", "Add to Favorites").Value;
-
-            options.Add(new ContextMenuOption(favText, true, () => { PrefabHelper.ToggleFavorite(targetId); }));
-
-            return options;
+                value = creator();
+                dictionary.Add(key, value);
+            }
+            return value;
         }
     }
 }
