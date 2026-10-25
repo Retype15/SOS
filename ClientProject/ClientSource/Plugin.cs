@@ -5,8 +5,6 @@
 #pragma warning disable IDE0130
 #pragma warning disable IDE0290
 
-global using LogLevel = Microsoft.Extensions.Logging.LogLevel;
-
 using System.Diagnostics;
 using Barotrauma;
 using Barotrauma.LuaCs;

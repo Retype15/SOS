@@ -14,6 +14,17 @@ using Microsoft.Xna.Framework;
 namespace SOS
 {
 
+    public enum LogLevel
+    {
+        Trace,
+        Debug,
+        Information,
+        Warning,
+        Error,
+        Critical,
+        None
+    }
+
     /// <summary>
     /// Provides logging functionality for the S.O.S mod with support for multiple log levels, conditional compilation (DEBUG/RELEASE), and integrated logger services.
     /// </summary>
