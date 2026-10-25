@@ -13,43 +13,6 @@ using Microsoft.Xna.Framework;
 
 namespace SOS
 {
-    /// <summary>
-    /// Severity levels for log messages produced by <see cref="Logger"/>.
-    /// </summary>
-    /// <remarks>
-    /// Log levels determine which messages are actually output based on the active <c>ActualLogLevel</c>.
-    /// Lower numeric values include all higher severity messages (e.g., <see cref="Error"/> includes <see cref="Critical"/>).
-    /// In DEBUG mode, the default threshold is <see cref="LogLevel.Debug"/>; in RELEASE, it is <see cref="LogLevel.Information"/>.
-    /// </remarks>
-    public enum LogLevel
-    {
-        /// <summary>No messages are logged.</summary>
-        None,
-        /// <summary>Critical messages that indicate a fatal failure.</summary>
-        Critical,
-        /// <summary>Error messages indicating a problem that needs attention.</summary>
-        Error,
-        /// <summary>Warning messages indicating a potential issue.</summary>
-        Warning,
-        /// <summary>Informational messages about normal operation.</summary>
-        Information,
-        /// <summary>Debug messages for development-time diagnostics.</summary>
-        Debug,
-        /// <summary>Trace messages for detailed diagnostic output.</summary>
-        Trace,
-    }
-
-    /// <summary>
-    /// String representations for each <see cref="LogLevel"/>, used for display and serialization.
-    /// </summary>
-    /// <remarks>
-    /// Indices correspond to the <see cref="LogLevel"/> enum values:
-    /// 0: "none", 1: "critical", 2: "error", 3: "warning", 4: "info", 5: "debug", 6: "trace".
-    /// </remarks>
-    internal static class LogLevelStates
-    {
-        internal static string[] Labels = ["none", "critical", "error", "warning", "info", "debug", "trace"];
-    }
 
     /// <summary>
     /// Provides logging functionality for the S.O.S mod with support for multiple log levels, conditional compilation (DEBUG/RELEASE), and integrated logger services.
@@ -64,8 +27,6 @@ namespace SOS
         /// <summary>Gets or sets the active logger service implementation.</summary>
         internal static ILoggerService? LoggerService = null;
 
-
-
         /// <summary>Gets the currently active log level threshold.</summary>
 #if DEBUG
         internal static LogLevel ActualLogLevel = LogLevel.Debug;
@@ -76,7 +37,7 @@ namespace SOS
         /// <summary>Determines whether a message at the given level would be logged based on the current <see cref="ActualLogLevel"/>.</summary>
         /// <param name="level">The log level to check.</param>
         /// <returns><c>true</c> if the level is at or below the active threshold.</returns>
-        public static bool ComplainsLogLevel(LogLevel level) => level <= ActualLogLevel;
+        public static bool ComplainsLogLevel(LogLevel level) => level >= ActualLogLevel;
 
         /// <summary>
         /// Logs a debug-level message. Only compiled and executed in DEBUG builds.
@@ -154,7 +115,7 @@ namespace SOS
         /// </remarks>
         public static void Log(string? message, Color? color = null, ILoggerService? logger = null, LogLevel level = LogLevel.Information)
         {
-            if (level > ActualLogLevel || string.IsNullOrEmpty(message)) return;
+            if (!ComplainsLogLevel(level) || string.IsNullOrEmpty(message)) return;
             color ??= Color.SkyBlue;
             if (logger != null) logger.Log(message, color);
             else if (LoggerService != null) LoggerService.Log(message, color);
@@ -173,7 +134,7 @@ namespace SOS
         /// </remarks>
         public static void LogError(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Error)
         {
-            if (level > ActualLogLevel || string.IsNullOrEmpty(message)) return;
+            if (!ComplainsLogLevel(level) || string.IsNullOrEmpty(message)) return;
             if (logger != null) logger.LogError(message);
             else if (LoggerService != null) LoggerService.LogError(message);
             else LuaCsLogger.LogError(message);
@@ -192,7 +153,7 @@ namespace SOS
         /// </remarks>
         public static void LogWarning(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Warning)
         {
-            if (level > ActualLogLevel || string.IsNullOrEmpty(message)) return;
+            if (!ComplainsLogLevel(level) || string.IsNullOrEmpty(message)) return;
             if (logger != null) logger.LogWarning(message);
             else if (LoggerService != null) LoggerService.LogWarning(message);
             else LuaCsLogger.Log(message, Color.Yellow);

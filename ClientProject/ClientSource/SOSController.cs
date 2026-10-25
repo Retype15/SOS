@@ -56,15 +56,48 @@ namespace SOS
 
         public void ResolveCommand(string[] args)
         {
-            if (args.Length == 0) { ToggleUI(); return; }
-            if (args.Length == 1) Logger.Log(Plugin.CommandHelp());
-            if (args.Length == 2) switch (args[0].ToLowerInvariant())
-                {
-                    case "log": if (args[1] == "help") { Logger.Log(Texts.Get("sos.command.help.log", "- log [{logCommands}]\nExample: 'sos log verbose'").Value); } else Logger.ActualLogLevel = (LogLevel)LogLevelStates.Labels.IndexOf(args[1].ToLowerInvariant()); return;
-                }
+            if (args.Length == 0)
+            {
+                ToggleUI();
+                return;
+            }
+            switch (args[0])
+            {
+                case "help":
+                    ShowHelp(args[1..]);
+                    return;
+                case "log":
+                    ShowLog(args[1..]);
+                    return;
+            }
 
-            Logger.LogWarning($"Command 'sos {string.Join(' ', args)}' not recognized.");
-            return;
+            Logger.LogWarning($"Command 'sos {string.Join(' ', args)}' not recognized.", level: LogLevel.Critical);
+        }
+
+        private static void ShowHelp(string[] _)
+        {
+            Logger.Log(Plugin.CommandHelp(), level: LogLevel.Critical);
+        }
+
+        private static void ShowLog(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Logger.Log(Texts.Get("sos.command.log.status", "Log: {ActualLogLevel}").Replace("{ActualLogLevel}", Logger.ActualLogLevel.ToString()).Value, level: LogLevel.Critical);
+                return;
+            }
+            if (args[0] == "help")
+            {
+                Logger.Log(Texts.Get("sos.command.help.log", "- log '{logCommands}'\n   Example: 'sos log verbose'").Replace("{logCommands}", string.Join(", ", Enum.GetNames(typeof(LogLevel)).Reverse())).Value, level: LogLevel.Critical);
+                return;
+            }
+            else if (Enum.TryParse(args[0], true, out LogLevel log))
+            {
+                Logger.ActualLogLevel = log;
+                return;
+            }
+
+            Logger.LogWarning($"Attribute '{args[0]}' in Command 'sos log {string.Join(' ', args)}' not recognized.", level: LogLevel.Critical);
         }
 
         public void ToggleUI(Prefab? prefab = null)
