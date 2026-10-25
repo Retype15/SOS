@@ -363,6 +363,9 @@ namespace SOS
         LocalizedString? GetDescription(Prefab prefab)
             => PrefabInfoDefaults.GetDescription(prefab);
 
+        LocalizedString? GetTooltip(Prefab prefab)
+            => GetDescription(prefab);
+
         Sprite? GetIcon(Prefab prefab)
             => PrefabInfoDefaults.GetIcon(prefab);
 
@@ -519,6 +522,9 @@ namespace SOS
 
         public static LocalizedString? GetDescription(Prefab _)
             => null;
+
+        public static LocalizedString? GetTooltip(Prefab prefab)
+            => GetDescription(prefab);
 
         public static Sprite? GetIcon(Prefab _)
             => null;

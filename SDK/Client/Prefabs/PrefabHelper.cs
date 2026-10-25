@@ -211,6 +211,40 @@ namespace SOS.Prefabs
             cacheInfo.Clear();
         }
 
+        /// <summary>
+        /// Resolves a prefab by its identifier, using every active prefab provider.
+        /// </summary>
+        /// <param name="id">The identifier to look up. Leading and trailing whitespace is ignored.</param>
+        /// <returns>The matching prefab, or <c>null</c> if no active provider exposes it.</returns>
+        public static Prefab? Find(Identifier id)
+        {
+            if (!id.Value.IsNullOrWhiteSpace())
+                foreach (var provider in API.GetAllPrefabProviderInstances())
+                    if (provider.GetPrefabs(new SearchFilter(string.Empty))
+                            .FirstOrDefault(prefab => prefab.Identifier == id) is { } prefab)
+                        return prefab;
+            return null;
+        }
+
+        public static Prefab? FindOrFirst(Identifier? id)
+        {
+            Prefab? first = null;
+            bool idValid = !id?.Value.IsNullOrWhiteSpace() ?? false;
+            foreach (var provider in API.GetAllPrefabProviderInstances())
+            {
+                var prefabs = provider.GetPrefabs(new SearchFilter(string.Empty));
+                first ??= prefabs.FirstOrDefault();
+                if (idValid)
+                {
+                    if (prefabs.FirstOrDefault(prefab => prefab.Identifier == id) is { } prefab)
+                        return prefab;
+                }
+                else if (first != null)
+                    return first;
+            }
+            return first;
+        }
+
         public static LocalizedString? GetName(Prefab prefab)
             => cacheInfo.GetOrCreate(prefab, () => new(prefab)).Name;
 
@@ -236,6 +270,35 @@ namespace SOS.Prefabs
 
         public static LocalizedString? GetDescription(Prefab prefab)
             => cacheInfo.GetOrCreate(prefab, () => new(prefab)).Description;
+
+        public static LocalizedString? GetTooltip(Prefab prefab)
+        {
+            foreach (var info in API.GetAllPrefabInfoInstances())
+            {
+                if (!info.CanHandle(prefab)) continue;
+                if (info.GetTooltip(prefab) is { } tooltip) return tooltip;
+                if (info.GetDescription(prefab) is { } description) return description;
+            }
+
+            return null;
+        }
+
+        public static RichString GetEnrichedTooltip(Prefab prefab)
+        {
+            LocalizedString actual = GetTooltip(prefab) ?? Texts.Get("sos.gen.unknown", "???");
+            ReadOnlySpan<char> value = actual.Value.AsSpan();
+            int idx = value.LastIndexOf('\n');
+            ReadOnlySpan<char> modLine = idx == -1 ? value : value[(idx + 1)..];
+
+            if (prefab.ContentPackage != null)
+            {
+                if (modLine.Equals(prefab.ContentPackage.Name, StringComparison.Ordinal))
+                    return RichString.Rich(actual);
+
+                actual += '\n' + prefab.ContentPackage.Name.SetColor(Color.MediumPurple);
+            }
+            return RichString.Rich(actual);
+        }
 
         public static Sprite? GetIcon(Prefab prefab)
             => cacheInfo.GetOrCreate(prefab, () => new(prefab)).Icon;

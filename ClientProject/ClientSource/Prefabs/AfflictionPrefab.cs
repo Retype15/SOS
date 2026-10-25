@@ -85,5 +85,10 @@ namespace SOS.Prefabs.Affliction
             if (prefab is not AfflictionPrefab affliction) return null;
             return string.Join("\n\n", affliction.Descriptions?.Select(static d => $"({d.MinStrength.ToString().SetColor(Color.Orange)}-{d.MaxStrength.ToString().SetColor(Color.OrangeRed)}) {d.Target.ToString().SetColor(Color.BlueViolet)}: {d.Text}") ?? []);
         }
+
+        public LocalizedString? GetTooltip(Prefab prefab)
+            => prefab is AfflictionPrefab affliction
+                ? affliction.GetDescription(0f, AfflictionPrefab.Description.TargetType.Any)
+                : null;
     }
 }

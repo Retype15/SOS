@@ -102,6 +102,7 @@ namespace SOS
 
         public void ToggleUI(Prefab? prefab = null)
         {
+            API.Initialize(Plugin.Instance.PluginManagementService);
             if (!_sosStarted) ConfigHelper.LoadConfigs();
             _sosStarted = true;
             ProfileHelper.OnTargetSelected(prefab);
@@ -139,7 +140,6 @@ namespace SOS
             if (ActiveProfile != null) return ActiveProfile;
             if (HaveOldConfigFile || BGUI.Canvas == null || IsSOSBlocked) return null;
 
-            API.Initialize(Plugin.Instance.PluginManagementService);
             return API.GetWindowProfileInstance(WindowProfileConfig.Instance.ActiveProfileId);
         }
 

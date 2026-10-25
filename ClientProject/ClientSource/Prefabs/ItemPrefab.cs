@@ -7,6 +7,7 @@
 
 using Barotrauma;
 
+using Microsoft.Xna.Framework;
 using SOS.Extensions;
 using SOS.GUI;
 
@@ -108,11 +109,17 @@ namespace SOS.Prefabs.Item
         public Sprite? GetIcon(Prefab prefab)
             => prefab is ItemPrefab item ? item.InventoryIcon ?? item.Sprite : null;
 
+        public Color? GetIconColor(Prefab prefab)
+            => prefab is ItemPrefab item ? item.InventoryIconColor : null;
+
         public ContentXElement? GetConfigElement(Prefab prefab)
             => prefab is ItemPrefab item ? item.ConfigElement : null;
 
         public LocalizedString? GetDescription(Prefab prefab)
             => prefab is ItemPrefab item ? item.Description : null;
+
+        public LocalizedString? GetTooltip(Prefab prefab)
+            => prefab is ItemPrefab item ? item.GetTooltip(Character.Controlled) : null;
 
         public List<ContextMenuOption> GetContextOptions(Prefab prefab)
         {
