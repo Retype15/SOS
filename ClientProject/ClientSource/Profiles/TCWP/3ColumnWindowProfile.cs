@@ -230,7 +230,7 @@ namespace SOS.Profiles.TCWP
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.15f, 0.9f), headerLayout.RectTransform, Anchor.CenterLeft), style: null)
                 {
-                    OnDrawToolTip = component => component.ToolTip = CardBuilder.GetDetailedTooltip(target)
+                    OnDrawToolTip = component => component.ToolTip = target.GetRichTooltip()
                 };
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true)
                 {

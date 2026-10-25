@@ -480,6 +480,12 @@ namespace SOS.Extensions
         public static LocalizedString? GetDescription(this Prefab prefab)
             => PrefabHelper.GetDescription(prefab);
 
+        private static LocalizedString? GetTooltip(this Prefab prefab)
+            => PrefabHelper.GetTooltip(prefab);
+
+        public static RichString GetRichTooltip(this Prefab prefab)
+            => PrefabHelper.GetEnrichedTooltip(prefab);
+
         public static Sprite? GetIcon(this Prefab prefab)
             => PrefabHelper.GetIcon(prefab);
 

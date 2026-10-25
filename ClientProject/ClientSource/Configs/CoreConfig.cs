@@ -118,9 +118,7 @@ namespace SOS.Configs
         private Prefab? _currentTarget;
         public Prefab? CurrentTarget
         {
-            get => _currentTarget ??= (Prefab?)ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == _lastItemId.Value)
-                             ?? (Prefab?)AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == _lastItemId.Value)
-                             ?? (Prefab?)ItemPrefab.Prefabs.FirstOrDefault();
+            get => _currentTarget ??= PrefabHelper.FindOrFirst(_lastItemId.Value);
             set => _currentTarget = value;
         }
 

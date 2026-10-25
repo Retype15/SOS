@@ -9,6 +9,8 @@
 using System.Text;
 using Barotrauma;
 using Microsoft.Xna.Framework;
+using SOS.Extensions;
+using SOS.Prefabs;
 
 namespace SOS.GUI
 {
@@ -294,26 +296,14 @@ namespace SOS.GUI
             for (int i = 0; i < idList.Count; i++)
             {
                 string id = idList[i];
-                Prefab? found = (Prefab?)AfflictionPrefab.List.FirstOrDefault(a => a.Identifier.Value == id)
-                             ?? ItemPrefab.Prefabs.FirstOrDefault(p => p.Identifier.Value == id);
+                Prefab? found = PrefabHelper.Find(id);
 
                 if (found != null) data.Add(found);
                 else data.Add(fallbackFilterPrefix.HasValue ? $"{fallbackFilterPrefix}{id}" : id);
             }
 
-            string GetText(object obj, int index)
-            {
-                if (obj is ItemPrefab ip) return ip.Name.Value;
-                if (obj is AfflictionPrefab ap) return ap.Name.Value;
-                return (nameList != null && index < nameList.Count) ? nameList[index] : obj.ToString()!;
-            }
-
-            Color GetColor(object obj)
-            {
-                if (obj is ItemPrefab ip) return ip.InventoryIconColor;
-                if (obj is AfflictionPrefab ap) return ap.IconColors?.FirstOrDefault() ?? Color.White;
-                return Color.LightSkyBlue;
-            }
+            string GetFallbackText(object obj, int index)
+                => (nameList != null && index < nameList.Count) ? nameList[index] : obj.ToString()!;
 
             var row = new GUIButton(NewDefaultRectTransform(), style: null)
             {
@@ -325,8 +315,11 @@ namespace SOS.GUI
             for (int i = 0; i < data.Count; i++)
             {
                 var obj = data[i];
-                var c = GetColor(obj);
-                sb.Append($"‖color:{c.R},{c.G},{c.B}‖{GetText(obj, i)}‖end‖");
+                if (obj is Prefab prefab)
+                    sb.Append(prefab.GetNameOrFallback(prefab.GetIconColor() ?? Color.White).Value);
+                else
+                    sb.Append(GetFallbackText(obj, i).SetColor(Color.LightSkyBlue));
+
                 if (i < data.Count - 1)
                     sb.Append(", ");
             }

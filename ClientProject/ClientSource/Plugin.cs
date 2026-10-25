@@ -31,8 +31,6 @@ namespace SOS
                 API.RegisterConfig(() => TestGUILayoutBuilderOnConfigs.Instance, TestGUILayoutBuilderOnConfigs.ID, 1);
 #endif
 
-                Configs.ConfigHelper.LoadConfigs();
-
                 ConsoleCommandsService.RegisterCommand(
                         name: "sos",
                         help: CommandHelp(),

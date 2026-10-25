@@ -39,28 +39,6 @@ namespace SOS.Panels.ItemPanel
 
         private static readonly Dictionary<Identifier, string> machineNameCache = [];
 
-        public static RichString GetDetailedTooltip(Prefab? prefab)
-        {
-            LocalizedString actual = prefab switch
-            {
-                ItemPrefab item => item?.GetTooltip(Character.Controlled) ?? "",
-                AfflictionPrefab affliction => (LocalizedString)(affliction?.GetDescription(0f, AfflictionPrefab.Description.TargetType.Self) ?? ""),
-                _ => Texts.Get("sos.gen.unknown", "???"),
-            };
-            ReadOnlySpan<char> value = actual.Value.AsSpan();
-            int idx = value.LastIndexOf('\n');
-            ReadOnlySpan<char> modLine = idx == -1 ? value : value[(idx + 1)..];
-
-            if (prefab?.ContentPackage != null)
-            {
-                if (modLine.Equals(prefab.ContentPackage.Name, StringComparison.Ordinal)) return RichString.Rich(actual);
-
-                string modColor = XMLExtensions.ToStringHex(Color.MediumPurple);
-                actual += $"\n‖color:{modColor}‖{prefab.ContentPackage.Name}‖color:end‖";
-            }
-            return RichString.Rich(actual);
-        }
-
         public static void DrawHeader(GUIFrame parent, ItemPrefab item)
         {
             var layout = new GUILayoutGroup(new RectTransform(Vector2.One, parent.RectTransform), isHorizontal: true) { AbsoluteSpacing = 10 };
@@ -71,7 +49,7 @@ namespace SOS.Panels.ItemPanel
                 {
                     //ToolTip = GetDetailedTooltip(item),
                     OnDrawToolTip = component =>
-                        component.ToolTip = GetDetailedTooltip(item)
+                        component.ToolTip = item.GetRichTooltip()
                 };
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), imgFrame.RectTransform, Anchor.Center), icon, scaleToFit: true) { Color = item.InventoryIconColor, CanBeFocused = false };
             }
@@ -350,27 +328,27 @@ namespace SOS.Panels.ItemPanel
 
         public static void DrawMinimalItemRow(GUIComponent parent, Prefab? prefab, float amount, Action<Prefab>? onPrimaryClick = null, Action<Prefab>? onSecondaryClick = null, Color? badgeColor = null)
         {
+            if (prefab == null) return;
             var btnRect = new RectTransform(new Point(30, 30), parent.RectTransform);
 
             var btn = new GUIButton(btnRect, style: "GUIButton")
             {
                 OnDrawToolTip = component =>
-                        component.ToolTip = GetDetailedTooltip(prefab),
+                        component.ToolTip = prefab.GetRichTooltip(),
                 Color = Color.Black * 0.4f
             };
 
-            if (prefab != null && (onPrimaryClick != null || onSecondaryClick != null))
+            if (onPrimaryClick != null || onSecondaryClick != null)
             {
                 btn.OnClicked = (_, _) => { onPrimaryClick?.Invoke(prefab); return true; };
                 btn.OnSecondaryClicked = (_, _) => { onSecondaryClick?.Invoke(prefab); return true; };
             }
 
-            Sprite? icon = prefab?.GetIcon();
-            if (icon != null)
+            if (prefab.GetIcon() is { } icon)
             {
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), btn.RectTransform, Anchor.Center), icon, scaleToFit: true)
                 {
-                    Color = prefab?.GetIconColor() ?? Color.White,
+                    Color = prefab.GetIconColor() ?? Color.White,
                     CanBeFocused = false
                 };
             }
@@ -392,16 +370,17 @@ namespace SOS.Panels.ItemPanel
 
         public static void DrawCompactItemRow(GUIComponent parent, Prefab? prefab, float amount, bool isCardInside, string extraText = "", Color? color = null, Action<Prefab>? onPrimaryClick = null, Action<Prefab>? onSecondaryClick = null)
         {
+            if (prefab == null) return;
             var rowRect = new RectTransform(new Vector2(1f, 0f), parent.RectTransform) { MinSize = new Point(0, RowHeight) };
 
             GUIComponent container;
 
-            if (prefab != null && (onPrimaryClick != null || onSecondaryClick != null))
+            if (onPrimaryClick != null || onSecondaryClick != null)
             {
                 var btn = new GUIButton(rowRect, style: "ListBoxElement")
                 {
                     OnDrawToolTip = component =>
-                        component.ToolTip = GetDetailedTooltip(prefab),
+                        component.ToolTip = prefab.GetRichTooltip(),
                     OnClicked = (_, _) =>
                     {
                         onPrimaryClick?.Invoke(prefab);
@@ -422,7 +401,7 @@ namespace SOS.Panels.ItemPanel
                     AbsoluteSpacing = 5,
                     CanBeFocused = true,
                     OnDrawToolTip = component =>
-                        component.ToolTip = GetDetailedTooltip(prefab)
+                        component.ToolTip = prefab.GetRichTooltip()
                 };
             }
 
