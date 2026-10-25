@@ -147,8 +147,8 @@ namespace SOS.Profiles
                 if (prefab == null)
                     return $"{text.SetColor(Color.Gray)}\n{info}".Rich();
 
-                var (name, color) = prefab.SafeName(Color.BlueViolet);
-                return $"{text.SetColor(Color.Gold)}: {name.SetColor(color)}\n{info}".Rich();
+                var name = prefab.GetNameOrFallback(Color.BlueViolet);
+                return $"{text.SetColor(Color.Gold)}: {name}\n{info}".Rich();
 
             };
 
@@ -159,8 +159,8 @@ namespace SOS.Profiles
                 if (prefab == null)
                     return $"{text.SetColor(Color.Gray)}\n{info}".Rich();
 
-                var (name, color) = prefab.SafeName(Color.BlueViolet);
-                return $"{text.SetColor(Color.Gold)}: {name.SetColor(color)}\n{info}".Rich();
+                var name = prefab.GetNameOrFallback(Color.BlueViolet);
+                return $"{text.SetColor(Color.Gold)}: {name}\n{info}".Rich();
             };
 
             navigationHistory.UpdateButtonStates();
@@ -728,8 +728,8 @@ namespace SOS.Profiles
         /// </remarks>
         public static string GetRawXMLSafe(Prefab item)
         {
-            var configElement = item.ConfigElement();
-            if (configElement == null) return "<!-- No XML data found for this item -->";
+            var configElement = item.GetConfigElement();
+            if (configElement == null || !configElement.HasElements) return "<!-- No XML data found for this item -->";
             try
             {
                 string rawXml = configElement.ToString() ?? "<!-- Empty XML -->";

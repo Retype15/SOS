@@ -365,12 +365,12 @@ namespace SOS.Panels.ItemPanel
                 btn.OnSecondaryClicked = (_, _) => { onSecondaryClick?.Invoke(prefab); return true; };
             }
 
-            Sprite? icon = prefab.Icon();
+            Sprite? icon = prefab?.GetIcon();
             if (icon != null)
             {
                 _ = new GUIImage(new RectTransform(new Vector2(0.8f, 0.8f), btn.RectTransform, Anchor.Center), icon, scaleToFit: true)
                 {
-                    Color = prefab.IconColor(),
+                    Color = prefab?.GetIconColor() ?? Color.White,
                     CanBeFocused = false
                 };
             }
@@ -432,16 +432,26 @@ namespace SOS.Panels.ItemPanel
                 CanBeFocused = false
             };
 
-            Sprite? icon = prefab?.Icon();
+            Sprite? icon = prefab?.GetIcon();
             if (icon != null)
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Point(20, 20), contentLayout.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(isCardInside ? 0 : 5, 0) }, style: null) { CanBeFocused = false };
-                _ = new GUIImage(new RectTransform(Vector2.One, imgFrame.RectTransform), icon, scaleToFit: true) { Color = prefab.IconColor(), CanBeFocused = false };
+                _ = new GUIImage(new RectTransform(Vector2.One, imgFrame.RectTransform), icon, scaleToFit: true)
+                {
+                    Color = prefab?.GetIconColor() ?? Color.White,
+                    CanBeFocused = false
+                };
             }
 
-            var (nameStr, aColor) = prefab.SafeName(color ?? Color.White);
+            var nameStr = prefab?.GetName();
+            var nameColor = color ?? Color.White;
+            if (nameStr.IsNullOrEmpty())
+            {
+                nameStr = prefab?.GetNameFallback() ?? Texts.Get("sos.cardbuilder.none_selected", "Nothing Selected...");
+                nameColor = Color.Red;
+            }
 
-            var nameBlock = new GUITextBlock(new RectTransform(new Vector2(0.6f, 1f), contentLayout.RectTransform), nameStr, font: GUIStyle.SmallFont, textColor: aColor, textAlignment: Alignment.CenterLeft) { CanBeFocused = false };
+            var nameBlock = new GUITextBlock(new RectTransform(new Vector2(0.6f, 1f), contentLayout.RectTransform), nameStr, font: GUIStyle.SmallFont, textColor: nameColor, textAlignment: Alignment.CenterLeft) { CanBeFocused = false };
 
             string amtStr = (amount > 1 || amount < 1) ? $" x{amount}" : "";
             var rightBlock = new GUITextBlock(new RectTransform(new Vector2(0.4f, 1f), contentLayout.RectTransform), $"{extraText}{amtStr}", font: GUIStyle.SmallFont, textColor: color ?? Color.Gray, textAlignment: Alignment.CenterRight)

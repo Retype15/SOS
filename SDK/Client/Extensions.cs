@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using Barotrauma;
 using Barotrauma.LuaCs.Data;
 using Microsoft.Xna.Framework;
+using SOS.Prefabs;
 
 namespace SOS.Extensions
 {
@@ -462,109 +463,31 @@ namespace SOS.Extensions
     /// Provides extension methods for working with prefabs, including name resolution, icon retrieval,
     /// and config element access.
     /// </summary>
-    /// <remarks>
-    /// These methods are useful for modders who need to display prefab information in custom UI.
-    /// The SafeName method handles null prefabs and provides default colors/text for missing data.
-    /// </remarks>
     internal static class PrefabExt
     {
+        public static LocalizedString? GetName(this Prefab prefab)
+            => PrefabHelper.GetName(prefab);
 
-        /// <summary>
-        /// Gets the safe name and text color for a prefab, handling null values and missing data.
-        /// </summary>
-        /// <param name="prefab">The prefab to get the name for. Can be null.</param>
-        /// <param name="defaultColor">The default color to use if the prefab has no name or identifier.</param>
-        /// <returns>A tuple containing the display name and text color.</returns>
-        /// <remarks>
-        /// If the prefab is null, returns the default name "???" in the default color.
-        /// If the prefab has an empty name, the identifier is shown in brackets with red color.
-        /// Otherwise, the prefab's name value is used with the default color.
-        /// </remarks>
-        public static (string Name, Color TextColor) SafeName(this Prefab? prefab, Color defaultColor)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.Name.IsNullOrEmpty()
-                                        ? ($"[{item.Identifier}]", Color.Red)
-                                        : (item.Name.Value, defaultColor),
-                AfflictionPrefab affliction => affliction.Name.IsNullOrEmpty()
-                                        ? ($"[{affliction.Identifier}]", Color.Red)
-                                        : (affliction.Name.Value, defaultColor),
-                _ => (Texts.Get("sos.gen.unknown", "???").Value, defaultColor),
-            };
-        }
-        /// <summary>
-        /// Gets the display name for a prefab.
-        /// </summary>
-        /// <param name="prefab">The prefab to get the name for.</param>
-        /// <returns>The name of the prefab, or the identifier as a string if the name is not available.</returns>
-        public static string Name(this Prefab prefab)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.Name.ToString(),
-                AfflictionPrefab affliction => affliction.Name.ToString(),
-                _ => prefab.Identifier.ToString()
-            };
-        }
-        /// <summary>
-        /// Gets the icon sprite for a prefab.
-        /// </summary>
-        /// <param name="prefab">The prefab to get the icon for. Can be null.</param>
-        /// <returns>The inventory icon sprite for items, the affliction icon for afflictions, or null for other types.</returns>
-        /// <remarks>
-        /// For <see cref="ItemPrefab"/>, prefers the inventory icon, falling back to the sprite.
-        /// For <see cref="AfflictionPrefab"/>, returns the Icon property.
-        /// Returns null for other prefab types or if the prefab is null.
-        /// </remarks>
-        public static Sprite? Icon(this Prefab? prefab)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.InventoryIcon ?? item.sprite,
-                AfflictionPrefab affliction => affliction.Icon,
-                _ => null
-            };
-        }
-        /// <summary>
-        /// Gets the icon color for a prefab.
-        /// </summary>
-        /// <param name="prefab">The prefab to get the icon color for. Can be null.</param>
-        /// <returns>The inventory icon color for items, the first icon color for afflictions, or white for other types.</returns>
-        /// <remarks>
-        /// For <see cref="ItemPrefab"/>, returns the InventoryIconColor.
-        /// For <see cref="AfflictionPrefab"/>, returns the first color from IconColors or White.
-        /// Returns White for other prefab types or if the prefab is null.
-        /// </remarks>
-        public static Color IconColor(this Prefab? prefab)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.InventoryIconColor,
-                AfflictionPrefab affliction => affliction.IconColors?.FirstOrDefault(Color.White),
-                _ => null
-            } ?? Color.White;
-        }
+        public static LocalizedString GetNameFallback(this Prefab prefab)
+            => PrefabHelper.GetNameFallback(prefab);
 
-        /// <summary>
-        /// Gets the configuration XML element for a prefab.
-        /// </summary>
-        /// <param name="prefab">The prefab to get the config element for.</param>
-        /// <returns>The ConfigElement for items, the configElement for afflictions, or null for other types.</returns>
-        /// <remarks>
-        /// For <see cref="ItemPrefab"/>, returns the ConfigElement property.
-        /// For <see cref="AfflictionPrefab"/>, returns the configElement field.
-        /// Returns null for other prefab types.
-        /// </remarks>
-        public static ContentXElement? ConfigElement(this Prefab prefab)
-        {
-            return prefab switch
-            {
-                ItemPrefab item => item.ConfigElement,
-                AfflictionPrefab affliction => affliction.configElement,
-                _ => null
-            };
-        }
+        public static LocalizedString GetNameOrFallback(this Prefab prefab)
+            => PrefabHelper.GetNameOrFallback(prefab);
+
+        public static LocalizedString GetNameOrFallback(this Prefab prefab, Color color)
+            => PrefabHelper.GetNameOrFallback(prefab, color);
+
+        public static LocalizedString? GetDescription(this Prefab prefab)
+            => PrefabHelper.GetDescription(prefab);
+
+        public static Sprite? GetIcon(this Prefab prefab)
+            => PrefabHelper.GetIcon(prefab);
+
+        public static Color? GetIconColor(this Prefab prefab)
+            => PrefabHelper.GetIconColor(prefab);
+
+        public static ContentXElement? GetConfigElement(this Prefab prefab)
+            => PrefabHelper.GetConfigElement(prefab);
     }
 
     /// <summary>

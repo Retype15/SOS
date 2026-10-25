@@ -963,18 +963,13 @@ namespace SOS.StatsInfo
     {
         public void Draw(RectTransform rectT, Prefab prefab)
         {
-            string? text = prefab switch
-            {
-                ItemPrefab item => item.Description?.Value ?? "",
-                AfflictionPrefab affliction => string.Join("\n\n", affliction.Descriptions.Select(d => $"({d.MinStrength.ToString().SetColor(Color.Orange)}-{d.MaxStrength.ToString().SetColor(Color.OrangeRed)}) {d.Target.ToString().SetColor(Color.BlueViolet)}: {d.Text}")),
-                _ => null
-            };
+            var text = prefab.GetDescription();
 
-            if (string.IsNullOrEmpty(text)) return;
+            if (text.IsNullOrEmpty()) return;
 
             using var l = new GUILayoutBuilder(rectT);
             l.Header(Texts.Get("sos.item.description", "DESCRIPTION").Value, Color.Gold);
-            l.Text(text.Rich());
+            l.Text(text.Value.Rich());
         }
     }
 }

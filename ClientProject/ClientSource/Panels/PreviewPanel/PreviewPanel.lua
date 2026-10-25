@@ -2,37 +2,22 @@
 -- This file is licensed under the GNU GPLv3.
 -- See the LICENSE file in the project root for details.
 
-local API        = LuaUserData.CreateStatic("SOS.API")
-local Logger     = LuaUserData.CreateStatic("SOS.Logger")
+local API          = LuaUserData.CreateStatic("SOS.API")
+local Logger       = LuaUserData.CreateStatic("SOS.Logger")
+local PrefabHelper = LuaUserData.CreateStatic("SOS.Prefabs.PrefabHelper")
 
-local PreviewTab = {}
+local PreviewTab   = {}
 
-local nameBlock  = nil
-local idBlock    = nil
-local sprite     = nil
+local nameBlock    = nil
+local idBlock      = nil
+local sprite       = nil
+local spriteColor  = Color.White
 
 function PreviewTab.CanHandle(prefab)
     if prefab == nil then return false end
 
     return LuaUserData.IsTargetType(prefab, "Barotrauma.ItemPrefab")
         or LuaUserData.IsTargetType(prefab, "Barotrauma.AfflictionPrefab")
-end
-
-local function GetPrefabIcon(pf)
-    if pf == nil then return nil end
-    if LuaUserData.IsTargetType(pf, "Barotrauma.ItemPrefab") then
-        return pf.InventoryIcon or pf.Sprite
-    elseif LuaUserData.IsTargetType(pf, "Barotrauma.AfflictionPrefab") then
-        return pf.Icon
-    end
-    return nil
-end
-
-local function GetPrefabName(pf)
-    if pf == nil then return "" end
-    local ok, name = pcall(function() return pf.Name.Value end)
-    if ok and name then return name end
-    return tostring(pf.Identifier.Value or "")
 end
 
 function PreviewTab.Init(container, tabButton)
@@ -62,14 +47,15 @@ function PreviewTab.Init(container, tabButton)
         local scaleY = rect.Height / sourceRect.Height
         local scale = math.min(scaleX, scaleY) * 0.85
 
-        sb.Draw(sprite.Texture, center, sourceRect, Color.White, 0, origin, scale, 0, 0)
+        sb.Draw(sprite.Texture, center, sourceRect, spriteColor, 0, origin, scale, 0, 0)
     end)
 end
 
 function PreviewTab.Update(prefab)
-    nameBlock.Text = GetPrefabName(prefab)
+    nameBlock.Text = PrefabHelper.GetNameOrFallback(prefab)
     idBlock.Text = tostring(prefab.Identifier.Value)
-    sprite = GetPrefabIcon(prefab)
+    sprite = PrefabHelper.GetIcon(prefab)
+    spriteColor = PrefabHelper.GetIconColor(prefab) or Color.White
 end
 
 function PreviewTab.Dispose()
