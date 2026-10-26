@@ -389,6 +389,7 @@ namespace SOS.GUI
         {
             return new(new RectTransform(new Point(280, 180), BGUI.Canvas, Anchor.TopRight) { AbsoluteOffset = new Point(20, 150) })
             {
+                Visible = false,
                 CanBeFocused = false,
                 Color = Color.Black * 0.6f
             };

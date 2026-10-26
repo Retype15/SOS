@@ -102,9 +102,7 @@ namespace SOS
 
         public void ToggleUI(Prefab? prefab = null)
         {
-            API.Initialize(Plugin.Instance.PluginManagementService);
-            if (!_sosStarted) ConfigHelper.LoadConfigs();
-            _sosStarted = true;
+            EnsureStarted();
             ProfileHelper.OnTargetSelected(prefab);
 
             if (ActiveProfile == null)
@@ -116,6 +114,15 @@ namespace SOS
 
             if (prefab != null) ProfileHelper.OpenWindow();
             else ProfileHelper.ToggleWindow();
+        }
+
+        private void EnsureStarted()
+        {
+            if (_sosStarted) return;
+
+            API.Initialize(Plugin.Instance.PluginManagementService);
+            ConfigHelper.LoadConfigs();
+            _sosStarted = true;
         }
 
         private void EnsureProfileCreated()
@@ -172,7 +179,10 @@ namespace SOS
                 {
                     if (PlayerInput.IsCtrlDown() && !IsSOSBlocked)
                     {
-                        Tracker.ToggleTracker();
+                        bool wasStarted = _sosStarted;
+                        EnsureStarted();
+                        if (wasStarted) Tracker.ToggleTracker();
+                        else GUIRecipeTracker.ShowTracker();
                     }
                     else
                     {
@@ -212,7 +222,7 @@ namespace SOS
             ActiveProfile?.Update();
 
             if (migrationPending) MigrationDialog.Update();
-            if (!IsSOSBlocked && Screen.Selected == GameMain.GameScreen) Tracker.Update();
+            if (_sosStarted && !IsSOSBlocked && Screen.Selected == GameMain.GameScreen) Tracker.Update();
             ProfileHelper.Update();
         }
 
