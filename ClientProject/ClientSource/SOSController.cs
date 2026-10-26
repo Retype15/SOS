@@ -88,7 +88,7 @@ namespace SOS
             }
             if (args[0] == "help")
             {
-                Logger.Log(Texts.Get("sos.command.help.log", "- log '{logCommands}'\n   Example: 'sos log verbose'").Replace("{logCommands}", string.Join(", ", Enum.GetNames(typeof(LogLevel)).Reverse())).Value, level: LogLevel.Critical);
+                Logger.Log(Texts.Get("sos.command.help.log", "- log '{logCommands}'\n   Example: 'sos log debug'").Replace("{logCommands}", string.Join(", ", Enum.GetNames(typeof(LogLevel)).Reverse())).Value, level: LogLevel.Critical);
                 return;
             }
             else if (Enum.TryParse(args[0], true, out LogLevel log))

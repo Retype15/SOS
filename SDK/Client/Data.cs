@@ -383,7 +383,7 @@ namespace SOS
         List<ContextMenuOption> GetContextOptions(Prefab prefab)
             => PrefabInfoDefaults.GetContextOptions(prefab);
 
-        Dictionary<Tuple<Identifier, Type>, Func<Prefab, object>> Metadata(Prefab prefab)
+        Dictionary<Identifier, Func<Prefab, object>> Metadata(Prefab prefab)
             => PrefabInfoDefaults.Metadata(prefab);
     }
 
@@ -535,7 +535,7 @@ namespace SOS
         public static ContentXElement? GetConfigElement(Prefab _)
             => null;
 
-        public static Dictionary<Tuple<Identifier, Type>, Func<Prefab, object>> Metadata(Prefab _)
+        public static Dictionary<Identifier, Func<Prefab, object>> Metadata(Prefab _)
             => [];
 
         /// <summary>

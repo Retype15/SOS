@@ -163,13 +163,8 @@ namespace SOS
                 }
 
                 // Restore last selected item
-                if (!string.IsNullOrEmpty(lastItemId))
-                {
-                    cfg.CurrentTarget = (Prefab?)ItemPrefab.Prefabs
-                        .FirstOrDefault(p => p.Identifier.Value == lastItemId)
-                        ?? (Prefab?)AfflictionPrefab.List
-                            .FirstOrDefault(a => a.Identifier.Value == lastItemId);
-                }
+                if (!lastItemId.IsNullOrEmpty())
+                    cfg.CurrentTarget = PrefabHelper.Find(lastItemId);
 
                 // save
                 ConfigHelper.SaveConfigs();
