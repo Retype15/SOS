@@ -236,9 +236,8 @@ namespace SOS.Prefabs
         /// </returns>
         public static Prefab? FindOrFirst(Identifier? id)
         {
-            Prefab? result = null;
-            if (id?.Value.IsNullOrWhiteSpace() ?? false) result = Find((Identifier)id);
-            if (result != null) return result;
+            if (id != null && Find((Identifier)id) is { } found)
+                return found;
             foreach (var provider in API.GetAllPrefabProviderInstances())
                 if (provider.GetPrefabs(new SearchFilter(string.Empty)).FirstOrDefault() is { } prefab)
                     return prefab;
