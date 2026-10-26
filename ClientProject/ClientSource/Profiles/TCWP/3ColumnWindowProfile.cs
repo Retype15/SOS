@@ -51,9 +51,15 @@ namespace SOS.Profiles.TCWP
         private List<Prefab> allFilteredTargets = [];
         private readonly Dictionary<Type, string> headerCache = [];
         private int itemsLoaded = 0;
-        private const int ChunkSize = 50;
-        private bool isUpdating = false;
+        private const int RowHeight = 32;
+        private const int PrefetchRows = 2;
+        private const int MaxRowsPerLoad = 256;
         private Type? lastTypeInList;
+
+        // Compact layout
+        private GUILayoutGroup? currentRow;
+        private int itemsInRow;
+        private bool loadPerformedThisFrame;
 
         private readonly double searchDelay = 0.2;
         private double searchExecutionTime = 0;
@@ -147,14 +153,13 @@ namespace SOS.Profiles.TCWP
         {
             if (!Visible) return;
 
+            loadPerformedThisFrame = false;
             UpdateLayout();
             HandleSearchDebounce();
 
-            if (itemList != null && itemsLoaded < allFilteredTargets.Count && !isUpdating)
+            if (!loadPerformedThisFrame && itemList != null && itemsLoaded < allFilteredTargets.Count && IsNearListEnd())
             {
-                int total = allFilteredTargets.Count;
-                int currentIndex = (int)(itemList.ScrollBar.BarScroll * (total - 1));
-                if (currentIndex >= total - 5) LoadNextChunk();
+                LoadNextChunk();
             }
 
             if (layoutMenuFrame != null && PlayerInput.PrimaryMouseButtonClicked())
@@ -341,7 +346,6 @@ namespace SOS.Profiles.TCWP
             rightPanelMode = DisplayMode.Normal;
             lastLeftWForReflow = 0;
             lastCenterWForReflow = 0;
-            isUpdating = false;
             pendingSearchQuery = null;
             searchExecutionTime = 0;
             layoutMenuFrame = null;
@@ -518,6 +522,9 @@ namespace SOS.Profiles.TCWP
         private void UpdateSearch(string query)
         {
             if (itemList == null) return;
+
+            pendingSearchQuery = null;
+
             var filter = new SearchFilter(query);
 
             allFilteredTargets.Clear();
@@ -539,37 +546,54 @@ namespace SOS.Profiles.TCWP
                 }
             }
 
-            var ctrl = SOSController.Instance;
             allFilteredTargets = [.. candidates
                 .OrderByDescending(c => PrefabHelper.IsFavorite(c.Identifier.Value))];
 
             itemsLoaded = 0;
-            itemList.Content.ClearChildren();
+            currentRow = null;
+            itemsInRow = 0;
+            itemList.ClearChildren();
             itemList.ScrollBar.BarScroll = 0;
 
             LoadNextChunk();
         }
 
+        private bool IsNearListEnd()
+        {
+            if (itemList == null) return false;
+
+            float viewport = itemList.Content.Rect.Height;
+            float scrollable = itemList.TotalSize - viewport;
+            if (scrollable <= 0f) return true;
+
+            float remaining = (1f - itemList.ScrollBar.BarScroll) * scrollable;
+            return remaining <= PrefetchRows * RowHeight;
+        }
+
         private void LoadNextChunk()
         {
-            if (itemList == null || itemsLoaded >= allFilteredTargets.Count || isUpdating) return;
+            if (itemList == null || itemsLoaded >= allFilteredTargets.Count) return;
+            if (leftPanelMode == DisplayMode.Hidden) return;
 
-            isUpdating = true;
-            float totalScrollableHeightBefore = itemList.Content.Rect.Height - itemList.Rect.Height;
-            float currentScrollPixels = itemList.ScrollBar.BarScroll * totalScrollableHeightBefore;
-            int nextBatch = Math.Min(itemsLoaded + ChunkSize, allFilteredTargets.Count);
+            loadPerformedThisFrame = true;
 
-            int slotSize = 32;
-            int itemsInRow = 0;
+            float viewport = itemList.Content.Rect.Height;
+            float targetPixels = viewport + PrefetchRows * RowHeight;
+            float scrollableBefore = Math.Max(0f, itemList.TotalSize - viewport);
+            float anchorPixels = itemList.ScrollBar.BarScroll * scrollableBefore;
+
+            float addedPixels = 0f;
+            int rowsAdded = 0;
+
+            int slotSize = RowHeight;
             int availableWidth = (int)itemList.Rect.Width - 14;
             int maxItemsPerRow = Math.Max(1, availableWidth / slotSize);
 
-            GUILayoutGroup? currentRow = null;
-            var ctrl = SOSController.Instance;
-
-            for (int i = itemsLoaded; i < nextBatch; i++)
+            while (itemsLoaded < allFilteredTargets.Count &&
+                   addedPixels < targetPixels &&
+                   rowsAdded < MaxRowsPerLoad)
             {
-                var prefab = allFilteredTargets[i];
+                var prefab = allFilteredTargets[itemsLoaded];
                 Type currentType = prefab.GetType();
 
                 if (currentType != lastTypeInList)
@@ -587,6 +611,9 @@ namespace SOS.Profiles.TCWP
                     _ = new GUITextBlock(new RectTransform(Vector2.One, separatorFrame.RectTransform),
                         headerText, font: GUIStyle.SmallFont, textColor: Color.MediumPurple, textAlignment: Alignment.Center)
                     { Wrap = true };
+
+                    addedPixels += separatorFrame.Rect.Height;
+                    rowsAdded++;
                     currentRow = null;
                     itemsInRow = 0;
                 }
@@ -601,6 +628,9 @@ namespace SOS.Profiles.TCWP
                             var rowRect = new RectTransform(new Vector2(1f, 0f), itemList.Content.RectTransform) { MinSize = new Point(0, slotSize) };
                             currentRow = new GUILayoutGroup(rowRect, isHorizontal: true) { AbsoluteSpacing = 2 };
                             itemsInRow = 0;
+
+                            addedPixels += currentRow.Rect.Height;
+                            rowsAdded++;
                         }
                         CardBuilder.DrawMinimalItemRow(currentRow, prefab, 1,
                             onPrimaryClick: ProfileHelper.OnPrimary,
@@ -618,23 +648,22 @@ namespace SOS.Profiles.TCWP
                             CanBeFocused = true
                         };
                         CardBuilder.DrawCompactItemRow(btn, prefab, 1, false, color: isFav ? Color.Gold : Color.White);
+
+                        addedPixels += btn.Rect.Height;
+                        rowsAdded++;
                         break;
                 }
+
+                itemsLoaded++;
             }
 
-            itemsLoaded = nextBatch;
             itemList.RecalculateChildren();
             itemList.UpdateScrollBarSize();
 
-            float totalScrollableHeightAfter = itemList.Content.Rect.Height - itemList.Rect.Height;
-            if (totalScrollableHeightAfter > 0)
-            {
-                float newBarScroll = currentScrollPixels / totalScrollableHeightAfter;
-                newBarScroll = MathHelper.Clamp(newBarScroll, 0, 0.80f);
-                itemList.ScrollBar.BarScroll = newBarScroll;
-            }
-
-            isUpdating = false;
+            float scrollableAfter = Math.Max(0f, itemList.TotalSize - viewport);
+            itemList.ScrollBar.BarScroll = scrollableAfter > 0f
+                ? MathHelper.Clamp(anchorPixels / scrollableAfter, 0f, 1f)
+                : 0f;
         }
 
         private string GetHeaderForType(Type type)
