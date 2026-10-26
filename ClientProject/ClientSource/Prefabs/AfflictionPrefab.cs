@@ -87,8 +87,14 @@ namespace SOS.Prefabs.Affliction
         }
 
         public LocalizedString? GetTooltip(Prefab prefab)
-            => prefab is AfflictionPrefab affliction
-                ? affliction.GetDescription(0f, AfflictionPrefab.Description.TargetType.Any)
-                : null;
+        {
+            if (prefab is not AfflictionPrefab affliction) return null;
+
+            LocalizedString tooltip = affliction.Name.SetColor(GUIStyle.TextColorBright);
+            var description = affliction.GetDescription(0f, AfflictionPrefab.Description.TargetType.Any);
+            if (!description.IsNullOrEmpty())
+                tooltip += (LocalizedString)$"\n{description}";
+            return tooltip;
+        }
     }
 }
