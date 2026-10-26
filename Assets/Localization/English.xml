@@ -3,7 +3,9 @@
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] Client: Initialized. Press 'J' to open.</sos.client.init>
 	<sos.command.help>Open/Close SOS.\nSub-command available:</sos.command.help>
-	<sos.command.help.log>- log [{logCommands}]\nExample: 'sos log verbose'</sos.command.help.log>
+	<sos.command.help.log>- log [{logCommands}]
+	Example: 'sos log debug'</sos.command.help.log>
+	<sos.command.log.status>Log: {ActualLogLevel}</sos.command.log.status>
 	<sos.command.name>sos</sos.command.name>
 	<sos.shared.debugmode>[SOS] Debug Mode is enabled.</sos.shared.debugmode>
 	<sos.shared.loaded>[SOS] Loaded Successfully.</sos.shared.loaded>

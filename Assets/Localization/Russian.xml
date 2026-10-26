@@ -3,7 +3,9 @@
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] Клиент: Инициализирован. Нажмите 'J', чтобы открыть.</sos.client.init>
 	<sos.command.help>Открыть/Закрыть SOS.</sos.command.help>
-	<sos.command.help.log>- log [{logCommands}]\nПример: 'sos log verbose'</sos.command.help.log>
+	<sos.command.help.log>- log [{logCommands}]
+	Пример: 'sos log debug'</sos.command.help.log>
+	<sos.command.log.status>Журнал: {ActualLogLevel}</sos.command.log.status>
 	<sos.command.name>sos</sos.command.name>
 	<sos.shared.debugmode>[SOS] Режим отладки включен.</sos.shared.debugmode>
 	<sos.shared.loaded>[SOS] Успешно загружено.</sos.shared.loaded>

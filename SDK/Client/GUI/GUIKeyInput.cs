@@ -11,19 +11,43 @@ using BGUI = Barotrauma.GUI;
 
 namespace SOS.GUI
 {
+    /// <summary>
+    /// A button that captures the next key or mouse input and exposes it as a bindable value.
+    /// </summary>
     public class GUIKeyInput : GUIButton
     {
         private static GUICustomComponent? InputListener;
 
         private KeyOrMouse? _value;
+
+        /// <summary>
+        /// Gets or sets the currently bound key or mouse input.
+        /// </summary>
+        /// <remarks>Setting the value updates the button text and invokes <see cref="OnChangedValue"/>.</remarks>
         public KeyOrMouse? Value
         {
             get => _value;
             set => ApplyValue(value);
         }
+
+        /// <summary>
+        /// Gets or sets the default binding used when no value has been assigned.
+        /// </summary>
         public KeyOrMouse? DefaultValue;
+
+        /// <summary>
+        /// Invoked after the bound value changes.
+        /// </summary>
         public Action<KeyOrMouse?>? OnChangedValue;
 
+        /// <summary>
+        /// Creates a key input button.
+        /// </summary>
+        /// <param name="rectT">The rectangle that defines the button's size and position.</param>
+        /// <param name="value">The initial binding, or <c>null</c> for an unbound button.</param>
+        /// <param name="textAlignment">The alignment of the button text.</param>
+        /// <param name="style">The GUI style name. Defaults to <c>"GUIKeyInput"</c> when empty.</param>
+        /// <param name="color">Optional button color.</param>
         public GUIKeyInput(RectTransform rectT, KeyOrMouse? value = null, Alignment textAlignment = Alignment.Center, string style = "", Color? color = null)
         : base(rectT, LocalizedString.EmptyString, textAlignment, string.IsNullOrWhiteSpace(style) ? "GUIKeyInput" : style, color)
         {

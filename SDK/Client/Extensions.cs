@@ -606,6 +606,12 @@ namespace SOS.Extensions
         public static bool SetIfNotEqual([NotNullWhen(false)] this ISettingControl setting, KeyOrMouse value)
             => (!setting.Value?.Equals(value) ?? true) && setting.TrySetValue(value);
 
+        /// <summary>
+        /// Parses a key or mouse binding from text and sets it only if it differs from the current value.
+        /// </summary>
+        /// <param name="setting">The setting to update.</param>
+        /// <param name="value">The serialized key or mouse value to parse.</param>
+        /// <returns><c>true</c> if the parsed value was changed; <c>false</c> if parsing failed or the value was already equal.</returns>
         public static bool SetIfNotEqual([NotNullWhen(false)] this ISettingControl setting, string value)
         {
             var result = GetKeyOrMouse(value);
