@@ -399,6 +399,14 @@ namespace SOS
 
         #region Prefab Info Getters
 
+        /// <summary>
+        /// Registers a prefab information provider that supplies names, icons, tooltips, and context actions for prefabs.
+        /// </summary>
+        /// <param name="obj">The provider to register: a concrete <see cref="Type"/>, a factory delegate, or an existing instance.</param>
+        /// <param name="id">Optional unique identifier. When omitted, an identifier is derived from the provider type.</param>
+        /// <param name="order">Priority order used when multiple providers can handle the same prefab. Defaults to <c>0.0</c>.</param>
+        /// <param name="active">Whether the provider is initially enabled. Defaults to <c>true</c>.</param>
+        /// <returns><c>true</c> if registration succeeded; otherwise, <c>false</c>.</returns>
         public static bool RegisterPrefabInfo(object obj, string? id = null, double order = 0.0, bool active = true)
         {
             bool registered = PrefabInfoFactories.Register(obj, id, order, active);
@@ -406,6 +414,11 @@ namespace SOS
             return registered;
         }
 
+        /// <summary>
+        /// Enables a registered prefab information provider so it participates in lookups.
+        /// </summary>
+        /// <param name="id">The unique identifier of the provider.</param>
+        /// <returns><c>true</c> if the provider was found and activated; otherwise, <c>false</c>.</returns>
         public static bool ActivatePrefabInfo(string id)
         {
             bool activated = PrefabInfoFactories.SetActive(id, true);
@@ -413,6 +426,11 @@ namespace SOS
             return activated;
         }
 
+        /// <summary>
+        /// Disables a registered prefab information provider so it is excluded from lookups.
+        /// </summary>
+        /// <param name="id">The unique identifier of the provider.</param>
+        /// <returns><c>true</c> if the provider was found and deactivated; otherwise, <c>false</c>.</returns>
         public static bool DeactivatePrefabInfo(string id)
         {
             bool deactivated = PrefabInfoFactories.SetActive(id, false);
@@ -420,21 +438,56 @@ namespace SOS
             return deactivated;
         }
 
+        /// <summary>
+        /// Gets the registration entry for a prefab information provider without instantiating it.
+        /// </summary>
+        /// <param name="id">The unique identifier of the provider.</param>
+        /// <returns>The matching factory entry, or <c>null</c> if no provider is registered with <paramref name="id"/>.</returns>
         public static IFactoryEntry<ISOSPrefabInfo>? GetPrefabInfo(string id)
             => PrefabInfoFactories.Get(id);
 
+        /// <summary>
+        /// Gets a strongly typed prefab information provider instance.
+        /// </summary>
+        /// <typeparam name="T">The expected provider type.</typeparam>
+        /// <param name="id">The unique identifier of the provider.</param>
+        /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance.</param>
+        /// <returns>The provider instance when it matches <typeparamref name="T"/>; otherwise, <c>default</c>.</returns>
         public static T? GetPrefabInfoInstance<T>(string id, bool fresh = false)
             => GetPrefabInfoInstance(id, fresh) is T t ? t : default;
 
+        /// <summary>
+        /// Gets a prefab information provider instance.
+        /// </summary>
+        /// <param name="id">The unique identifier of the provider.</param>
+        /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance.</param>
+        /// <returns>The provider instance if found and active; otherwise, <c>null</c>.</returns>
         public static ISOSPrefabInfo? GetPrefabInfoInstance(string id, bool fresh = false)
             => PrefabInfoFactories.GetInstance(id, fresh);
 
+        /// <summary>
+        /// Gets all registered prefab information provider entries in ascending registration order, without instantiating them.
+        /// </summary>
+        /// <param name="onlyActives">If <c>true</c>, returns only entries marked active. If <c>false</c>, returns all entries.</param>
+        /// <returns>An enumerable sequence of prefab information factory entries.</returns>
         public static IEnumerable<IFactoryEntry<ISOSPrefabInfo>> GetAllPrefabInfo(bool onlyActives = true)
             => PrefabInfoFactories.GetAll(onlyActives);
 
+        /// <summary>
+        /// Resolves and enumerates all prefab information provider instances in ascending registration order.
+        /// </summary>
+        /// <param name="onlyActives">If <c>true</c>, returns only active instances. If <c>false</c>, returns all instances.</param>
+        /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing cached instances.</param>
+        /// <returns>An enumerable sequence of prefab information provider instances.</returns>
         public static IEnumerable<ISOSPrefabInfo> GetAllPrefabInfoInstances(bool onlyActives = true, bool fresh = false)
                     => PrefabInfoFactories.GetAllInstances(onlyActives, fresh);
 
+        /// <summary>
+        /// Removes a prefab information provider registration or its cached instance by identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the provider.</param>
+        /// <param name="onlyInstance">If <c>true</c>, evicts only the cached instance without unregistering.</param>
+        /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemovePrefabInfo(string id, bool onlyInstance = false)
         {
             bool removed = PrefabInfoFactories.Remove(id, onlyInstance);

@@ -352,26 +352,68 @@ namespace SOS
         IEnumerable<Prefab> GetPrefabs(IPrefabFilter filter);
     }
 
+    /// <summary>
+    /// Supplies presentation data and context actions for a prefab runtime type.
+    /// </summary>
+    /// <remarks>
+    /// Multiple providers can handle the same prefab. The browser merges their results, using the first
+    /// non-null value for each field, while context actions from every matching provider are combined.
+    /// </remarks>
     [DefaultClass<PrefabInfoDefaults>]
     public interface ISOSPrefabInfo
     {
+        /// <summary>
+        /// Determines whether this provider supports the specified prefab.
+        /// </summary>
+        /// <param name="prefab">The prefab to inspect.</param>
+        /// <returns><c>true</c> if this provider can supply information for <paramref name="prefab"/>; otherwise, <c>false</c>.</returns>
         bool CanHandle(Prefab prefab);
 
+        /// <summary>
+        /// Gets the display name for a prefab.
+        /// </summary>
+        /// <param name="prefab">The prefab to describe.</param>
+        /// <returns>The localized name, or <c>null</c> to fall back to another provider or the identifier.</returns>
         LocalizedString? GetName(Prefab prefab)
             => PrefabInfoDefaults.GetName(prefab);
 
+        /// <summary>
+        /// Gets the description for a prefab.
+        /// </summary>
+        /// <param name="prefab">The prefab to describe.</param>
+        /// <returns>The localized description, or <c>null</c> if none is available.</returns>
         LocalizedString? GetDescription(Prefab prefab)
             => PrefabInfoDefaults.GetDescription(prefab);
 
+        /// <summary>
+        /// Gets the tooltip for a prefab.
+        /// </summary>
+        /// <param name="prefab">The prefab to describe.</param>
+        /// <returns>The localized tooltip, or <c>null</c> if none is available.</returns>
         LocalizedString? GetTooltip(Prefab prefab)
             => GetDescription(prefab);
 
+        /// <summary>
+        /// Gets the icon sprite for a prefab.
+        /// </summary>
+        /// <param name="prefab">The prefab to describe.</param>
+        /// <returns>The icon sprite, or <c>null</c> if none is available.</returns>
         Sprite? GetIcon(Prefab prefab)
             => PrefabInfoDefaults.GetIcon(prefab);
 
+        /// <summary>
+        /// Gets the tint color applied to the prefab icon.
+        /// </summary>
+        /// <param name="prefab">The prefab to describe.</param>
+        /// <returns>The icon color, or <c>null</c> to use the default color.</returns>
         Color? GetIconColor(Prefab prefab)
             => PrefabInfoDefaults.GetIconColor(prefab);
 
+        /// <summary>
+        /// Gets the XML configuration element associated with a prefab.
+        /// </summary>
+        /// <param name="prefab">The prefab to inspect.</param>
+        /// <returns>The configuration element, or <c>null</c> if none is available.</returns>
         ContentXElement? GetConfigElement(Prefab prefab)
             => PrefabInfoDefaults.GetConfigElement(prefab);
 
@@ -383,6 +425,11 @@ namespace SOS
         List<ContextMenuOption> GetContextOptions(Prefab prefab)
             => PrefabInfoDefaults.GetContextOptions(prefab);
 
+        /// <summary>
+        /// Gets provider-specific metadata entries for a prefab.
+        /// </summary>
+        /// <param name="prefab">The prefab to inspect.</param>
+        /// <returns>A dictionary keyed by prefab identifier and metadata value type.</returns>
         Dictionary<Identifier, Func<Prefab, object>> Metadata(Prefab prefab)
             => PrefabInfoDefaults.Metadata(prefab);
     }

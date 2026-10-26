@@ -226,6 +226,14 @@ namespace SOS.Prefabs
             return null;
         }
 
+        /// <summary>
+        /// Resolves a prefab by identifier, falling back to the first prefab exposed by the active providers.
+        /// </summary>
+        /// <param name="id">The identifier to look up. Leading and trailing whitespace is ignored.</param>
+        /// <returns>
+        /// The matching prefab; the first available prefab when <paramref name="id"/> is null, empty, or not found;
+        /// or <c>null</c> if no active provider exposes any prefab.
+        /// </returns>
         public static Prefab? FindOrFirst(Identifier? id)
         {
             Prefab? result = null;
@@ -237,12 +245,27 @@ namespace SOS.Prefabs
             return null;
         }
 
+        /// <summary>
+        /// Gets the localized display name for a prefab from the active information providers.
+        /// </summary>
+        /// <param name="prefab">The prefab to resolve.</param>
+        /// <returns>The localized name, or <c>null</c> if no provider supplies one.</returns>
         public static LocalizedString? GetName(Prefab prefab)
             => cacheInfo.GetOrCreate(prefab, () => new(prefab)).Name;
 
+        /// <summary>
+        /// Gets the identifier-based fallback name for a prefab.
+        /// </summary>
+        /// <param name="prefab">The prefab whose identifier is used.</param>
+        /// <returns>The trimmed prefab identifier.</returns>
         public static LocalizedString GetNameFallback(Prefab prefab)
             => prefab.Identifier.Value.Trim();
 
+        /// <summary>
+        /// Gets the localized name for a prefab, falling back to its identifier when no name is available.
+        /// </summary>
+        /// <param name="prefab">The prefab to resolve.</param>
+        /// <returns>The localized name or the identifier fallback.</returns>
         public static LocalizedString GetNameOrFallback(Prefab prefab)
         {
             var name = GetName(prefab);
@@ -251,6 +274,12 @@ namespace SOS.Prefabs
             return name;
         }
 
+        /// <summary>
+        /// Gets the localized name for a prefab with a color, falling back to a red identifier when no name is available.
+        /// </summary>
+        /// <param name="prefab">The prefab to resolve.</param>
+        /// <param name="color">The color applied when a localized name exists.</param>
+        /// <returns>The colored name or a red identifier fallback.</returns>
         public static LocalizedString GetNameOrFallback(Prefab prefab, Color color)
         {
             var name = GetName(prefab);
@@ -260,9 +289,19 @@ namespace SOS.Prefabs
                 return name.SetColor(color);
         }
 
+        /// <summary>
+        /// Gets the localized description for a prefab from the active information providers.
+        /// </summary>
+        /// <param name="prefab">The prefab to resolve.</param>
+        /// <returns>The localized description, or <c>null</c> if no provider supplies one.</returns>
         public static LocalizedString? GetDescription(Prefab prefab)
             => cacheInfo.GetOrCreate(prefab, () => new(prefab)).Description;
 
+        /// <summary>
+        /// Gets the tooltip for a prefab, preferring provider tooltips and falling back to descriptions.
+        /// </summary>
+        /// <param name="prefab">The prefab to resolve.</param>
+        /// <returns>The localized tooltip, or <c>null</c> if no provider supplies one.</returns>
         public static LocalizedString? GetTooltip(Prefab prefab)
         {
             foreach (var info in API.GetAllPrefabInfoInstances())
@@ -275,6 +314,11 @@ namespace SOS.Prefabs
             return null;
         }
 
+        /// <summary>
+        /// Gets a rich tooltip for a prefab and appends the content package name when it is not already present.
+        /// </summary>
+        /// <param name="prefab">The prefab to resolve.</param>
+        /// <returns>The rich tooltip, using the unknown placeholder when no tooltip is available.</returns>
         public static RichString GetEnrichedTooltip(Prefab prefab)
         {
             LocalizedString actual = GetTooltip(prefab) ?? Texts.Get("sos.gen.unknown", "???");
@@ -292,12 +336,27 @@ namespace SOS.Prefabs
             return RichString.Rich(actual);
         }
 
+        /// <summary>
+        /// Gets the icon sprite for a prefab from the active information providers.
+        /// </summary>
+        /// <param name="prefab">The prefab to resolve.</param>
+        /// <returns>The icon sprite, or <c>null</c> if no provider supplies one.</returns>
         public static Sprite? GetIcon(Prefab prefab)
             => cacheInfo.GetOrCreate(prefab, () => new(prefab)).Icon;
 
+        /// <summary>
+        /// Gets the icon tint color for a prefab from the active information providers.
+        /// </summary>
+        /// <param name="prefab">The prefab to resolve.</param>
+        /// <returns>The icon color, or <c>null</c> if no provider supplies one.</returns>
         public static Color? GetIconColor(Prefab prefab)
             => cacheInfo.GetOrCreate(prefab, () => new(prefab)).IconColor;
 
+        /// <summary>
+        /// Gets the XML configuration element for a prefab from the first provider that supplies one.
+        /// </summary>
+        /// <param name="prefab">The prefab to resolve.</param>
+        /// <returns>The configuration element, or <c>null</c> if no provider supplies one.</returns>
         public static ContentXElement? GetConfigElement(Prefab prefab)
         {
             foreach (var metadata in API.GetAllPrefabInfoInstances())
@@ -306,6 +365,11 @@ namespace SOS.Prefabs
             return null;
         }
 
+        /// <summary>
+        /// Combines the context menu options supplied by every provider that handles a prefab.
+        /// </summary>
+        /// <param name="prefab">The prefab to resolve.</param>
+        /// <returns>A list containing all provider-specific context menu options.</returns>
         public static List<ContextMenuOption> GetContextOptions(Prefab prefab)
             => [.. API.GetAllPrefabInfoInstances().Where(meta => meta.CanHandle(prefab)).SelectMany((meta) => meta.GetContextOptions(prefab))];
 

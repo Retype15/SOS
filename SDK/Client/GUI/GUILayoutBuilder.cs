@@ -725,6 +725,15 @@ namespace SOS.GUI
             return input;
         }
 
+        /// <summary>
+        /// Adds a labeled key or mouse binding row to the layout.
+        /// </summary>
+        /// <param name="label">The label displayed on the left side of the row.</param>
+        /// <param name="value">The initial key or mouse binding.</param>
+        /// <param name="onChangedValue">Action invoked when the binding changes.</param>
+        /// <param name="height">Height of the row in pixels. Defaults to 28.</param>
+        /// <param name="style">Optional button style. Defaults to the key input style when empty.</param>
+        /// <returns>The created <see cref="GUIKeyInput"/>.</returns>
         public GUIKeyInput KeyInput(LocalizedString label, KeyOrMouse value, Action<KeyOrMouse?> onChangedValue, int height = 28, string style = "")
         {
             var row = new GUIFrame(NewDefaultRectTransform(height), style: null) { CanBeFocused = false };

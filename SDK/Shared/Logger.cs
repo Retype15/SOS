@@ -14,14 +14,24 @@ using Microsoft.Xna.Framework;
 namespace SOS
 {
 
+    /// <summary>
+    /// Defines the severity threshold used by <see cref="Logger"/>.
+    /// </summary>
     public enum LogLevel
     {
+        /// <summary>Most detailed diagnostic messages.</summary>
         Trace,
+        /// <summary>Debugging messages useful during development.</summary>
         Debug,
+        /// <summary>General informational messages.</summary>
         Information,
+        /// <summary>Messages about recoverable issues.</summary>
         Warning,
+        /// <summary>Messages about failed operations.</summary>
         Error,
+        /// <summary>Messages about critical failures.</summary>
         Critical,
+        /// <summary>Disables all log output.</summary>
         None
     }
 

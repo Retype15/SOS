@@ -3,7 +3,9 @@
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] 客户端：已初始化。按 'J' 键打开。</sos.client.init>
 	<sos.command.help>打开/关闭 SOS。</sos.command.help>
-	<sos.command.help.log>- log [{logCommands}]\n示例：'sos log verbose'</sos.command.help.log>
+	<sos.command.help.log>- log [{logCommands}]
+	示例：'sos log debug'</sos.command.help.log>
+	<sos.command.log.status>日志: {ActualLogLevel}</sos.command.log.status>
 	<sos.command.name>sos</sos.command.name>
 	<sos.shared.debugmode>[SOS] 调试模式已启用。</sos.shared.debugmode>
 	<sos.shared.loaded>[SOS] 已成功加载。</sos.shared.loaded>

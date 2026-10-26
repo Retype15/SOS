@@ -3,7 +3,9 @@
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] Client: Inicializado. Presiona 'J' para abrir.</sos.client.init>
 	<sos.command.help>Abre/Cierra SOS.</sos.command.help>
-	<sos.command.help.log>- log [{logCommands}]\nEjemplo: 'sos log verbose'</sos.command.help.log>
+	<sos.command.help.log>- log [{logCommands}]
+	Ejemplo: 'sos log debug'</sos.command.help.log>
+	<sos.command.log.status>Registro: {ActualLogLevel}</sos.command.log.status>
 	<sos.command.name>sos</sos.command.name>
 	<sos.shared.debugmode>[SOS] Modo depuración activado.</sos.shared.debugmode>
 	<sos.shared.loaded>[SOS] Cargado correctamente.</sos.shared.loaded>

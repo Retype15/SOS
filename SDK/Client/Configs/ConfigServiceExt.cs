@@ -31,6 +31,12 @@ namespace SOS.Configs
         public static bool TrySaveBatch(this IConfigService configService, IReadOnlyCollection<ISettingBase> settings)
             => configService.SaveBatch(settings).IsSuccess;
 
+        /// <summary>
+        /// Persists a batch of settings, using the optimized per-package implementation when available.
+        /// </summary>
+        /// <param name="configService">The configuration service that owns the settings.</param>
+        /// <param name="settings">The settings to persist.</param>
+        /// <returns>A result describing success or the failures encountered while saving.</returns>
         public static Result SaveBatch(this IConfigService configService, IReadOnlyCollection<ISettingBase> settings)
         {
             if (configService is ConfigService service)
@@ -38,6 +44,12 @@ namespace SOS.Configs
             return configService.SaveBatchByOne(settings);
         }
 
+        /// <summary>
+        /// Persists a batch of settings grouped by content package, performing one read/modify/write cycle per package.
+        /// </summary>
+        /// <param name="configService">The concrete configuration service that owns the settings.</param>
+        /// <param name="settings">The settings to persist.</param>
+        /// <returns>A result describing success or the failures encountered while saving.</returns>
         public static Result SaveBatch(this ConfigService configService, IReadOnlyCollection<ISettingBase> settings)
         {
             if (settings.Count == 0) return Result.Ok();
