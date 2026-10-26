@@ -47,7 +47,6 @@ namespace SOS.Panels.ItemPanel
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Vector2(0.1f, 0.9f), layout.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(10, 0) }, style: "InnerFrame")
                 {
-                    //ToolTip = GetDetailedTooltip(item),
                     OnDrawToolTip = component =>
                         component.ToolTip = item.GetRichTooltip()
                 };
@@ -411,22 +410,22 @@ namespace SOS.Panels.ItemPanel
                 CanBeFocused = false
             };
 
-            Sprite? icon = prefab?.GetIcon();
+            Sprite? icon = prefab.GetIcon();
             if (icon != null)
             {
                 var imgFrame = new GUIFrame(new RectTransform(new Point(20, 20), contentLayout.RectTransform, Anchor.CenterLeft) { AbsoluteOffset = new Point(isCardInside ? 0 : 5, 0) }, style: null) { CanBeFocused = false };
                 _ = new GUIImage(new RectTransform(Vector2.One, imgFrame.RectTransform), icon, scaleToFit: true)
                 {
-                    Color = prefab?.GetIconColor() ?? Color.White,
+                    Color = prefab.GetIconColor() ?? Color.White,
                     CanBeFocused = false
                 };
             }
 
-            var nameStr = prefab?.GetName();
+            var nameStr = prefab.GetName();
             var nameColor = color ?? Color.White;
             if (nameStr.IsNullOrEmpty())
             {
-                nameStr = prefab?.GetNameFallback() ?? Texts.Get("sos.cardbuilder.none_selected", "Nothing Selected...");
+                nameStr = prefab.GetNameFallback();
                 nameColor = Color.Red;
             }
 

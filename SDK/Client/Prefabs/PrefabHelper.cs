@@ -228,21 +228,13 @@ namespace SOS.Prefabs
 
         public static Prefab? FindOrFirst(Identifier? id)
         {
-            Prefab? first = null;
-            bool idValid = !id?.Value.IsNullOrWhiteSpace() ?? false;
+            Prefab? result = null;
+            if (id?.Value.IsNullOrWhiteSpace() ?? false) result = Find((Identifier)id);
+            if (result != null) return result;
             foreach (var provider in API.GetAllPrefabProviderInstances())
-            {
-                var prefabs = provider.GetPrefabs(new SearchFilter(string.Empty));
-                first ??= prefabs.FirstOrDefault();
-                if (idValid)
-                {
-                    if (prefabs.FirstOrDefault(prefab => prefab.Identifier == id) is { } prefab)
-                        return prefab;
-                }
-                else if (first != null)
-                    return first;
-            }
-            return first;
+                if (provider.GetPrefabs(new SearchFilter(string.Empty)).FirstOrDefault() is { } prefab)
+                    return prefab;
+            return null;
         }
 
         public static LocalizedString? GetName(Prefab prefab)
