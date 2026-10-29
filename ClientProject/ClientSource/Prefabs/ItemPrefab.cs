@@ -40,6 +40,8 @@ namespace SOS.Prefabs.Item
 
         public IEnumerable<Prefab> GetPrefabs(IPrefabFilter filter)
         {
+            if (!filter.AllowsType(nameof(ItemPrefab))) return [];
+
             return ItemPrefab.Prefabs
                 .Where(p => Matches(p, filter)).OrderBy(p => p.GetNameOrFallback());
         }

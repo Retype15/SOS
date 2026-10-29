@@ -17,6 +17,8 @@ namespace SOS.Prefabs.Affliction
     {
         public IEnumerable<Prefab> GetPrefabs(IPrefabFilter filter)
         {
+            if (!filter.AllowsType(nameof(AfflictionPrefab))) return [];
+
             return AfflictionPrefab.List
                 .Where(a => Matches(a, filter))
                 .OrderBy(a => a is AfflictionPrefabHusk ? 1 : 0).ThenBy(p => p.GetNameOrFallback());

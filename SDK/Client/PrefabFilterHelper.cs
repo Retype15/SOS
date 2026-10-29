@@ -63,13 +63,16 @@ namespace SOS
     /// </remarks>
     internal class SearchFilter : IPrefabFilter
     {
-        public List<string> General { get; } = [];
-        public List<string> Mod { get; } = [];
-        public List<string> Category { get; } = [];
-        public List<string> Tag { get; } = [];
-        public List<string> Slot { get; } = [];
-        public List<string> ID { get; } = [];
-        public List<string> PrefabType { get; } = [];
+        public IReadOnlyCollection<string> General { get; } = [];
+        public IReadOnlyCollection<string> Mod { get; } = [];
+        public IReadOnlyCollection<string> Category { get; } = [];
+        public IReadOnlyCollection<string> Tag { get; } = [];
+        public IReadOnlyCollection<string> Slot { get; } = [];
+        public IReadOnlyCollection<string> ID { get; } = [];
+        public IReadOnlyCollection<string> PrefabType { get; } = [];
+        public IReadOnlyCollection<string> Favorites => SOS.Prefabs.PrefabHelper.Favorites;
+
+        public bool IsFavorite(string id) => SOS.Prefabs.PrefabHelper.IsFavorite(id);
 
         /// <summary>
         /// Parses a raw query string into a structured search filter.
@@ -88,6 +91,14 @@ namespace SOS
             int startIndex = 0;
             string query = rawQuery + " ";
 
+            List<string> general = [];
+            List<string> mod = [];
+            List<string> category = [];
+            List<string> tag = [];
+            List<string> slot = [];
+            List<string> id = [];
+            List<string> prefabType = [];
+
             for (int i = 0; i < query.Length; i++)
             {
                 char c = query[i];
@@ -98,19 +109,27 @@ namespace SOS
                     {
                         switch (currentType)
                         {
-                            case ' ': General.Add(content); break;
-                            case '@': Mod.Add(content); break;
-                            case '#': Category.Add(content); break;
-                            case '$': Tag.Add(content); break;
-                            case '&': Slot.Add(content); break;
-                            case '!': ID.Add(content); break;
-                            case '%': PrefabType.Add(content); break;
+                            case ' ': general.Add(content); break;
+                            case '@': mod.Add(content); break;
+                            case '#': category.Add(content); break;
+                            case '$': tag.Add(content); break;
+                            case '&': slot.Add(content); break;
+                            case '!': id.Add(content); break;
+                            case '%': prefabType.Add(content); break;
                         }
                     }
                     currentType = c;
                     startIndex = i + 1;
                 }
             }
+
+            General = general;
+            Mod = mod;
+            Category = category;
+            Tag = tag;
+            Slot = slot;
+            ID = id;
+            PrefabType = prefabType;
         }
 
         /// <summary>

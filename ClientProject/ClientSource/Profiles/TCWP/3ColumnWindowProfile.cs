@@ -48,7 +48,8 @@ namespace SOS.Profiles.TCWP
         private GUITickBox? rawXmlTickBox;
 
         // Search
-        private List<Prefab> allFilteredTargets = [];
+        private IEnumerator<Prefab>? activeSearch;
+        private bool hasMoreItems = false;
         private readonly Dictionary<Type, string> headerCache = [];
         private int itemsLoaded = 0;
         private const int RowHeight = 32;
@@ -157,7 +158,7 @@ namespace SOS.Profiles.TCWP
             UpdateLayout();
             HandleSearchDebounce();
 
-            if (!loadPerformedThisFrame && itemList != null && itemsLoaded < allFilteredTargets.Count && IsNearListEnd())
+            if (!loadPerformedThisFrame && itemList != null && hasMoreItems && IsNearListEnd())
             {
                 LoadNextChunk();
             }
@@ -194,6 +195,10 @@ namespace SOS.Profiles.TCWP
 
             if (RectTransform != null)
                 RectTransform.Parent = null;
+
+            activeSearch?.Dispose();
+            activeSearch = null;
+            hasMoreItems = false;
 
             itemList = null;
             searchBox = null;
@@ -527,35 +532,70 @@ namespace SOS.Profiles.TCWP
 
             var filter = new SearchFilter(query);
 
-            allFilteredTargets.Clear();
             headerCache.Clear();
             lastTypeInList = null;
+            itemsLoaded = 0;
+            currentRow = null;
+            itemsInRow = 0;
 
-            var candidates = new List<Prefab>();
+            activeSearch?.Dispose();
+            activeSearch = BuildSearchEnumerator(filter);
+            hasMoreItems = activeSearch.MoveNext();
 
-            foreach (var provider in API.GetAllPrefabProviderInstances()) // TODO: Optimize using .Next() in LoadNextChunk for consuming in place.
+            itemList.ClearChildren();
+            itemList.ScrollBar.BarScroll = 0;
+
+            LoadNextChunk();
+        }
+
+        private static IEnumerator<Prefab> BuildSearchEnumerator(IPrefabFilter filter)
+        {
+            var seen = new HashSet<Identifier>();
+            var providers = API.GetAllPrefabProviderInstances();
+
+            //favs
+            foreach (ISOSPrefab provider in providers)
             {
+                IEnumerable<Prefab> favs;
                 try
                 {
-                    candidates.AddRange(provider.GetPrefabs(filter).Where(p => filter.AllowsType(p.GetType().Name)));
+                    favs = provider.GetPrefabFavorites(filter);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning($"[SOS] Provider '{provider.GetType().FullOrName()}' failed getting favorites: {ex.Message}");
+                    Logger.LogDebugWarning(ex.StackTrace, level: LogLevel.Trace);
+                    continue;
+                }
+
+                foreach (var prefab in favs)
+                {
+                    if (seen.Add(prefab.Identifier))
+                        yield return prefab;
+                }
+            }
+
+            // others
+            foreach (var provider in providers)
+            {
+                IEnumerable<Prefab> items;
+                try
+                {
+                    items = provider.GetPrefabs(filter);
                 }
                 catch (Exception ex)
                 {
                     Logger.LogWarning($"[SOS] Provider '{provider.GetType().FullOrName()}' failed: {ex.Message}");
                     Logger.LogDebugWarning(ex.StackTrace, level: LogLevel.Trace);
+                    continue;
+                }
+
+                foreach (var prefab in items)
+                {
+                    if (seen.Add(prefab.Identifier))
+                        yield return prefab;
                 }
             }
-
-            allFilteredTargets = [.. candidates
-                .OrderByDescending(c => PrefabHelper.IsFavorite(c.Identifier.Value))];
-
-            itemsLoaded = 0;
-            currentRow = null;
-            itemsInRow = 0;
-            itemList.ClearChildren();
-            itemList.ScrollBar.BarScroll = 0;
-
-            LoadNextChunk();
         }
 
         private bool IsNearListEnd()
@@ -572,7 +612,7 @@ namespace SOS.Profiles.TCWP
 
         private void LoadNextChunk()
         {
-            if (itemList == null || itemsLoaded >= allFilteredTargets.Count) return;
+            if (itemList == null || !hasMoreItems) return;
             if (leftPanelMode == DisplayMode.Hidden) return;
 
             loadPerformedThisFrame = true;
@@ -589,11 +629,11 @@ namespace SOS.Profiles.TCWP
             int availableWidth = (int)itemList.Rect.Width - 14;
             int maxItemsPerRow = Math.Max(1, availableWidth / slotSize);
 
-            while (itemsLoaded < allFilteredTargets.Count &&
+            while (hasMoreItems &&
                    addedPixels < targetPixels &&
                    rowsAdded < MaxRowsPerLoad)
             {
-                var prefab = allFilteredTargets[itemsLoaded];
+                var prefab = activeSearch!.Current;
                 Type currentType = prefab.GetType();
 
                 if (currentType != lastTypeInList)
@@ -655,6 +695,7 @@ namespace SOS.Profiles.TCWP
                 }
 
                 itemsLoaded++;
+                hasMoreItems = activeSearch.MoveNext();
             }
 
             itemList.RecalculateChildren();

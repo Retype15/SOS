@@ -288,37 +288,44 @@ namespace SOS
         /// <summary>
         /// Gets general search keywords that match across names, identifiers, or content package titles.
         /// </summary>
-        List<string> General { get; }
+        IReadOnlyCollection<string> General { get; }
 
         /// <summary>
         /// Gets content package / mod name filter tokens (prefixed with '@').
         /// </summary>
-        List<string> Mod { get; }
+        IReadOnlyCollection<string> Mod { get; }
 
         /// <summary>
         /// Gets entity category filter tokens (prefixed with '#').
         /// </summary>
-        List<string> Category { get; }
+        IReadOnlyCollection<string> Category { get; }
 
         /// <summary>
         /// Gets tag filter tokens (prefixed with '$').
         /// </summary>
-        List<string> Tag { get; }
+        IReadOnlyCollection<string> Tag { get; }
 
         /// <summary>
         /// Gets equipment inventory slot filter tokens (prefixed with '&amp;').
         /// </summary>
-        List<string> Slot { get; }
+        IReadOnlyCollection<string> Slot { get; }
 
         /// <summary>
         /// Gets exact identifier filter tokens (prefixed with '!').
         /// </summary>
-        List<string> ID { get; }
+        IReadOnlyCollection<string> ID { get; }
 
         /// <summary>
         /// Gets entity prefab type filter tokens (prefixed with '%').
         /// </summary>
-        List<string> PrefabType { get; }
+        IReadOnlyCollection<string> PrefabType { get; }
+
+        IReadOnlyCollection<string> Favorites { get; }
+
+        bool AllowsType(string typeName);
+
+        bool IsFavorite(string id);
+
     }
 
     /// <summary>
@@ -343,6 +350,10 @@ namespace SOS
     /// </example>
     public interface ISOSPrefab
     {
+
+        IEnumerable<Prefab> GetPrefabFavorites(IPrefabFilter filter)
+            => GetPrefabs(filter).Where(p => filter.IsFavorite(p.Identifier.Value));
+
         /// <summary>
         /// Queries and yields all prefabs provided by this source that satisfy the specified <paramref name="filter"/>.
         /// A provider serves its own prefabs whatever their runtime types are; related subtypes stay grouped by the browser.
