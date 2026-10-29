@@ -768,8 +768,8 @@ namespace SOS
         {
             if (_isRegisteredTypesToLuaDataService) return;
 
-            var servicesProvider = Barotrauma.LuaCsSetup.Instance._servicesProvider;
-            ILuaUserDataService? userDataService = servicesProvider.GetService<ILuaUserDataService>();
+            IServicesProvider servicesProvider = Barotrauma.LuaCsSetup.Instance._servicesProvider;
+            ILuaUserDataService userDataService = servicesProvider.GetService<ILuaUserDataService>();
 
             foreach (var type in typeof(API).Assembly.GetExportedTypes())
             {
