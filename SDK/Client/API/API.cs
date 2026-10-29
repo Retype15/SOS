@@ -158,7 +158,7 @@ namespace SOS
         /// <param name="order">Display priority order determining tab button sequence. Lower values appear first. Defaults to <c>0.0</c>.</param>
         /// <param name="active">Whether the tab is initially enabled. Defaults to <c>true</c>.</param>
         /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is null or fails type contract validation.</returns>
-        public static bool RegisterTab(object obj, string id, double order = 0.0, bool active = true)
+        public static bool RegisterTab(object obj, string? id = null, double order = 0.0, bool active = true)
             => TabFactories.Register(obj, id, order, active);
 
         /// <summary>
@@ -507,7 +507,7 @@ namespace SOS
         /// <param name="order">Priority order in the profile selector dropdown. Defaults to <c>0.0</c>.</param>
         /// <param name="active">Whether the profile is initially enabled. Defaults to <c>true</c>.</param>
         /// <returns><c>true</c> if registration succeeded; <c>false</c> if <paramref name="obj"/> is null or fails type contract validation.</returns>
-        public static bool RegisterWindowProfile(object obj, string id, double order = 0.0, bool active = true)
+        public static bool RegisterWindowProfile(object obj, string? id = null, double order = 0.0, bool active = true)
                     => ProfileFactories.Register(obj, id, order, active);
 
         /// <summary>
