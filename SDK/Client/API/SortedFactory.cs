@@ -360,7 +360,7 @@ namespace SOS
 
         private static Identifier? GetIdIfValid(Identifier? id, Type returnType)
         {
-            if (!string.IsNullOrWhiteSpace(id?.Value)) return null;
+            if (!string.IsNullOrWhiteSpace(id?.Value)) return id;
             if (returnType != typeof(object) && !returnType.IsInterface && !returnType.IsAbstract) return null;
 
             Logger.LogError($"[SOS.API] Register failed for '{typeof(T).Name}': factory delegates returning '{returnType.FullOrName()}' require an explicit id.");
