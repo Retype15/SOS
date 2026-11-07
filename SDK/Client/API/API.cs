@@ -100,8 +100,8 @@ namespace SOS
         /// <param name="id">The unique identifier of the section.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>The resolved section instance if found and active; otherwise, <c>default</c>.</returns>
-        public static T? GetStatInfoInstance<T>(string id, bool fresh = false) where T : class
-            => GetStatInfoInstance(id, fresh)?.TryCast<T>();
+        public static T? GetStatInfoInstance<T>(string id) where T : class
+            => GetStatInfoInstance(id)?.TryCast<T>();
 
         /// <summary>
         /// Resolves a registered stat section by identifier.
@@ -109,8 +109,8 @@ namespace SOS
         /// <param name="id">The unique identifier of the section.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>The <see cref="ISOSStatInfo"/> instance if found and active; otherwise, <c>null</c>.</returns>
-        public static ISOSStatInfo? GetStatInfoInstance(string id, bool fresh = false)
-            => SectionFactories.GetInstance(id, fresh);
+        public static ISOSStatInfo? GetStatInfoInstance(string id)
+            => SectionFactories.GetIfActive(id)?.Value;
 
         /// <summary>
         /// Resolves and enumerates all currently active stat sections in ascending registration order.
@@ -118,8 +118,8 @@ namespace SOS
         /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>An enumerable sequence of active <see cref="ISOSStatInfo"/> instances.</returns>
-        public static IEnumerable<ISOSStatInfo> GetAllStatInfoInstances(bool onlyActives = true, bool fresh = false)
-            => SectionFactories.GetAllInstances(onlyActives, fresh);
+        public static IEnumerable<ISOSStatInfo> GetAllStatInfoInstances(bool onlyActives = true)
+            => SectionFactories.GetAllInstances(onlyActives);
 
         /// <summary>
         /// Gets the factory entry registered under <paramref name="id"/>, without instantiating it.
@@ -144,7 +144,7 @@ namespace SOS
         /// <param name="onlyInstance">If <c>true</c>, evicts only the cached instance without removing the registration. Defaults to <c>false</c>.</param>
         /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemoveStatInfo(string id, bool onlyInstance = false)
-            => SectionFactories.Remove(id, onlyInstance);
+            => RemoveOrClean(SectionFactories, id, onlyInstance);
 
         #endregion
 
@@ -190,8 +190,8 @@ namespace SOS
         /// <param name="id">The unique identifier of the tab.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>The resolved tab instance if found and active; otherwise, <c>default</c>.</returns>
-        public static T? GetTabInstance<T>(string id, bool fresh = false)
-            => GetTabInstance(id, fresh) is T t ? t : default;
+        public static T? GetTabInstance<T>(string id)
+            => GetTabInstance(id) is T t ? t : default;
 
         /// <summary>
         /// Resolves a registered tab by identifier.
@@ -199,8 +199,8 @@ namespace SOS
         /// <param name="id">The unique identifier of the tab.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>The <see cref="ISOSTab"/> instance if found and active; otherwise, <c>null</c>.</returns>
-        public static ISOSTab? GetTabInstance(string id, bool fresh = false)
-            => TabFactories.GetInstance(id, fresh);
+        public static ISOSTab? GetTabInstance(string id)
+            => TabFactories.GetIfActive(id)?.Value;
 
         /// <summary>
         /// Gets all registered tab factory entries in ascending registration order, without instantiating them.
@@ -216,8 +216,8 @@ namespace SOS
         /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>An enumerable sequence of active <see cref="ISOSTab"/> instances.</returns>
-        public static IEnumerable<ISOSTab> GetAllTabInstances(bool onlyActives = true, bool fresh = false)
-            => TabFactories.GetAllInstances(onlyActives, fresh);
+        public static IEnumerable<ISOSTab> GetAllTabInstances(bool onlyActives = true)
+            => TabFactories.GetAllInstances(onlyActives);
 
         /// <summary>
         /// Removes a tab registration or its cached instance by identifier.
@@ -226,7 +226,7 @@ namespace SOS
         /// <param name="onlyInstance">If <c>true</c>, evicts only the cached instance without unregistering. Defaults to <c>false</c>.</param>
         /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemoveTab(string id, bool onlyInstance = false)
-            => TabFactories.Remove(id, onlyInstance);
+            => RemoveOrClean(TabFactories, id, onlyInstance);
 
         #endregion
 
@@ -272,8 +272,8 @@ namespace SOS
         /// <param name="id">The unique identifier of the config.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>The config instance if found and active; otherwise, <c>default</c>.</returns>
-        public static T? GetConfigInstance<T>(string id, bool fresh = false) where T : class
-            => GetConfigInstance(id, fresh)?.TryCast<T>();
+        public static T? GetConfigInstance<T>(string id) where T : class
+            => GetConfigInstance(id)?.TryCast<T>();
 
         /// <summary>
         /// Resolves a registered configuration by identifier.
@@ -281,8 +281,8 @@ namespace SOS
         /// <param name="id">The unique identifier of the config.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>The <see cref="ISOSConfig"/> instance if found and active; otherwise, <c>null</c>.</returns>
-        public static ISOSConfig? GetConfigInstance(string id, bool fresh = false)
-            => ConfigFactories.GetInstance(id, fresh);
+        public static ISOSConfig? GetConfigInstance(string id)
+            => ConfigFactories.GetIfActive(id)?.Value;
 
         /// <summary>
         /// Gets all registered configuration factory entries in ascending registration order, without instantiating them.
@@ -298,8 +298,8 @@ namespace SOS
         /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>An enumerable sequence of active <see cref="ISOSConfig"/> instances.</returns>
-        public static IEnumerable<ISOSConfig> GetAllConfigInstances(bool onlyActives = true, bool fresh = false)
-            => ConfigFactories.GetAllInstances(onlyActives, fresh);
+        public static IEnumerable<ISOSConfig> GetAllConfigInstances(bool onlyActives = true)
+            => ConfigFactories.GetAllInstances(onlyActives);
 
         /// <summary>
         /// Removes a configuration registration and disposes its cached instance by identifier.
@@ -353,8 +353,8 @@ namespace SOS
         /// <param name="id">The unique identifier of the provider.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>The provider instance if found and active; otherwise, <c>default</c>.</returns>
-        public static T? GetPrefabProviderInstance<T>(string id, bool fresh = false)
-            => GetPrefabProviderInstance(id, fresh) is T t ? t : default;
+        public static T? GetPrefabProviderInstance<T>(string id)
+            => GetPrefabProviderInstance(id) is T t ? t : default;
 
         /// <summary>
         /// Resolves a registered prefab provider by identifier.
@@ -362,8 +362,8 @@ namespace SOS
         /// <param name="id">The unique identifier of the provider.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>The <see cref="ISOSPrefab"/> instance if found and active; otherwise, <c>null</c>.</returns>
-        public static ISOSPrefab? GetPrefabProviderInstance(string id, bool fresh = false)
-            => PrefabFactories.GetInstance(id, fresh);
+        public static ISOSPrefab? GetPrefabProviderInstance(string id)
+            => PrefabFactories.GetIfActive(id)?.Value;
 
         /// <summary>
         /// Gets all registered prefab provider factory entries in ascending registration order, without instantiating them.
@@ -379,8 +379,8 @@ namespace SOS
         /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c>.</param>
         /// <returns>An enumerable sequence of active <see cref="ISOSPrefab"/> instances.</returns>
-        public static IEnumerable<ISOSPrefab> GetAllPrefabProviderInstances(bool onlyActives = true, bool fresh = false)
-                    => PrefabFactories.GetAllInstances(onlyActives, fresh);
+        public static IEnumerable<ISOSPrefab> GetAllPrefabProviderInstances(bool onlyActives = true)
+                    => PrefabFactories.GetAllInstances(onlyActives);
 
         /// <summary>
         /// Removes a prefab provider registration or its cached instance by identifier.
@@ -390,7 +390,7 @@ namespace SOS
         /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemovePrefabProvider(string id, bool onlyInstance = false)
         {
-            if (!PrefabFactories.Remove(id, onlyInstance)) return false;
+            if (!RemoveOrClean(PrefabFactories, id, onlyInstance)) return false;
             PrefabHelper.CleanCache();
             return true;
         }
@@ -453,8 +453,8 @@ namespace SOS
         /// <param name="id">The unique identifier of the provider.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance.</param>
         /// <returns>The provider instance when it matches <typeparamref name="T"/>; otherwise, <c>default</c>.</returns>
-        public static T? GetPrefabInfoInstance<T>(string id, bool fresh = false)
-            => GetPrefabInfoInstance(id, fresh) is T t ? t : default;
+        public static T? GetPrefabInfoInstance<T>(string id)
+            => GetPrefabInfoInstance(id) is T t ? t : default;
 
         /// <summary>
         /// Gets a prefab information provider instance.
@@ -462,8 +462,8 @@ namespace SOS
         /// <param name="id">The unique identifier of the provider.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance.</param>
         /// <returns>The provider instance if found and active; otherwise, <c>null</c>.</returns>
-        public static ISOSPrefabInfo? GetPrefabInfoInstance(string id, bool fresh = false)
-            => PrefabInfoFactories.GetInstance(id, fresh);
+        public static ISOSPrefabInfo? GetPrefabInfoInstance(string id)
+            => PrefabInfoFactories.GetIfActive(id)?.Value;
 
         /// <summary>
         /// Gets all registered prefab information provider entries in ascending registration order, without instantiating them.
@@ -479,8 +479,8 @@ namespace SOS
         /// <param name="onlyActives">If <c>true</c>, returns only active instances. If <c>false</c>, returns all instances.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing cached instances.</param>
         /// <returns>An enumerable sequence of prefab information provider instances.</returns>
-        public static IEnumerable<ISOSPrefabInfo> GetAllPrefabInfoInstances(bool onlyActives = true, bool fresh = false)
-                    => PrefabInfoFactories.GetAllInstances(onlyActives, fresh);
+        public static IEnumerable<ISOSPrefabInfo> GetAllPrefabInfoInstances(bool onlyActives = true)
+                    => PrefabInfoFactories.GetAllInstances(onlyActives);
 
         /// <summary>
         /// Removes a prefab information provider registration or its cached instance by identifier.
@@ -490,7 +490,7 @@ namespace SOS
         /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemovePrefabInfo(string id, bool onlyInstance = false)
         {
-            bool removed = PrefabInfoFactories.Remove(id, onlyInstance);
+            bool removed = RemoveOrClean(PrefabInfoFactories, id, onlyInstance);
             if (removed) PrefabHelper.CleanCache();
             return removed;
         }
@@ -539,8 +539,8 @@ namespace SOS
         /// <param name="id">The unique identifier of the profile.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c> for visual profiles.</param>
         /// <returns>The profile instance if found and active; otherwise, <c>default</c>.</returns>
-        public static T? GetWindowProfileInstance<T>(string id, bool fresh = false)
-            => GetWindowProfileInstance(id, fresh) is T t ? t : default;
+        public static T? GetWindowProfileInstance<T>(string id)
+            => GetWindowProfileInstance(id) is T t ? t : default;
 
         /// <summary>
         /// Resolves a registered window profile by identifier, falling back to the default profile if not found.
@@ -548,23 +548,18 @@ namespace SOS
         /// <param name="id">The unique identifier of the profile. If <c>null</c> or empty, resolves the first active profile.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c> for visual profiles.</param>
         /// <returns>The resolved <see cref="ISOSWindowProfile"/> instance; or <c>null</c> if no active profiles are registered.</returns>
-        public static ISOSWindowProfile? GetWindowProfileInstance(string? id, bool fresh = false)
+        public static ISOSWindowProfile? GetWindowProfileInstance(string? id)
         {
-            ISOSWindowProfile? v;
-            if (string.IsNullOrEmpty(id)) v = ProfileFactories.FirstInstance(fresh);
-            else
+            if (!string.IsNullOrWhiteSpace(id))
             {
                 Logger.LogDebug($"GetWindowProfile >> id: '{id}'", level: LogLevel.Trace);
                 var entry = ProfileFactories.Get(id);
-                v = entry?.Instance(fresh);
-                if (v == null)
-                {
-                    Logger.LogWarning("[SOS] Profile not encountered. Trying to use default profile.");
-                    v = ProfileFactories.FirstInstance();
-                    entry = ProfileFactories.First();
-                }
+                if (entry is null || !entry.IsActive)
+                    Logger.LogWarning("[SOS] Profile not encountered or inactive. Trying to use default profile.");
                 Logger.LogDebug($"GetWindowProfile >> Name: '{entry?.DisplayName() ?? "null"}'", level: LogLevel.Trace);
             }
+
+            ISOSWindowProfile? v = ProfileFactories.GetOrFirstInstance(id);
             if (v == null)
             {
                 var color = Microsoft.Xna.Framework.Color.LightSkyBlue;
@@ -588,8 +583,8 @@ namespace SOS
         /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
         /// <param name="fresh">If <c>true</c>, forces re-instantiation, replacing and disposing the cached instance. Defaults to <c>false</c> for visual profiles.</param>
         /// <returns>An enumerable sequence of active <see cref="ISOSWindowProfile"/> instances.</returns>
-        public static IEnumerable<ISOSWindowProfile> GetAllWindowProfileInstances(bool onlyActives = true, bool fresh = false)
-            => ProfileFactories.GetAllInstances(onlyActives, fresh);
+        public static IEnumerable<ISOSWindowProfile> GetAllWindowProfileInstances(bool onlyActives = true)
+            => ProfileFactories.GetAllInstances(onlyActives);
 
         /// <summary>
         /// Removes a window profile registration or its cached instance by identifier.
@@ -598,7 +593,7 @@ namespace SOS
         /// <param name="onlyInstance">If <c>true</c>, evicts only the cached instance without unregistering. Defaults to <c>false</c>.</param>
         /// <returns><c>true</c> if found and removed; otherwise, <c>false</c>.</returns>
         public static bool RemoveWindowProfile(string id, bool onlyInstance = false)
-            => ProfileFactories.Remove(id, onlyInstance);
+            => RemoveOrClean(ProfileFactories, id, onlyInstance);
 
         #endregion
 
@@ -781,7 +776,10 @@ namespace SOS
             _isRegisteredTypesToLuaDataService = true;
         }
 
-        internal static void ClearTemporaryInstances()
+        private static bool RemoveOrClean(SortedFactory factory, string id, bool onlyInstance)
+            => onlyInstance ? factory.CleanInstance(id) : factory.Remove(id);
+
+        internal static void CleanInstances()
         {
             foreach (var factory in SortedFactory.GetAllFactories())
                 factory.CleanInstances();

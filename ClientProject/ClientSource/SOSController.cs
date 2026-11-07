@@ -165,7 +165,7 @@ namespace SOS
             ConfigHelper.SaveConfigs();
             ActiveProfile.Dispose();
             ActiveProfile = null;
-            API.ClearTemporaryInstances();
+            API.CleanInstances();
             GUIAnimSequence.ClearAll();
         }
 

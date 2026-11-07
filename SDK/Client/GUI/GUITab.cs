@@ -168,6 +168,8 @@ namespace SOS.GUI
                     Logger.LogError($"Error when trying to remove conflicted `ITab<{typeof(T).Name}>` of Type {tab.GetType().FullOrName()}.");
                     Logger.LogDebugError(ex2.StackTrace);
                 }
+
+                if (tab is IDisposable d) d.Dispose();
             }
         }
 
