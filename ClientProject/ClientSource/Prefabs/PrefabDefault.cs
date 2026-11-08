@@ -7,6 +7,7 @@
 #pragma warning disable IDE0290
 
 using Barotrauma;
+using SOS.Extensions;
 
 namespace SOS.Prefabs
 {
@@ -20,7 +21,7 @@ namespace SOS.Prefabs
         {
             var options = new List<ContextMenuOption>
             {
-                new(Texts.Get("sos.context.view_recipes", "View Recipes").Value, isEnabled: true, onSelected: () => API.Emit(CommKeys.SelectTarget, prefab))
+                new(Texts.Get("sos.context.view_recipes", "View {name}").Value.Replace("{name}", prefab.GetNameOrFallback().Value), isEnabled: true, onSelected: () => API.Emit(CommKeys.SelectTarget, prefab))
             };
 
             string targetId = prefab.Identifier.Value;

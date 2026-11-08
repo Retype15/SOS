@@ -36,7 +36,7 @@
 	<sos.context.untrack>Dejar de rastrear</sos.context.untrack>
 	<sos.context.track_recipe>Añadir al HUD</sos.context.track_recipe>
 	<sos.context.untrack_from_hud>Quitar del HUD</sos.context.untrack_from_hud>
-	<sos.context.view_recipes>Ver Recetas</sos.context.view_recipes>
+	<sos.context.view_recipes>Ver {name}</sos.context.view_recipes>
 
 	<!-- Window -->
 	<sos.window.additional_info>INFO ADICIONAL</sos.window.additional_info>
