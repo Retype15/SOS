@@ -1,0 +1,8 @@
+name = "docs"
+version = "0.1.0"
+description = "A new project named 'docs', managed by `axes`."
+
+[scripts] # axes ./docs/build_init
+build_init = ["<scripts::build>", "<scripts::init>"]
+build = "@powershell ./cs/scripts/build.ps1"
+init = "@python scripts/http_server.py cs/build --port <params::0(default='8080')> --route <params::1(default='/:html')>"

@@ -1,0 +1,26 @@
+name = "SOS"
+version = "0.1.0"
+description = "Base mod data visualizer for barotrauma game."
+
+[scripts.test]
+desc = "Run a simple test echo command."
+run = """echo "✅ Test for '<name>' successful!""""
+
+[options.at_start]
+desc = "Commands to run when entering a session (e.g., `source .venv/bin/activate`)"
+run = "# echo 'Entering session...'"
+
+[options.at_exit]
+desc = "Commands to run when exiting a session (e.g., `docker-compose down`)"
+run = "# echo 'Exiting session...'"
+
+[options.open_with] # axes SOS open
+default = 'vsc'
+explorer = "explorer \"<path>\""
+vsc = "vsc \"<path>\""
+shell.windows = "wt -d \"<path>\""
+
+[vars]
+Hello = "Hello from an axes variable!"
+
+[env]
