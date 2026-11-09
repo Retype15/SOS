@@ -55,9 +55,9 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="rectT">The rectangle transform to use as the parent for built components. Must not be null.</param>
         /// <remarks>
-        /// Internal constructor used by <c>Accordion</c> methods to create nested builders.
+        /// Use this overload to compose a builder over any existing container instead of a list box content area.
         /// The <paramref name="rectT"/> becomes the root container for all components added through
-        /// the returned builder instance.
+        /// the returned builder instance; the accordion helpers use it to build their nested content.
         /// </remarks>
         public GUILayoutBuilder(RectTransform rectT) : base(rectT) { }
 
@@ -840,8 +840,8 @@ namespace SOS.GUI
         /// and its ancestors.
         /// Calls <see cref="GC.SuppressFinalize"/> to prevent the finalizer from running, as disposal
         /// has already handled all cleanup.
-        /// This method is safe to call multiple times; subsequent calls after the first are no-ops
-        /// because the finalizer suppression prevents re-entry.
+        /// Calling it more than once is harmless: the builder is removed again only when it is still empty,
+        /// otherwise the layout is recalculated again.
         /// </remarks>
         public void Dispose()
         {

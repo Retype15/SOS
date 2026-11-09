@@ -25,9 +25,10 @@ namespace SOS.Configs
     public static class ConfigServiceExt
     {
         private static string SaveDataFileName => ConfigService.SaveDataFileName;
-        /// <summary>Persists all dirty settings, batching file I/O per content package.</summary>
+        /// <summary>Persists all dirty settings, batching file I/O per content package when possible.</summary>
         /// <param name="configService">The configuration service that owns the settings.</param>
         /// <param name="settings">The settings to persist.</param>
+        /// <returns><c>true</c> if the batch was saved without failures; otherwise, <c>false</c>.</returns>
         public static bool TrySaveBatch(this IConfigService configService, IReadOnlyCollection<ISettingBase> settings)
             => configService.SaveBatch(settings).IsSuccess;
 

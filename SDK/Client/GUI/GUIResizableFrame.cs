@@ -45,7 +45,7 @@ namespace SOS.GUI
     /// A resizable and draggable frame component with configurable resize directions and bounds clamping.
     /// </summary>
     /// <remarks>
-    /// Supports mouse-based resizing from edges and corners, with optional symmetric resizing (Shift),
+    /// Supports mouse-based resizing from edges and corners, with symmetric resizing (Alt or <see cref="ForceSymmetric"/>),
     /// aspect ratio preservation (Shift on corner), and parent bounds clamping.
     /// Also supports dragging the frame by its title area (top 50px by default).
     /// </remarks>
@@ -142,8 +142,8 @@ namespace SOS.GUI
         /// <item><term>Idle:</term><description>Detects hover over resize edges/corners (within <see cref="ResizeMargin"/>)
         /// or title area. Updates cursor to indicate available interaction.</description></item>
         /// <item><term>Dragging (resizing):</term><description>Resizes the frame based on mouse movement.
-        /// Supports corner resizing with aspect ratio preservation (Shift), symmetric resizing (Shift on edge,
-        /// Alt for temporary symmetric), and parent bounds clamping.</description></item>
+        /// Supports corner resizing with aspect ratio preservation (Shift), symmetric resizing (Alt or
+        /// <see cref="ForceSymmetric"/>), and parent bounds clamping.</description></item>
         /// <item><term>Moving:</term><description>Moves the frame by dragging the title area (top <see cref="DragAreaHeight"/> pixels).
         /// Ignores interactive child elements (buttons, text boxes, dropdowns, list boxes).</description></item>
         /// </list>

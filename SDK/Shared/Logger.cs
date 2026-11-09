@@ -57,7 +57,7 @@ namespace SOS
 
         /// <summary>Determines whether a message at the given level would be logged based on the current <see cref="ActualLogLevel"/>.</summary>
         /// <param name="level">The log level to check.</param>
-        /// <returns><c>true</c> if the level is at or below the active threshold.</returns>
+        /// <returns><c>true</c> if the level is at or above the active threshold.</returns>
         public static bool ComplainsLogLevel(LogLevel level) => level >= ActualLogLevel;
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace SOS
         /// <param name="logger">Optional custom <see cref="ILoggerService"/>.</param>
         /// <param name="level">The log level threshold to check. Defaults to <see cref="LogLevel.Information"/>.</param>
         /// <remarks>
-        /// Returns immediately if <paramref name="level"/> exceeds <see cref="ActualLogLevel"/> or
+        /// Returns immediately if <paramref name="level"/> is below <see cref="ActualLogLevel"/> or
         /// if <paramref name="message"/> is <c>null</c> or empty.
         /// Dispatches to the first available logger: <paramref name="logger"/>, <see cref="LoggerService"/>, or <see cref="LuaCsLogger"/>.
         /// </remarks>
@@ -150,7 +150,7 @@ namespace SOS
         /// <param name="logger">Optional custom <see cref="ILoggerService"/>.</param>
         /// <param name="level">The log level to check. Defaults to <see cref="LogLevel.Error"/>.</param>
         /// <remarks>
-        /// Returns immediately if <paramref name="level"/> exceeds <see cref="ActualLogLevel"/> or
+        /// Returns immediately if <paramref name="level"/> is below <see cref="ActualLogLevel"/> or
         /// if <paramref name="message"/> is <c>null</c> or empty.
         /// </remarks>
         public static void LogError(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Error)
@@ -169,7 +169,7 @@ namespace SOS
         /// <param name="level">The log level to check. Defaults to <see cref="LogLevel.Warning"/>.</param>
         /// <remarks>
         /// Warning messages are displayed in <see cref="Color.Yellow"/> when routed through <see cref="LuaCsLogger"/>.
-        /// Returns immediately if <paramref name="level"/> exceeds <see cref="ActualLogLevel"/> or
+        /// Returns immediately if <paramref name="level"/> is below <see cref="ActualLogLevel"/> or
         /// if <paramref name="message"/> is <c>null</c> or empty.
         /// </remarks>
         public static void LogWarning(string? message, ILoggerService? logger = null, LogLevel level = LogLevel.Warning)

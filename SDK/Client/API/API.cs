@@ -22,7 +22,7 @@ namespace SOS
     /// <b>Architecture:</b>
     /// <list type="bullet">
     /// <item><description><b>SOS Module Registries:</b> Manages SOS modules: sections (<see cref="ISOSStatInfo"/>), tabs (<see cref="ISOSTab"/>), configs (<see cref="ISOSConfig"/>), prefab providers (<see cref="ISOSPrefab"/>), and window profiles (<see cref="ISOSWindowProfile"/>) with ordering and activation control.</description></item>
-    /// <item><description><b>Prioritized Event Pipeline:</b> Provides thread-safe event publishing and subscription (<c>On"</c>, <c>Off"</c>, <c>Emit</c>) ordered deterministically across <see cref="EventPriority"/> tiers.</description></item>
+    /// <item><description><b>Prioritized Event Pipeline:</b> Provides thread-safe event publishing and subscription (<c>On</c>, <c>Off</c>, <c>Emit</c>) ordered deterministically across <see cref="EventPriority"/> tiers.</description></item>
     /// <item><description><b>Shared State:</b> Offers a lightweight, reactive key-value state store (<see cref="SetState{T}(string, T, bool)"/>, <see cref="GetState{T}(string)"/>) for cross-mod communication.</description></item>
     /// </list>
     /// </para>
@@ -113,8 +113,8 @@ namespace SOS
         /// <summary>
         /// Resolves and enumerates all currently active stat sections in ascending registration order.
         /// </summary>
-        /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
-        /// <returns>An enumerable sequence of active <see cref="ISOSStatInfo"/> instances.</returns>
+        /// <param name="onlyActives">If <c>true</c>, yields only entries whose <see cref="IFactoryEntry{T}.IsActive"/> flag is set. If <c>false</c>, yields every registered entry.</param>
+        /// <returns>An enumerable sequence of resolved <see cref="ISOSStatInfo"/> instances.</returns>
         public static IEnumerable<ISOSStatInfo> GetAllStatInfoInstances(bool onlyActives = true)
             => SectionFactories.GetAllInstances(onlyActives);
 
@@ -208,8 +208,8 @@ namespace SOS
         /// <summary>
         /// Resolves and enumerates all currently active tabs in ascending registration order.
         /// </summary>
-        /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
-        /// <returns>An enumerable sequence of active <see cref="ISOSTab"/> instances.</returns>
+        /// <param name="onlyActives">If <c>true</c>, yields only entries whose <see cref="IFactoryEntry{T}.IsActive"/> flag is set. If <c>false</c>, yields every registered entry.</param>
+        /// <returns>An enumerable sequence of resolved <see cref="ISOSTab"/> instances.</returns>
         public static IEnumerable<ISOSTab> GetAllTabInstances(bool onlyActives = true)
             => TabFactories.GetAllInstances(onlyActives);
 
@@ -287,8 +287,8 @@ namespace SOS
         /// <summary>
         /// Resolves and enumerates all currently active configurations in ascending registration order.
         /// </summary>
-        /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
-        /// <returns>An enumerable sequence of active <see cref="ISOSConfig"/> instances.</returns>
+        /// <param name="onlyActives">If <c>true</c>, yields only entries whose <see cref="IFactoryEntry{T}.IsActive"/> flag is set. If <c>false</c>, yields every registered entry.</param>
+        /// <returns>An enumerable sequence of resolved <see cref="ISOSConfig"/> instances.</returns>
         public static IEnumerable<ISOSConfig> GetAllConfigInstances(bool onlyActives = true)
             => ConfigFactories.GetAllInstances(onlyActives);
 
@@ -365,8 +365,8 @@ namespace SOS
         /// <summary>
         /// Resolves and enumerates all currently active prefab providers in ascending registration order.
         /// </summary>
-        /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
-        /// <returns>An enumerable sequence of active <see cref="ISOSPrefab"/> instances.</returns>
+        /// <param name="onlyActives">If <c>true</c>, yields only entries whose <see cref="IFactoryEntry{T}.IsActive"/> flag is set. If <c>false</c>, yields every registered entry.</param>
+        /// <returns>An enumerable sequence of resolved <see cref="ISOSPrefab"/> instances.</returns>
         public static IEnumerable<ISOSPrefab> GetAllPrefabProviderInstances(bool onlyActives = true)
                     => PrefabFactories.GetAllInstances(onlyActives);
 
@@ -563,8 +563,8 @@ namespace SOS
         /// <summary>
         /// Resolves and enumerates all currently active window profiles in ascending registration order.
         /// </summary>
-        /// <param name="onlyActives">If <c>true</c>, returns only instances that marked with in `IsActive`. If <c>false</c>, returns all instances.</param>
-        /// <returns>An enumerable sequence of active <see cref="ISOSWindowProfile"/> instances.</returns>
+        /// <param name="onlyActives">If <c>true</c>, yields only entries whose <see cref="IFactoryEntry{T}.IsActive"/> flag is set. If <c>false</c>, yields every registered entry.</param>
+        /// <returns>An enumerable sequence of resolved <see cref="ISOSWindowProfile"/> instances.</returns>
         public static IEnumerable<ISOSWindowProfile> GetAllWindowProfileInstances(bool onlyActives = true)
             => ProfileFactories.GetAllInstances(onlyActives);
 

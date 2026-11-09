@@ -64,7 +64,7 @@ namespace SOS.Configs
     /// Provides helper methods for configuration management, including loading, saving, and resetting configs.
     /// </summary>
     /// <remarks>
-    /// All operations iterate over configs retrieved via <c>API.GetAllConfigs()</c>.
+    /// All operations iterate over configs retrieved via <c>API.GetAllConfigInstances()</c>.
     /// Errors during individual config operations are logged via <see cref="Logger"/> and execution continues
     /// to the next config (no single failure stops the entire operation).
     /// </remarks>
@@ -76,7 +76,7 @@ namespace SOS.Configs
         /// Loads all registered SOS modules implementing <see cref="ISOSConfig"/> by calling <see cref="ISOSConfig.Load"/> on each one.
         /// </summary>
         /// <remarks>
-        /// Iterates over all configs retrieved via <c>API.GetAllConfigs()</c>.
+        /// Iterates over all configs retrieved via <c>API.GetAllConfigInstances()</c>.
         /// If a config's <see cref="ISOSConfig.Load"/> throws an exception, it is caught, logged via
         /// <see cref="Logger.LogError"/>, and execution continues to the next config.
         /// </remarks>
@@ -98,7 +98,7 @@ namespace SOS.Configs
         /// Saves all registered SOS modules implementing <see cref="ISOSConfig"/> by calling <see cref="ISOSConfig.Save"/> on each one.
         /// </summary>
         /// <remarks>
-        /// Iterates over all configs retrieved via <c>API.GetAllConfigs()</c>.
+        /// Iterates over all configs retrieved via <c>API.GetAllConfigInstances()</c>.
         /// If a config's <see cref="ISOSConfig.Save"/> throws an exception, it is caught, logged via
         /// <see cref="Logger.LogError"/>, and execution continues to the next config.
         /// </remarks>
@@ -148,8 +148,8 @@ namespace SOS.Configs
         /// </summary>
         /// <param name="l">The layout builder to which the button will be added.</param>
         /// <param name="cfg">The SOS module configuration to reset and save when the button is clicked.</param>
-        /// <param name="text">Optional custom text for the button. If <c>null</c>, uses the default text
-        /// "sos.config.reset_section" (localized "Reset Section Defaults").</param>
+        /// <param name="text">Optional custom text for the button. If <c>null</c>, uses the localized text
+        /// "sos.config.reset_section" (fallback "Reset this Config Section to Default").</param>
         /// <param name="onClick">Optional additional action to perform after resetting and saving the config.</param>
         /// <param name="tooltip">Optional tool tip for the button. If <c>null</c>, no tool tip is set.</param>
         /// <param name="color">Optional button color. If <c>null</c>, uses the default (IndianRed with 0.8 alpha).</param>
@@ -241,7 +241,7 @@ namespace SOS.Configs
         /// </summary>
         /// <param name="parent">The parent rectangle size.</param>
         /// <param name="child">The child rectangle size.</param>
-        /// <returns>The centered offset].</returns>
+        /// <returns>The centered offset.</returns>
         public static Point NewDefaultCenterPoint(Point parent, Point child)
             => new((parent.X - child.X) / 2, (parent.Y - child.Y) / 2);
 

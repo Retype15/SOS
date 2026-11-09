@@ -36,7 +36,8 @@ namespace SOS
         /// </summary>
         /// <param name="key">The localization key to look up.</param>
         /// <param name="fallback">The fallback string to use if the key is not found.</param>
-        /// <param name="forceFallback">If <c>true</c>, returns <paramref name="fallback"/> directly without lookup.</param>
+        /// <param name="forceFallback">If <c>true</c> and <paramref name="fallback"/> is non-empty, returns
+        /// <paramref name="fallback"/> instead of the localized value. The key is still queried first.</param>
         /// <returns>
         /// The localized string if found; otherwise <paramref name="fallback"/> (prefixed with "[NT]" in DEBUG).
         /// </returns>
@@ -74,6 +75,7 @@ namespace SOS
         /// Results are cached in <see cref="prefixCache"/> for subsequent calls with the same prefix.
         /// The cache is populated by querying <see cref="TextManager.GetAllTagTextPairs"/> on first access.
         /// Returns an empty dictionary if no translations match the prefix.
+        /// The returned dictionary is the cached instance, so callers must treat it as read-only.
         /// </remarks>
         public static Dictionary<Identifier, string> GetTranslationsByPrefix(string prefix)
         {

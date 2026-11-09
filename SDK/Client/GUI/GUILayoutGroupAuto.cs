@@ -15,8 +15,9 @@ namespace SOS.GUI
     /// A layout group that automatically recalculates its preferred height based on its visible children.
     /// </summary>
     /// <remarks>
-    /// This <see cref="GUILayoutGroup"/> arranges its children in a vertical flow, summing the heights of all
-    /// visible children plus the absolute spacing between them, plus a 10-pixel bottom padding. The <see cref="Recalculate"/>
+    /// Sums the heights of all visible children plus the absolute spacing between them, plus a 10-pixel bottom
+    /// padding. The calculation is height-based, so the class is intended for vertically stacked layouts even
+    /// though the base constructor also accepts horizontal mode. The <see cref="Recalculate"/>
     /// method is called whenever <see cref="GUILayoutGroup.NeedsToRecalculate"/> is true, typically after a child's state changes.
     /// <para>
     /// <b>Lifecycle:</b> Recalculation occurs during <see cref="Update"/>; this component is not thread-safe and
@@ -42,8 +43,9 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="deltaTime">The number of seconds that have elapsed since the last frame.</param>
         /// <remarks>
-        /// If <see cref="GUILayoutGroup.NeedsToRecalculate"/> is <c>true</c>, the <see cref="Recalculate"/> method is invoked
-        /// and then <see cref="RefreshAncestors"/> is called to update any parent <see cref="GUIListBox"/> components.
+        /// If <see cref="GUILayoutGroup.NeedsToRecalculate"/> is <c>true</c>, the <see cref="Recalculate"/> method is invoked;
+        /// <see cref="RefreshAncestors"/> is called only when <see cref="Recalculate"/> reports that the size changed,
+        /// updating any parent <see cref="GUIListBox"/> components.
         /// This method is called automatically by the GUI framework each frame and should not be called manually.
         /// <para>
         /// <b>Thread safety:</b> Must only be called from the GUI thread; this component is not thread-safe.

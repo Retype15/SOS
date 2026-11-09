@@ -23,7 +23,10 @@ namespace SOS.GUI
         /// <summary>
         /// Gets or sets the currently bound key or mouse input.
         /// </summary>
-        /// <remarks>Setting the value updates the button text and invokes <see cref="OnChangedValue"/>.</remarks>
+        /// <remarks>
+        /// Setting the value updates the button text and invokes <see cref="OnChangedValue"/> asynchronously
+        /// after a short delay (0.1 s).
+        /// </remarks>
         public KeyOrMouse? Value
         {
             get => _value;
@@ -31,7 +34,8 @@ namespace SOS.GUI
         }
 
         /// <summary>
-        /// Gets or sets the default binding used when no value has been assigned.
+        /// Optional default binding for consumers. The control does not apply it automatically when
+        /// <see cref="Value"/> is <c>null</c>.
         /// </summary>
         public KeyOrMouse? DefaultValue;
 

@@ -13,11 +13,11 @@ using SOS.Extensions;
 namespace SOS.GUI
 {
     /// <summary>
-    /// A collapsible container with an animated chevron icon and a content area.
+    /// A collapsible container with a chevron icon and a content area.
     /// </summary>
     /// <remarks>
     /// Consists of a header button with a dropdown-style chevron icon and a content area
-    /// (<see cref="GUILayoutBuilder"/>) that can be shown/hidden. The chevron rotates -90 degrees
+    /// (<see cref="GUILayoutBuilder"/>) that can be shown/hidden. The chevron is rotated -90 degrees
     /// when collapsed. Toggling triggers layout recalculation on the accordion and its parent layout group.
     /// </remarks>
     public sealed class GUIAccordion : GUILayoutGroupAuto

@@ -73,7 +73,8 @@ namespace SOS.Prefabs
         /// <param name="emit">If <c>true</c>, emits a <see cref="CommKeys.RefreshSearch"/> event after adding.</param>
         /// <returns><c>true</c> if the identifier was added; <c>false</c> if it was already in favorites.</returns>
         /// <remarks>
-        /// If the identifier is already in favorites, the method returns <c>false</c> and no event is emitted.
+        /// The event is emitted whenever <paramref name="emit"/> is <c>true</c>, even if the identifier
+        /// was already present (in which case the method returns <c>false</c>).
         /// </remarks>
         public static bool AddFavorite(string id, bool emit = true)
         {
@@ -89,8 +90,8 @@ namespace SOS.Prefabs
         /// <param name="emit">If <c>true</c>, emits a <see cref="CommKeys.RefreshSearch"/> event after adding.</param>
         /// <returns><c>true</c> if at least one identifier was added; <c>false</c> if all were already in favorites.</returns>
         /// <remarks>
-        /// Adds each identifier individually. The event is emitted only once if <paramref name="emit"/> is <c>true</c>
-        /// and at least one identifier was successfully added.
+        /// Adds each identifier individually. The event is emitted only once whenever <paramref name="emit"/> is
+        /// <c>true</c>, regardless of whether any identifier was actually added.
         /// </remarks>
         public static bool AddRangeFavorite(IEnumerable<string> ids, bool emit = true)
         {
@@ -108,7 +109,8 @@ namespace SOS.Prefabs
         /// <param name="emit">If <c>true</c>, emits a <see cref="CommKeys.RefreshSearch"/> event after removing.</param>
         /// <returns><c>true</c> if the identifier was removed; <c>false</c> if it was not in favorites.</returns>
         /// <remarks>
-        /// If the identifier is not in favorites, the method returns <c>false</c> and no event is emitted.
+        /// The event is emitted whenever <paramref name="emit"/> is <c>true</c>, even if the identifier
+        /// was not present (in which case the method returns <c>false</c>).
         /// </remarks>
         public static bool RemoveFavorite(string id, bool emit = true)
         {
@@ -192,10 +194,9 @@ namespace SOS.Prefabs
         /// <param name="target">The prefab to open the context menu for.</param>
         /// <param name="position">Optional mouse position. Defaults to <see cref="PlayerInput.MousePosition"/>.</param>
         /// <remarks>
-        /// Collects provider-specific options from every SOS module implementing <see cref="ISOSPrefab"/>
-        /// (each provider filters by itself), then appends the baseline actions once,
-        /// and creates a <see cref="GUIContextMenu"/> with those options.
-        /// Returns immediately if no options are available.
+        /// Collects the options contributed by every active <see cref="ISOSPrefabInfo"/> provider that can handle
+        /// the prefab, including the baseline actions supplied by the default provider, and creates a
+        /// <see cref="GUIContextMenu"/> with them. Returns immediately if no options are available.
         /// </remarks>
         public static void OpenContextMenu(Prefab target, Vector2? position = null)
         {
@@ -214,8 +215,11 @@ namespace SOS.Prefabs
         /// <summary>
         /// Resolves a prefab by its identifier, using every active prefab provider.
         /// </summary>
-        /// <param name="id">The identifier to look up. Leading and trailing whitespace is ignored.</param>
-        /// <returns>The matching prefab, or <c>null</c> if no active provider exposes it.</returns>
+        /// <param name="id">The identifier to look up. Matched case-insensitively; whitespace is not trimmed.</param>
+        /// <returns>
+        /// The matching prefab, or <c>null</c> when <paramref name="id"/> is empty/whitespace or no active
+        /// provider exposes it.
+        /// </returns>
         public static Prefab? Find(Identifier id)
         {
             if (!id.Value.IsNullOrWhiteSpace())
@@ -229,10 +233,10 @@ namespace SOS.Prefabs
         /// <summary>
         /// Resolves a prefab by identifier, falling back to the first prefab exposed by the active providers.
         /// </summary>
-        /// <param name="id">The identifier to look up. Leading and trailing whitespace is ignored.</param>
+        /// <param name="id">The identifier to look up. Matched case-insensitively; whitespace is not trimmed.</param>
         /// <returns>
-        /// The matching prefab; the first available prefab when <paramref name="id"/> is null, empty, or not found;
-        /// or <c>null</c> if no active provider exposes any prefab.
+        /// The matching prefab; the first available prefab when <paramref name="id"/> is null, empty, whitespace, or
+        /// not found; or <c>null</c> if no active provider exposes any prefab.
         /// </returns>
         public static Prefab? FindOrFirst(Identifier? id)
         {
@@ -368,7 +372,10 @@ namespace SOS.Prefabs
         /// Combines the context menu options supplied by every provider that handles a prefab.
         /// </summary>
         /// <param name="prefab">The prefab to resolve.</param>
-        /// <returns>A list containing all provider-specific context menu options.</returns>
+        /// <returns>
+        /// A list containing all context menu options contributed by providers, including the baseline actions
+        /// supplied by the default provider.
+        /// </returns>
         public static List<ContextMenuOption> GetContextOptions(Prefab prefab)
             => [.. API.GetAllPrefabInfoInstances().Where(meta => meta.CanHandle(prefab)).SelectMany((meta) => meta.GetContextOptions(prefab))];
 

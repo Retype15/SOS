@@ -558,8 +558,8 @@ namespace SOS.Extensions
         /// <param name="key">The key to look up.</param>
         /// <returns>The value associated with the key, or the default value for <typeparamref name="T"/> if not found.</returns>
         /// <remarks>
-        /// Acquires a lock on the dictionary before performing the lookup, ensuring thread safety
-        /// when multiple threads access the same dictionary.
+        /// Acquires a lock on the dictionary instance before performing the lookup. This only synchronizes callers that
+        /// also use this helper (or lock the same dictionary instance); it cannot protect writes performed elsewhere.
         /// </remarks>
         public static T? GetValueLocked<S, T>(this IDictionary<S, T> dict, S key) where S : notnull
         {
@@ -659,11 +659,15 @@ namespace SOS.Extensions
         /// <summary>
         /// Gets the localized display name of the profile, shown in the profile selection dropdown.
         /// </summary>
+        /// <param name="entry">The window profile factory entry to resolve.</param>
+        /// <returns>The localized name, or a humanized last identifier segment when no translation exists.</returns>
         public static string DisplayName(this IFactoryEntry<ISOSWindowProfile> entry) => Texts.Get($"{entry.Id}.name", entry.Id.Value.Split('.')[^1].FormatCamelCaseWithSpaces()).Value;
 
         /// <summary>
         /// Gets the localized description of the profile. Empty when untranslated.
         /// </summary>
+        /// <param name="entry">The window profile factory entry to resolve.</param>
+        /// <returns>The localized description, or an empty string when no translation exists.</returns>
         public static string Description(this IFactoryEntry<ISOSWindowProfile> entry) => Texts.Get($"{entry.Id}.desc").Value;
     }
 

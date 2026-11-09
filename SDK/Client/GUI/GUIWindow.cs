@@ -285,7 +285,7 @@ namespace SOS.GUI
         /// </summary>
         /// <param name="text">Button text.</param>
         /// <param name="style">Button style name.</param>
-        /// <param name="tooltip">Localization key for tooltip.</param>
+        /// <param name="tooltip">The localized tooltip text shown while hovering the button.</param>
         /// <param name="onClick">Click handler.</param>
         /// <returns>The created button, or <c>null</c> on failure.</returns>
         private GUIButton CreateSystemButton(string text, string style, LocalizedString tooltip, Action onClick)
@@ -362,9 +362,9 @@ namespace SOS.GUI
         }
 
         /// <summary>
-        /// Shows the window and optionally forces a display mode.
+        /// Shows the window and applies the given display mode.
         /// </summary>
-        /// <param name="forceMode">Mode to apply when opening. Defaults to <see cref="WindowMode.Windowed"/>.</param>
+        /// <param name="forceMode">Mode applied when opening. Defaults to <see cref="WindowMode.Windowed"/>.</param>
         public void Open(WindowMode forceMode = WindowMode.Windowed)
         {
             Visible = true;

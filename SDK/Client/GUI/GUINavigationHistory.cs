@@ -17,9 +17,10 @@ namespace SOS.GUI
     /// </summary>
     /// <typeparam name="T">The type of items in the history. Must not be null.</typeparam>
     /// <remarks>
-    /// Provides a UI with back and forward buttons, keyboard shortcuts (Alt+Left/Right, Backspace, Mouse 4/5),
-    /// and events for navigation actions. The history is maintained as a list with a current index pointer.
-    /// Thread-safe: this component is not thread-safe; all operations must be called from the UI thread.
+    /// Provides a UI with back and forward buttons; their tooltips advertise the Alt+Left/Right, Backspace and
+    /// Mouse 4/5 shortcuts, which are handled by the host window controller rather than by this component.
+    /// The history is maintained as a list with a current index pointer.
+    /// Thread-safety: this component is not thread-safe; all operations must be called from the UI thread.
     /// </remarks>
     public sealed class GUINavigationHistory<T> : GUICustomComponent where T : notnull
     {

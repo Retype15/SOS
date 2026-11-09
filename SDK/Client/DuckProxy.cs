@@ -119,7 +119,7 @@ namespace SOS.DuckProxy
 {
 
     /// <summary>
-    /// A DispatchProxy-based adapter that dynamic MoonSharp Lua tables and external assemblies to C# interfaces at runtime.
+    /// A DispatchProxy-based adapter that maps MoonSharp Lua tables and external CLR objects onto C# interfaces at runtime.
     /// </summary>
     /// <typeparam name="T">The C# interface type that the proxy adapts.</typeparam>
     /// <remarks>

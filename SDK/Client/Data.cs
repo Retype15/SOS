@@ -236,10 +236,9 @@ namespace SOS
     ///     public void Reset() { /* ... */ }
     ///     public void Draw(RectTransform rectT)
     ///     {
-    ///         using var l = new GUILayoutBuilder(container);
+    ///         using var l = new GUILayoutBuilder(rectT);
     ///         l.Header("MY MOD CONFIG", Color.Gold);
     ///         l.ButtonToResetSection(this);
-    ///         return;
     ///     }
     /// }
     /// </code>
@@ -320,10 +319,29 @@ namespace SOS
         /// </summary>
         IReadOnlyCollection<string> PrefabType { get; }
 
+        /// <summary>
+        /// Gets the identifiers of the prefabs the user marked as favorites.
+        /// </summary>
+        /// <remarks>
+        /// The collection is backed by the shared favorites set maintained by <see cref="Prefabs.PrefabHelper"/>.
+        /// </remarks>
         IReadOnlyCollection<string> Favorites { get; }
 
+        /// <summary>
+        /// Determines whether <paramref name="typeName"/> is accepted by the prefab type filter (<see cref="PrefabType"/>).
+        /// </summary>
+        /// <param name="typeName">The prefab type name to test, such as <c>ItemPrefab</c> or <c>AfflictionPrefab</c>.</param>
+        /// <returns>
+        /// <c>true</c> if no type filter is active or any type token is contained in <paramref name="typeName"/> (case-insensitive);
+        /// otherwise, <c>false</c>.
+        /// </returns>
         bool AllowsType(string typeName);
 
+        /// <summary>
+        /// Determines whether <paramref name="id"/> belongs to the user's favorites.
+        /// </summary>
+        /// <param name="id">The prefab identifier to test.</param>
+        /// <returns><c>true</c> if the identifier is a favorite; otherwise, <c>false</c>.</returns>
         bool IsFavorite(string id);
 
     }
@@ -343,7 +361,7 @@ namespace SOS
     /// {
     ///     public IEnumerable&lt;Prefab&gt; GetPrefabs(IPrefabFilter filter)
     ///     {
-    ///         return JobPrefab.Prefabs.Where(j => filter.General.Count == 0 || j.Name.Value.Contains(filter.General[0]));
+    ///         return JobPrefab.Prefabs.Where(j => filter.General.All(t => j.Name.Value.Contains(t, StringComparison.OrdinalIgnoreCase)));
     ///     }
     /// }
     /// </code>
@@ -351,6 +369,22 @@ namespace SOS
     public interface ISOSPrefab
     {
 
+        /// <summary>
+        /// Yields the favorite prefabs provided by this source that satisfy the specified <paramref name="filter"/>.
+        /// </summary>
+        /// <param name="filter">The structured search filter containing text, category, tag, and mod tokens.</param>
+        /// <returns>An enumerable sequence of matching favorite <see cref="Barotrauma.Prefab"/> instances.</returns>
+        /// <remarks>
+        /// <para>
+        /// The browser invokes this method before <see cref="GetPrefabs(IPrefabFilter)"/> so favorites are listed first.
+        /// The default implementation already keeps the prefabs reported by <see cref="GetPrefabs(IPrefabFilter)"/> whose
+        /// identifier satisfies <see cref="IPrefabFilter.IsFavorite(string)"/>, so overriding is only needed when favorites
+        /// cannot be derived from that query.
+        /// </para>
+        /// <para>
+        /// Exceptions thrown by an override are logged and the browser continues with the remaining providers.
+        /// </para>
+        /// </remarks>
         IEnumerable<Prefab> GetPrefabFavorites(IPrefabFilter filter)
             => GetPrefabs(filter).Where(p => filter.IsFavorite(p.Identifier.Value));
 
@@ -432,7 +466,10 @@ namespace SOS
         /// Constructs right-click contextual action options for an entity belonging to this provider.
         /// </summary>
         /// <param name="prefab">The prefab being right-clicked.</param>
-        /// <returns>Provider-specific context menu options (e.g., "Track to HUD"). The hosting browser appends the baseline actions once.</returns>
+        /// <returns>
+        /// Options contributed by this provider (e.g., "Track to HUD"). The default prefab info provider
+        /// supplies the shared baseline actions.
+        /// </returns>
         List<ContextMenuOption> GetContextOptions(Prefab prefab)
             => PrefabInfoDefaults.GetContextOptions(prefab);
 
@@ -440,7 +477,11 @@ namespace SOS
         /// Gets provider-specific metadata entries for a prefab.
         /// </summary>
         /// <param name="prefab">The prefab to inspect.</param>
-        /// <returns>A dictionary keyed by prefab identifier and metadata value type.</returns>
+        /// <returns>
+        /// A dictionary keyed by an arbitrary metadata <see cref="Identifier"/> whose values are deferred factories
+        /// that produce the metadata value for <paramref name="prefab"/>. Returns an empty dictionary when the provider
+        /// exposes no metadata.
+        /// </returns>
         Dictionary<Identifier, Func<Prefab, object>> Metadata(Prefab prefab)
             => PrefabInfoDefaults.Metadata(prefab);
     }
@@ -464,11 +505,13 @@ namespace SOS
     /// [AutoRegister("MyMod.CompactProfile", order: 20.0)]
     /// public class CompactProfile : GUIWindow, ISOSWindowProfile
     /// {
-    ///     public string DisplayName => "Compact Inspector";
-    ///     public string Description => "Minimalist floating window.";
     ///     public void Init() { /* Build UI */ }
     ///     public void Update() { /* Frame update */ }
     /// }
+    ///
+    /// // The profile selector resolves its display name and description
+    /// // from localization ("MyMod.CompactProfile.name" / "MyMod.CompactProfile.desc")
+    /// // through ISOSWindowProfileExt.DisplayName() and Description().
     /// </code>
     /// </example>
     [DefaultClass<WindowProfileDefaults>]
@@ -562,11 +605,10 @@ namespace SOS
         public static void Reset() { }
 
         /// <summary>
-        /// Default settings render implementation returning <c>false</c> (no UI drawn).
+        /// Default settings render implementation: draws nothing.
         /// </summary>
-        /// <param name="_">The GUI list box container (ignored).</param>
-        /// <returns>Always <c>false</c>.</returns>
-        public static void Draw(GUIListBox _) { }
+        /// <param name="_">The host container (ignored).</param>
+        public static void Draw(RectTransform _) { }
     }
 
     /// <summary>
@@ -598,7 +640,7 @@ namespace SOS
 
         /// <summary>
         /// Default empty contextual actions for prefab providers adapted via <see cref="DuckProxy{T}"/>.
-        /// The hosting browser appends the baseline actions once.
+        /// The default prefab info provider still supplies the shared baseline actions.
         /// </summary>
         public static List<ContextMenuOption> GetContextOptions(Prefab _) => [];
     }

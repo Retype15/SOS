@@ -223,7 +223,7 @@ namespace SOS.GUI
         /// Broadcasts the target to every tab via <see cref="ITab{T}.CanHandle"/>, falls back
         /// <see cref="ActiveTab"/> when it no longer applies, flips stored content and button
         /// visibility, then rebuilds the active tab only via <see cref="ITab{T}.Update"/>.
-        /// If there's only one valid tab, the button area is hidden and the content area fills the full height.
+        /// If there's fewer than two valid tabs, the button area is hidden and the content area fills the full height.
         /// </remarks>
         public void UpdateTabs(T target)
         {
