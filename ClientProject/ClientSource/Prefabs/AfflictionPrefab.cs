@@ -17,11 +17,18 @@ namespace SOS.Prefabs.Affliction
     {
         public IEnumerable<Prefab> GetPrefabs(IPrefabFilter filter)
         {
-            if (!filter.AllowsType(nameof(AfflictionPrefab))) return [];
+            bool canShowAfflictionPrefab = filter.AllowsType(nameof(AfflictionPrefab));
+            bool canShowAfflictionPrefabHusk = filter.AllowsType(nameof(AfflictionPrefabHusk));
+            if (!canShowAfflictionPrefab && !canShowAfflictionPrefabHusk) return [];
+            IEnumerable<AfflictionPrefab>? result = AfflictionPrefab.List;
 
-            return AfflictionPrefab.List
-                .Where(a => Matches(a, filter))
-                .OrderBy(a => a is AfflictionPrefabHusk ? 1 : 0).ThenBy(p => p.GetNameOrFallback());
+            if (!canShowAfflictionPrefab)
+                result = result.Where(a => a is AfflictionPrefabHusk);
+            if (!canShowAfflictionPrefabHusk)
+                result = result.Where(a => a is not AfflictionPrefabHusk);
+
+            return result.Where(a => Matches(a, filter))
+                    .OrderBy(a => a is AfflictionPrefabHusk ? 1 : 0).ThenBy(p => p.GetNameOrFallback());
         }
 
         private static bool Matches(AfflictionPrefab a, IPrefabFilter filter)
