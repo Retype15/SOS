@@ -240,7 +240,12 @@ namespace SOS.GUI
             bool isCorner = IsCorner(currentDragDir);
             bool isShift = PlayerInput.IsShiftDown();
             bool isAlt = PlayerInput.IsAltDown();
-            bool isSymmetric = ForceSymmetric || isAlt;
+
+            bool canSymmetricX = AllowedDirections.HasFlag(ResizeDirection.Left) && AllowedDirections.HasFlag(ResizeDirection.Right);
+            bool canSymmetricY = AllowedDirections.HasFlag(ResizeDirection.Top) && AllowedDirections.HasFlag(ResizeDirection.Bottom);
+
+            bool symmetricX = (ForceSymmetric || isAlt) && canSymmetricX;
+            bool symmetricY = (ForceSymmetric || isAlt) && canSymmetricY;
 
             if (!isCorner && isShift && !IsFixed)
             {
@@ -272,7 +277,8 @@ namespace SOS.GUI
             if (currentDragDir.HasFlag(ResizeDirection.Bottom)) rawDeltaY = deltaY;
             else if (currentDragDir.HasFlag(ResizeDirection.Top)) rawDeltaY = -deltaY;
 
-            if (isSymmetric) { rawDeltaX *= 2; rawDeltaY *= 2; }
+            if (symmetricX) rawDeltaX *= 2;
+            if (symmetricY) rawDeltaY *= 2;
 
             float targetW = startRect.Width + rawDeltaX;
             float targetH = startRect.Height + rawDeltaY;
@@ -318,12 +324,11 @@ namespace SOS.GUI
             float finalCY = targetH - startRect.Height;
             float moveL = 0, moveT = 0;
 
-            if (isSymmetric) { moveL = -finalCX / 2f; moveT = -finalCY / 2f; }
-            else
-            {
-                if (currentDragDir.HasFlag(ResizeDirection.Left)) moveL = -finalCX;
-                if (currentDragDir.HasFlag(ResizeDirection.Top)) moveT = -finalCY;
-            }
+            if (symmetricX) moveL = -finalCX / 2f;
+            else if (currentDragDir.HasFlag(ResizeDirection.Left)) moveL = -finalCX;
+
+            if (symmetricY) moveT = -finalCY / 2f;
+            else if (currentDragDir.HasFlag(ResizeDirection.Top)) moveT = -finalCY;
 
             Vector2 pivot = GetPivotVector(RectTransform.Pivot);
             RectTransform.NonScaledSize = new Point((int)Math.Round(targetW), (int)Math.Round(targetH));
