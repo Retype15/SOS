@@ -4,8 +4,8 @@ description = "Base mod data visualizer for barotrauma game."
 
 [scripts] # axes /run
 run = ["><scripts::build>", "><scripts::run_baro>"]
-run_baro = "@start steam://run/602960"              # steam barotrauma
-build = "@dotnet build <params>"
+run_baro = "@start steam://run/602960"                 # steam barotrauma
+build = "@dotnet build <vars::release_param> <params>"
 
 [scripts.collect]
 desc = "Propietary private script, do not use this command."
@@ -19,5 +19,6 @@ shell.windows = "wt -d \"<path>\""
 
 [vars]
 Hello = "Hello from an axes variable!"
+release_param = "<params::release(alias='-r', map='-c ', default='Release')>"
 
 [env]
