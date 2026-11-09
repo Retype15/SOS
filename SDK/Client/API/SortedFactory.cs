@@ -353,7 +353,12 @@ namespace SOS
         {
 
             Identifier? finalId = GetIdIfValid(id, func.Method.ReturnType);
-            if (finalId == null) return false;
+            if (finalId == null)
+            {
+                Logger.LogError($"[SOS.API] Register failed for '{typeof(T).Name}': factory delegates returning '{func.Method.ReturnType.FullOrName()}' require an explicit id.");
+                return false;
+            }
+
             Add((Identifier)finalId, order, active, () => func()?.Cast<T>(), ownsInstances: true);
             return true;
         }
@@ -363,7 +368,6 @@ namespace SOS
             if (!string.IsNullOrWhiteSpace(id?.Value)) return id;
             if (returnType != typeof(object) && !returnType.IsInterface && !returnType.IsAbstract) return null;
 
-            Logger.LogError($"[SOS.API] Register failed for '{typeof(T).Name}': factory delegates returning '{returnType.FullOrName()}' require an explicit id.");
             return ResolveId(id, returnType.FullOrName());
         }
 
