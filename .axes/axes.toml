@@ -5,7 +5,11 @@ description = "Base mod data visualizer for barotrauma game."
 [scripts] # axes /run
 run = ["><scripts::build>", "><scripts::run_baro>"]
 run_baro = "@start steam://run/602960"              # steam barotrauma
-build = "@dotnet build"
+build = "@dotnet build <params>"
+
+[scripts.collect]
+desc = "Propietary private script, do not use this command."
+run = "collect --extension .cs,.md,.lua --exclude 'bin,Assets,obj,docs' --output SOS.txt --content"
 
 [options.open_with] # axes SOS open
 default = 'vsc'
