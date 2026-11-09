@@ -8,8 +8,8 @@
 using System.Xml.Linq;
 using Barotrauma;
 using Microsoft.Xna.Framework;
-
 using SOS.Configs;
+using SOS.Configs.TCWP;
 using SOS.Extensions;
 using SOS.GUI;
 using SOS.Panels.ItemPanel;
@@ -21,8 +21,8 @@ namespace SOS.Profiles.TCWP
     [AutoRegister("SOS.Profile.Default3Column", -1)]
     internal sealed class ThreeColumnWindowProfile : GUIWindow, ISOSWindowProfile
     {
-        private Configs.TCWP.TCWPConfig? config;
-        public ISOSConfig ProfileConfig => config ??= new();
+        public ISOSConfig ProfileConfig => TCWPConfig.Instance;
+        private static TCWPConfig Config => TCWPConfig.Instance;
 
         private bool _windowEventsRegistered;
         private bool _initialized;
@@ -111,7 +111,7 @@ namespace SOS.Profiles.TCWP
 
             ProfileConfig.Load();
             ApplyWindowSizeAndPosition();
-            Mode = (config?.IsMaximized ?? false) ? WindowMode.Fullscreen : WindowMode.Windowed;
+            Mode = (Config?.IsMaximized ?? false) ? WindowMode.Fullscreen : WindowMode.Windowed;
             BuildMainUI();
 
             if (needsShowLogo)
@@ -145,8 +145,8 @@ namespace SOS.Profiles.TCWP
             return new TPLayout
             {
                 WindowSize = NormalSize,
-                LeftPanelWidth = leftPanel?.Rect.Width ?? config!.LeftPanelWidth,
-                RightPanelWidth = rightPanel?.Rect.Width ?? config!.RightPanelWidth
+                LeftPanelWidth = leftPanel?.Rect.Width ?? Config!.LeftPanelWidth,
+                RightPanelWidth = rightPanel?.Rect.Width ?? Config!.RightPanelWidth
             };
         }
 
@@ -203,20 +203,19 @@ namespace SOS.Profiles.TCWP
             itemList = null;
             searchBox = null;
             metaPanel = null;
-            config = null;
         }
 
         private void SaveSettings()
         {
-            if (_initialized && config != null)
+            if (_initialized && Config != null)
             {
-                config.WindowSize = NormalSize;
-                config.WindowPosition = NormalOffset;
-                config.IsMaximized = Mode == WindowMode.Fullscreen;
-                if (leftPanel != null) config.LeftPanelWidth = leftPanel.Rect.Width;
-                if (rightPanel != null) config.RightPanelWidth = rightPanel.Rect.Width;
+                Config.WindowSize = NormalSize;
+                Config.WindowPosition = NormalOffset;
+                Config.IsMaximized = Mode == WindowMode.Fullscreen;
+                if (leftPanel != null) Config.LeftPanelWidth = leftPanel.Rect.Width;
+                if (rightPanel != null) Config.RightPanelWidth = rightPanel.Rect.Width;
 
-                config.Save();
+                Config.Save();
                 Logger.LogDebug($"Settings for 3ColumnWindowProfile has saved...", level: LogLevel.Trace);
             }
         }
@@ -331,14 +330,14 @@ namespace SOS.Profiles.TCWP
 
         private void ApplyWindowSizeAndPosition()
         {
-            if (config == null) return;
+            if (Config == null) return;
 
-            RectTransform.NonScaledSize = config.WindowSize;
+            RectTransform.NonScaledSize = Config.WindowSize;
 
-            var position = config.WindowPosition;
+            var position = Config.WindowPosition;
             RectTransform.AbsoluteOffset = position.X != -1 && position.Y != -1
                 ? position
-                : ConfigHelper.NewDefaultCenterPoint(BGUI.Canvas.Rect.Size, config.WindowSize);
+                : ConfigHelper.NewDefaultCenterPoint(BGUI.Canvas.Rect.Size, Config.WindowSize);
 
             NormalSize = RectTransform.NonScaledSize;
             NormalOffset = RectTransform.AbsoluteOffset;
@@ -384,7 +383,7 @@ namespace SOS.Profiles.TCWP
             OnClose += ProfileHelper.CloseWindow;
 
             // Left panel
-            int initialLeftW = (config != null && config.LeftPanelWidth > 0) ? config.LeftPanelWidth : 250;
+            int initialLeftW = (Config != null && Config.LeftPanelWidth > 0) ? Config.LeftPanelWidth : 250;
             leftPanel = new GUIResizableFrame(
                 new RectTransform(new Point(initialLeftW, ContentArea.Rect.Height), ContentArea.RectTransform, Anchor.TopLeft, isFixedSize: true),
                 style: "InnerFrame")
@@ -449,7 +448,7 @@ namespace SOS.Profiles.TCWP
             centerTabWidget = ProfileHelper.CreateTabWidget(new RectTransform(new Vector2(1f, 0.90f), centerLayout.RectTransform));
 
             // Right panel
-            int initialRightW = (config != null && config.RightPanelWidth > 0) ? config.RightPanelWidth : 300;
+            int initialRightW = (Config != null && Config.RightPanelWidth > 0) ? Config.RightPanelWidth : 300;
             rightPanel = new GUIResizableFrame(
                 new RectTransform(new Point(initialRightW, ContentArea.Rect.Height), ContentArea.RectTransform, Anchor.TopRight, isFixedSize: true),
                 style: "InnerFrame")
@@ -774,7 +773,7 @@ namespace SOS.Profiles.TCWP
 
         public void ForceLayoutUpdate()
         {
-            if (config == null) return;
+            if (Config == null) return;
 
             ApplyWindowSizeAndPosition();
             ApplyPanelWidths();
@@ -783,9 +782,9 @@ namespace SOS.Profiles.TCWP
 
         internal void ApplyConfig()
         {
-            if (!_initialized || config == null) return;
+            if (!_initialized || Config == null) return;
 
-            if (config.IsMaximized)
+            if (Config.IsMaximized)
             {
                 if (Mode != WindowMode.Fullscreen) Mode = WindowMode.Fullscreen;
             }
@@ -801,12 +800,12 @@ namespace SOS.Profiles.TCWP
 
         private void ApplyPanelWidths()
         {
-            if (config == null) return;
+            if (Config == null) return;
 
-            if (leftPanel != null && config.LeftPanelWidth > 0)
-                leftPanel.RectTransform.NonScaledSize = new Point(config.LeftPanelWidth, leftPanel.Rect.Height);
-            if (rightPanel != null && config.RightPanelWidth > 0)
-                rightPanel.RectTransform.NonScaledSize = new Point(config.RightPanelWidth, rightPanel.Rect.Height);
+            if (leftPanel != null && Config.LeftPanelWidth > 0)
+                leftPanel.RectTransform.NonScaledSize = new Point(Config.LeftPanelWidth, leftPanel.Rect.Height);
+            if (rightPanel != null && Config.RightPanelWidth > 0)
+                rightPanel.RectTransform.NonScaledSize = new Point(Config.RightPanelWidth, rightPanel.Rect.Height);
         }
 
         private void ForceLayoutTo(Point? windowSize, int? leftW, int? rightW)

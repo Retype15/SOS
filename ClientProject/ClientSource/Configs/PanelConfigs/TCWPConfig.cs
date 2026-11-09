@@ -21,6 +21,9 @@ namespace SOS.Configs.TCWP
     //MARK: TCWPConfig
     internal sealed class TCWPConfig : ConfigDirtySaver, ISOSConfig
     {
+        private static TCWPConfig? _instance;
+        public static TCWPConfig Instance => _instance ??= new();
+
         internal readonly SortedDictionary<string, TPLayout> CustomLayouts = new(new Comparers.NaturalStringComparer());
 
         private bool _presetsCollapsed = false;
