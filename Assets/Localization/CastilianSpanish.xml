@@ -2,8 +2,8 @@
 <infotexts language="Castilian Spanish" nowhitespace="false" translatedname="Castellano">
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] Client: Inicializado. Pulsa 'J' para abrir.</sos.client.init>
-	<sos.command.help>Abre/Cierra SOS.</sos.command.help>
-	<sos.command.help.log>- log '{logCommands}'
+	<sos.command.help>Abre/Cierra SOS.\nSubcomando disponible:</sos.command.help>
+	<sos.command.help.log>- log [{logCommands}]
 	Ejemplo: 'sos log debug'</sos.command.help.log>
 	<sos.command.log.status>Registro: {ActualLogLevel}</sos.command.log.status>
 	<sos.command.name>sos</sos.command.name>
@@ -26,6 +26,9 @@
 	<sos.gen.no>No</sos.gen.no>
 	<sos.gen.unknown>???</sos.gen.unknown>
 	<sos.gen.yes>Sí</sos.gen.yes>
+
+	<!-- GUI -->
+	<sos.guitextimput.not_defined>No definido</sos.guitextimput.not_defined>
 
 	<!-- Context Menu -->
 	<sos.context.add_favorite>Añadir a Favoritos</sos.context.add_favorite>
@@ -295,15 +298,15 @@ Derecha: Información detallada del objeto seleccionado.</sos.profile.default3co
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>Si la ventana se sale de la interfaz, prueba a ajustar estos valores hasta que se reubique. Recomendado: 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>
 
-	<!-- Window Resetting to Default -->
-	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>SOS: Reiniciar todas las configuraciones por defecto?</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>
-	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.Tooltip>Marque esta casilla y guarda si deseas reiniciar todas las configuraciones de S.O.S por defecto.
+	<!-- Reset All Settings -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>SOS: Restablecer toda la configuración</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.Tooltip>Restablece toda la configuración de S.O.S. a sus valores por defecto.
 Advertencia: Esta acción es irreversible.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.Tooltip>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayCategory>
 
-	<!-- Global Reset to Default -->
-	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>SOS: Reiniciar las dimensiones de la ventana por defecto?</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>
-	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.Tooltip>Marque esta casilla si deseas reiniciar el tamaño y posición de todas las ventanas S.O.S. disponibles. Útil si la ventana escapó de las dimensiones de su ventana y necesita reiniciarla.
+	<!-- Reset Window Dimensions -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>SOS: Restablecer las dimensiones de las ventanas</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.Tooltip>Restablece el tamaño y la posición de todas las ventanas de S.O.S. Es útil si una ventana acabó fuera de los límites de la pantalla y necesita restablecerse.
 Advertencia: Esta acción es irreversible.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.Tooltip>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayCategory>
 </infotexts>

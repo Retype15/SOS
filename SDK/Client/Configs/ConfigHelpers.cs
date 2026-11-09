@@ -149,7 +149,7 @@ namespace SOS.Configs
         /// <param name="l">The layout builder to which the button will be added.</param>
         /// <param name="cfg">The SOS module configuration to reset and save when the button is clicked.</param>
         /// <param name="text">Optional custom text for the button. If <c>null</c>, uses the localized text
-        /// "sos.config.reset_section" (fallback "Reset this Config Section to Default").</param>
+        /// "sos.config.reset_section" (fallback "Reset Section Defaults").</param>
         /// <param name="onClick">Optional additional action to perform after resetting and saving the config.</param>
         /// <param name="tooltip">Optional tool tip for the button. If <c>null</c>, no tool tip is set.</param>
         /// <param name="color">Optional button color. If <c>null</c>, uses the default (IndianRed with 0.8 alpha).</param>
@@ -167,7 +167,7 @@ namespace SOS.Configs
                 Profiles.ProfileHelper.RefreshSettings(); // OK
             });
             l.Button(
-                text: text ?? Texts.Get("sos.config.reset_section", "Reset this Config Section to Default").Value,
+                text: text ?? Texts.Get("sos.config.reset_section", "Reset Section Defaults").Value,
                 onClick: reset,
                 tooltip: tooltip,
                 color: color ?? (Color.IndianRed * 0.8f),

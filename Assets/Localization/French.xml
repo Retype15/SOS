@@ -2,7 +2,7 @@
 <infotexts language="French" nowhitespace="false" translatedname="Français">
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] Client : Initialisé. Appuyez sur 'J' pour ouvrir.</sos.client.init>
-	<sos.command.help>Ouvrir/Fermer SOS.</sos.command.help>
+	<sos.command.help>Ouvrir/Fermer SOS.\nSous-commande disponible :</sos.command.help>
 	<sos.command.help.log>- log [{logCommands}]
 	Exemple : 'sos log debug'</sos.command.help.log>
 	<sos.command.log.status>Journal : {ActualLogLevel}</sos.command.log.status>
@@ -27,6 +27,9 @@
 	<sos.gen.unknown>???</sos.gen.unknown>
 	<sos.gen.yes>Oui</sos.gen.yes>
 
+	<!-- GUI -->
+	<sos.guitextimput.not_defined>Non défini</sos.guitextimput.not_defined>
+
 	<!-- Context Menu -->
 	<sos.context.add_favorite>Ajouter aux favoris</sos.context.add_favorite>
 	<sos.context.recipe_options>Options de recette</sos.context.recipe_options>
@@ -36,7 +39,7 @@
 	<sos.context.untrack>Ne plus suivre</sos.context.untrack>
 	<sos.context.track_recipe>Ajouter au HUD</sos.context.track_recipe>
 	<sos.context.untrack_from_hud>Retirer du HUD</sos.context.untrack_from_hud>
-	<sos.context.view_recipes>Voir les recettes</sos.context.view_recipes>
+	<sos.context.view_recipes>Voir {name}</sos.context.view_recipes>
 
 	<!-- Window -->
 	<sos.window.additional_info>INFO SUPPLÉMENTAIRE</sos.window.additional_info>
@@ -258,7 +261,7 @@ Droite : informations détaillées sur l'objet sélectionné.</sos.profile.defau
 	<!-- Migration -->
 	<sos.migration.title>SOS — Migration de Configuration</sos.migration.title>
 	<sos.migration.description>Une ancienne configuration SOS a été trouvée.
-	ulez-vous importer vos données vers le nouveau système ?</sos.migration.description>
+Voulez-vous importer vos données vers le nouveau système ?</sos.migration.description>
 	<sos.migration.import>Importer</sos.migration.import>
 	<sos.migration.discard>Rejeter</sos.migration.discard>
 	<sos.migration.ignore>Ignorer</sos.migration.ignore>
@@ -294,4 +297,16 @@ Droite : informations détaillées sur l'objet sélectionné.</sos.profile.defau
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>SOS: Position Y de la fenêtre</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>Si la fenêtre sort de l'interface, essayez d'ajuster ces valeurs jusqu'à ce qu'elle se repositionne. Recommandé : 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>
+
+	<!-- Reset All Settings -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>SOS: Réinitialiser tous les paramètres</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.Tooltip>Réinitialise tous les paramètres de S.O.S. à leurs valeurs par défaut.
+Attention : cette action est irréversible.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayCategory>
+
+	<!-- Reset Window Dimensions -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>SOS: Réinitialiser les dimensions des fenêtres</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.Tooltip>Réinitialise la taille et la position de toutes les fenêtres S.O.S. Utile si une fenêtre s'est retrouvée hors des limites de l'écran et doit être réinitialisée.
+Attention : cette action est irréversible.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayCategory>
 </infotexts>

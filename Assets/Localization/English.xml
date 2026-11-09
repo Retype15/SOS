@@ -27,6 +27,9 @@
 	<sos.gen.unknown>???</sos.gen.unknown>
 	<sos.gen.yes>Yes</sos.gen.yes>
 
+	<!-- GUI -->
+	<sos.guitextimput.not_defined>Not Defined</sos.guitextimput.not_defined>
+
 	<!-- Context Menu -->
 	<sos.context.add_favorite>Add to Favorites</sos.context.add_favorite>
 	<sos.context.recipe_options>Recipe Options</sos.context.recipe_options>
@@ -36,7 +39,7 @@
 	<sos.context.untrack>Untrack</sos.context.untrack>
 	<sos.context.track_recipe>Add to HUD</sos.context.track_recipe>
 	<sos.context.untrack_from_hud>Remove from HUD</sos.context.untrack_from_hud>
-	<sos.context.view_recipes>View Recipes</sos.context.view_recipes>
+	<sos.context.view_recipes>View {name}</sos.context.view_recipes>
 
 	<!-- Window -->
 	<sos.window.additional_info>ADDITIONAL INFO</sos.window.additional_info>
@@ -294,4 +297,16 @@ Do you want to import your data to the new system?</sos.migration.description>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>SOS: Window position Y</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>If the window falls outside of the UI, try adjusting these values until it is repositioned. Recommended: 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>
+
+	<!-- Reset All Settings -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>SOS: Reset All Settings</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.Tooltip>Resets all S.O.S. settings to their default values.
+Warning: This action is irreversible.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayCategory>
+
+	<!-- Reset Window Dimensions -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>SOS: Reset Window Dimensions</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.Tooltip>Resets the size and position of all S.O.S. windows. Useful if a window ended up outside the screen bounds and needs to be reset.
+Warning: This action is irreversible.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayCategory>
 </infotexts>

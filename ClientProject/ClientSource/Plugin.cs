@@ -75,7 +75,7 @@ namespace SOS
         internal static string CommandHelp()
         {
             return
-                Texts.Get("sos.command.help", "Open/Close SOS.\nSub-commands available:\n").Value +
+                Texts.Get("sos.command.help", "Open/Close SOS.\nSub-command available:").Value +
                 string.Join("\n", Texts.GetTranslationsByPrefix("sos.command.help.").Values).Replace("{logCommands}", string.Join(", ", Enum.GetNames(typeof(LogLevel)).Reverse()));
         }
     }

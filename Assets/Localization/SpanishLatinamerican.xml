@@ -2,7 +2,7 @@
 <infotexts language="Latinamerican Spanish" nowhitespace="false" translatedname="Español Latinoamericano">
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] Client: Inicializado. Presiona 'J' para abrir.</sos.client.init>
-	<sos.command.help>Abre/Cierra SOS.</sos.command.help>
+	<sos.command.help>Abre/Cierra SOS.\nSubcomando disponible:</sos.command.help>
 	<sos.command.help.log>- log [{logCommands}]
 	Ejemplo: 'sos log debug'</sos.command.help.log>
 	<sos.command.log.status>Registro: {ActualLogLevel}</sos.command.log.status>
@@ -26,6 +26,9 @@
 	<sos.gen.no>No</sos.gen.no>
 	<sos.gen.unknown>???</sos.gen.unknown>
 	<sos.gen.yes>Sí</sos.gen.yes>
+
+	<!-- GUI -->
+	<sos.guitextimput.not_defined>No definido</sos.guitextimput.not_defined>
 
 	<!-- Context Menu -->
 	<sos.context.add_favorite>Añadir a Favoritos</sos.context.add_favorite>
@@ -294,4 +297,16 @@ Derecha: Información detallada del objeto seleccionado.</sos.profile.default3co
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>SOS: Posición Y de la ventana</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>Si la ventana se sale de la interfaz, prueba a ajustar estos valores hasta que se reubique. Recomendado: 0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>
+
+	<!-- Reset All Settings -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>SOS: Restablecer toda la configuración</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.Tooltip>Restablece toda la configuración de S.O.S. a sus valores por defecto.
+Advertencia: Esta acción es irreversible.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayCategory>
+
+	<!-- Reset Window Dimensions -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>SOS: Restablecer las dimensiones de las ventanas</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.Tooltip>Restablece el tamaño y la posición de todas las ventanas de S.O.S. Es útil si una ventana acabó fuera de los límites de la pantalla y necesita restablecerse.
+Advertencia: Esta acción es irreversible.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayCategory>
 </infotexts>

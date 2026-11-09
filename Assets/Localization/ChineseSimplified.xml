@@ -2,7 +2,7 @@
 <infotexts language="Simplified Chinese" nowhitespace="true" translatedname="中文">
 	<!-- Commands & Init -->
 	<sos.client.init>[SOS] 客户端：已初始化。按 'J' 键打开。</sos.client.init>
-	<sos.command.help>打开/关闭 SOS。</sos.command.help>
+	<sos.command.help>打开/关闭 SOS。\n可用子命令：</sos.command.help>
 	<sos.command.help.log>- log [{logCommands}]
 	示例：'sos log debug'</sos.command.help.log>
 	<sos.command.log.status>日志: {ActualLogLevel}</sos.command.log.status>
@@ -27,6 +27,9 @@
 	<sos.gen.unknown>???</sos.gen.unknown>
 	<sos.gen.yes>是</sos.gen.yes>
 
+	<!-- GUI -->
+	<sos.guitextimput.not_defined>未定义</sos.guitextimput.not_defined>
+
 	<!-- Context Menu -->
 	<sos.context.add_favorite>添加到收藏</sos.context.add_favorite>
 	<sos.context.recipe_options>配方选项</sos.context.recipe_options>
@@ -36,7 +39,7 @@
 	<sos.context.untrack>取消追踪</sos.context.untrack>
 	<sos.context.track_recipe>添加到 HUD</sos.context.track_recipe>
 	<sos.context.untrack_from_hud>从 HUD 移除</sos.context.untrack_from_hud>
-	<sos.context.view_recipes>查看配方</sos.context.view_recipes>
+	<sos.context.view_recipes>查看{name}</sos.context.view_recipes>
 
 	<!-- Window -->
 	<sos.window.additional_info>额外信息</sos.window.additional_info>
@@ -294,4 +297,16 @@
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>SOS: 窗口位置 Y</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayName>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>如果窗口超出UI范围，请尝试调整这些数值直到重新定位。推荐值：0</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.Tooltip>
 	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.WindowSizeY.DisplayCategory>
+
+	<!-- Reset All Settings -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>SOS: 重置所有设置</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.Tooltip>将所有 S.O.S. 设置重置为默认值。
+警告：此操作不可撤销。</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsAllResetToDefault.DisplayCategory>
+
+	<!-- Reset Window Dimensions -->
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>SOS: 重置窗口尺寸</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayName>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.Tooltip>重置所有 S.O.S. 窗口的大小和位置。如果窗口超出屏幕范围，可用此选项恢复。
+警告：此操作不可撤销。</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.Tooltip>
+	<S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayCategory>S.O.S.</S.O.S_x0020_-_x0020_Standard_x0020_Operations_x0020_Schematics.SettingsWindowResetToDefault.DisplayCategory>
 </infotexts>

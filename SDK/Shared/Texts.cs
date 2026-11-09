@@ -21,7 +21,7 @@ namespace SOS
     /// <example>
     /// <code>
     /// // Basic usage with fallback
-    /// var text = Texts.Get("sos.some_key", "Fallback text if not found");
+    /// var text = Texts.Get(key, "Fallback text if not found");
     ///
     /// // Get all translations starting with a prefix
     /// var translations = Texts.GetTranslationsByPrefix("sos.");
