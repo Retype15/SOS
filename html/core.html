@@ -84,12 +84,13 @@ $(function(){initNavTree('core.html','',''); });
 <ul>
 <li><b>Prefabs to track (ISOSPrefab):</b><ul>
 <li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/ItemPrefab.cs"><span class="tt">ItemPrefabProvider</span>:</a> Adds all the Items.</li>
-<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs"><span class="tt">AfflictionPrefabProvider</span>:</a> Adds all the afflictions. It makes a distinction about the Husk afflictions using another empty subscriber <a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs"><span class="tt">AfflictionHuskPrefabProvider</span>:</a>.</li>
+<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs"><span class="tt">AfflictionPrefabProvider</span>:</a> Adds all the afflictions.</li>
 </ul>
 </li>
 <li><b>Central panels (ISOSTab):</b><ul>
-<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/ItemPanel/ItemPanel.cs">ItemPanel:</a> Component that inherits from <span class="tt"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_tab.html" title="Defines an SOS module acting as a modular prefab inspection tab (type alias for ITab&lt;T&gt; where T is Ba...">SOS.ISOSTab</a></span> and implements the list of recipes of the selected item. <em>See:</em> <b><a href="//">Barotrauma.ItemPrefab</a></b></li>
-<li><a href="//"><span class="tt">PreviewPanel</span>:</a> It is a simple example panel that simply shows the main image of the selected component. Written as an individual component in Lua to demonstrate full and clean execution capabilities of components that come from Lua.</li>
+<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/ItemPanel/ItemPanel.cs"><span class="tt">ItemPanelTab</span>:</a> Component that implements <span class="tt"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_tab.html" title="Defines an SOS module acting as a modular prefab inspection tab (type alias for ITab&lt;T&gt; where T is Ba...">SOS.ISOSTab</a></span> and builds the list of recipes of the selected item. <em>See:</em> <b><a href="//">Barotrauma.ItemPrefab</a></b></li>
+<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/MarketPanel/MarketTab.cs"><span class="tt">MarketTab</span>:</a> Component that implements <span class="tt"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_tab.html" title="Defines an SOS module acting as a modular prefab inspection tab (type alias for ITab&lt;T&gt; where T is Ba...">SOS.ISOSTab</a></span> and <span class="tt">IDisposable</span>, and builds the price comparison of the selected item between the different store types.</li>
+<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/PreviewPanel/PreviewPanel.cs"><span class="tt">PreviewPanelTab</span>:</a> It is a simple example panel that simply shows the main image of the selected component. Written as an individual component in Lua to demonstrate full and clean execution capabilities of components that come from Lua.</li>
 </ul>
 </li>
 <li><b>Window Profiles (ISOSWindowProfile):</b><ul>
