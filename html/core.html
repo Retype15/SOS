@@ -76,33 +76,33 @@ $(function(){initNavTree('core.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_manual_2_core"></a></p>
-<p>Este archivo es solamente de referencia al proyecto base. El modder trabaja contra el SDK; aquí solo ve qué implementa el Core vanilla para copiar patrones.</p>
-<p>Es el base el cual cumple dos funciones: Gestionar la ventana principal, inicialización crucial, ciclos y eventos de teclado internos duros a través de <span class="tt">SOSController</span>, e implementar los componentes vanilla del mod, como por ejemplo localizar items y sus recetas por medio de las herramientas del proyecto, el Profile vanilla, etc.</p>
-<p>Está compuesto por el controlador <span class="tt">SOSController</span>, quien se encarga gestionar los eventos de teclas e inicialización, y los componentes base que ya muestran las versiones anteriores, a excepción de <span class="tt">SimulatorManager</span> quien fue empujado como mod opcional separado del <span class="tt">Core</span>. <em>ver:</em> <b><a href="https://github.com/retype15/SOS-DummyManager">SOS - Dummy Manager</a></b>.</p>
-<p>Nunca trabajará con este, pero documentaremos igual porque es útil para entender funcionamiento interno y ver ejemplos de los componentes ya implementados por <a class="el" href="namespace_s_o_s.html">SOS</a> base.</p>
-<p><b>Implementa:</b></p>
+<p>This file is only for reference to the base project. The modder works against the SDK; here you only see what the vanilla Core implements in order to copy patterns.</p>
+<p>It is the base which fulfills two functions: Manage the main window, crucial initialization, cycles and hard internal keyboard events through <span class="tt">SOSController</span>, and implement the mod's vanilla components, like for example locating items and their recipes by means of the project's tools, the vanilla Profile, etc.</p>
+<p>It is composed of the controller <span class="tt">SOSController</span>, who is in charge of managing the key events and initialization, and the base components that the previous versions already show, with the exception of <span class="tt">SimulatorManager</span> who was pushed as an optional mod separated from the <span class="tt">Core</span>. <em>see:</em> <b><a href="https://github.com/retype15/SOS-DummyManager">SOS - Dummy Manager</a></b>.</p>
+<p>You will never work with this one, but we will document it anyway because it is useful to understand the internal functioning and to see examples of the components already implemented by the base <a class="el" href="namespace_s_o_s.html">SOS</a>.</p>
+<p><b>Implements:</b></p>
 <ul>
-<li><b>Prefabs a rastrear (ISOSPrefab):</b><ul>
-<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/ItemPrefab.cs"><span class="tt">ItemPrefabProvider</span>:</a> Agrega todos los Items.</li>
-<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs"><span class="tt">AfflictionPrefabProvider</span>:</a> Agrega todas las aflicciones. Hace distinción sobre las aflicciones Husk usando otro subscriptor vacío <a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs"><span class="tt">AfflictionHuskPrefabProvider</span>:</a>.</li>
+<li><b>Prefabs to track (ISOSPrefab):</b><ul>
+<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/ItemPrefab.cs"><span class="tt">ItemPrefabProvider</span>:</a> Adds all the Items.</li>
+<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs"><span class="tt">AfflictionPrefabProvider</span>:</a> Adds all the afflictions. It makes a distinction about the Husk afflictions using another empty subscriber <a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs"><span class="tt">AfflictionHuskPrefabProvider</span>:</a>.</li>
 </ul>
 </li>
-<li><b>Paneles centrales (ISOSTab):</b><ul>
-<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/ItemPanel/ItemPanel.cs">ItemPanel:</a> Componente que hereda de <span class="tt"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_tab.html" title="Defines an SOS module acting as a modular prefab inspection tab (type alias for ITab&lt;T&gt; where T is Ba...">SOS.ISOSTab</a></span> e implementa la lista de recetas del item seleccionado. <em>Ver:</em> <b><a href="//">Barotrauma.ItemPrefab</a></b></li>
-<li><a href="//"><span class="tt">PreviewPanel</span>:</a> Es un simple panel de ejemplo que simplemente muestra la imagen principal del componente seleccionado. Escrito como componente individual en Lua para demostrar capacidades de ejecución completa y limpia de componentes que provienen de Lua.</li>
+<li><b>Central panels (ISOSTab):</b><ul>
+<li><a href="https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/ItemPanel/ItemPanel.cs">ItemPanel:</a> Component that inherits from <span class="tt"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_tab.html" title="Defines an SOS module acting as a modular prefab inspection tab (type alias for ITab&lt;T&gt; where T is Ba...">SOS.ISOSTab</a></span> and implements the list of recipes of the selected item. <em>See:</em> <b><a href="//">Barotrauma.ItemPrefab</a></b></li>
+<li><a href="//"><span class="tt">PreviewPanel</span>:</a> It is a simple example panel that simply shows the main image of the selected component. Written as an individual component in Lua to demonstrate full and clean execution capabilities of components that come from Lua.</li>
 </ul>
 </li>
-<li><b>Perfiles de Ventana (ISOSWindowProfile):</b><ul>
-<li><a href="//"><span class="tt">ThreeColumnWindowProfile</span>:</a> Agrega el perfil visual clásico del mod con ventana redimensionable.</li>
+<li><b>Window Profiles (ISOSWindowProfile):</b><ul>
+<li><a href="//"><span class="tt">ThreeColumnWindowProfile</span>:</a> Adds the classic visual profile of the mod with a resizable window.</li>
 </ul>
 </li>
-<li><b>Badges de información y estadísticas (ISOSStatInfo):</b><ul>
-<li><a href="//"><span class="tt">*StatInfo</span>:</a> Agregan información limpia sobre Items o aflicciones.</li>
+<li><b>Information and statistics badges (ISOSStatInfo):</b><ul>
+<li><a href="//"><span class="tt">*StatInfo</span>:</a> They add clean information about Items or afflictions.</li>
 <li>...</li>
 </ul>
 </li>
 </ul>
-<dl class="section note"><dt>Note</dt><dd>Este documento está incompleto, cosidere ver la documentación auto-generada, o si lo desea puede pedir ayuda en el <a href="//">discord oficial</a> del mod. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This document is incomplete, considere seeing the auto-generated documentation, or if you wish you can ask for help in the <a href="//">official discord</a> of the mod. </dd></dl>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

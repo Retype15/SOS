@@ -76,40 +76,40 @@ $(function(){initNavTree('data_sharing.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_manual_2guide_24__data__sharing"></a></p>
-<p>Un sistema de suscripcion de eventos y almacen de datos compartidos bidireccional para todos los mods para evitar referencias duras entre todos, así como asegurar orden lógico y predecible de ejecución.</p>
-<p>Cada método necesita recibir como primer parámetro <b>string key</b>: clave o identificador de puente como primer parámetro. Las claves comúnes están definidas y documentadas en la clase estática <em><a class="el" href="class_s_o_s_1_1_comm_keys.html" title="Centralized registry of standardized communication channel identifiers for the decoupled S....">SOS.CommKeys</a></em>.</p>
+<p>A bidirectional event subscription system and shared data store for all mods to avoid hard references between all of them, as well as ensuring a logical and predictable order of execution.</p>
+<p>Every method needs to receive as first parameter <b>string key</b>: bridge key or identifier as first parameter. The common keys are defined and documented in the static class <em><a class="el" href="class_s_o_s_1_1_comm_keys.html" title="Centralized registry of standardized communication channel identifiers for the decoupled S....">SOS.CommKeys</a></em>.</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
-1. Transmisores de datos compartido</h1>
-<p>Métodos de suscripción y llamadas usando delegados.</p>
-<p>Los Layers recomendados a usar lo define la clase estática <span class="tt"><a class="el" href="class_s_o_s_1_1_event_priority.html" title="Defines canonical priority constants for deterministic execution ordering within the S....">SOS.EventPriority</a></span>.</p>
-<p>Cada uno de los métodos aceptan opcionalmente <b>double order = 0</b> para añadir/eliminar/llamar el método de forma atómica en el layer de orden definido y define el orden de ejecución de los delegados.</p>
-<p>Cada grupo de delegados agrupado por el mismo valor <b>order</b> lo llamaremos <b>layer</b>. Los Layers recomendados a usar los define la clase estática <span class="tt"><a class="el" href="class_s_o_s_1_1_event_priority.html" title="Defines canonical priority constants for deterministic execution ordering within the S....">SOS.EventPriority</a></span>.</p>
-<dl class="section note"><dt>Note</dt><dd>Recomendado pasar el mismo <b>layer</b> usado en <span class="tt">SOS.API.On</span> a la desuscripción <span class="tt">SOS.API.Off</span> por optimización, pero no es obligatorio. <br  />
+1. Shared data transmitters</h1>
+<p>Subscription and call methods using delegates.</p>
+<p>The Layers recommended to use are defined by the static class <span class="tt"><a class="el" href="class_s_o_s_1_1_event_priority.html" title="Defines canonical priority constants for deterministic execution ordering within the S....">SOS.EventPriority</a></span>.</p>
+<p>Each one of the methods optionally accept <b>double order = 0</b> to add/remove/call the method atomically in the defined order layer and define the execution order of the delegates.</p>
+<p>Each group of delegates grouped by the same <b>order</b> value we will call <b>layer</b>. The Layers recommended to use are defined by the static class <span class="tt"><a class="el" href="class_s_o_s_1_1_event_priority.html" title="Defines canonical priority constants for deterministic execution ordering within the S....">SOS.EventPriority</a></span>.</p>
+<dl class="section note"><dt>Note</dt><dd>Recommended to pass the same <b>layer</b> used in <span class="tt">SOS.API.On</span> to the unsubscription <span class="tt">SOS.API.Off</span> for optimization, but it is not mandatory. <br  />
 <br  />
- <span class="tt">double order</span> se acota la parte de punto flotante desde <em>.0</em> a <em>.9999</em> para evitar errores relacionados con la precisión y establecer un límite claro y seguro para layers intermedios.</dd></dl>
+ <span class="tt">double order</span> clamps the floating point part from <em>.0</em> to <em>.9999</em> to avoid errors related to precision and establish a clear and safe limit for intermediate layers.</dd></dl>
 <ul>
-<li><span class="tt">SOS.API.On</span>: Permite suscribir delegados que son llamados al emitir usando <span class="tt">SOS.API.Emit</span> y ejecutados en orden definido por su <b>layer</b>. acepta <span class="tt">Action</span>/<span class="tt">Action&lt;T&gt;</span> <em>handler</em> como segundo parámetro, y es el método que es llamado cuando se emite con su misma <span class="tt">key</span>. <span class="tt">T</span> Describe el tipo que recibe el método, si este requiere <span class="tt">T</span>, solo será ejecutado si el emisor <span class="tt">SOS.API.Emit&lt;T&gt;</span> como por <span class="tt">SOS.API.Emit&lt;T&gt;</span></li>
-<li><span class="tt">SOS.API.Off</span>: Permite desuscribir un delegado del bus de eventos para limpiar referencias. Requiere key, y el mismo <em>handler</em> que suscribió usando <span class="tt">SOS.API.On</span> anteriormente. Recuerde llamar apropiadamente este método cuando deje de necesitar escuchar. Si recibe <b>order</b> solo desuscribirá el <b>handler</b> del layer específico proporcionado, si recibe <span class="tt">null</span> intenta desuscribir el <b>handler</b> de cada uno de los layers registrados.</li>
-<li><span class="tt">SOS.API.Emit</span>: Permite emitir un valor y llamar a todos los métodos suscritos por la <span class="tt">key</span> proporcionada. Acepta opcionalmente <b>value : <span class="tt">T</span></b> para emitir pasando a los métodos registrados un objeto de tipo <span class="tt">T</span>. Acepta <b>order</b> para llamar todos los métodos que estén suscritos únicamente a ese <b>layer</b>. Si es parametrizado <span class="tt">T</span> acepta <span class="tt">bool setState = true</span> el cual guardará usando <span class="tt">SOS.API.SetState&lt;T&gt;</span> luego de emitir satisfactoriamente si valor si es <span class="tt">true</span>, otherwise ejecuta sin guardar.</li>
-<li><span class="tt">SOS.API.EmitRange</span>: Permite emitir un valor y llamar a todos los métodos suscritos por la <span class="tt">key</span> proporcionada. Acepta opcionalmente <span class="tt">double min = double.MinValue</span>, <span class="tt">double max = double.MaxValue</span> para llamar a los métodos de un rango de layers para casos de uso avanzados. Si es parametrizado <span class="tt">T</span> acepta <span class="tt">bool setState = true</span> el cual guardará usando <span class="tt">SOS.SOS.API.SetState&lt;T&gt;</span> luego de emitir satisfactoriamente si valor si es <span class="tt">true</span>, otherwise ejecuta sin gaurdar/actualizar el valor.</li>
+<li><span class="tt">SOS.API.On</span>: Allows subscribing delegates that are called when emitting using <span class="tt">SOS.API.Emit</span> and executed in the order defined by their <b>layer</b>. it accepts <span class="tt">Action</span>/<span class="tt">Action&lt;T&gt;</span> <em>handler</em> as second parameter, and it is the method that is called when emitting with its same <span class="tt">key</span>. <span class="tt">T</span> Describes the type that the method receives, if it requires <span class="tt">T</span>, it will only be executed if the emitter <span class="tt">SOS.API.Emit&lt;T&gt;</span> as by <span class="tt">SOS.API.Emit&lt;T&gt;</span></li>
+<li><span class="tt">SOS.API.Off</span>: Allows unsubscribing a delegate from the event bus to clean references. It requires key, and the same <em>handler</em> that subscribed using <span class="tt">SOS.API.On</span> previously. Remember to call this method appropriately when you stop needing to listen. If it receives <b>order</b> it will only unsubscribe the <b>handler</b> from the specific provided layer, if it receives <span class="tt">null</span> it tries to unsubscribe the <b>handler</b> from each one of the registered layers.</li>
+<li><span class="tt">SOS.API.Emit</span>: Allows emitting a value and calling all the methods subscribed by the provided <span class="tt">key</span>. It optionally accepts <b>value : <span class="tt">T</span></b> to emit passing an object of type <span class="tt">T</span> to the registered methods. It accepts <b>order</b> to call all the methods that are subscribed only to that <b>layer</b>. If it is parameterized <span class="tt">T</span> it accepts <span class="tt">bool setState = true</span> which will save using <span class="tt">SOS.API.SetState&lt;T&gt;</span> after emitting successfully if the value if it is <span class="tt">true</span>, otherwise it executes without saving.</li>
+<li><span class="tt">SOS.API.EmitRange</span>: Allows emitting a value and calling all the methods subscribed by the provided <span class="tt">key</span>. It optionally accepts <span class="tt">double min = double.MinValue</span>, <span class="tt">double max = double.MaxValue</span> to call the methods of a range of layers for advanced use cases. If it is parameterized <span class="tt">T</span> it accepts <span class="tt">bool setState = true</span> which will save using <span class="tt">SOS.SOS.API.SetState&lt;T&gt;</span> after emitting successfully if the value if it is <span class="tt">true</span>, otherwise it executes without saving/updating the value.</li>
 </ul>
-<dl class="section important"><dt>Important</dt><dd>Emitir pasando un objeto <span class="tt">T</span> ejecutará todo método suscrito que acepte el parámetro <span class="tt">T</span> o no tenga parámetro, pero emitir sin parámetros solo llamará a los metodos sin parámetros, téngalo en cuenta.</dd></dl>
+<dl class="section important"><dt>Important</dt><dd>Emitting passing an object <span class="tt">T</span> will execute every subscribed method that accepts the <span class="tt">T</span> parameter or that has no parameter, but emitting without parameters will only call the methods without parameters, keep that in mind.</dd></dl>
 <h2 class="doxsection"><a class="anchor" id="examples_1"></a>
-Ejemplos</h2>
+Examples</h2>
 <p>...</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md20"></a>
-2. Almacén de datos</h1>
-<p>Para guardar objetos o datos compartidos públicos para todos los mods</p>
+2. Data store</h1>
+<p>To save objects or shared data public for all mods</p>
 <ul>
-<li><span class="tt">SOS.API.SetState&lt;T&gt;</span>: Permite guardar una variable de tipo <span class="tt">T</span> en un estado compartido público fácilmente accesibles desde cualquier mod.</li>
-<li><span class="tt">SOS.API.GetState&lt;T&gt;</span>: Permite obtener la variable de tipo <span class="tt">T</span> guardada en el estado compartido público antes guardada por <span class="tt">SOS.API.SetState&lt;T&gt;</span>.</li>
-<li><span class="tt">SOS.API.RemoveState</span>: Permite eliminar por completo un estado guardado.</li>
+<li><span class="tt">SOS.API.SetState&lt;T&gt;</span>: Allows saving a variable of type <span class="tt">T</span> in a public shared state easily accessible from any mod.</li>
+<li><span class="tt">SOS.API.GetState&lt;T&gt;</span>: Allows obtaining the variable of type <span class="tt">T</span> saved in the public shared state previously saved by <span class="tt">SOS.API.SetState&lt;T&gt;</span>.</li>
+<li><span class="tt">SOS.API.RemoveState</span>: Allows deleting a saved state completely.</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="examples_2"></a>
-Ejemplos</h2>
+Examples</h2>
 <p>...</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md21"></a>
-Otros recursos</h1>
+Other resources</h1>
 <p><b>Next to: <a href="ui_comps.html">UI and GUI Components</a></b></p>
 <p><b>Back to: <a href="registration.html">Registration</a></b> </p>
 </div></div><!-- contents -->

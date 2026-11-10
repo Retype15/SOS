@@ -76,35 +76,35 @@ $(function(){initNavTree('registration.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_manual_2guide_23__registration"></a></p>
-<p>Luego de crear y definir tu clase, deberás registrarla a la API de <a class="el" href="namespace_s_o_s.html">SOS</a> para que sea reconocida y validada.</p>
-<p>Para ello, hay dos formas principales de registrar un nuevo módulo a <a class="el" href="namespace_s_o_s.html">SOS</a>:</p>
+<p>After creating and defining your class, you will have to register it to the <a class="el" href="namespace_s_o_s.html">SOS</a> API so that it is recognized and validated.</p>
+<p>For that, there are two main ways to register a new module to <a class="el" href="namespace_s_o_s.html">SOS</a>:</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
-1. Registro Automático</h1>
-<p>Usando el atributo <span class="tt"><a class="el" href="class_s_o_s_1_1_auto_register_attribute.html" title="Instructs the S.O.S. discovery engine to automatically register the decorated class as an SOS module ...">SOS.AutoRegisterAttribute</a></span> sobre un módulo <a class="el" href="namespace_s_o_s.html">SOS</a> (clase que implemente alguna interfaz <a href="sos_modules.html">ISOS*</a>), para registro automático la primera vez que se abra la ventana de <a class="el" href="namespace_s_o_s.html">SOS</a> (nunca antes) pasando las propiedades opcionales de registro:</p>
+1. Automatic Registration</h1>
+<p>Using the <span class="tt"><a class="el" href="class_s_o_s_1_1_auto_register_attribute.html" title="Instructs the S.O.S. discovery engine to automatically register the decorated class as an SOS module ...">SOS.AutoRegisterAttribute</a></span> attribute over an <a class="el" href="namespace_s_o_s.html">SOS</a> module (class that implements some <a href="sos_modules.html">ISOS*</a> interface), for automatic registration the first time the <a class="el" href="namespace_s_o_s.html">SOS</a> window is opened (never before) passing the optional registration properties:</p>
 <ul>
-<li><span class="tt">string id</span>: El identificador único para su tipo, si otro objeto del mismo tipo intenta registrarse posteriormente con el mismo identificador, será sobreescrito. <b>Default: type.FullName ?? type.Name</b>. Si registra un módulo <a class="el" href="namespace_s_o_s.html">SOS</a> con el mismo nombre de uno anterior, se sobreescribirá, téngalo en cuenta si desea sobreescribir módulos <a class="el" href="namespace_s_o_s.html">SOS</a> de otros mods para lógica personalizada.</li>
-<li><span class="tt">double order</span>: Orden de ejecución o llamada. Orden ascendente. llaman de menor a mayor, si es igual se trata alfabéticamente por el Id, permitiendo ordenarse en las llamdas de forma predecible. <b>Default: 0</b></li>
-<li><span class="tt">bool active</span>: Indica si por defecto este módulo <a class="el" href="namespace_s_o_s.html">SOS</a> se ejecutará o no. Permite añadir lógica de activación/desactivación de módulos <a class="el" href="namespace_s_o_s.html">SOS</a> para lógica condicional, o permitir al jugador desactivar módulos <a class="el" href="namespace_s_o_s.html">SOS</a> a conciencia para no sobrecargar su interfaz con informacion que no necesita. <b>Default: True</b></li>
+<li><span class="tt">string id</span>: The unique identifier for your type, if another object of the same type tries to register later with the same identifier, it will be overwritten. <b>Default: type.FullName ?? type.Name</b>. If you register an <a class="el" href="namespace_s_o_s.html">SOS</a> module with the same name as a previous one, it will be overwritten, keep it in mind if you wish to overwrite <a class="el" href="namespace_s_o_s.html">SOS</a> modules from other mods for custom logic.</li>
+<li><span class="tt">double order</span>: Order of execution or call. Ascending order. they are called from lowest to highest, if it is equal it is treated alphabetically by the Id, allowing them to be ordered in the calls in a predictable way. <b>Default: 0</b></li>
+<li><span class="tt">bool active</span>: Indicates if by default this <a class="el" href="namespace_s_o_s.html">SOS</a> module will be executed or not. It allows adding activation/deactivation logic of <a class="el" href="namespace_s_o_s.html">SOS</a> modules for conditional logic, or allowing the player to consciously deactivate <a class="el" href="namespace_s_o_s.html">SOS</a> modules so as not to overload their interface with information that they do not need. <b>Default: True</b></li>
 </ul>
-<dl class="section remark"><dt>Remarks</dt><dd>Usando este método, la clase se descubre automáticamente. Es la forma idiomática de registrar clases que implementen nuestras interfaces. <br  />
+<dl class="section remark"><dt>Remarks</dt><dd>Using this method, the class is discovered automatically. It is the idiomatic way to register classes that implement our interfaces. <br  />
 <br  />
- Dado que este método no requiere ejecutar código manual para registrar las clases, se puede obviar por completo la clase Plugin si el objetivo de tu mod es únicamente añadir contenenido a <a class="el" href="namespace_s_o_s.html">SOS</a>.</dd></dl>
+ Since this method does not require executing manual code to register the classes, the Plugin class can be completely obviated if your mod's objective is only to add content to <a class="el" href="namespace_s_o_s.html">SOS</a>.</dd></dl>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
-2. Registro manual</h1>
-<p>Usando cualquier método <span class="tt">API.Register*</span> (ej: <a class="el" href="class_s_o_s_1_1_a_p_i.html#af6889131fc0d27b1ec59af61d7ea3c62" title="Registers an SOS module acting as a stat section provider into the S.O.S. inspector sidebar registry.">SOS.API.RegisterStatInfo</a>) y pasando un objeto que represente el método de instanciación y las mismas propiedades opcionales anteriormente descritas luego del objeto (<em><b>obj</b></em>, id, order, active). Puede registrar objetos genéricos y tablas Lua que implementen de forma directa o indirecta los métodos del contrato.</p>
-<p>Hay varias formas de registrar un módulo <a class="el" href="namespace_s_o_s.html">SOS</a></p>
+2. Manual registration</h1>
+<p>Using any <span class="tt">API.Register*</span> method (e.g: <a class="el" href="class_s_o_s_1_1_a_p_i.html#af6889131fc0d27b1ec59af61d7ea3c62" title="Registers an SOS module acting as a stat section provider into the S.O.S. inspector sidebar registry.">SOS.API.RegisterStatInfo</a>) and passing an object that represents the instantiation method and the same optional properties previously described after the object (<em><b>obj</b></em>, id, order, active). You can register generic objects and Lua tables that implement directly or indirectly the contract's methods.</p>
+<p>There are several ways to register an <a class="el" href="namespace_s_o_s.html">SOS</a> module</p>
 <ul>
-<li><p class="startli"><span class="tt">class\&lt;T\&gt;</span>: Instancia directa de un objeto que implemente el contrato. Esta es la forma más simple de pasar una única instancia global y evitar instanciar.</p>
+<li><p class="startli"><span class="tt">class\&lt;T\&gt;</span>: Direct instance of an object that implements the contract. This is the simplest way to pass a single global instance and avoid instantiating.</p>
 <div class="fragment"><div class="line"><a class="code hl_namespace" href="namespace_s_o_s.html">SOS</a>.<a class="code hl_class" href="class_s_o_s_1_1_a_p_i.html">API</a>.<a class="code hl_function" href="class_s_o_s_1_1_a_p_i.html#af6889131fc0d27b1ec59af61d7ea3c62">RegisterStatInfo</a>(<span class="keyword">new</span> TreatmentStatInfo(), <span class="stringliteral">&quot;MyMod.TreatmentInfo&quot;</span>, 1);</div>
 <div class="ttc" id="aclass_s_o_s_1_1_a_p_i_html"><div class="ttname"><a href="class_s_o_s_1_1_a_p_i.html">SOS.API</a></div><div class="ttdoc">Primary static facade providing access to S.O.S. mod extensibility points, SOS module registries,...</div><div class="ttdef"><b>Definition</b> <a href="_a_p_i_8cs_source.html#l00048">API.cs:49</a></div></div>
 <div class="ttc" id="aclass_s_o_s_1_1_a_p_i_html_af6889131fc0d27b1ec59af61d7ea3c62"><div class="ttname"><a href="class_s_o_s_1_1_a_p_i.html#af6889131fc0d27b1ec59af61d7ea3c62">SOS.API.RegisterStatInfo</a></div><div class="ttdeci">static bool RegisterStatInfo(object obj, string? id=null, double order=0.0, bool active=true)</div><div class="ttdoc">Registers an SOS module acting as a stat section provider into the S.O.S. inspector sidebar registry.</div></div>
 <div class="ttc" id="anamespace_s_o_s_html"><div class="ttname"><a href="namespace_s_o_s.html">SOS</a></div><div class="ttdef"><b>Definition</b> <a href="_a_p_i_8cs_source.html#l00014">API.cs:15</a></div></div>
 </div><!-- fragment --></li>
-<li><p class="startli"><span class="tt">Func\&lt;T\&gt;</span>: Pasar una función que retorne la instancia que se desea, útil para pasar una instancia única con un método personalizado para instanciación, por ejemplo compatibilidad con el patrón singleton o una factoría personalizada.</p>
+<li><p class="startli"><span class="tt">Func\&lt;T\&gt;</span>: Pass a function that returns the instance that is wanted, useful to pass a single instance with a custom method for instantiation, for example compatibility with the singleton pattern or a custom factory.</p>
 <div class="fragment"><div class="line"><a class="code hl_namespace" href="namespace_s_o_s.html">SOS</a>.<a class="code hl_class" href="class_s_o_s_1_1_a_p_i.html">API</a>.<a class="code hl_function" href="class_s_o_s_1_1_a_p_i.html#a465c1a0b610e9b5941c051fe9db7ad56">RegisterConfig</a>(() =&gt; MyModConfig.Instance, <span class="stringliteral">&quot;MyMod.MainConfig&quot;</span>, 0);</div>
 <div class="ttc" id="aclass_s_o_s_1_1_a_p_i_html_a465c1a0b610e9b5941c051fe9db7ad56"><div class="ttname"><a href="class_s_o_s_1_1_a_p_i.html#a465c1a0b610e9b5941c051fe9db7ad56">SOS.API.RegisterConfig</a></div><div class="ttdeci">static bool RegisterConfig(object obj, string? id=null, double order=0.0, bool active=true)</div><div class="ttdoc">Registers an SOS module acting as an extensible configuration unit into the SDK.</div></div>
 </div><!-- fragment --></li>
-<li><p class="startli"><span class="tt">object</span>: Objetos genéricos que no implementan de forma directa el contrato, o tablas de Lua(Compatibilidad con Lua). En estos casos se recurre a la reflexión para intentar vincular los metodos de la instancia recibida con los métodos que exige el contrato usando un proxy personalizado <a href="lua_interop.html"><span class="tt">object.Cast&lt;T&gt;()</span></a>, permitiendo registrar de forma indirecta clases sin necesidad de hacer una referencia dura al SDK de S.O.S, simplemente obteniendo por reflexion el método manual de registro <span class="tt">API.Register*</span> y pasando un objeto que cumpla el contrato de forma indirecta (por nombre de métodos).</p>
+<li><p class="startli"><span class="tt">object</span>: Generic objects that do not implement the contract directly, or Lua tables(Lua compatibility). In these cases reflection is used to try to link the methods of the received instance with the methods that the contract requires using a custom proxy <a href="lua_interop.html"><span class="tt">object.Cast&lt;T&gt;()</span></a>, allowing to register indirectly classes without the need of making a hard reference to the S.O.S SDK, simply obtaining by reflection the manual registration method <span class="tt">API.Register*</span> and passing an object that fulfills the contract indirectly (by method name).</p>
 <div class="fragment"><div class="line"><span class="keyword">using </span>Barotrauma;</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">public</span> <span class="keyword">class </span>MyStatInfoSoft</div>
@@ -116,8 +116,8 @@ $(function(){initNavTree('registration.html','',''); });
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">//IMPORTANT: Se debe obtener el último assembly cargado por el leak de assemblies de LuaCsForBarotrauma.</span></div>
-<div class="line"><span class="comment">// Hay formas más limpias de hacerlo. Esto es solo un ejemplo.</span></div>
+<div class="line"><span class="comment">//IMPORTANT: The last assembly loaded by the assembly leak of LuaCsForBarotrauma must be obtained.</span></div>
+<div class="line"><span class="comment">// There are cleaner ways to do it. This is only an example.</span></div>
 <div class="line">var apiType = AppDomain.CurrentDomain.GetAssemblies().LastOrDefault(t =&gt; t.GetType(<span class="stringliteral">&quot;SOS.API&quot;</span>) != <span class="keyword">null</span>)?.GetType(<span class="stringliteral">&quot;SOS.API&quot;</span>);</div>
 <div class="line"><span class="keywordflow">if</span> (apiType == <span class="keyword">null</span>)</div>
 <div class="line">{</div>
@@ -136,20 +136,20 @@ $(function(){initNavTree('registration.html','',''); });
 <div class="line">registerMethod.Invoke(apiType, [<span class="keyword">new</span> MyStatInfoSoft(), MyStatInfoSoft.ID, -1]);</div>
 </div><!-- fragment --></li>
 </ul>
-<dl class="section note"><dt>Note</dt><dd>Todo patrón desconocido cae en esta rama, y por tanto se intentará castear usando la propiedad y los nombres de metodos sobre este object(o su target si es DuckProxy). No intente registrar tipos arbitrarios que claramente no cumplen el contrato ni tampoco registrar en bucle indefinido porque podría penalizar el rendimiento. Asegúrese de que sean válidos.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Every unknown pattern falls in this branch, and therefore it will try to be cast using the property and the method names over this object(or its target if it is a DuckProxy). Do not try to register arbitrary types that clearly do not fulfill the contract nor register in an indefinite loop because it could penalize the performance. Make sure that they are valid.</dd></dl>
 <ul>
-<li><p class="startli"><span class="tt">Func\&lt;object\&gt;</span>: Delegado para registrar un builder de instancia usando un objeto genérico que implemente de forma indirecta la interfaz, o tabla de Lua.</p>
+<li><p class="startli"><span class="tt">Func\&lt;object\&gt;</span>: Delegate to register an instance builder using a generic object that implements the interface indirectly, or a Lua table.</p>
 <div class="fragment"><div class="line">registerMethod.Invoke(apiType, [() =&gt; <span class="keyword">new</span> MyStatInfoSoft(), MyStatInfoSoft.ID, 1]);</div>
 </div><!-- fragment --></li>
-<li><p class="startli"><span class="tt">Type : T</span>: Pasar un tipo de clase que implemente el contrato de la instancia. Es el método default que usa el registro automático.</p>
+<li><p class="startli"><span class="tt">Type : T</span>: Pass a class type that implements the instance's contract. It is the default method used by the automatic registration.</p>
 <div class="fragment"><div class="line"><a class="code hl_namespace" href="namespace_s_o_s.html">SOS</a>.<a class="code hl_class" href="class_s_o_s_1_1_a_p_i.html">API</a>.<a class="code hl_function" href="class_s_o_s_1_1_a_p_i.html#af6889131fc0d27b1ec59af61d7ea3c62">RegisterStatInfo</a>(typeof(TreatmentStatInfo), <span class="stringliteral">&quot;MyMod.TreatmentInfo&quot;</span>, 0.2);</div>
 </div><!-- fragment --></li>
-<li><p class="startli"><span class="tt">Type : object</span>: Pasar un tipo genérico que implemente el contrato de la instancia de forma indirecta.</p>
+<li><p class="startli"><span class="tt">Type : object</span>: Pass a generic type that implements the instance's contract indirectly.</p>
 <div class="fragment"><div class="line">registerMethod.Invoke(apiType, [typeof(MyStatInfoSoft), MyStatInfoSoft.ID]);</div>
 </div><!-- fragment --></li>
 </ul>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
-Otros recursos</h1>
+Other resources</h1>
 <p><b>Next to: <a href="data_sharing.html">Data Sharing</a></b></p>
 <p><b>Back to: <a href="sos_modules.html">SOS Modules</a></b> </p>
 </div></div><!-- contents -->

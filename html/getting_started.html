@@ -77,18 +77,18 @@ $(function(){initNavTree('getting_started.html','',''); });
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_manual_2guide_21__getting__started"></a></p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md1"></a>
-1. Requisitos mínimos</h1>
-<p>El proyecto integral principal, y el único binario sobre el que deberá trabajar cualquier mod es el proyecto <span class="tt">SDK</span>(<span class="tt">SOS.SDK.dll</span>). Está pensado para ser cargado Client-Side only y compatible para cualquier plataforma. Este implementa la mayoría de lógicas, contratos, patrones y componentes GUI personalizados compartidos. Puede descargarlo desde <a href="https://github.com/Retype15/SOS/releases/latest/download/SOS.SDK.dll">AQUÍ</a>.</p>
-<p>Requisitos específicos del proyecto dependen de LuaCsForBarotrauma, véase la <a href="https://evilfactory.github.io/LuaCsForBarotrauma">guía de introducción de <span class="tt">LuaCsForBarotrauma</span></a> para crear mods compatibles.</p>
+1. Minimum requirements</h1>
+<p>The main integral project, and the only binary on which any mod should work is the <span class="tt">SDK</span> project(<span class="tt">SOS.SDK.dll</span>). It is thought to be loaded Client-Side only and compatible for any platform. It implements most of the logics, contracts, patterns and shared custom GUI components. You can download it from <a href="https://github.com/Retype15/SOS/releases/latest/download/SOS.SDK.dll">HERE</a>.</p>
+<p>The specific requirements of the project depend on LuaCsForBarotrauma, see the <a href="https://evilfactory.github.io/LuaCsForBarotrauma"><span class="tt">LuaCsForBarotrauma</span> introduction guide</a> to create compatible mods.</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md2"></a>
-2. Setup del proyecto</h1>
-<dl class="section remark"><dt>Remarks</dt><dd>Si su proyecto es Lua, puede saltar este paso.</dd></dl>
-<p>La forma más fácil de iniciar un mod que dependa del nuestro es linkear el binario <span class="tt">SOS.SDK.dll</span> compilado para DEBUG a su proyecto o mod. Si ha seguido la guía de LuaCsForBarotrauma para <a href="https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/html/md_manual_assemblymod.html">Assembly CSharp Mods</a>, recomendamos incluir el binario en la carpeta /Refs y referenciar desde ahí , si no es el caso o desea una referencia opcional usando reflexión puede ignorar este paso. (Más información a continuación y en la <a href="registration.html">sección Registration</a>.)</p>
+2. Project setup</h1>
+<dl class="section remark"><dt>Remarks</dt><dd>If your project is Lua, you can skip this step.</dd></dl>
+<p>The easiest way to start a mod that depends on ours is to link the <span class="tt">SOS.SDK.dll</span> binary compiled for DEBUG to your project or mod. If you have followed the LuaCsForBarotrauma guide for <a href="https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/html/md_manual_assemblymod.html">Assembly CSharp Mods</a>, we recommend including the binary in the /Refs folder and referencing from there, if it is not the case or you wish an optional reference using reflection you can ignore this step. (More information below and in the <a href="registration.html">Registration section</a>.)</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
 Example mod</h1>
-<p>Cualquier mod que desee implementar una pestaña de información solamente necesita crear una clase base que herede de la interfaz <b>ISOS*</b> correspondiente e implemente el contenido que quiera añadir (e.g: Una nueva sección en los stat sections necesita una clase pública que implemente el contrato <span class="tt"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_stat_info.html" title="Defines an SOS module acting as a modular, completely stateless wiki inspector section rendered in th...">SOS.ISOSStatInfo</a></span>), y posteriormente registrarla.</p>
+<p>Any mod that wishes to implement an information tab only needs to create a base class that inherits from the corresponding <b>ISOS*</b> interface and implements the content it wants to add (e.g: A new section in the stat sections needs a public class that implements the <span class="tt"><a class="el" href="interface_s_o_s_1_1_i_s_o_s_stat_info.html" title="Defines an SOS module acting as a modular, completely stateless wiki inspector section rendered in th...">SOS.ISOSStatInfo</a></span> contract), and afterwards register it.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
-Ejemplo de uso</h2>
+Usage example</h2>
 <h3 class="doxsection"><a class="anchor" id="cs_example"></a>
 Csharp</h3>
 <div class="fragment"><div class="line"><span class="keyword">using </span>Barotrauma;</div>
@@ -152,35 +152,35 @@ Lua</h3>
 <div class="line">    end</div>
 <div class="line">end</div>
 <div class="line"> </div>
-<div class="line">function HelloTab.Dispose() -- Opcionalmente, si necesita liberar recursos, puede definir el método Dispose, y será invocado cuando se elimine el objeto en C#.</div>
+<div class="line">function HelloTab.Dispose() -- Optionally, if you need to release resources, you can define the Dispose method, and it will be invoked when the object is deleted in C#.</div>
 <div class="line">    text = nil</div>
 <div class="line">end</div>
 <div class="line"> </div>
 <div class="line">API.RegisterTab(HelloTab, &quot;MyMod.HelloTab&quot;, 105)</div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Si en su caso específico no puede usar referencias duras, puede usar reflexion y registrar clases genéricas o instancias de las mismas que implementen de forma indirecta los contratos, o sea métodos por nombre y parámetros. Más información en la <a href="registration.html">sección Registration</a>.</dd></dl>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>If in your specific case you cannot use hard references, you can use reflection and register generic classes or instances of them that implement the contracts indirectly, that is, methods by name and parameters. More information in the <a href="registration.html">Registration section</a>.</dd></dl>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md5"></a>
-Registro de binarios opcionales que usen el SDK</h2>
-<p>Si su mod no requiere estrictamente de <a class="el" href="namespace_s_o_s.html">SOS</a>, recomendamos configurar su ModConfig.xml para poder usar la lógica condicional y activar el archivo que contiene lógica <a class="el" href="namespace_s_o_s.html">SOS</a> sólo cuando el mod <a class="el" href="namespace_s_o_s.html">SOS</a> está activo.</p>
+Registration of optional binaries that use the SDK</h2>
+<p>If your mod does not strictly require <a class="el" href="namespace_s_o_s.html">SOS</a>, we recommend configuring your ModConfig.xml to be able to use the conditional logic and activate the file that contains <a class="el" href="namespace_s_o_s.html">SOS</a> logic only when the <a class="el" href="namespace_s_o_s.html">SOS</a> mod is active.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md6"></a>
-Ejemplo</h3>
+Example</h3>
 <div class="fragment"><div class="line">&lt;?<span class="keyword">xml</span> <span class="keyword">version</span>=<span class="stringliteral">&quot;1.0&quot;</span> <span class="keyword">encoding</span>=<span class="stringliteral">&quot;utf-8&quot;</span>?&gt;</div>
 <div class="line">&lt;<span class="keywordtype">ModConfig</span>&gt;</div>
 <div class="line">    &lt;<span class="keywordtype">FileGroup</span>&gt;  </div>
 <div class="line">        &lt;<span class="keywordtype">Conditional</span> <span class="keyword">Dependencies</span>=<span class="stringliteral">&quot;S.O.S - Standard Operations Schematics&quot;</span> <span class="keyword">IsLoaded</span>=<span class="stringliteral">&quot;true&quot;</span> /&gt; </div>
-<div class="line">        <span class="comment">&lt;!-- Ejemplo ensamblado --&gt;</span> </div>
+<div class="line">        <span class="comment">&lt;!-- Assembly example --&gt;</span> </div>
 <div class="line">        &lt;<span class="keywordtype">Assembly</span> <span class="keyword">File</span>=<span class="stringliteral">&quot;%ModDir%/bin/Client/Linux/MyModSOS.dll&quot;</span> <span class="keyword">Target</span>=<span class="stringliteral">&quot;Client&quot;</span> <span class="keyword">Platform</span>=<span class="stringliteral">&quot;Linux&quot;</span> <span class="keyword">Optional</span>=<span class="stringliteral">&quot;true&quot;</span> /&gt;</div>
 <div class="line">        &lt;<span class="keywordtype">Assembly</span> <span class="keyword">File</span>=<span class="stringliteral">&quot;%ModDir%/bin/Client/OSX/MyModSOS.dll&quot;</span> <span class="keyword">Target</span>=<span class="stringliteral">&quot;Client&quot;</span> <span class="keyword">Platform</span>=<span class="stringliteral">&quot;OSX&quot;</span> <span class="keyword">Optional</span>=<span class="stringliteral">&quot;true&quot;</span> /&gt;</div>
 <div class="line">        &lt;<span class="keywordtype">Assembly</span> <span class="keyword">File</span>=<span class="stringliteral">&quot;%ModDir%/bin/Client/Windows/MyModSOS.dll&quot;</span> <span class="keyword">Target</span>=<span class="stringliteral">&quot;Client&quot;</span> <span class="keyword">Platform</span>=<span class="stringliteral">&quot;Windows&quot;</span> <span class="keyword">Optional</span>=<span class="stringliteral">&quot;true&quot;</span> /&gt;</div>
-<div class="line">        <span class="comment">&lt;!-- Ejemplo Lua --&gt;</span></div>
+<div class="line">        <span class="comment">&lt;!-- Lua example --&gt;</span></div>
 <div class="line">        &lt;<span class="keywordtype">Lua</span> <span class="keyword">File</span>=<span class="stringliteral">&quot;%ModDir%/lua/Autorun/MyModSOS.lua&quot;</span> <span class="keyword">IsAutorun</span>=<span class="stringliteral">&quot;true&quot;</span> <span class="keyword">Target</span>=<span class="stringliteral">&quot;Client&quot;</span> <span class="keyword">Optional</span>=<span class="stringliteral">&quot;true&quot;</span> /&gt;</div>
 <div class="line">        <span class="comment">&lt;!-- Example In-mermory file --&gt;</span></div>
 <div class="line">        &lt;<span class="keywordtype">Script</span> <span class="keyword">File</span>=<span class="stringliteral">&quot;%ModDir%/cs/MyModSOS.cs&quot;</span> <span class="keyword">Target</span>=<span class="stringliteral">&quot;Client&quot;</span> <span class="keyword">Optional</span>=<span class="stringliteral">&quot;true&quot;</span> /&gt;</div>
 <div class="line">    &lt;/<span class="keywordtype">FileGroup</span>&gt;</div>
-<div class="line">    <span class="comment">&lt;!-- Otros archivos... --&gt;</span></div>
+<div class="line">    <span class="comment">&lt;!-- Other files... --&gt;</span></div>
 <div class="line">&lt;/<span class="keywordtype">ModConfig</span>&gt;</div>
-</div><!-- fragment --><p>En resumen, solamente necesita agrupar en un <em>FileGroup</em> todos los archivos afectados, luego definir una item <em>Conditional</em> tal y como está definido en el ejemplo. Luego incluya la etiqueta '<em>Optional</em>="true"', y eso es todo.</p>
+</div><!-- fragment --><p>In summary, you only need to group in a <em>FileGroup</em> all the affected files, then define a <em>Conditional</em> item just as it is defined in the example. Then include the '<em>Optional</em>="true"' tag, and that's it.</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
-Otros recursos</h1>
+Other resources</h1>
 <p><b>Next to: <a href="sos_modules.html">SOS Modules</a></b></p>
 <p><b>Back to: <a href="index.html">Introduction</a></b> </p>
 </div></div><!-- contents -->
