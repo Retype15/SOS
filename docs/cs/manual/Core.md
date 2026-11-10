@@ -12,11 +12,12 @@ You will never work with this one, but we will document it anyway because it is 
 
 - **Prefabs to track (ISOSPrefab):**
   - [`ItemPrefabProvider`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/ItemPrefab.cs) Adds all the Items.
-  - [`AfflictionPrefabProvider`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs) Adds all the afflictions. It makes a distinction about the Husk afflictions using another empty subscriber [`AfflictionHuskPrefabProvider`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs).
+  - [`AfflictionPrefabProvider`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs) Adds all the afflictions.
 
 - **Central panels (ISOSTab):**
-  - [ItemPanel:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/ItemPanel/ItemPanel.cs) Component that inherits from `SOS.ISOSTab` and implements the list of recipes of the selected item. *See:* **[Barotrauma.ItemPrefab](//)**
-  - [`PreviewPanel`:](//) It is a simple example panel that simply shows the main image of the selected component. Written as an individual component in Lua to demonstrate full and clean execution capabilities of components that come from Lua.
+  - [`ItemPanelTab`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/ItemPanel/ItemPanel.cs) Component that implements `SOS.ISOSTab` and builds the list of recipes of the selected item. *See:* **[Barotrauma.ItemPrefab](//)**
+  - [`MarketTab`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/MarketPanel/MarketTab.cs) Component that implements `SOS.ISOSTab` and `IDisposable`, and builds the price comparison of the selected item between the different store types.
+  - [`PreviewPanelTab`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/PreviewPanel/PreviewPanel.cs) It is a simple example panel that simply shows the main image of the selected component. Written as an individual component in Lua to demonstrate full and clean execution capabilities of components that come from Lua.
 
 - **Window Profiles (ISOSWindowProfile):**
   - [`ThreeColumnWindowProfile`:](//) Adds the classic visual profile of the mod with a resizable window.

@@ -45,7 +45,7 @@ There are several ways to register an SOS module
   public class MyStatInfoSoft
   {
       public static string ID => "MyMod.MyStatInfoSoft";
-      public void Draw(GUIListBox contentPanel, Prefab prefab)
+      public void Draw(RectTransform rectT, Prefab prefab)
       {
           //...
       }

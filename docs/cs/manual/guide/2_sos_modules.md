@@ -70,6 +70,7 @@ Central inspection tab for an entity type. It appears in the tab bar only when `
 ```csharp
 using Barotrauma;
 
+using Microsoft.Xna.Framework;
 using SOS;
 
 # pragma warning disable IDE0130
@@ -88,7 +89,7 @@ public class BiomeTab : ISOSTab
     // Receives the instances of the container and the button created using the optional CreateTabButton method. It is treated as a constructor for GUITab.
     public void Init(GUIFrame container, GUIButton tabButton) 
     {
-        // If you do not define your own `CreateTabButton` method, you can define the properties using the returned instance.
+        // If you do not define your own `CreateTabButton` method or doesn't to use localization strings, you can define the properties using the returned instance.
         // tabButton.Text = "Biome Visualizer";
         // tabButton.ToolTip = "A Biome information...";
 
@@ -108,9 +109,6 @@ public class BiomeTab : ISOSTab
         Description: {biome.Description}""";
         // ...
     }
-
-    // It is optional, and allows defining the way in which the button of the Tabs bar is created. It receives the rectT of the list, and the Id of the object where, if the method is not defined, it will be resolved from localization ({Id}.title/.tooltip).
-    public GUIButton CreateTabButton(RectTransform rectT, string Id) => TabDefaults.CreateTabButton(rectT, "Biome Visualizer", "A Biome information...");
 }
 ```
 
@@ -173,6 +171,7 @@ using Microsoft.Xna.Framework;
 
 using SOS;
 using SOS.Configs;
+using SOS.Extensions;
 using SOS.GUI;
 
 # pragma warning disable IDE0130
