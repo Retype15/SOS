@@ -1,15 +1,15 @@
 # Introductory Guide {#guide}
 
-Esta guía manual abarcará con el mayor detalle posible todo lo que necesita saber sobre la creacion de Módulos SOS o plug-ins para el mod **S.O.S - Standard Operations Schematics**.
+This manual guide will cover with the greatest possible detail everything you need to know about the creation of SOS Modules or plug-ins for the mod **S.O.S - Standard Operations Schematics**.
 
-## Lista de Contenido
+## Contents List
 
-1. @subpage getting_started - Aquí se explica lo más básico como la forma de crear un mod, requisitos, e incluye un ejemplo en código tanto C# como Lua de cómo desarrollar con nuestro SDK.
-2. @subpage sos_modules - Esta página define lo que consideramos un Módulo SOS (o plug-in SOS), y posteriormente se explica cada tipo de Módulo admitido y cómo usted puede implementar sus própios módulos de forma vanilla.
-3. @subpage registration - Registrar su módulo por primera vez es muy sencillo, esta página explica en detalle cada forma que existe actualmente para registrar un módulo.
-4. @subpage data_sharing - Para una comunicación efectiva entre mods de forma descentralizada, es que aquí se explica la forma canónica para enganchar sus delegados como hooks para una ejecución predecible y ordenada justo cuando lo necesites, además de también cómo guardar datos compartidos para todos de forma sencilla y thread-safe.
-5. @subpage ui_comps - Para liberar todo el poder del SDK, este expone varios componentes GUIs personalizados y varios helpers para hacer la vida del modder más fácil, esta sección se encarga de explicar todos los miembros nuevos más importantes que debería conocer.
+1. @subpage getting_started - Here the most basic things are explained, like the way to create a mod, requirements, and it includes a code example both in C# and Lua of how to develop with our SDK.
+2. @subpage sos_modules - This page defines what we consider an SOS Module (or SOS plug-in), and afterwards each type of admitted Module is explained and how you can implement your own modules in a vanilla way.
+3. @subpage registration - Registering your module for the first time is very simple, this page explains in detail each form that currently exists to register a module.
+4. @subpage data_sharing - For an effective communication between mods in a decentralized way, here is explained the canonical form to hook your delegates as hooks for a predictable and ordered execution right when you need it, besides also how to save shared data for everyone in a simple and thread-safe way.
+5. @subpage ui_comps - To release all the power of the SDK, this exposes several custom GUI components and several helpers to make the modder's life easier, this section is in charge of explaining all the most important new members that you should know.
 
-> Ante cualquier duda, recomendamos unirte al [Discord oficial](https://discord.gg/pjZ3SQjgM) de SOS y pedir ayuda.
+> Before any doubt, we recommend you to join the [official Discord](https://discord.gg/pjZ3SQjgM) of SOS and ask for help.
 
 **Recomended to start:** [**Getting Started**](getting_started.html)

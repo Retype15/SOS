@@ -1,43 +1,43 @@
 # Registration {#registration}
 
-Luego de crear y definir tu clase, deberás registrarla a la API de SOS para que sea reconocida y validada.
+After creating and defining your class, you will have to register it to the SOS API so that it is recognized and validated.
 
-Para ello, hay dos formas principales de registrar un nuevo módulo a SOS:
+For that, there are two main ways to register a new module to SOS:
 
-## 1. Registro Automático
+## 1. Automatic Registration
 
-Usando el atributo `SOS.AutoRegisterAttribute` sobre un módulo SOS (clase que implemente alguna interfaz [ISOS*](sos_modules.html)), para registro automático la primera vez que se abra la ventana de SOS (nunca antes) pasando las propiedades opcionales de registro:
+Using the `SOS.AutoRegisterAttribute` attribute over an SOS module (class that implements some [ISOS*](sos_modules.html) interface), for automatic registration the first time the SOS window is opened (never before) passing the optional registration properties:
 
-- `string id`: El identificador único para su tipo, si otro objeto del mismo tipo intenta registrarse posteriormente con el mismo identificador, será sobreescrito. **Default: type.FullName ?? type.Name**. Si registra un módulo SOS con el mismo nombre de uno anterior, se sobreescribirá, téngalo en cuenta si desea sobreescribir módulos SOS de otros mods para lógica personalizada.
+- `string id`: The unique identifier for your type, if another object of the same type tries to register later with the same identifier, it will be overwritten. **Default: type.FullName ?? type.Name**. If you register an SOS module with the same name as a previous one, it will be overwritten, keep it in mind if you wish to overwrite SOS modules from other mods for custom logic.
 
-- `double order`: Orden de ejecución o llamada. Orden ascendente. llaman de menor a mayor, si es igual se trata alfabéticamente por el Id, permitiendo ordenarse en las llamdas de forma predecible. **Default: 0**
+- `double order`: Order of execution or call. Ascending order. they are called from lowest to highest, if it is equal it is treated alphabetically by the Id, allowing them to be ordered in the calls in a predictable way. **Default: 0**
 
-- `bool active`: Indica si por defecto este módulo SOS se ejecutará o no. Permite añadir lógica de activación/desactivación de módulos SOS para lógica condicional, o permitir al jugador desactivar módulos SOS a conciencia para no sobrecargar su interfaz con informacion que no necesita. **Default: True**
+- `bool active`: Indicates if by default this SOS module will be executed or not. It allows adding activation/deactivation logic of SOS modules for conditional logic, or allowing the player to consciously deactivate SOS modules so as not to overload their interface with information that they do not need. **Default: True**
 
 > [!TIP]
-> Usando este método, la clase se descubre automáticamente. Es la forma idiomática de registrar clases que implementen nuestras interfaces.
+> Using this method, the class is discovered automatically. It is the idiomatic way to register classes that implement our interfaces.
 >
-> Dado que este método no requiere ejecutar código manual para registrar las clases, se puede obviar por completo la clase Plugin si el objetivo de tu mod es únicamente añadir contenenido a SOS.
+> Since this method does not require executing manual code to register the classes, the Plugin class can be completely obviated if your mod's objective is only to add content to SOS.
 
-## 2. Registro manual
+## 2. Manual registration
 
-Usando cualquier método `API.Register*` (ej: SOS.API.RegisterStatInfo) y pasando un objeto que represente el método de instanciación y las mismas propiedades opcionales anteriormente descritas luego del objeto (***obj***, id, order, active). Puede registrar objetos genéricos y tablas Lua que implementen de forma directa o indirecta los métodos del contrato.
+Using any `API.Register*` method (e.g: SOS.API.RegisterStatInfo) and passing an object that represents the instantiation method and the same optional properties previously described after the object (***obj***, id, order, active). You can register generic objects and Lua tables that implement directly or indirectly the contract's methods.
   
-Hay varias formas de registrar un módulo SOS
+There are several ways to register an SOS module
   
-- `class\<T\>`: Instancia directa de un objeto que implemente el contrato. Esta es la forma más simple de pasar una única instancia global y evitar instanciar.
+- `class\<T\>`: Direct instance of an object that implements the contract. This is the simplest way to pass a single global instance and avoid instantiating.
 
   ```csharp
   SOS.API.RegisterStatInfo(new TreatmentStatInfo(), "MyMod.TreatmentInfo", 1);
   ```
 
-- `Func\<T\>`: Pasar una función que retorne la instancia que se desea, útil para pasar una instancia única con un método personalizado para instanciación, por ejemplo compatibilidad con el patrón singleton o una factoría personalizada.
+- `Func\<T\>`: Pass a function that returns the instance that is wanted, useful to pass a single instance with a custom method for instantiation, for example compatibility with the singleton pattern or a custom factory.
 
   ```csharp
   SOS.API.RegisterConfig(() => MyModConfig.Instance, "MyMod.MainConfig", 0);
   ```
 
-- `object`: Objetos genéricos que no implementan de forma directa el contrato, o tablas de Lua(Compatibilidad con Lua). En estos casos se recurre a la reflexión para intentar vincular los metodos de la instancia recibida con los métodos que exige el contrato usando un proxy personalizado [`object.Cast<T>()`](lua_interop.html), permitiendo registrar de forma indirecta clases sin necesidad de hacer una referencia dura al SDK de S.O.S, simplemente obteniendo por reflexion el método manual de registro `API.Register*` y pasando un objeto que cumpla el contrato de forma indirecta (por nombre de métodos).
+- `object`: Generic objects that do not implement the contract directly, or Lua tables(Lua compatibility). In these cases reflection is used to try to link the methods of the received instance with the methods that the contract requires using a custom proxy [`object.Cast<T>()`](lua_interop.html), allowing to register indirectly classes without the need of making a hard reference to the S.O.S SDK, simply obtaining by reflection the manual registration method `API.Register*` and passing an object that fulfills the contract indirectly (by method name).
 
   ```csharp
   using Barotrauma;
@@ -51,8 +51,8 @@ Hay varias formas de registrar un módulo SOS
       }
   }
 
-  //IMPORTANT: Se debe obtener el último assembly cargado por el leak de assemblies de LuaCsForBarotrauma.
-  // Hay formas más limpias de hacerlo. Esto es solo un ejemplo.
+  //IMPORTANT: The last assembly loaded by the assembly leak of LuaCsForBarotrauma must be obtained.
+  // There are cleaner ways to do it. This is only an example.
   var apiType = AppDomain.CurrentDomain.GetAssemblies().LastOrDefault(t => t.GetType("SOS.API") != null)?.GetType("SOS.API");
   if (apiType == null)
   {
@@ -72,31 +72,31 @@ Hay varias formas de registrar un módulo SOS
   ```
 
   > [!NOTE]
-  > Todo patrón desconocido cae en esta rama, y por tanto se intentará castear usando la propiedad y los nombres de metodos sobre este object(o su target si es DuckProxy). No intente registrar tipos arbitrarios que claramente no cumplen el contrato ni tampoco registrar en bucle indefinido porque podría penalizar el rendimiento. Asegúrese de que sean válidos.
+  > Every unknown pattern falls in this branch, and therefore it will try to be cast using the property and the method names over this object(or its target if it is a DuckProxy). Do not try to register arbitrary types that clearly do not fulfill the contract nor register in an indefinite loop because it could penalize the performance. Make sure that they are valid.
 
-- `Func\<object\>`: Delegado para registrar un builder de instancia usando un objeto genérico que implemente de forma indirecta la interfaz, o tabla de Lua.
+- `Func\<object\>`: Delegate to register an instance builder using a generic object that implements the interface indirectly, or a Lua table.
 
   ```csharp
   registerMethod.Invoke(apiType, [() => new MyStatInfoSoft(), MyStatInfoSoft.ID, 1]);
   ```
 
-- `Type : T`: Pasar un tipo de clase que implemente el contrato de la instancia. Es el método default que usa el registro automático.
+- `Type : T`: Pass a class type that implements the instance's contract. It is the default method used by the automatic registration.
 
   ```csharp
   SOS.API.RegisterStatInfo(typeof(TreatmentStatInfo), "MyMod.TreatmentInfo", 0.2);
   ```
 
-- `Type : object`: Pasar un tipo genérico que implemente el contrato de la instancia de forma indirecta.
+- `Type : object`: Pass a generic type that implements the instance's contract indirectly.
 
   ```csharp
   registerMethod.Invoke(apiType, [typeof(MyStatInfoSoft), MyStatInfoSoft.ID]);
   ```
 
-<!-- TODO: Explicar sobre DefaultClassAtribute y métodos defaults para Lua?(redirigir a lua_interop para más info) -->
+<!-- TODO: Explain about DefaultClassAtribute and default methods for Lua?(redirect to lua_interop for more info) -->
 
-<!-- TODO: Recordar hAblar de IDisposable para objetos genéricos. -->
+<!-- TODO: Remember to talk about IDisposable for generic objects. -->
 
-## Otros recursos
+## Other resources
 
 **Next to: [Data Sharing](data_sharing.html)**
 

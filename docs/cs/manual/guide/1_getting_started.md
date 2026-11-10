@@ -1,25 +1,25 @@
 # Getting Started {#getting_started}
 
-## 1. Requisitos mínimos
+## 1. Minimum requirements
 
-El proyecto integral principal, y el único binario sobre el que deberá trabajar cualquier mod es el proyecto `SDK`(`SOS.SDK.dll`). Está pensado para ser cargado Client-Side only y compatible para cualquier plataforma. Este implementa la mayoría de lógicas, contratos, patrones y componentes GUI personalizados compartidos. Puede descargarlo desde [AQUÍ](https://github.com/Retype15/SOS/releases/latest/download/SOS.SDK.dll).
+The main integral project, and the only binary on which any mod should work is the `SDK` project(`SOS.SDK.dll`). It is thought to be loaded Client-Side only and compatible for any platform. It implements most of the logics, contracts, patterns and shared custom GUI components. You can download it from [HERE](https://github.com/Retype15/SOS/releases/latest/download/SOS.SDK.dll).
 
-Requisitos específicos del proyecto dependen de LuaCsForBarotrauma, véase la [guía de introducción de `LuaCsForBarotrauma`](https://evilfactory.github.io/LuaCsForBarotrauma) para crear mods compatibles.
+The specific requirements of the project depend on LuaCsForBarotrauma, see the [`LuaCsForBarotrauma` introduction guide](https://evilfactory.github.io/LuaCsForBarotrauma) to create compatible mods.
 
-## 2. Setup del proyecto
+## 2. Project setup
 
 > [!TIP]
-> Si su proyecto es Lua, puede saltar este paso.
+> If your project is Lua, you can skip this step.
 
-La forma más fácil de iniciar un mod que dependa del nuestro es linkear el binario `SOS.SDK.dll` compilado para DEBUG a su proyecto o mod. Si ha seguido la guía de LuaCsForBarotrauma para [Assembly CSharp Mods](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/html/md_manual_assemblymod.html), recomendamos incluir el binario en la carpeta /Refs y referenciar desde ahí , si no es el caso o desea una referencia opcional usando reflexión puede ignorar este paso. (Más información a continuación y en la [sección Registration](registration.html).)
+The easiest way to start a mod that depends on ours is to link the `SOS.SDK.dll` binary compiled for DEBUG to your project or mod. If you have followed the LuaCsForBarotrauma guide for [Assembly CSharp Mods](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/html/md_manual_assemblymod.html), we recommend including the binary in the /Refs folder and referencing from there, if it is not the case or you wish an optional reference using reflection you can ignore this step. (More information below and in the [Registration section](registration.html).)
 
-<!-- Puede el binario con el flag DEBUG [AQUÍ](//). <!-- TODO: FALTA RUTA AQUÍ -->
+<!-- Can the binary with the DEBUG flag [HERE](//). <!-- TODO: MISSING PATH HERE -->
 
 ## Example mod
 
-Cualquier mod que desee implementar una pestaña de información solamente necesita crear una clase base que herede de la interfaz **ISOS\*** correspondiente e implemente el contenido que quiera añadir (e.g: Una nueva sección en los stat sections necesita una clase pública que implemente el contrato `SOS.ISOSStatInfo`), y posteriormente registrarla.
+Any mod that wishes to implement an information tab only needs to create a base class that inherits from the corresponding **ISOS\*** interface and implements the content it wants to add (e.g: A new section in the stat sections needs a public class that implements the `SOS.ISOSStatInfo` contract), and afterwards register it.
 
-### Ejemplo de uso
+### Usage example
 
 #### Csharp {#cs_example}
 
@@ -84,7 +84,7 @@ function HelloTab.Update(prefab)
     end
 end
 
-function HelloTab.Dispose() -- Opcionalmente, si necesita liberar recursos, puede definir el método Dispose, y será invocado cuando se elimine el objeto en C#.
+function HelloTab.Dispose() -- Optionally, if you need to release resources, you can define the Dispose method, and it will be invoked when the object is deleted in C#.
     text = nil
 end
 
@@ -92,35 +92,35 @@ API.RegisterTab(HelloTab, "MyMod.HelloTab", 105)
 ```
 
 > [!NOTE]
-> Si en su caso específico no puede usar referencias duras, puede usar reflexion y registrar clases genéricas o instancias de las mismas que implementen de forma indirecta los contratos, o sea métodos por nombre y parámetros. Más información en la [sección Registration](registration.html).
+> If in your specific case you cannot use hard references, you can use reflection and register generic classes or instances of them that implement the contracts indirectly, that is, methods by name and parameters. More information in the [Registration section](registration.html).
 
-### Registro de binarios opcionales que usen el SDK
+### Registration of optional binaries that use the SDK
 
-Si su mod no requiere estrictamente de SOS, recomendamos configurar su ModConfig.xml para poder usar la lógica condicional y activar el archivo que contiene lógica SOS sólo cuando el mod SOS está activo.
+If your mod does not strictly require SOS, we recommend configuring your ModConfig.xml to be able to use the conditional logic and activate the file that contains SOS logic only when the SOS mod is active.
 
-#### Ejemplo
+#### Example
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <ModConfig>
     <FileGroup>  
         <Conditional Dependencies="S.O.S - Standard Operations Schematics" IsLoaded="true" /> 
-        <!-- Ejemplo ensamblado --> 
+        <!-- Assembly example --> 
         <Assembly File="%ModDir%/bin/Client/Linux/MyModSOS.dll" Target="Client" Platform="Linux" Optional="true" />
         <Assembly File="%ModDir%/bin/Client/OSX/MyModSOS.dll" Target="Client" Platform="OSX" Optional="true" />
         <Assembly File="%ModDir%/bin/Client/Windows/MyModSOS.dll" Target="Client" Platform="Windows" Optional="true" />
-        <!-- Ejemplo Lua -->
+        <!-- Lua example -->
         <Lua File="%ModDir%/lua/Autorun/MyModSOS.lua" IsAutorun="true" Target="Client" Optional="true" />
         <!-- Example In-mermory file -->
         <Script File="%ModDir%/cs/MyModSOS.cs" Target="Client" Optional="true" />
     </FileGroup>
-    <!-- Otros archivos... -->
+    <!-- Other files... -->
 </ModConfig>
 ```
 
-En resumen, solamente necesita agrupar en un *FileGroup* todos los archivos afectados, luego definir una item *Conditional* tal y como está definido en el ejemplo. Luego incluya la etiqueta '*Optional*="true"', y eso es todo.
+In summary, you only need to group in a *FileGroup* all the affected files, then define a *Conditional* item just as it is defined in the example. Then include the '*Optional*="true"' tag, and that's it.
 
-## Otros recursos
+## Other resources
 
 **Next to: [SOS Modules](sos_modules.html)**
 

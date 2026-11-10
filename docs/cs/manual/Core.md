@@ -1,29 +1,29 @@
 # S.O.S - Core {#core}
 
-Este archivo es solamente de referencia al proyecto base. El modder trabaja contra el SDK; aquí solo ve qué implementa el Core vanilla para copiar patrones.
+This file is only for reference to the base project. The modder works against the SDK; here you only see what the vanilla Core implements in order to copy patterns.
 
-Es el base el cual cumple dos funciones: Gestionar la ventana principal, inicialización crucial, ciclos y eventos de teclado internos duros a través de `SOSController`, e implementar los componentes vanilla del mod, como por ejemplo localizar items y sus recetas por medio de las herramientas del proyecto, el Profile vanilla, etc.
+It is the base which fulfills two functions: Manage the main window, crucial initialization, cycles and hard internal keyboard events through `SOSController`, and implement the mod's vanilla components, like for example locating items and their recipes by means of the project's tools, the vanilla Profile, etc.
 
-Está compuesto por el controlador `SOSController`, quien se encarga gestionar los eventos de teclas e inicialización, y los componentes base que ya muestran las versiones anteriores, a excepción de `SimulatorManager` quien fue empujado como mod opcional separado del `Core`. *ver:* **[SOS - Dummy Manager](https://github.com/retype15/SOS-DummyManager)**.
+It is composed of the controller `SOSController`, who is in charge of managing the key events and initialization, and the base components that the previous versions already show, with the exception of `SimulatorManager` who was pushed as an optional mod separated from the `Core`. *see:* **[SOS - Dummy Manager](https://github.com/retype15/SOS-DummyManager)**.
 
-Nunca trabajará con este, pero documentaremos igual porque es útil para entender funcionamiento interno y ver ejemplos de los componentes ya implementados por SOS base.
+You will never work with this one, but we will document it anyway because it is useful to understand the internal functioning and to see examples of the components already implemented by the base SOS.
 
-  **Implementa:**
+  **Implements:**
 
-- **Prefabs a rastrear (ISOSPrefab):**
-  - [`ItemPrefabProvider`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/ItemPrefab.cs) Agrega todos los Items.
-  - [`AfflictionPrefabProvider`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs) Agrega todas las aflicciones. Hace distinción sobre las aflicciones Husk usando otro subscriptor vacío [`AfflictionHuskPrefabProvider`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs).
+- **Prefabs to track (ISOSPrefab):**
+  - [`ItemPrefabProvider`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/ItemPrefab.cs) Adds all the Items.
+  - [`AfflictionPrefabProvider`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs) Adds all the afflictions. It makes a distinction about the Husk afflictions using another empty subscriber [`AfflictionHuskPrefabProvider`:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Prefabs/AfflictionPrefab.cs).
 
-- **Paneles centrales (ISOSTab):**
-  - [ItemPanel:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/ItemPanel/ItemPanel.cs) Componente que hereda de `SOS.ISOSTab` e implementa la lista de recetas del item seleccionado. *Ver:* **[Barotrauma.ItemPrefab](//)**
-  - [`PreviewPanel`:](//) Es un simple panel de ejemplo que simplemente muestra la imagen principal del componente seleccionado. Escrito como componente individual en Lua para demostrar capacidades de ejecución completa y limpia de componentes que provienen de Lua.
+- **Central panels (ISOSTab):**
+  - [ItemPanel:](https://github.com/Retype15/SOS/blob/main/ClientProject/ClientSource/Panels/ItemPanel/ItemPanel.cs) Component that inherits from `SOS.ISOSTab` and implements the list of recipes of the selected item. *See:* **[Barotrauma.ItemPrefab](//)**
+  - [`PreviewPanel`:](//) It is a simple example panel that simply shows the main image of the selected component. Written as an individual component in Lua to demonstrate full and clean execution capabilities of components that come from Lua.
 
-- **Perfiles de Ventana (ISOSWindowProfile):**
-  - [`ThreeColumnWindowProfile`:](//) Agrega el perfil visual clásico del mod con ventana redimensionable.
+- **Window Profiles (ISOSWindowProfile):**
+  - [`ThreeColumnWindowProfile`:](//) Adds the classic visual profile of the mod with a resizable window.
 
-- **Badges de información y estadísticas (ISOSStatInfo):**
-  - [`*StatInfo`:](//) Agregan información limpia sobre Items o aflicciones.
+- **Information and statistics badges (ISOSStatInfo):**
+  - [`*StatInfo`:](//) They add clean information about Items or afflictions.
   - ...
 
 > [!NOTE]
-> Este documento está incompleto, cosidere ver la documentación auto-generada, o si lo desea puede pedir ayuda en el [discord oficial](//) del mod.
+> This document is incomplete, considere seeing the auto-generated documentation, or if you wish you can ask for help in the [official discord](//) of the mod.

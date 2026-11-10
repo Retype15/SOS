@@ -1,24 +1,24 @@
 # SOS Modules {#sos_modules}
 
-Esta sección te enseñarán los diferente tipos de interfaces o contratos que cualquier Módulo SOS necesita o admite.
+This section will teach you the different types of interfaces or contracts that any SOS Module needs or admits.
 
-Un módulo SOS es cualquier clase que implemente alguna interfaz **ISOS\*** (`SOS.ISOSTab`, `SOS.ISOSStatInfo`, `SOS.ISOSPrefab`, `SOS.ISOSConfig`, `SOS.ISOSWindowProfile`).
+An SOS module is any class that implements some **ISOS\*** interface (`SOS.ISOSTab`, `SOS.ISOSStatInfo`, `SOS.ISOSPrefab`, `SOS.ISOSConfig`, `SOS.ISOSWindowProfile`).
 
 > [!NOTE]
-> Para Lua el contrato es prácticamente el mismo que en C#, salvo el registro: No admite el atributo `SOS.AutoRegisterAttribute` por lo que es obligatorio pasar una tabla Lua que implemente los métodos del contrato usando cualquier método [`API.Register*`](class_s_o_s_1_1_a_p_i.html) (e.g: el ejemplo [`HelloTab` de Getting Started](getting_started.html#lua_example)). Es por ello que los ejemplos posteriores están escritos solo en C#, pero aplican de igual manera a Lua.
+> For Lua the contract is practically the same as in C#, except the registration: It does not admit the `SOS.AutoRegisterAttribute` attribute so it is mandatory to pass a Lua table that implements the contract's methods using any [`API.Register*`](class_s_o_s_1_1_a_p_i.html) method (e.g: the [`HelloTab` example from Getting Started](getting_started.html#lua_example)). That is why the later examples are written only in C#, but they apply in the same way to Lua.
 
 <!-- - -->
 
 > [!TIP]
-> Para crear sus propios módulos SOS, necesita crear una clase pública que implemente el contrato correspondiente ya sea directa o indirectamente(genérico por nombre/parámetros de métodos) y posteriormente registrarla vía `SOS.AutoRegisterAttribute` o [`API.Register*`](class_s_o_s_1_1_a_p_i.html). Ver: [Registration](registration.html).
+> To create your own SOS modules, you need to create a public class that implements the corresponding contract either directly or indirectly(generic by name/parameters of methods) and afterwards register it via `SOS.AutoRegisterAttribute` or [`API.Register*`](class_s_o_s_1_1_a_p_i.html). See: [Registration](registration.html).
 
 ## 1. Stat Info
 
 [`ISOSStatInfo`](interface_s_o_s_1_1_i_s_o_s_stat_info.html)
 
-Sección de la wiki del inspector que dibuja filas de informacion sobre el prefab seleccionado. Si el *rectT* no tiene hijos, se limpia.
+Section of the inspector wiki that draws rows of information about the selected prefab. If the *rectT* has no children, it is cleaned.
 
-### Ejemplo de uso
+### Usage example
 
 ```csharp
 using Barotrauma;
@@ -32,7 +32,7 @@ using SOS.GUI;
 
 namespace MyMod;
 
-// Usar [AutoRegister] sin parámetros da como resultado:
+// Using [AutoRegister] without parameters results in:
 // (id: "MyMod.RadiationStatInfo", order: 0, active: true).
 [AutoRegister]
 public class RadiationStatInfo : ISOSStatInfo
@@ -49,7 +49,7 @@ public class RadiationStatInfo : ISOSStatInfo
 }
 ```
 
-Y su localización en el `Localization/English.xml` de tu mod:
+And its localization in your mod's `Localization/English.xml`:
 
 ```xml
 <mymod.radiation.header>RADIATION HAZARD</mymod.radiation.header>
@@ -57,15 +57,15 @@ Y su localización en el `Localization/English.xml` de tu mod:
 ```
 
 > [!TIP]
-> Recomendamos devolver pronto con `return` cuando el prefab no contenga datos relevantes, así la sección no se dibuja sin nada relevante.
+> We recommend returning early with `return` when the prefab does not contain relevant data, so the section is not drawn with nothing relevant.
 
 ## 2. Central Tabs
 
 [`ISOSTab`](interface_s_o_s_1_1_i_s_o_s_tab.html)
 
-Pestaña central de inspección para un tipo de entidad. Aparece en la tab bar solo cuando `SOS.ISOSTab.CanHandle` devuelve `true` para el objetivo actual.
+Central inspection tab for an entity type. It appears in the tab bar only when `SOS.ISOSTab.CanHandle` returns `true` for the current target.
 
-### Ejemplo de uso {#ej1}
+### Usage example {#ej1}
 
 ```csharp
 using Barotrauma;
@@ -82,22 +82,22 @@ public class BiomeTab : ISOSTab
 {
     private GUITextBlock? text = null;
 
-    // Si es true, dibuja su Tab Button, si es False no se mostrará. Es opcional, y si no se define siempre retornará true.
+    // If it is true, it draws its Tab Button, if it is False it will not be shown. It is optional, and if it is not defined it will always return true.
     public bool CanHandle(Prefab prefab) => prefab is Biome;
 
-    // Recibe las instancias del contenedor y el botón creado usando el metodo opcional CreateTabButton. Es tratado como un constructor para GUITab.
+    // Receives the instances of the container and the button created using the optional CreateTabButton method. It is treated as a constructor for GUITab.
     public void Init(GUIFrame container, GUIButton tabButton) 
     {
-        // Si no define su propio metodo `CreateTabButton`, puede definir las propiedades usando la instancia devuelta.
+        // If you do not define your own `CreateTabButton` method, you can define the properties using the returned instance.
         // tabButton.Text = "Biome Visualizer";
         // tabButton.ToolTip = "A Biome information...";
 
-        // Inicializa y crea los componentes que necesite.
+        // Initializes and creates the components that it needs.
         text = new GUITextBlock(new RectTransform(new Vector2(1f, 0.1f), container.RectTransform, 4), "", null,
         GUIStyle.LargeFont, Alignment.Center);
     }
 
-    // Llamado cuando sea el Tab principal, CanHandle retorne true y el prefab haya cambiado. Es opcional.
+    // Called when it is the main Tab, CanHandle returns true and the prefab has changed. It is optional.
     public void Update(Prefab prefab)
     {
         if (text == null) return;
@@ -109,12 +109,12 @@ public class BiomeTab : ISOSTab
         // ...
     }
 
-    // Es opcional, y permite definir la forma en que se crea el botón de la barra de Tabs. Recibe el rectT de la lista, y el Id del objeto donde si no se define el método, se resolverá desde localización ({Id}.title/.tooltip).
+    // It is optional, and allows defining the way in which the button of the Tabs bar is created. It receives the rectT of the list, and the Id of the object where, if the method is not defined, it will be resolved from localization ({Id}.title/.tooltip).
     public GUIButton CreateTabButton(RectTransform rectT, string Id) => TabDefaults.CreateTabButton(rectT, "Biome Visualizer", "A Biome information...");
 }
 ```
 
-Y su localización en el `Localization/English.xml`.
+And its localization in the `Localization/English.xml`.
 
 ```xml
 <mymod.biometab.title>BIOME</mymod.biometab.title>
@@ -122,15 +122,15 @@ Y su localización en el `Localization/English.xml`.
 ```
 
 > [!NOTE]
-> GUITab asegura de que `Update` nunca se llame antes de `Init`, pero siempre es buena práctica comprobar nulos.
+> GUITab ensures that `Update` is never called before `Init`, but it is always good practice to check for nulls.
 
 ## 3. Prefab Providers
 
 [`ISOSPrefab`](interface_s_o_s_1_1_i_s_o_s_prefab.html)
 
-Proveedor de datos que alimenta el navegador lateral con un nuevo tipo de entidad (e.g: [`JobPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_job_prefab.html), [`EventPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_event_prefab.html), [`TalentPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_talent_prefab.html), [`CharacterPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_character_prefab.html), etc). El navegador agrupa sus prefabs por tipo de runtime y resuelve cada cabecera desde localización (`{Type}.header`); solo necesita servirlos con `SOS.ISOSPrefab.GetPrefabs`.
+Data provider that feeds the side browser with a new type of entity (e.g: [`JobPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_job_prefab.html), [`EventPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_event_prefab.html), [`TalentPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_talent_prefab.html), [`CharacterPrefab`](https://evilfactory.github.io/LuaCsForBarotrauma/cs-docs/baro-client/html/class_barotrauma_1_1_character_prefab.html), etc). The browser groups its prefabs by runtime type and resolves each header from localization (`{Type}.header`); you only need to serve them with `SOS.ISOSPrefab.GetPrefabs`.
 
-### Ejemplo de uso {#ej2}
+### Usage example {#ej2}
 
 ```csharp
 using System.Collections.Generic;
@@ -155,17 +155,17 @@ public class JobPrefabProvider : ISOSPrefab
 ```
 
 > [!TIP]
-> La cabecera de su sección se resuelve sola desde localización (`sos.prefab.{Type}.header`, e.g: `sos.prefab.jobprefab.header` → "Jobs"). Si falta la clave, se usa el nombre del tipo humanizado.
+> The header of your section is resolved by itself from localization (`sos.prefab.{Type}.header`, e.g: `sos.prefab.jobprefab.header` → "Jobs"). If the key is missing, the humanized type name is used.
 >
-> Use los tokens del filtro (`filter.General`, `filter.Mod`, `filter.Category`, etc.) para que su proveedor responda a la búsqueda avanzada del navegador.
+> Use the filter tokens (`filter.General`, `filter.Mod`, `filter.Category`, etc.) so that your provider responds to the browser's advanced search.
 
 ## 4. Configs
 
 [`ISOSConfig`](interface_s_o_s_1_1_i_s_o_s_config.html)
 
-Unidad de configuración extensible con persistencia y renderizado declarativo en la ventana de settings. Herede de `SOS.Configs.ConfigDirtySaver` para gestión automatizada y guardado de cambios.
+Extensible configuration unit with persistence and declarative rendering in the settings window. Inherit from `SOS.Configs.ConfigDirtySaver` for automated management and saving of changes.
 
-### Ejemplo de uso {#ej3}
+### Usage example {#ej3}
 
 ```csharp
 using Barotrauma;
@@ -194,25 +194,25 @@ public class MyModSettings : ConfigDirtySaver, ISOSConfig
 
     public MyModSettings()
     {
-        // Plugin es tu propio IAssemblyPlugin: expone los servicios LuaCs de tu mod.
+        // Plugin is your own IAssemblyPlugin: it exposes your mod's LuaCs services.
         var configService = Plugin.Instance.ConfigService;
         var package = Plugin.Instance.Package;
 
         TryInitConfig("ShowHints", out showHints, configService, package);
     }
 
-    // Se ejecuta cuando SOS decide que debe cargar datos, por ejemplo al abrir la ventana S.O.S.
-    // Los valores ya viven en el servicio; úsalo para sincronizar UI propia si la tienes.
+    // It runs when SOS decides that it should load data, for example when opening the S.O.S window.
+    // The values already live in the service; use it to synchronize your own UI if you have one.
     public void Load() { }
 
-    // Se ejecuta cuando SOS decide que debe guardar los datos, por ejemplo al cerrar la ventana S.O.S.
-    // Solo persiste lo marcado como dirty (vía SetIfNotEqual).
+    // It runs when SOS decides that it should save the data, for example when closing the S.O.S window.
+    // It only persists what is marked as dirty (via SetIfNotEqual).
     public void Save() => SaveChanges(Plugin.Instance.ConfigService);
 
-    // Restaura los valores de fábrica de esta configuración.
+    // Restores the factory values of this configuration.
     public void Reset() => ShowHints = true;
 
-    // Dibuja las opciones de configuración personalizada para esta configuración directamente en el panel de configuración.
+    // Draws the custom configuration options for this configuration directly in the configuration panel.
     public void Draw(RectTransform rectT)
     {
         using var l = new GUILayoutBuilder(rectT);
@@ -223,13 +223,13 @@ public class MyModSettings : ConfigDirtySaver, ISOSConfig
 }
 ```
 
-Cada setting debe declararse en el XML de configuración de tu mod:
+Each setting must be declared in your mod's configuration XML:
 
 ```xml
 <Setting Name="ShowHints" Type="bool" Value="true" ShowInMenus="false" />
 ```
 
-Y su localización en el `Localization/English.xml` de tu mod:
+And its localization in your mod's `Localization/English.xml`:
 
 ```xml
 <mymod.settings.showhints>Show Hints</mymod.settings.showhints>
@@ -237,21 +237,21 @@ Y su localización en el `Localization/English.xml` de tu mod:
 
 > [!TIP]
 >
-> 1. Recomendamos que convierta sus `SOS.ISOSConfig` en un Singleton + registro manual para que la inicialización solo ocurra una única vez, además de permitir accesos directos como hace la mayoría de nuestros Modulos de configuracion base.
+> 1. We recommend that you convert your `SOS.ISOSConfig` into a Singleton + manual registration so that the initialization only happens a single time, besides allowing direct accesses like most of our base configuration Modules do.
 >
-> 2. *SOS.ISettingBaseExt.SetIfNotEqual* es un helper que guarda la propiedad solo si no hubo cambio real, permitiendo que *SOS.Configs.ConfigDirtySaver* haga su trabajo. Se hablará en profundidad de *SOS.Configs.ConfigDirtySaver* a futuro.
+> 2. *SOS.ISettingBaseExt.SetIfNotEqual* is a helper that saves the property only if there was no real change, allowing *SOS.Configs.ConfigDirtySaver* to do its work. *SOS.Configs.ConfigDirtySaver* will be discussed in depth in the future.
 >
-> 3. *SOS.ISOSConfig.Reset* y *SOS.ISOSConfig.Draw* traen implementación por defecto, puede obviarlos si su módulo SOS no necesita settings visibles.
+> 3. *SOS.ISOSConfig.Reset* and *SOS.ISOSConfig.Draw* bring a default implementation, you can obviate them if your SOS module does not need visible settings.
 
 ## 5. Window Profiles
 
 [`ISOSWindowProfile`](interface_s_o_s_1_1_i_s_o_s_window_profile.html)
 
-Layout visual intercambiable de la ventana SOS. Puede crear cualquier estilo visual, ejemplo una vista de una única columna, un inspector compacto, o una herramienta flotante con solo lo esencial. Hereda de `SOS.GUI.GUIWindow` y se puede cambiar vía **SOS.API.Emit(SOS.CommKeys.ChangeProfile, id)**.
+Interchangeable visual layout of the SOS window. You can create any visual style, for example a single-column view, a compact inspector, or a floating tool with only the essentials. It inherits from `SOS.GUI.GUIWindow` and can be changed via **SOS.API.Emit(SOS.CommKeys.ChangeProfile, id)**.
 
-Es completamente libre de modificar la apariencia por completo de la ventana.
+It is completely free to modify the appearance of the window completely.
 
-### Ejemplo de uso {#ej4}
+### Usage example {#ej4}
 
 ```csharp
 using Barotrauma;
@@ -283,11 +283,11 @@ public class CompactProfile : GUIWindow, ISOSWindowProfile
         API.On<Prefab?>(CommKeys.SelectTarget, OnTarget, EventPriority.UI);
         _eventsRegistered = true;
 
-        // Construye tu UI aquí y ponte al día con la selección actual:
+        // Build your UI here and catch up with the current selection:
         OnTarget(API.GetState<Prefab?>(CommKeys.SelectTarget));
     }
 
-    public void Update() { /* Lógica por frame: layout, input, etc... */ }
+    public void Update() { /* Per-frame logic: layout, input, etc... */ }
 
     public void Dispose()
     {
@@ -299,23 +299,23 @@ public class CompactProfile : GUIWindow, ISOSWindowProfile
 
     private void Toggle() => Visible = !Visible;
     private void Open() => Visible = true;
-    private void OnTarget(Prefab? target) { /* Reconstruye el contenido para target... */ }
+    private void OnTarget(Prefab? target) { /* Rebuilds the content for target... */ }
 }
 ```
 
-El nombre y la descripción del desplegable se resuelven desde localización (`{id}.name` / `{id}.desc`), en el `Localization/English.xml` de tu mod:
+The name and the description of the dropdown are resolved from localization (`{id}.name` / `{id}.desc`), in your mod's `Localization/English.xml`:
 
 ```xml
 <mymod.compactprofile.name>Compact Inspector</mymod.compactprofile.name>
 <mymod.compactprofile.desc>Minimalist floating window.</mymod.compactprofile.desc>
 ```
 
-Puede leer el código actual en el repositorio para más detalle.
+You can read the current code in the repository for more detail.
 
 > [!TIP]
-> Opcionalmente, puede definir *SOS.ISOSWindowProfile.ProfileConfig*, una configuracion específica para este Módulo, donde se llamará luego de guardarse el módulo SOS.ISOSConfig **WindowProfileConfig**, y dibujará su *SOS.ISOSConfig.Draw()* dentro de esta configuración en el área específica dada por esta.
+> Optionally, you can define *SOS.ISOSWindowProfile.ProfileConfig*, a specific configuration for this Module, where it will be called after the SOS.ISOSConfig **WindowProfileConfig** module is saved, and it will draw its *SOS.ISOSConfig.Draw()* inside this configuration in the specific area given by it.
 >
-> **Ejemplo de definición:**
+> **Definition example:**
 >
 > ```csharp
 > public class CompactProfile : GUIWindow, ISOSWindowProfile
@@ -327,18 +327,18 @@ Puede leer el código actual en el repositorio para más detalle.
 > }
 > ```
 >
-> Reset es afectado por **WindowProfileConfig** y el reset general.
+> Reset is affected by **WindowProfileConfig** and the general reset.
 
-## Recomendaciones y buenas prácticas
+## Recommendations and good practices
 
-NO recomendamos implementar en una misma clase varios tipos de módulos SOS, esto lo consideramos un anti-patrón y actualmente llevará a crear 2 instancias de la misma clase para cada tipo de contrato(A menos que registre manualmente una misma instancia o delegado para ambos, pero igualmente no lo recomendamos).
+We do NOT recommend implementing several types of SOS modules in the same class, we consider this an anti-pattern and currently it will lead to creating 2 instances of the same class for each type of contract(Unless you manually register the same instance or delegate for both, but we do not recommend it either).
 
 <!-- - -->
 
 > [!IMPORTANT]
-> Cada módulo SOS funciona como un builder de instancia única por defecto, lo que significa que se usa la misma instancia hasta cerrar/reabrir la ventana SOS. Téngalo en cuenta si considera guardar informacion en la clase, que esta no interfiera al ser llamada en diferentes contextos.
+> Each SOS module works as a single-instance builder by default, which means that the same instance is used until the SOS window is closed/reopened. Keep it in mind if you consider saving information in the class, that it does not interfere when being called in different contexts.
 
-## Otros recursos
+## Other resources
 
 **Next to: [Registration](registration.html)**
 
