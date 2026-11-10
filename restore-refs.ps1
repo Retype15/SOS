@@ -31,7 +31,8 @@ if (Test-Path $HashFile) {
 }
 
 Write-Host "Downloading refs from $downloadUrl ..."
-$tmpZip = "$env:TEMP\refs_$(Get-Random).zip"
+$tempDir = [System.IO.Path]::GetTempPath()
+$tmpZip = Join-Path $tempDir "refs_$(Get-Random).zip"
 try {
     Invoke-WebRequest -Uri $downloadUrl -OutFile $tmpZip
 }
