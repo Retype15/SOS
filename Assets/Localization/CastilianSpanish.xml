@@ -112,6 +112,8 @@ Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.tab.recipes.analyzing>Analizando gráfico de dependencia de recetas...</sos.tab.recipes.analyzing>
 	<sos.tab.previewpanel.title>VISTA PREVIA</sos.tab.previewpanel.title>
 	<sos.tab.previewpanel.tooltip>Muestra el sprite visual del prefab seleccionado.</sos.tab.previewpanel.tooltip>
+	<sos.tab.market.title>TIENDA</sos.tab.market.title>
+	<sos.tab.market.tooltip>Muestra lo que el puesto de avanzada actual paga por el artículo, cómo se comparan el resto de los tipos de tiendas y cómo cada facción de la campaña trataría al jugador.</sos.tab.market.tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>Alias:</sos.item.aliases>
@@ -133,6 +135,37 @@ Ejemplo: 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.item.price>Precio:</sos.item.price>
 	<sos.item.required_faction>Facción Requerida:</sos.item.required_faction>
 	<sos.item.tags>TAGS:</sos.item.tags>
+
+	<!-- Market -->
+	<sos.market.buy>Precio de Compra</sos.market.buy>
+	<sos.market.daily_special>Oferta diaria: más barata mientras dure.</sos.market.daily_special>
+	<sos.market.estimated_difficulty>Estimado: requiere una dificultad de bioma de al menos {0}%.</sos.market.estimated_difficulty>
+	<sos.market.estimated_faction>Estimado: solo se vende en puestos de avanzada de {0}.</sos.market.estimated_faction>
+	<sos.market.estimated_reputation>Estimado: requiere una reputación de al menos {0}.</sos.market.estimated_reputation>
+	<sos.market.faction_tooltip>Estimado en un puesto de avanzada del tipo de la ubicación actual, variando solo la reputación.</sos.market.faction_tooltip>
+	<sos.market.found_in_outposts>Puede encontrarse en puestos de avanzada:</sos.market.found_in_outposts>
+	<sos.market.funds>Fondos de la tienda:</sos.market.funds>
+	<sos.market.locked>Bloqueado</sos.market.locked>
+	<sos.market.locked_difficulty>Bloqueado (dif. {0}%)</sos.market.locked_difficulty>
+	<sos.market.locked_faction>Bloqueado (facción)</sos.market.locked_faction>
+	<sos.market.locked_no_trade>Bloqueado (sin comercio)</sos.market.locked_no_trade>
+	<sos.market.locked_reputation>Bloqueado (rep. {0:0})</sos.market.locked_reputation>
+	<sos.market.na>N/D</sos.market.na>
+	<sos.market.no_base_price>Sin precio base</sos.market.no_base_price>
+	<sos.market.no_trade_faction>Esta tienda no comercia con tu facción.</sos.market.no_trade_faction>
+	<sos.market.not_sold>No se acepta</sos.market.not_sold>
+	<sos.market.reputation>Reputación:</sos.market.reputation>
+	<sos.market.req_difficulty>Requiere una dificultad de bioma de al menos {0}%.</sos.market.req_difficulty>
+	<sos.market.req_faction>Solo se vende en puestos de avanzada de {0}.</sos.market.req_faction>
+	<sos.market.req_reputation>Requiere una reputación de al menos {0:0}.</sos.market.req_reputation>
+	<sos.market.requested_good>Mercancía solicitada: la tienda paga más por ella.</sos.market.requested_good>
+	<sos.market.section_factions>TARIFAS DE FACCIÓN DE CAMPAÑA</sos.market.section_factions>
+	<sos.market.section_outpost>PUESTO DE AVANZADA ACTUAL</sos.market.section_outpost>
+	<sos.market.section_stores>OTROS TIPOS DE TIENDA</sos.market.section_stores>
+	<sos.market.sell>Precio de Venta</sos.market.sell>
+	<sos.market.stock>Existencias:</sos.market.stock>
+	<sos.market.tag_demand>DEMANDA</sos.market.tag_demand>
+	<sos.market.tag_special>OFERTA</sos.market.tag_special>
 
 	<!-- Weapon -->
 	<sos.weapon.area_radius>Radio de Área:</sos.weapon.area_radius>
