@@ -1,10 +1,13 @@
 var interface_s_o_s_1_1_i_prefab_filter =
 [
-    [ "Category", "interface_s_o_s_1_1_i_prefab_filter.html#a2e98d094a280dfd8fad27c31cd9cf5f3", null ],
-    [ "General", "interface_s_o_s_1_1_i_prefab_filter.html#a2512f507b114433a2caa2a7a3dee012f", null ],
-    [ "ID", "interface_s_o_s_1_1_i_prefab_filter.html#a9021331495769ef8a6273579a99f3690", null ],
-    [ "Mod", "interface_s_o_s_1_1_i_prefab_filter.html#ae65be7aba17aa1a9c6f2a0b7ade425d2", null ],
-    [ "PrefabType", "interface_s_o_s_1_1_i_prefab_filter.html#ae18de1dfe4e9060ac288260ae0b5be3c", null ],
-    [ "Slot", "interface_s_o_s_1_1_i_prefab_filter.html#aeb6332aa9bfce2da9ce6c7336a9142dd", null ],
-    [ "Tag", "interface_s_o_s_1_1_i_prefab_filter.html#a6c1caa0adfe725246ec77b711e4c6708", null ]
+    [ "AllowsType", "interface_s_o_s_1_1_i_prefab_filter.html#a3e51d80d33dd9daa20e18a7b51df0200", null ],
+    [ "IsFavorite", "interface_s_o_s_1_1_i_prefab_filter.html#a79bf1cb3218e19d3fc66fcd4710b47a9", null ],
+    [ "Category", "interface_s_o_s_1_1_i_prefab_filter.html#ab046213c6cb6f6553c5d969c398c759d", null ],
+    [ "Favorites", "interface_s_o_s_1_1_i_prefab_filter.html#ac9275b3e4e66d98538adeef60f63ef23", null ],
+    [ "General", "interface_s_o_s_1_1_i_prefab_filter.html#a8a9193758e10bf26aa37d040e064a2bb", null ],
+    [ "ID", "interface_s_o_s_1_1_i_prefab_filter.html#a09f2dcda5acf633e9522eb8824f38fe2", null ],
+    [ "Mod", "interface_s_o_s_1_1_i_prefab_filter.html#a298eb1038c9c7aa6c1c37ced300604bd", null ],
+    [ "PrefabType", "interface_s_o_s_1_1_i_prefab_filter.html#adf46c611231fbacb1add4a5afb9fccf6", null ],
+    [ "Slot", "interface_s_o_s_1_1_i_prefab_filter.html#aaebaf72bede71fe319a69c7a87cbbbe8", null ],
+    [ "Tag", "interface_s_o_s_1_1_i_prefab_filter.html#af1d07387bcd52b8d565905e2c97f8e95", null ]
 ];

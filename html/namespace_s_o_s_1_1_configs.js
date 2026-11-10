@@ -1,5 +1,6 @@
 var namespace_s_o_s_1_1_configs =
 [
     [ "ConfigDirtySaver", "class_s_o_s_1_1_configs_1_1_config_dirty_saver.html", "class_s_o_s_1_1_configs_1_1_config_dirty_saver" ],
-    [ "ConfigHelper", "class_s_o_s_1_1_configs_1_1_config_helper.html", "class_s_o_s_1_1_configs_1_1_config_helper" ]
+    [ "ConfigHelper", "class_s_o_s_1_1_configs_1_1_config_helper.html", "class_s_o_s_1_1_configs_1_1_config_helper" ],
+    [ "ConfigServiceExt", "class_s_o_s_1_1_configs_1_1_config_service_ext.html", "class_s_o_s_1_1_configs_1_1_config_service_ext" ]
 ];

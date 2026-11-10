@@ -10,6 +10,7 @@ var class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder =
     [ "Dispose", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#aa03986836cbf1dabc6176aa376ed462f", null ],
     [ "Dropdown", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#afd3664a9e4603e66fb775300dcf1e310", null ],
     [ "Header", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#ab624b58c10ad53eb76f099f80ab9e51c", null ],
+    [ "KeyInput", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#ab514a91e86827149706d9f49d77702c9", null ],
     [ "NewDefaultRectTransform", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#ad40b4fc609945af4a6f8c4aaa84811fa", null ],
     [ "NewDefaultRectTransform", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#acb4d3b69bfb090732f2538a8f96515c6", null ],
     [ "NumberInput", "class_s_o_s_1_1_g_u_i_1_1_g_u_i_layout_builder.html#a6835e5179e674d082117819c2939b547", null ],
