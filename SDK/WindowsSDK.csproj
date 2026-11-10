@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <SdkPlatformFolder>Windows</SdkPlatformFolder>
+        <SdkMonoGameAssembly>MonoGame.Framework.Windows.NetStandard</SdkMonoGameAssembly>
+        <SdkPublishToRefs>true</SdkPublishToRefs>
+        <OutputPath>bin\Windows\</OutputPath>
+    </PropertyGroup>
+
+    <Import Project="SDK.Shared.props" />
+
+</Project>

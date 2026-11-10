@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <SdkPlatformFolder>Linux</SdkPlatformFolder>
+        <SdkMonoGameAssembly>MonoGame.Framework.Linux.NetStandard</SdkMonoGameAssembly>
+        <OutputPath>bin\Linux\</OutputPath>
+    </PropertyGroup>
+
+    <Import Project="SDK.Shared.props" />
+
+</Project>

@@ -2,7 +2,10 @@
 <ModConfig>
 
     <!-- Binaries -->
-    <Assembly File="%ModDir%/bin/Client/Shared/SOS.SDK.dll" Target="Client" />
+    <Assembly File="%ModDir%/bin/Client/Windows/SOS.SDK.dll" Target="Client" Platform="Windows" />
+    <Assembly File="%ModDir%/bin/Client/Linux/SOS.SDK.dll" Target="Client" Platform="Linux" />
+    <Assembly File="%ModDir%/bin/Client/OSX/SOS.SDK.dll" Target="Client" Platform="OSX" />
+
     <Assembly File="%ModDir%/bin/Client/Linux/SOS.dll" Target="Client" Platform="Linux" />
     <Assembly File="%ModDir%/bin/Client/OSX/SOS.dll" Target="Client" Platform="OSX" />
     <Assembly File="%ModDir%/bin/Client/Windows/SOS.dll" Target="Client" Platform="Windows" />
