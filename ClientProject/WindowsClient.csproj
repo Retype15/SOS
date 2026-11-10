@@ -58,7 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SDK\SDK.csproj" />
+    <ProjectReference Include="..\SDK\WindowsSDK.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
