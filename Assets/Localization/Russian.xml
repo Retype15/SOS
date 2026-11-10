@@ -112,6 +112,8 @@
 	<sos.tab.recipes.analyzing>Анализ зависимой граф рецептов...</sos.tab.recipes.analyzing>
 	<sos.tab.previewpanel.title>ПРЕДПРОСМОТР</sos.tab.previewpanel.title>
 	<sos.tab.previewpanel.tooltip>Показывает визуальный спрайт выбранного префаба.</sos.tab.previewpanel.tooltip>
+	<sos.tab.market.title>МАГАЗИН</sos.tab.market.title>
+	<sos.tab.market.tooltip>Показывает, сколько текущий аванпост платит за предмет, как сравниваются остальные типы магазинов и как каждая фракция кампании будет относиться к игроку.</sos.tab.market.tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>Алиасы:</sos.item.aliases>
@@ -133,6 +135,37 @@
 	<sos.item.price>Цена:</sos.item.price>
 	<sos.item.required_faction>Требуемая фракция:</sos.item.required_faction>
 	<sos.item.tags>ТЕГИ:</sos.item.tags>
+
+	<!-- Market -->
+	<sos.market.buy>Цена покупки</sos.market.buy>
+	<sos.market.daily_special>Товар дня: дешевле, пока не закончится.</sos.market.daily_special>
+	<sos.market.estimated_difficulty>Оценка: требуется сложность биома не ниже {0}%.</sos.market.estimated_difficulty>
+	<sos.market.estimated_faction>Оценка: продаётся только в аванпостах {0}.</sos.market.estimated_faction>
+	<sos.market.estimated_reputation>Оценка: требуется репутация не ниже {0}.</sos.market.estimated_reputation>
+	<sos.market.faction_tooltip>Оценка для аванпоста текущего типа, изменяется только репутация.</sos.market.faction_tooltip>
+	<sos.market.found_in_outposts>Можно найти в аванпостах:</sos.market.found_in_outposts>
+	<sos.market.funds>Средства магазина:</sos.market.funds>
+	<sos.market.locked>Заблокировано</sos.market.locked>
+	<sos.market.locked_difficulty>Заблокировано (сложн. {0}%)</sos.market.locked_difficulty>
+	<sos.market.locked_faction>Заблокировано (фракция)</sos.market.locked_faction>
+	<sos.market.locked_no_trade>Заблокировано (нет торговли)</sos.market.locked_no_trade>
+	<sos.market.locked_reputation>Заблокировано (реп. {0:0})</sos.market.locked_reputation>
+	<sos.market.na>Н/Д</sos.market.na>
+	<sos.market.no_base_price>Нет базовой цены</sos.market.no_base_price>
+	<sos.market.no_trade_faction>Этот магазин не торгует с вашей фракцией.</sos.market.no_trade_faction>
+	<sos.market.not_sold>Не принимается</sos.market.not_sold>
+	<sos.market.reputation>Репутация:</sos.market.reputation>
+	<sos.market.req_difficulty>Требуется сложность биома не ниже {0}%.</sos.market.req_difficulty>
+	<sos.market.req_faction>Продаётся только в аванпостах {0}.</sos.market.req_faction>
+	<sos.market.req_reputation>Требуется репутация не ниже {0:0}.</sos.market.req_reputation>
+	<sos.market.requested_good>Запрашиваемый товар: магазин платит за него больше.</sos.market.requested_good>
+	<sos.market.section_factions>СТАВКИ ФРАКЦИЙ КАМПАНИИ</sos.market.section_factions>
+	<sos.market.section_outpost>ТЕКУЩИЙ АВАНПОСТ</sos.market.section_outpost>
+	<sos.market.section_stores>ДРУГИЕ ТИПЫ МАГАЗИНОВ</sos.market.section_stores>
+	<sos.market.sell>Цена продажи</sos.market.sell>
+	<sos.market.stock>Запас:</sos.market.stock>
+	<sos.market.tag_demand>СПРОС</sos.market.tag_demand>
+	<sos.market.tag_special>АКЦИЯ</sos.market.tag_special>
 
 	<!-- Weapon -->
 	<sos.weapon.area_radius>Радиус области:</sos.weapon.area_radius>

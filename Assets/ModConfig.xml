@@ -15,5 +15,8 @@
 
     <!-- Per-Profile Settings -->
     <Config File="%ModDir%/Config/SettingsTCPClient.xml" Target="Client" />
+
+    <!-- Market Tab Settings-->
+    <Config File="%ModDir%/Config/SettingsMarket.xml" Target="Client" />
     
 </ModConfig>

@@ -112,6 +112,8 @@ Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.tab.recipes.analyzing>Analyse du graphique de dépendance des recettes...</sos.tab.recipes.analyzing>
 	<sos.tab.previewpanel.title>APERÇU</sos.tab.previewpanel.title>
 	<sos.tab.previewpanel.tooltip>Affiche le sprite visuel du prefab sélectionné.</sos.tab.previewpanel.tooltip>
+	<sos.tab.market.title>MAGASIN</sos.tab.market.title>
+	<sos.tab.market.tooltip>Montre combien l'avant-poste actuel paie pour l'article, comment les autres types de magasins se comparent et comment chaque faction de campagne traiterait le joueur.</sos.tab.market.tooltip>
 
 	<!-- Items -->
 	<sos.item.aliases>Alias :</sos.item.aliases>
@@ -133,6 +135,37 @@ Exemple : 'Brain @NT #Medical $surgery %Item'</sos.window.search_tooltip>
 	<sos.item.price>Prix :</sos.item.price>
 	<sos.item.required_faction>Faction Requise :</sos.item.required_faction>
 	<sos.item.tags>TAGS :</sos.item.tags>
+
+	<!-- Market -->
+	<sos.market.buy>Prix d'achat</sos.market.buy>
+	<sos.market.daily_special>Offre du jour : moins cher tant que ça dure.</sos.market.daily_special>
+	<sos.market.estimated_difficulty>Estimation : nécessite une difficulté de biome d'au moins {0} %.</sos.market.estimated_difficulty>
+	<sos.market.estimated_faction>Estimation : vendu uniquement dans les avant-postes de {0}.</sos.market.estimated_faction>
+	<sos.market.estimated_reputation>Estimation : nécessite une réputation d'au moins {0}.</sos.market.estimated_reputation>
+	<sos.market.faction_tooltip>Estimation dans un avant-poste du type de lieu actuel, en ne faisant varier que la réputation.</sos.market.faction_tooltip>
+	<sos.market.found_in_outposts>Peut être trouvé dans les avant-postes :</sos.market.found_in_outposts>
+	<sos.market.funds>Fonds du magasin :</sos.market.funds>
+	<sos.market.locked>Verrouillé</sos.market.locked>
+	<sos.market.locked_difficulty>Verrouillé (diff. {0} %)</sos.market.locked_difficulty>
+	<sos.market.locked_faction>Verrouillé (faction)</sos.market.locked_faction>
+	<sos.market.locked_no_trade>Verrouillé (hors commerce)</sos.market.locked_no_trade>
+	<sos.market.locked_reputation>Verrouillé ({0:0} rép.)</sos.market.locked_reputation>
+	<sos.market.na>N/D</sos.market.na>
+	<sos.market.no_base_price>Aucun prix de base</sos.market.no_base_price>
+	<sos.market.no_trade_faction>Ce magasin ne commerce pas avec votre faction.</sos.market.no_trade_faction>
+	<sos.market.not_sold>Non accepté</sos.market.not_sold>
+	<sos.market.reputation>Réputation :</sos.market.reputation>
+	<sos.market.req_difficulty>Nécessite une difficulté de biome d'au moins {0} %.</sos.market.req_difficulty>
+	<sos.market.req_faction>Vendu uniquement dans les avant-postes de {0}.</sos.market.req_faction>
+	<sos.market.req_reputation>Nécessite une réputation d'au moins {0:0}.</sos.market.req_reputation>
+	<sos.market.requested_good>Marchandise demandée : le magasin la paie plus cher.</sos.market.requested_good>
+	<sos.market.section_factions>TAUX DES FACTIONS DE CAMPAGNE</sos.market.section_factions>
+	<sos.market.section_outpost>AVANT-POSTE ACTUEL</sos.market.section_outpost>
+	<sos.market.section_stores>AUTRES TYPES DE MAGASINS</sos.market.section_stores>
+	<sos.market.sell>Prix de vente</sos.market.sell>
+	<sos.market.stock>Stock :</sos.market.stock>
+	<sos.market.tag_demand>DEMANDE</sos.market.tag_demand>
+	<sos.market.tag_special>PROMO</sos.market.tag_special>
 
 	<!-- Weapon -->
 	<sos.weapon.area_radius>Rayon de zone :</sos.weapon.area_radius>

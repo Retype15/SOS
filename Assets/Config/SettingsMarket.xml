@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Client-only settings -->
+<Configuration>
+    <Settings>
+
+        <!-- Market tab section collapsion state -->
+        <Setting Name="MarketOutpostCollapsed" Type="bool" Value="false" ShowInMenus="false" />
+        <Setting Name="MarketStoresCollapsed" Type="bool" Value="false" ShowInMenus="false" />
+        <Setting Name="MarketFactionsCollapsed" Type="bool" Value="false" ShowInMenus="false" />
+    </Settings>
+</Configuration>

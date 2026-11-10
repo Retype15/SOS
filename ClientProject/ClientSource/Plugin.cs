@@ -26,6 +26,7 @@ namespace SOS
                 controller = SOSController.Instance;
                 API.RegisterConfig(() => CoreConfig.Instance, CoreConfig.ID, 1);
                 API.RegisterConfig(() => WindowProfileConfig.Instance, WindowProfileConfig.ID, 0);
+                API.RegisterConfig(() => MarketConfig.Instance, MarketConfig.ID, 2);
 
 #if DEBUG
                 API.RegisterConfig(() => TestGUILayoutBuilderOnConfigs.Instance, TestGUILayoutBuilderOnConfigs.ID, 1);
