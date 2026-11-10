@@ -62,7 +62,7 @@ Search by Name, ID, Category, Tags, ModName, ItemType, and other filters.
 [i]Example:[/i] [code]Brain @NT #Medical $surgery %Item[/code]
 
 [h2][NEW] For Modders[/h2]
-S.O.S. can now be extended: other mods can add inspector tabs, wiki sections, new browser data providers, their own settings and even full window layouts, in both C# and Lua. You can follow the modding guide to get started.
+S.O.S. can now be extended: other mods can add inspector tabs, wiki sections, new browser data providers, their own settings and even full window layouts, in both C# and Lua. You can follow the modding guide to get started. See [url=https://retype15.github.io/SOS/html]This guide[/url].
 
 [h2]Other Plugins[/h2]
 [h3]Official Plugins[/h3]
