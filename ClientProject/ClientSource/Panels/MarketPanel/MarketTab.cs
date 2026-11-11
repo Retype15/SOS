@@ -44,6 +44,7 @@ namespace SOS.Panels.MarketPanel
         private double _nextPollTime;
         private Location? _lastLocation;
         private int _columnCount;
+        private int _purchasedUnits;
 
         public bool CanHandle(Prefab prefab)
             => prefab is ItemPrefab item && (item.DefaultPrice != null || item.StorePrices is { Count: > 0 });
@@ -163,7 +164,12 @@ namespace SOS.Panels.MarketPanel
             _nextPollTime = Timing.TotalTime + PollInterval;
 
             Location? location = GameMain.GameSession?.Map?.CurrentLocation;
-            if (location != _lastLocation || GetColumnCount() != _columnCount) { Refresh(); }
+            if (location != _lastLocation ||
+                CountPurchasedUnits(location) != _purchasedUnits ||
+                GetColumnCount() != _columnCount)
+            {
+                Refresh();
+            }
         }
 
         private void Refresh()
@@ -175,6 +181,7 @@ namespace SOS.Panels.MarketPanel
             Location? location = GameMain.GameSession?.Map?.CurrentLocation;
             _lastLocation = location;
             _columnCount = GetColumnCount();
+            _purchasedUnits = CountPurchasedUnits(location);
 
             _outpostSection.Title.Text = BuildOutpostTitle(location);
 
@@ -302,6 +309,18 @@ namespace SOS.Panels.MarketPanel
             int width = _cardsListBox?.Rect.Width ?? 0;
             if (width <= 0) { width = MinCardWidth * 2; }
             return Math.Clamp(width / MinCardWidth, 1, MaxColumns);
+        }
+
+        private int CountPurchasedUnits(Location? location)
+        {
+            if (location?.Stores == null || CurrentItem is not ItemPrefab item) { return 0; }
+            if ((GameMain.GameSession?.Campaign as CampaignMode)?.CargoManager is not CargoManager cargo) { return 0; }
+
+            int purchased = 0;
+            foreach (var (_, store) in location.Stores)
+                purchased += cargo.GetPurchasedItemCount(store, item);
+
+            return purchased;
         }
 
         private static string BuildOutpostTitle(Location? location)

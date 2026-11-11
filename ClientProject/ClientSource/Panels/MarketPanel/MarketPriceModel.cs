@@ -70,16 +70,21 @@ namespace SOS.Panels.MarketPanel
             if (location?.Stores == null) { return quotes; }
 
             var campaign = GameMain.GameSession?.Campaign as CampaignMode;
+            var activeStores = StoreResolver.GetStoresWithLiveMerchant();
             bool canSell = item.CanBeSold;
 
             foreach (var (storeId, store) in location.Stores)
             {
+                if (!activeStores.Contains(storeId)) { continue; }
                 if (item.GetPriceInfo(store) is not PriceInfo priceInfo) { continue; }
 
                 PurchaseBlock block = GetPurchaseBlock(location, store, priceInfo, campaign);
                 int buyPrice = block == PurchaseBlock.None ? store.GetAdjustedItemBuyPrice(item, priceInfo) : 0;
                 int sellPrice = canSell ? store.GetAdjustedItemSellPrice(item, priceInfo) : 0;
                 var (icon, iconColor) = StoreResolver.ResolveMerchantVisuals(storeId);
+
+                int stock = store.Stock.FirstOrDefault(entry => entry.ItemPrefabIdentifier == item.Identifier)?.Quantity ?? 0;
+                int purchased = campaign?.CargoManager?.GetPurchasedItemCount(store, item) ?? 0;
 
                 quotes.Add(new StoreQuote
                 {
@@ -96,7 +101,7 @@ namespace SOS.Panels.MarketPanel
                     RequiredDifficulty = priceInfo.MinLevelDifficulty,
                     RequiredFaction = priceInfo.RequiredFaction,
                     RequiredReputation = GetRequiredReputation(priceInfo, store.GetMerchantOrLocationFactionIdentifier()),
-                    Stock = store.Stock.FirstOrDefault(entry => entry.ItemPrefabIdentifier == item.Identifier)?.Quantity ?? 0,
+                    Stock = Math.Max(stock - purchased, 0),
                     Balance = store.Balance,
                     IsLive = true,
                     IsDailySpecial = store.DailySpecials.Contains(item),
