@@ -70,10 +70,12 @@ namespace SOS.Panels.MarketPanel
             if (location?.Stores == null) { return quotes; }
 
             var campaign = GameMain.GameSession?.Campaign as CampaignMode;
+            var activeStores = StoreResolver.GetStoresWithLiveMerchant();
             bool canSell = item.CanBeSold;
 
             foreach (var (storeId, store) in location.Stores)
             {
+                if (!activeStores.Contains(storeId)) { continue; }
                 if (item.GetPriceInfo(store) is not PriceInfo priceInfo) { continue; }
 
                 PurchaseBlock block = GetPurchaseBlock(location, store, priceInfo, campaign);

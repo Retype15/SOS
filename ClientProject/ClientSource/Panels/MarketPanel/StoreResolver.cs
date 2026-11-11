@@ -91,6 +91,26 @@ namespace SOS.Panels.MarketPanel
         }
 
         /// <summary>
+        /// Returns the identifiers of the stores whose merchant is spawned at the loaded outpost and
+        /// still alive.
+        /// </summary>
+        public static HashSet<Identifier> GetStoresWithLiveMerchant()
+        {
+            HashSet<Identifier> storeIds = [];
+
+            foreach (Character character in Character.CharacterList)
+            {
+                if (character.Removed || character.IsDead) { continue; }
+                if (character.CampaignInteractionType != CampaignMode.InteractionType.Store) { continue; }
+                if (character.MerchantIdentifier.IsEmpty) { continue; }
+
+                storeIds.Add(character.MerchantIdentifier);
+            }
+
+            return storeIds;
+        }
+
+        /// <summary>
         /// Resolves the icon and tint used to represent a store
         /// </summary>
         public static (Sprite? Sprite, Color Color) ResolveMerchantVisuals(Identifier storeId)
